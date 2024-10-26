@@ -3,7 +3,9 @@
 For use with the Adafruit Motor Shield v2
 ---->	http://www.adafruit.com/products/1438
 */
-#include <Arduino.h>
+
+#include <WiFi.h>
+                                   #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
@@ -36,13 +38,18 @@ const int X_pin = 0; // analog pin connected to X output
 const int Y_pin = 1; // analog pin connected to Y output
 
 // Testing
-bool outputTesting = false;
+bool outputTesting = true;
 
 // You can also make another motor on port M2
-//Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
+// Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
+const char *ssid = "your-ssid";          // Change this to your WiFi SSID
+const char *password = "your-password";  // Change this to your WiFi password
 
 void setup() {
-  Serial.begin(9600); // set up Serial library at 9600 bps
+  Serial.begin(115200); // set up Serial library at 9600 bps
+  while (!Serial) {
+    delay(100);
+  }
   Serial.println("Adafruit Motorshield v2 - DC Motor test!");
   pinMode(SW_pin, INPUT);
   digitalWrite(SW_pin, HIGH);
@@ -66,7 +73,7 @@ void HandleControlInput(int Xin, int Yin) {
 
       ForwardReverse = BACKWARD;
       forwardSpeed = 255 - ((float) Xin / (float) 512) * 255;
-    } else { // forward 
+    } else { // forward                                                      
       if (outputTesting) Serial.println("Forward");
 
       ForwardReverse = FORWARD;
@@ -123,8 +130,8 @@ void HandleSpeedControl(int Xin, int Yin) {
   if (breaking) {
     desiredL = speedL = desiredR = speedR = 0;
   } else {
-    speedL = Accelerate(desiredL, speedL);
-    speedR = Accelerate(desiredR, speedR);
+    //speedL = Accelerate(desiredL, speedL);
+    //speedR = Accelerate(desiredR, speedR);
   }
 
   ML -> setSpeed(speedL);
@@ -132,6 +139,8 @@ void HandleSpeedControl(int Xin, int Yin) {
 
   if (!breaking && outputTesting){
     Serial.println(desiredL);
+    Serial.println(desiredR);
+
     Serial.println(Xin);
     Serial.println(Yin);
     Serial.println("\n");
@@ -145,7 +154,7 @@ void loop() {
   int SWpin = digitalRead(SW_pin);
   int Xin = analogRead(X_pin);
   int Yin = analogRead(Y_pin);
-
+  
   if (state == 0) {
     // handles input of joystick controller
     HandleControlInput(Xin, Yin);
