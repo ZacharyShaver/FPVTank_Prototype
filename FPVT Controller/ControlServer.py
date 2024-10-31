@@ -1,26 +1,50 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+import time
+import socket
+import tkinter as tk
+import VisualController as vc
 
-# Server settings
-HOST = '0.0.0.0'  # Listen on all available network interfaces
-PORT = 80         # Port to listen on (HTTP uses port 80)
 
-class MyRequestHandler(SimpleHTTPRequestHandler):
-    def do_GET(self):
-        # Respond to a GET request
-        self.send_response(200)  # Send HTTP status code 200 (OK)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
-        # Send a simple HTML response
-        self.wfile.write(b"<html><body><h1>Hello from Python Web Server!</h1></body></html>")
+HOST = "0.0.0.0"
+PORT = 3333
+TIMEOUT = 1
+MAXBUF = 1024
 
-if __name__ == "__main__":
-    # Create and configure the server
-    server = HTTPServer((HOST, PORT), MyRequestHandler)
-    print(f"Server started. Listening on {HOST}:{PORT}")
-    
-    # Start the server
+
+
+print("Create UDP Server Socket")
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.settimeout(TIMEOUT)
+
+s.bind((HOST, PORT))
+
+buf = bytearray(MAXBUF)
+
+
+# Create main tkinter window
+controller = vc.get_pressed_keys()
+controller.root.update()
+
+while True:
     try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("\nServer stopped.")
-        server.server_close()
+        controller.root.update()
+        size, addr = s.recvfrom_into(buf)
+        print("Init connection with robot")
+        print("Received", buf[:size], size, "bytes from", addr)
+    except socket.timeout:
+        print("Waiting for connection...")
+        continue
+    except Exception as e:
+        print("Error: ", e)
+        continue
+    
+    while True:
+        try:
+            size = s.sendto(controller.get_keys().to_bytes(), addr)
+            print("Sent", buf[:size], size, "bytes to", addr)
+        except Exception as e:
+            print("Error: ", e)
+            controller.root.update()
+            break
+        controller.root.update()
+        time.sleep(0.1)
+
