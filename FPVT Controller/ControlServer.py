@@ -4,47 +4,51 @@ import tkinter as tk
 import VisualController as vc
 
 
-HOST = "0.0.0.0"
-PORT = 3333
-TIMEOUT = 1
-MAXBUF = 1024
+class Server:
+    def __init__(self):
+        self.HOST = "0.0.0.0"
+        self.PORT = 3333
+        self.TIMEOUT = 3
+        self.MAXBUF = 1024
+        print("Create UDP Server Socket")
+        self.socks = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socks.settimeout(self.TIMEOUT)
+        self.socks.bind((self.HOST, self.PORT))
+        self.buf = bytearray(self.MAXBUF)
 
-
-
-print("Create UDP Server Socket")
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.settimeout(TIMEOUT)
-
-s.bind((HOST, PORT))
-
-buf = bytearray(MAXBUF)
-
-
-# Create main tkinter window
-controller = vc.get_pressed_keys()
-controller.root.update()
-
-while True:
-    try:
-        controller.root.update()
-        size, addr = s.recvfrom_into(buf)
-        print("Init connection with robot")
-        print("Received", buf[:size], size, "bytes from", addr)
-    except socket.timeout:
-        print("Waiting for connection...")
-        continue
-    except Exception as e:
-        print("Error: ", e)
-        continue
-    
-    while True:
+    def connect(self):
         try:
-            size = s.sendto(controller.get_keys().to_bytes(), addr)
-            print("Sent", buf[:size], size, "bytes to", addr)
+            self.size, self.addr = self.socks.recvfrom_into(self.buf)
+            print("Init connection with robot")
+            print("Received", self.buf[:self.size], self.size, "bytes from", self.addr)
+            return True
+        except socket.timeout:
+            print("Waiting for connection...")
+            return False
         except Exception as e:
             print("Error: ", e)
-            controller.root.update()
-            break
-        controller.root.update()
-        time.sleep(0.1)
+            return False
 
+    def send(self, data):
+        try:
+            self.size = self.socks.sendto(data, self.addr)
+            print("Sent", self.buf[:self.size], self.size, "bytes to", self.addr)
+            return True
+        except Exception as e:
+            print("Error: ", e)
+            return False
+        
+    def close(self):
+        self.socks.close()
+
+controller = vc.get_pressed_keys()
+controller.root.update()
+connected = False
+s = Server()
+while True:
+    controller.root.update()
+    if not connected:
+        connected = s.connect()
+    if controller.get_keys() != 0: s.send(controller.keybyte.to_bytes())
+    time.sleep(0.08)
+    
