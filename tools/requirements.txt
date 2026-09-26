@@ -1,0 +1,11 @@
+# For tools/ and head-v2/{fixes,checks}. On Zach's machine these are installed in `python`
+# (the Microsoft Store Python 3.10). The generator's own list is in its folder: requirements-cad.txt.
+#
+#   python -m pip install -r tools/requirements.txt
+#
+numpy
+cadquery            # OpenCascade (OCP): exact solids, booleans, STEP (~400 MB)
+pymeshlab           # mesh report, needle repair
+scikit-image        # the generator imports it (marching cubes)
+matplotlib          # picture sheets
+pillow              # renders
