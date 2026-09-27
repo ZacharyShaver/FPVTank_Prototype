@@ -53,10 +53,12 @@ PAN_RATIO = 2.0                              # 2:1 step-up: the drum turns twice
 PARTS = [
     ('well', os.path.join(GEN, 'pan-coil-b', 'fusion', 'well.obj'), 'base', (163, 168, 162)),
     ('gear_bay', os.path.join(GEN, 'pan-coil-b', 'fusion', 'bay.obj'), 'base', (180, 184, 178)),
+    ('gear_floor', os.path.join(GEN, 'pan-coil-b', 'fusion', 'floor.obj'), 'base', (180, 184, 178)),   # set 2
     ('pan_servo', os.path.join(GEN, 'pan-coil-b', 'fusion', 'servo.obj'), 'base', (40, 70, 140)),
     ('bearing_6809', os.path.join(GEN, 'pan-coil-b', 'fusion', 'bearing.obj'), 'base', (150, 150, 160)),
     ('input_gear', os.path.join(GEN, 'pan-coil-b', 'fusion', 'gear_in.obj'), 'gear', (79, 174, 158)),
     ('drum', os.path.join(GEN, 'pan-coil-b', 'fusion', 'drum.obj'), 'pan', (62, 156, 143)),
+    ('small_gear', os.path.join(GEN, 'pan-coil-b', 'fusion', 'gear_out.obj'), 'pan', (79, 174, 158)),  # off the drum, set 2
     ('cradle', os.path.join(GEN, 'tree-parts-b', 'fusion', 'fork.obj'), 'pan', (216, 195, 154)),
     ('post', config.out('ball_servo_post_v3.stl'), 'pan', (200, 120, 60)),
     ('ball_plus', config.out('BODY_NUMBA1_camposts.stl'), 'tilt', (235, 235, 230)),

@@ -3,6 +3,44 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-09-27: The pan coil comes apart to go together (print set 2)
+
+Zach asked how the small gear gets into its hole. It couldn't. Set 1 (the first pan-coil print set) had
+the drum's gear moulded on, 22.6 mm across, below a 10.5 mm journal and a 17.2 mm bay top hole. The
+gear bay was a closed box, so the 43.3 mm input gear couldn't get in either. Every pair check read zero.
+In `head-v2/generator/generators/pan_coil_b.py`:
+- **The small gear is its own part** (`gear_out`). The barrel steps from r 5 to a D-shaped r 4 seat
+  below the journal (flat at 3.2, 0.15 slide per side). The gear pushes up onto it from below, clamped
+  to the step by one M3 × 8 button head through a 1.5 mm web.
+- **The gear bay's floor is a separate plate** (`floor`, below Z −32) on 4 × M2 × 6 into corner bosses.
+  Both gears go in from underneath. Holes under both axes: the M3 head turns in one, and a driver
+  reaches the horn screw through the other.
+- **The well and the gear bay print as one part** (`base`). Zach picked this over keeping them
+  separate: nothing on the well (2 mm walls, the coil behind them) could take a screw. The bay's cuts
+  are applied to the bay alone, so the servo pocket doesn't bite the bearing seat.
+
+Print-in-place (Zach's suggestion) doesn't work for the drum: the 6809 has to go onto the drum from below
+before the drum enters the well. The input gear's horn needs the open bottom anyway.
+
+Found in the same pass, before set 2 printed, and fixed:
+- **The gear pair had zero play.** It was drawn at exactly the pitch centre distance, with teeth
+  touching both flanks at every angle. `GEAR_GAP` takes 0.3 off the small gear only, so a printed
+  set-1 input gear still meshes: 1.9° of drum play as drawn.
+- **The 6809's inner race sat on the fixed ledge.** The deck ring's top was solid under both races.
+  It is relieved 0.4 deep from r 20.5 to 26.0, so only the outer race lands.
+- **Bearing fits: seat 58.1, hub 44.9.** Both were drawn at exactly 58 and 45. The values follow the
+  6704 tilt seats' +0.1 / −0.1 precedent. Untested on this bearing.
+- **The drum's bearing shoulder is a sharp step.** A 1.5 blend at the hub-to-disc corner stood ~1 mm
+  proud all the way round, where the 6809's bore edge seats (30 mm³, the first time the bearing was
+  checked against the drum).
+
+`pan_coil_b_check.py` now slides each part in along its real path (`assembly()`), and measures gear
+play (`gear_play()`) and what each race sits on (`bearing_races()`). Its negative
+control, `--broken`, puts the gear back on the drum and the floor back in the bay.
+
+**Superseded:** set 1's separate well and gear bay, and the drum with its gear moulded on
+(`head-v2/out/print-pan/superseded - set 1, can't assemble/`).
+
 ## 2026-09-27: MuJoCo for simulating the head, not Isaac Sim (for now)
 
 For moving the pan/tilt head by hand and later training on it, the head is modelled in MuJoCo

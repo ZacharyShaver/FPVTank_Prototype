@@ -71,6 +71,16 @@ BRG_OR = 29.0                      # 6809 45 x 58 x 7
 BRG_Z0 = DECK_Z1                   # -0.4
 BRG_Z1 = BRG_Z0 + 7.0              # 6.6
 BOSS_R = 31.0
+# ---- bearing fits and the inner-race relief (2026-09-27, before set 2 printed) --------------
+# Both fits were drawn at exactly the 6809's size. The 6704 tilt seats' precedent (tree_parts.py
+# BRG_OD 27.1 for 27.0, HUB_R 9.95 for 20.0): seat +0.1 on the diameter, hub -0.1.
+SEAT_BORE_R = BRG_OR + 0.05        # 29.05
+HUB_FIT_R = HUB_R - 0.05           # 22.45
+# The deck ring's top face ran solid from r 19 to 31, under BOTH races: the inner race turns with
+# the drum and was pressed onto a fixed face by the drum's own weight. Relieved 0.4 deep out to
+# r 26.0 -- between the inner race's shoulder (d1 ~49.6) and the outer's (D1 ~53.5) -- so only
+# the outer race lands on the ledge.
+RELIEF_R0, RELIEF_R1, RELIEF_D = WELL_OR + 0.5, 26.0, 0.4
 
 # ---- the merge interface with tree_parts_b -------------------------------------------
 # The nest (variant B's fork) presents a FLAT underside at BASE_Z with a Ø51 base disc, and
@@ -100,6 +110,11 @@ CENTRE = 31.0                      # set by the servo clearing the can, not by t
 R_OUT_G = CENTRE * N_OUT / (N_OUT + N_IN)   # 10.33
 R_IN_G = CENTRE - R_OUT_G                   # 20.67
 TOOTH = 1.0
+# The pair was drawn at exactly CENTRE = R_OUT_G + R_IN_G: teeth touching both flanks at every
+# angle, 0.0 deg of free play, and printed parts come out fat. All the gap goes on the small gear
+# so a printed set-1 input gear still meshes. 0.3 -> 1.9 deg of drum play as drawn (0.1 -> 0,
+# 0.2 -> 1.2), expected to print tighter. Measured by pan_coil_b_check.gear_play().
+GEAR_GAP = 0.3
 
 # The servo lies with its LONG axis along Y. The tabs stick out at the ends of that axis
 # (TAB_SPAN is measured along it), and with the body along X the far tab tip landed at
@@ -118,6 +133,31 @@ SV_YC = (SV_Y0 + SV_Y1) / 2                                     # 5.5, the tab c
 TAB_Z0 = SV_Z0 + TAB_FROM_TOP      # -18.5, the shelf the tabs land on
 G_Z1, G_Z0 = SV_Z0 - 0.5, SV_Z0 - 6.5                           # -25.5 .. -31.5
 BAY_Z0 = G_Z0 - 2.0                                             # -33.5
+
+# ---- how it goes together (2026-09-27) --------------------------------------------------
+# Zach asked how the drum's gear gets in, and it couldn't: moulded on the drum it was 22.6
+# across and had to pass the 10.5 journal and the bay's 17.2 top hole, and the bay was a
+# closed box the 43.3 input gear couldn't enter either. Every seated check read zero. Now:
+#   * the small gear is its own part, pushed up onto a D-shaped seat on the barrel's end from
+#     below and held by one M3 x 8 button head screw up the axis;
+#   * the bay's floor is a separate plate on 4 x M2 x 6, so both gears go in from below;
+#   * the well and the bay print as ONE part, `base` -- nowhere on the well could hold a screw.
+# Order: servo in through the side window; 6809 onto the drum from below; drum into the base
+# from above; input gear + horn up onto the servo shaft, horn screw; small gear up onto the
+# seat, M3; floor on.
+SEAT_R = 4.0                       # barrel steps down 5 -> 4 below the journal: the step is the gear's stop
+SEAT_FLAT = 3.2                    # the D's flat, from the axis: it carries the torque
+SLIDE = 0.15                       # per side, the gear onto the seat (the slide rule, not the horn rule)
+WEB_Z1 = G_Z0 + 1.5                # -30.0: the gear's bottom 1.5 mm is a web the screw head pulls on
+SEAT_Z0 = WEB_Z1 + 0.3             # -29.7: the seat stops short of the web so the screw clamps the step
+M3_CLEAR, M3_BUTTON_R, M3_BUTTON_H = 1.7, 2.85, 1.65
+SCREW_L = 8.0
+SPLIT_Z = BAY_Z0 + 1.5             # -32.0: floor plate below, bay above
+FLOOR_HOLE_R = 3.5                 # under each axis: the gear screw's head turns in one, a driver reaches
+                                   # the horn screw through the other
+SCREW_BOSS_R, SCREW_BOSS_H = 3.0, 5.0   # M2 bosses in the bay's four inside corners, clear of both
+                                   # gears. NOT `BOSS_R`: that is the well's r 31, and reusing the
+                                   # name silently deleted the bearing seat (2026-09-27)
 
 # rolling-loop layout, angles CCW about +Z, 0 = +X
 # Zach, 2026-09-19: the ribbon is to leave the bottom of the can at the SIDE, not off the
@@ -187,8 +227,10 @@ def well(p, features=True):
     floor = ring_z(p, JOURNAL_R, WELL_OR, FLOOR_Z, CH_Z0, 0.6)
     sleeve = ring_z(p, JOURNAL_R, JOURNAL_R + 2.75, JOURNAL_Z0, CH_Z0, 0.4)
     deck = ring_z(p, DECK_IR, BOSS_R, DECK_Z0, DECK_Z1, 0.6)
-    seat = ring_z(p, BRG_OR, BOSS_R, DECK_Z0, BRG_Z1, 0.6)
+    seat = ring_z(p, SEAT_BORE_R, BOSS_R, DECK_Z0, BRG_Z1, 0.6)
     s = U(wall, floor, deck, seat, sleeve)
+    relief = ring_z(p, RELIEF_R0, RELIEF_R1, DECK_Z1 - RELIEF_D, DECK_Z1 + 1.0, 0.0)
+    s = np.maximum(s, -relief)
     if features:
         slot = box(at_exit(p), (-WELL_OR - 2, -(RIBBON_W + 1.6) / 2, BAND_Z0 - 0.4),
                    (-WELL_IR + 1, (RIBBON_W + 1.6) / 2, BAND_Z1 + 0.4))
@@ -199,24 +241,31 @@ def well(p, features=True):
 def drum(p, features=True):
     face = cyl_z(p, 0, 0, DRUM_R, CH_Z0, 0.0)
     flange = cyl_z(p, 0, 0, FLANGE_R, CH_Z1, 0.0)
-    hub = cyl_z(p, 0, 0, HUB_R, BRG_Z0, BRG_Z1)
+    hub = cyl_z(p, 0, 0, HUB_FIT_R, BRG_Z0, BRG_Z1)
     # The stand-in trunk is GONE. Above the bearing the drum ends in a disc the size of the
     # nest's own base, and the nest bolts to it -- that is the merge. Its underside doubles
     # as the bearing's inner-race shoulder.
     mate = cyl_z(p, 0, 0, MATE_R, BRG_Z1, BASE_Z)
-    barrel = cyl_z(p, 0, 0, BARREL_R, G_Z0, CH_Z0)
-    g = gear(p, R_OUT_G, N_OUT, 0.0, G_Z0, G_Z1)
+    # The gear used to be moulded on here, and it could not pass the journal (see SEAT_R).
+    # The barrel now ends in a D-shaped seat the separate gear_out pushes onto from below.
+    barrel = cyl_z(p, 0, 0, BARREL_R, G_Z1, CH_Z0)
+    seat = np.maximum(cyl_z(p, 0, 0, SEAT_R, SEAT_Z0, G_Z1 + 0.5), p[0] - SEAT_FLAT)
     # HARD union between the three stacks, not smin. Blending the flange into the hub bulged
     # the surface to r 19.84 -- past its named 17.7 -- and 133 mm3 of it ended up inside the
     # cup wall. A bearing shoulder wants a step, not a fillet, and the same blend at the
     # barrel's root was swelling it into the journal bore. Named radius != real radius
     # wherever a smooth min is involved; cradle-audit.md section 1 made the same mistake.
-    s = U(smin(face, flange, 1.0), smin(hub, mate, 1.5), smin(barrel, g, 0.8))
+    # hub + mate HARD too (2026-09-27): smin 1.5 left a fillet r 22.5..23.45, Z 5.6..6.55 all the way
+    # round the corner the 6809's bore edge seats in -- 30 mm3 against the bearing, found the first
+    # time the bearing was checked against the drum. A 6809's bore chamfer is only ~0.3-0.6.
+    s = U(smin(face, flange, 1.0), hub, mate, barrel, seat)
     if features:
         bore = cyl_z(p, 0, 0, BORE_R, CH_Z1 - 0.5, BASE_Z + 1)
         anchor = box(p, (DRUM_R - 5.5, -(RIBBON_W + 1.0) / 2, BAND_Z0),
                      (DRUM_R + 1, (RIBBON_W + 1.0) / 2, 0.5))
-        cuts = [bore, anchor]
+        # the gear screw's pilot, 1 mm past the tip of an M3 x 8
+        pilot = cyl_z(p, 0, 0, M3_PILOT, SEAT_Z0 - 1, G_Z0 + SCREW_L + 1)
+        cuts = [bore, anchor, pilot]
         for a in np.radians(MATE_SCREWS):
             cuts.append(cyl_z(p, MATE_SCREW_R * np.cos(a), MATE_SCREW_R * np.sin(a), M3_PILOT,
                               BASE_Z - 7.0, BASE_Z + 1))
@@ -238,8 +287,13 @@ def bay(p, features=True):
     s = smin(shell, tower, 2.0)
     # Rounding 1.0, not 2.5: a fat corner radius pinches back in over the gear's top face
     # and that alone read 28 mm3 against the teeth.
-    cav = rbox(p, (-BARREL_R - 7, -tip - 1.5, BAY_Z0 + 1.5), (gx1 - 2.0, tip + 1.5, G_Z1 + 1.8), 1.0)
-    s = np.maximum(s, -cav)
+    # Open underneath since 2026-09-27: the cavity runs out through the bottom and the floor is
+    # the separate `floor` plate below SPLIT_Z, so both gears go in from below.
+    cav = rbox(p, (-BARREL_R - 7, -tip - 1.5, BAY_Z0 - 2.0), (gx1 - 2.0, tip + 1.5, G_Z1 + 1.8), 1.0)
+    s = np.maximum(np.maximum(s, -cav), SPLIT_Z - p[2])
+    s = U(s, *[cyl_z(p, x, y, SCREW_BOSS_R, SPLIT_Z, SPLIT_Z + SCREW_BOSS_H) for x, y in floor_screws()])
+    s = np.maximum(s, -U(*[cyl_z(p, x, y, M2_PILOT, SPLIT_Z - 1, SPLIT_Z + SCREW_BOSS_H + 0.5)
+                           for x, y in floor_screws()]))
     if not features:
         return s
     # Zach, 2026-09-19: a window in the side so the servo slips in rather than dropping from
@@ -267,6 +321,52 @@ def bay(p, features=True):
     return np.maximum(s, -U(*cuts))
 
 
+def floor_screws():
+    """The four M2s, one in each inside corner of the gear cavity, 1.8 in from both walls."""
+    tip = R_IN_G + TOOTH
+    x0, x1, y1 = -BARREL_R - 7 + 1.8, CENTRE + tip + 3.5 - 2.0 - 1.8, tip + 1.5 - 1.8
+    return [(x0, -y1), (x0, y1), (x1, -y1), (x1, y1)]
+
+
+def floor(p, features=True):
+    """The bay's old floor, now a plate on four M2 x 6. Holes under both axes."""
+    tip = R_IN_G + TOOTH
+    shell = rbox(p, (-BARREL_R - 9, -tip - 4, BAY_Z0), (CENTRE + tip + 3.5, tip + 4, FLOOR_Z), 3.0)
+    s = np.maximum(shell, p[2] - SPLIT_Z)
+    if not features:
+        return s
+    cuts = [cyl_z(p, x, y, M2_CLEAR, BAY_Z0 - 1, SPLIT_Z + 1) for x, y in floor_screws()]
+    cuts += [cyl_z(p, x, 0, FLOOR_HOLE_R, BAY_Z0 - 1, SPLIT_Z + 1) for x in (0.0, CENTRE)]
+    return np.maximum(s, -U(*cuts))
+
+
+def base(p, features=True):
+    """The printed fixed part: the well and the bay fused. Each keeps its own cuts, so the
+    servo pocket does not bite the well's bearing seat."""
+    return U(well(p, features), bay(p, features))
+
+
+def gear_out(p, features=True):
+    """The drum's gear, off the drum since 2026-09-27. D bore onto the barrel's seat from
+    below, a web at the bottom for the M3 head to pull up on."""
+    s = gear(p, R_OUT_G - GEAR_GAP, N_OUT, 0.0, G_Z0, G_Z1)
+    s = np.maximum(s, np.maximum(G_Z0 - p[2], p[2] - G_Z1))
+    if not features:
+        return s
+    d = np.maximum(cyl_z(p, 0, 0, SEAT_R + SLIDE, WEB_Z1, G_Z1 + 1), p[0] - SEAT_FLAT - SLIDE)
+    hole = cyl_z(p, 0, 0, M3_CLEAR, G_Z0 - 1, WEB_Z1 + 0.1)
+    return np.maximum(s, -U(d, hole))
+
+
+def screw_out(p, features=True):
+    """The M3 x 8 button head holding gear_out, as hardware for the checks."""
+    head = cyl_z(p, 0, 0, M3_BUTTON_R, G_Z0 - M3_BUTTON_H, G_Z0)
+    # Shank drawn at the pilot's radius: the thread cutting into the drum is meant, and at 1.5
+    # it reads 16 mm3 against the drum in every check.
+    shank = cyl_z(p, 0, 0, M3_PILOT, G_Z0, G_Z0 + SCREW_L)
+    return U(head, shank)
+
+
 def servo(p, features=True):
     body = rbox(p, (SV_X0, SV_Y0, SV_Z0), (SV_X1, SV_Y1, SV_Z1), 1.0)
     tabs = rbox(p, (SV_X0, SV_YC - TAB_SPAN / 2, TAB_Z0), (SV_X1, SV_YC + TAB_SPAN / 2, TAB_Z0 + TAB_T), 0.8)
@@ -288,6 +388,9 @@ def gear_in(p, features=True):
     hub = cyl_z(p, CENTRE, 0, 5.0, G_Z0, G_Z1)     # flush both ends: hanging 1.5 below put
                                                    # it through the bay's floor, 28 mm3 of it
     s = smin(g, hub, 0.8)
+    # Trim both faces flat: the smooth min bulged ~0.2 below G_Z0 round the hub, so the gear sat on
+    # a ring and its face floated 0.05-0.3 mm off the bed (2026-09-27, print check).
+    s = np.maximum(s, np.maximum(G_Z0 - p[2], p[2] - G_Z1))
     if not features:
         return s
     # ZERO offset on the horn pocket -- Zach's method, 2026-09-19: subtract the horn's own
@@ -333,6 +436,15 @@ PARTS = {
     'gear_in':  (gear_in,  (CENTRE - R_IN_G - 3, -R_IN_G - 3, G_Z0 - 3),
                            (CENTRE + R_IN_G + 3, R_IN_G + 3, G_Z1 + 2), 0.28, 11500),
     'bearing':  (bearing,  (-30, -30, BRG_Z0 - 1), (30, 30, BRG_Z1 + 1), 0.26, 7000),
+    # 2026-09-27: what prints is base (= well + bay), floor and gear_out; well and bay stay as
+    # separate meshes for the viewer, the sim and the pair checks.
+    'base':     (base,     (-33, -33, BAY_Z0 - 1),
+                           (CENTRE + R_IN_G + 10, 33, BRG_Z1 + 1), 0.34, 60000),
+    'floor':    (floor,    (-17, -R_IN_G - 7, BAY_Z0 - 1), (CENTRE + R_IN_G + 7, R_IN_G + 7, SPLIT_Z + 1),
+                           0.25, 12000),
+    'gear_out': (gear_out, (-R_OUT_G - 3, -R_OUT_G - 3, G_Z0 - 1), (R_OUT_G + 3, R_OUT_G + 3, G_Z1 + 1),
+                           0.20, 9000),
+    'screw_out': (screw_out, (-4, -4, G_Z0 - M3_BUTTON_H - 1), (4, 4, G_Z0 + SCREW_L + 1), 0.20, 3000),
     'twist_gap': (twist_short, (-11, -11, TWIST_HAVE - 1), (11, 11, TWIST_NEED + 1), 0.30, 5000),
 }
 

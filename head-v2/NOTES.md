@@ -40,8 +40,11 @@ As of 2026-09-27.
 - **Seam screw heads in the generator:** `tree_parts_b.py` still has the screw-pocket bug. Moot for
   printing (the ball is Zach's model, with snap pins), but it matters if the generator's ball is used.
 - **The generator doesn't have Zach's revision.** Porting it was offered and hasn't been answered.
-- **Pan coil test print (2026-09-27):** the cradle bolts onto the drum now (`docs/decisions.md`). The
-  test set is `out/print-pan/` (`fixes/pan_print_set.py`): cradle, drum, well, gear bay, input gear, a
-  3MF plate and a README. **Printing since 2026-09-27**: ask Zach what fit before changing any of it. Open: the input gear's horn pocket is a placeholder (Zach
-  re-cuts it in Fusion); the ribbon thickness is uncalipered; where the fixed base screws to the tank
-  is undecided (the old deck screws sat under the bearing, brief §6.3).
+- **Pan coil test print, set 2 (2026-09-27):** the cradle bolts onto the drum (`docs/decisions.md`).
+  Set 1 couldn't be assembled (the gear moulded on the drum, the gear bay closed). Set 2, in
+  `out/print-pan/` (`fixes/pan_print_set.py`), fuses the well and the gear bay into `base`, takes the
+  bay's floor off as a plate, and makes the drum's gear its own part. Zach was part-way through printing
+  set 1 (the well half done) when this was found; the cradle and the input gear carry over. Ask what
+  fit before changing any of it. Open: the input gear's horn pocket is a placeholder (Zach re-cuts it in
+  Fusion; the servo's shaft must end inside the horn); the ribbon thickness is uncalipered; where the
+  base screws to the tank is undecided (the old deck screws sat under the bearing, brief §6.3).
