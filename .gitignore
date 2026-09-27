@@ -5,3 +5,4 @@ __pycache__/
 reference/downloads/
 _incoming/
 .claude/settings.local.json
+head-v2/generator/*/print/

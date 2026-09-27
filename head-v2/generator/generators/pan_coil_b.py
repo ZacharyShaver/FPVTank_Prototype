@@ -1,0 +1,378 @@
+"""Pan coil for variant B: a rolling loop in a flat can, sunk in the stump, 360 deg of pan.
+
+The item tree-parts-b/HANDOFF.md left open as section 0.3. Sized from the brief in
+../pan-coil-360-brief.md, which carries the reasoning; this file carries the geometry.
+
+Differences from variant C's pan_coil.py, and why:
+
+  * the pan servo is OFF-AXIS, driving a 2:1 step-up. That is what lets the drum shrink
+    from r 21.5 to r 12 -- travel goes as 1/r_inner, so a small drum buys turns per mm of
+    ribbon. Can outside diameter drops 60 -> 40 and the coil spends 70 mm instead of 115.
+  * the servo therefore sits BESIDE the can at deck level, not inside it, and only the
+    gear plane is below the can floor. Stump depth 31 mm, not the 47 a servo-under-the-can
+    bay would have cost.
+  * the ribbon rises ON AXIS above the drum's flange: below the flange the barrel is solid
+    down to the gear, above it the hub is a bore. A FIXED lid cannot be crossed by a ribbon
+    at a rotating radius, so the drum's own flange is the chamber's top cover -- the same
+    conclusion pan_coil.py reached with its thrust flange.
+
+  travel (rad) = L * (1/ri + 1/ro)     L = ribbon length inside the can
+
+Frame: mm, Z 0 at the deck top, pan axis at the origin, X forward. Matches tree_parts_b.
+
+    python pan_coil_b.py [part ...]
+"""
+import os, json, base64
+import numpy as np
+from skimage import measure
+import tree_parts as A
+from tree_parts import (smin, box, rbox, _cyl, cyl_z, U, ring_z, sample, project,
+                        decimate, report, quiet)
+
+OUT = os.path.join(A.D, '..', 'pan-coil-b')
+
+# ------------------------------------------------------------------ the ribbon
+RIBBON_W = 16.0                    # MEASURED 2026-09-18
+RIBBON_T = 0.2                     # Zach, "two sheets of paper" -- ASSUMED, wants calipers
+DRAW_T = 0.6                       # the coil is DRAWN this thick so it renders; it is 0.2
+MIN_BEND_R = 10 * RIBBON_T         # 2.0
+
+# ------------------------------------------------------------------ the can
+DRUM_R = 12.0                      # coil face: bore 18 for the twist + 3 wall, once the
+                                   # ribbon rises on axis rather than through the barrel
+GAP = 6.0
+WELL_IR = DRUM_R + GAP             # 18.0  -> cavity 36
+WELL_OR = WELL_IR + 2.0            # 20.0  -> can 40
+CLR = 0.25
+RI = DRUM_R + RIBBON_T / 2 + CLR   # 12.35  inner layer centreline
+RO = WELL_IR - RIBBON_T / 2 - CLR  # 17.65  outer layer centreline
+U_R = (RO - RI) / 2                # 2.65   -- against MIN_BEND_R 2.0
+L_CAN = 70.0                       # ribbon inside the can
+TRAVEL = L_CAN * (1 / RI + 1 / RO) # rad -- 540 deg of mechanism, software limited to 360
+
+CH_Z0, CH_Z1 = -20.0, -2.0         # chamber
+BAND_Z0, BAND_Z1 = -19.0, -3.0     # where the 16 mm ribbon sits
+FLOOR_Z = -22.0
+
+# ------------------------------------------------------------- above the deck
+# FLANGE_R was 19.6 and ploughed 270 mm3 through the deck ring, which starts at 19.0.
+# Zach saw the servo clash by eye; the check written afterwards found this one too.
+FLANGE_R = 17.7                    # the drum's own top cover, 0.3 inside the cup wall
+DECK_IR = 19.0                     # deck plate inner radius, 1.3 clear of the flange
+DECK_Z0, DECK_Z1 = -2.4, -0.4      # 0.4 of axial air under the rotating hub
+BORE_R = 9.0                       # 18 bore: the twist run, rule 3
+HUB_R = 22.5                       # 6809 bearing ID
+BRG_OR = 29.0                      # 6809 45 x 58 x 7
+# The bearing had NO SHOULDER. Its outer race now rests on the deck ring's top face and the
+# mating disc's underside bears down on the inner race, so the load path is
+#   drum -> disc -> inner race -> balls -> outer race -> well ledge.
+# Before this the inner race had nothing under it at r 22.5..26 and would have dropped 0.4 mm
+# onto the FIXED deck ring -- a rotating race grinding on a stationary part.
+BRG_Z0 = DECK_Z1                   # -0.4
+BRG_Z1 = BRG_Z0 + 7.0              # 6.6
+BOSS_R = 31.0
+
+# ---- the merge interface with tree_parts_b -------------------------------------------
+# The nest (variant B's fork) presents a FLAT underside at BASE_Z with a Ø51 base disc, and
+# it used to land on `roots` and a pan horn. In the merged part `roots` is gone: the drum
+# carries a matching disc and the nest bolts straight to it. Taken from tree_parts.py, not
+# retyped -- these numbers move if that file moves.
+BASE_Z, MATE_R = A.BASE_Z, A.PED_R           # 10.5 nest underside, 25.5 its base radius
+MATE_SCREW_R, MATE_SCREWS = 20.0, [0.0, 120.0, 240.0]
+M3_PILOT = 1.25
+BALL_UNDER = 21.3                  # tree_parts_b: H 52.0 - R_BALL 30.7
+
+TWIST_NEED = 40.0                  # ~40 mm of run per 90 deg for a 16 mm ribbon
+TWIST_HAVE = BALL_UNDER            # from the flange top (Z 0) to the ball's underside
+
+# ------------------------------------------------------------------ the drive
+# ---- second support, because one bearing is not enough --------------------------------
+# 159.6 g rotating with its CG 46.1 mm above the deck (measured off the variant B meshes,
+# plus servo/camera/bearings). Static tipping is only 4.6 N.mm, so strength is not the
+# question -- ANGULAR COMPLIANCE is. A single 6809 resists tilt over its 7 mm width, so
+# 0.10 mm of printed seat slop becomes 1.64 deg and 2.27 mm of sway at the top of the ball.
+# Running the barrel in a journal 24 mm lower takes the same slop to 0.48 deg and 0.66 mm.
+BARREL_R = 5.0
+JOURNAL_R = BARREL_R + 0.25        # 5.25 bore around the 10 mm barrel
+JOURNAL_Z0 = -25.0                 # 5 mm of sleeve, clearing the output gear by 0.5
+N_OUT, N_IN = 20, 40               # 2:1 step-up
+CENTRE = 31.0                      # set by the servo clearing the can, not by the gears
+R_OUT_G = CENTRE * N_OUT / (N_OUT + N_IN)   # 10.33
+R_IN_G = CENTRE - R_OUT_G                   # 20.67
+TOOTH = 1.0
+
+# The servo lies with its LONG axis along Y. The tabs stick out at the ends of that axis
+# (TAB_SPAN is measured along it), and with the body along X the far tab tip landed at
+# X 20.25 -- 0.25 mm outside the cup. Turned 90 deg it clears by 4.9.
+SW, SL, S2S = A.SERVO_W, A.SERVO_L, A.SHAFT_TO_END              # 12.2, 22.8, 5.9
+TAB_SPAN, TAB_FROM_TOP, TAB_PITCH = A.TAB_SPAN, A.TAB_FROM_TOP, A.TAB_PITCH   # 32.5, 6.5, 27.5
+TAB_T = 3.0                                                     # MEASURED by Zach 2026-09-18
+FIT, M2_PILOT, M2_CLEAR, M2_HEAD = A.FIT, A.M2_PILOT, A.M2_CLEAR, A.M2_HEAD
+HORN_L, HORN_W, HORN_C, HORN_D = A.HORN_L, A.HORN_W, A.HORN_C, A.HORN_D   # GENERIC -- see below
+HORN_ROOF = 1.5                    # material between the screw head and the horn
+SV_Z1 = DECK_Z0 - 0.1              # body top, tucked under the deck plate
+SV_Z0 = SV_Z1 - SL                 # -25.0: the shaft face, pointing DOWN
+SV_X0, SV_X1 = CENTRE - SW / 2, CENTRE + SW / 2                 # 24.9 .. 37.1
+SV_Y0, SV_Y1 = -S2S, SL - S2S                                   # -5.9 .. 16.9
+SV_YC = (SV_Y0 + SV_Y1) / 2                                     # 5.5, the tab centre
+TAB_Z0 = SV_Z0 + TAB_FROM_TOP      # -18.5, the shelf the tabs land on
+G_Z1, G_Z0 = SV_Z0 - 0.5, SV_Z0 - 6.5                           # -25.5 .. -31.5
+BAY_Z0 = G_Z0 - 2.0                                             # -33.5
+
+# rolling-loop layout, angles CCW about +Z, 0 = +X
+# Zach, 2026-09-19: the ribbon is to leave the bottom of the can at the SIDE, not off the
+# front or wrapped round. -90 is the -Y side, picked over +Y because the servo tower sits
+# there. Flip this one number to move it to the other side; nothing else needs touching --
+# travel does not depend on where the fixed anchor is, only on L, ri and ro. Once out of
+# the wall the ribbon can turn aft freely: that is a bend in its own plane, not a crease.
+EXIT_DEG = -90.0
+A_FIX = np.radians(EXIT_DEG)       # fixed anchor / wall exit
+
+
+def at_exit(p):
+    """Evaluate a shape drawn pointing at 180 deg as if it pointed at EXIT_DEG."""
+    a = np.pi - A_FIX
+    ca, sa = np.cos(a), np.sin(a)
+    return (p[0] * ca - p[1] * sa, p[0] * sa + p[1] * ca, p[2])
+
+
+def arc_band(p, R, a0, a1, half_t, z0, z1):
+    """A thin arc of radius R spanning [a0, a1] (a1 > a0, span < 2pi), as a band in Z."""
+    x, y = p[0], p[1]
+    r = np.hypot(x, y)
+    d = np.mod(np.arctan2(y, x) - a0, 2 * np.pi)
+    inside = d <= (a1 - a0)
+    e0 = np.hypot(x - R * np.cos(a0), y - R * np.sin(a0))
+    e1 = np.hypot(x - R * np.cos(a1), y - R * np.sin(a1))
+    d2 = np.where(inside, np.abs(r - R), np.minimum(e0, e1))
+    return _cyl(d2 - half_t, np.abs(p[2] - (z0 + z1) / 2) - (z1 - z0) / 2)
+
+
+def loop_angles(pan_deg=0.0):
+    """Drum anchor, U, at a pan angle. Length is conserved: L = ro(tU-tf) + ri(tU-ta)."""
+    tU_mid = A_FIX + L_CAN / (2 * RO)
+    ta_mid = tU_mid - L_CAN / (2 * RI)
+    ta = ta_mid + np.radians(pan_deg)
+    tU = (L_CAN + RO * A_FIX + RI * ta) / (RO + RI)
+    return ta, tU
+
+
+def ribbon(p, features=True, pan_deg=0.0):
+    ta, tU = loop_angles(pan_deg)
+    h = DRAW_T / 2
+    outer = arc_band(p, RO, A_FIX, tU, h, BAND_Z0, BAND_Z1)
+    inner = arc_band(p, RI, ta, tU, h, BAND_Z0, BAND_Z1)
+    cx, cy = (RO + RI) / 2 * np.cos(tU), (RO + RI) / 2 * np.sin(tU)
+    d2 = np.abs(np.hypot(p[0] - cx, p[1] - cy) - U_R) - h
+    turn = _cyl(d2, np.abs(p[2] - (BAND_Z0 + BAND_Z1) / 2) - (BAND_Z1 - BAND_Z0) / 2)
+    tail = box(at_exit(p), (-WELL_OR - 12, -h, BAND_Z0), (-RO, h, BAND_Z1))   # out the side
+    return U(outer, inner, turn, tail)
+
+
+def gear(p, R, n, x0, z0, z1, phase=0.0):
+    a = np.arctan2(p[1], p[0] - x0) * n + phase
+    rr = R + TOOTH * np.cos(a)
+    return _cyl(np.hypot(p[0] - x0, p[1]) - rr, np.abs(p[2] - (z0 + z1) / 2) - (z1 - z0) / 2)
+
+
+def well(p, features=True):
+    # Hard union, not smin. These four rings genuinely overlap, and blending them left a
+    # sub-resolution film between the cup and the bearing seat: 45 bodies and a decimator
+    # stalled at 304k faces against a 16k target, with the solid itself fine. Same class of
+    # fault as ../../lessons/2026-09-19-coincident-faces-and-insertion.md -- read the face
+    # count, not just watertight/manifold.
+    # The cup wall stops 0.4 BELOW the hub, not level with it. Taken to Z 0 it shared
+    # Z -0.4..0 with the rotating hub's r 22.5 -- 60 mm3, and a rubbing face even at zero.
+    wall = ring_z(p, WELL_IR, WELL_OR, FLOOR_Z, DECK_Z1 - 0.4, 0.6)
+    floor = ring_z(p, JOURNAL_R, WELL_OR, FLOOR_Z, CH_Z0, 0.6)
+    sleeve = ring_z(p, JOURNAL_R, JOURNAL_R + 2.75, JOURNAL_Z0, CH_Z0, 0.4)
+    deck = ring_z(p, DECK_IR, BOSS_R, DECK_Z0, DECK_Z1, 0.6)
+    seat = ring_z(p, BRG_OR, BOSS_R, DECK_Z0, BRG_Z1, 0.6)
+    s = U(wall, floor, deck, seat, sleeve)
+    if features:
+        slot = box(at_exit(p), (-WELL_OR - 2, -(RIBBON_W + 1.6) / 2, BAND_Z0 - 0.4),
+                   (-WELL_IR + 1, (RIBBON_W + 1.6) / 2, BAND_Z1 + 0.4))
+        s = np.maximum(s, -slot)
+    return s
+
+
+def drum(p, features=True):
+    face = cyl_z(p, 0, 0, DRUM_R, CH_Z0, 0.0)
+    flange = cyl_z(p, 0, 0, FLANGE_R, CH_Z1, 0.0)
+    hub = cyl_z(p, 0, 0, HUB_R, BRG_Z0, BRG_Z1)
+    # The stand-in trunk is GONE. Above the bearing the drum ends in a disc the size of the
+    # nest's own base, and the nest bolts to it -- that is the merge. Its underside doubles
+    # as the bearing's inner-race shoulder.
+    mate = cyl_z(p, 0, 0, MATE_R, BRG_Z1, BASE_Z)
+    barrel = cyl_z(p, 0, 0, BARREL_R, G_Z0, CH_Z0)
+    g = gear(p, R_OUT_G, N_OUT, 0.0, G_Z0, G_Z1)
+    # HARD union between the three stacks, not smin. Blending the flange into the hub bulged
+    # the surface to r 19.84 -- past its named 17.7 -- and 133 mm3 of it ended up inside the
+    # cup wall. A bearing shoulder wants a step, not a fillet, and the same blend at the
+    # barrel's root was swelling it into the journal bore. Named radius != real radius
+    # wherever a smooth min is involved; cradle-audit.md section 1 made the same mistake.
+    s = U(smin(face, flange, 1.0), smin(hub, mate, 1.5), smin(barrel, g, 0.8))
+    if features:
+        bore = cyl_z(p, 0, 0, BORE_R, CH_Z1 - 0.5, BASE_Z + 1)
+        anchor = box(p, (DRUM_R - 5.5, -(RIBBON_W + 1.0) / 2, BAND_Z0),
+                     (DRUM_R + 1, (RIBBON_W + 1.0) / 2, 0.5))
+        cuts = [bore, anchor]
+        for a in np.radians(MATE_SCREWS):
+            cuts.append(cyl_z(p, MATE_SCREW_R * np.cos(a), MATE_SCREW_R * np.sin(a), M3_PILOT,
+                              BASE_Z - 7.0, BASE_Z + 1))
+        s = np.maximum(s, -U(*cuts))
+    return s
+
+
+def bay(p, features=True):
+    """Gear plane below the can, plus the tower the servo drops into. The servo is NOT a
+    press fit in a hole: it lands on a shelf at TAB_Z0 and takes two M2 through its tabs.
+    Zach found it unfastened by eye, the same way he found variant B's tilt servo."""
+    # Tip radius, not pitch radius, is what has to clear: the cavity was cut to R_IN_G + 1,
+    # which IS the tooth tip, so the teeth shaved 122 mm3 off the wall. Give them 2.5.
+    tip = R_IN_G + TOOTH
+    gx1 = CENTRE + tip + 3.5
+    shell = rbox(p, (-BARREL_R - 9, -tip - 4, BAY_Z0), (gx1, tip + 4, FLOOR_Z), 3.0)
+    tower = rbox(p, (SV_X0 - 3.5, SV_YC - TAB_SPAN / 2 - 2.5, G_Z1 + 1.8),
+                 (SV_X1 + 3.5, SV_YC + TAB_SPAN / 2 + 2.5, DECK_Z0), 3.0)
+    s = smin(shell, tower, 2.0)
+    # Rounding 1.0, not 2.5: a fat corner radius pinches back in over the gear's top face
+    # and that alone read 28 mm3 against the teeth.
+    cav = rbox(p, (-BARREL_R - 7, -tip - 1.5, BAY_Z0 + 1.5), (gx1 - 2.0, tip + 1.5, G_Z1 + 1.8), 1.0)
+    s = np.maximum(s, -cav)
+    if not features:
+        return s
+    # Zach, 2026-09-19: a window in the side so the servo slips in rather than dropping from
+    # above. It goes in along its OWN long axis (-Y), which takes out only the short +Y end
+    # wall -- the two long X walls, which react the gear torque, stay whole. The far tab
+    # meeting the end of the tab slot is the depth stop. Both M2 sit at r > 31, outside the
+    # deck plate, so a driver still reaches them from above once the well is in.
+    win_y = SV_YC + TAB_SPAN / 2 + 4.0                 # out through the +Y wall
+    pocket = box(p, (SV_X0 - FIT, SV_Y0 - FIT, SV_Z0), (SV_X1 + FIT, win_y, 1.0))
+    # DOUBLES AS THE DRIVER PATH for the horn screw, which is driven from below up into
+    # the servo shaft. It runs r 3.5 from under the bay's floor all the way to the servo,
+    # so rule 6 is satisfied by accident, not by design -- shorten it and the screw
+    # becomes unreachable with nothing to show it. Checked: 0 mm3 of bay on that axis.
+    shaftway = cyl_z(p, CENTRE, 0, 3.5, BAY_Z0 - 1, SV_Z0 + 0.1)
+    # The drum's barrel runs up through the shell's top slab on its way to the can.
+    barrelway = cyl_z(p, 0, 0, JOURNAL_R + 3.35, G_Z1, FLOOR_Z + 1)
+    tabs = box(p, (SV_X0 - FIT, SV_YC - TAB_SPAN / 2 - FIT, TAB_Z0), (SV_X1 + FIT, win_y, 1.0))
+    # The body window is not enough on its own: sliding in, the OUTPUT SHAFT sweeps through
+    # the shell's +Y wall between the gear cavity and the outside, 4 mm below the pocket
+    # floor. Found by the insertion sweep, not by the pair check -- seated, it is clear.
+    shaftslot = box(p, (CENTRE - 3.2, tip + 0.5, SV_Z0 - 4.6), (CENTRE + 3.2, win_y + 2, SV_Z0 + 0.4))
+    cuts = [pocket, tabs, shaftway, barrelway, shaftslot]
+    for ty in (SV_YC - TAB_PITCH / 2, SV_YC + TAB_PITCH / 2):
+        cuts.append(cyl_z(p, CENTRE, ty, M2_PILOT, TAB_Z0 - 6.0, TAB_Z0 + 0.2))
+    return np.maximum(s, -U(*cuts))
+
+
+def servo(p, features=True):
+    body = rbox(p, (SV_X0, SV_Y0, SV_Z0), (SV_X1, SV_Y1, SV_Z1), 1.0)
+    tabs = rbox(p, (SV_X0, SV_YC - TAB_SPAN / 2, TAB_Z0), (SV_X1, SV_YC + TAB_SPAN / 2, TAB_Z0 + TAB_T), 0.8)
+    shaft = cyl_z(p, CENTRE, 0, 2.5, SV_Z0 - 4.0, SV_Z0 + 0.5)     # 4 mm of shaft, into the gear
+    return U(body, tabs, shaft)
+
+
+def horn_at(p, x0, z0, z1):
+    """A stock double-arm horn: centre disc plus the arm bar, as a cutting body."""
+    q = (p[0] - x0, p[1], p[2])
+    return U(cyl_z(q, 0, 0, HORN_C / 2, z0, z1),
+             rbox(q, (-HORN_L / 2, -HORN_W / 2, z0), (HORN_L / 2, HORN_W / 2, z1), 1.0))
+
+
+def gear_in(p, features=True):
+    # The hub used to run 2 mm ABOVE the gear and straight into the servo's case. It hangs
+    # below instead; the shaft still gets 3.5 mm of engagement.
+    g = gear(p, R_IN_G, N_IN, CENTRE, G_Z0, G_Z1, phase=np.pi)
+    hub = cyl_z(p, CENTRE, 0, 5.0, G_Z0, G_Z1)     # flush both ends: hanging 1.5 below put
+                                                   # it through the bay's floor, 28 mm3 of it
+    s = smin(g, hub, 0.8)
+    if not features:
+        return s
+    # ZERO offset on the horn pocket -- Zach's method, 2026-09-19: subtract the horn's own
+    # model in Fusion with no size change and the print comes out a tight fit. That beats the
+    # "+0.2 mm all round" in ball-head-validation-handoff.md, which was advice, not a result.
+    # HORN_* here are the repo's GENERIC numbers and are only a placeholder: re-cut this
+    # pocket in Fusion with the real horn model. What this file fixes is the POSITION.
+    #
+    # It matters more on this gear than anywhere else: a 34.4 mm horn fits inside a 41.3 mm
+    # gear, so the plastic grips the arm tips at r 17.2 instead of the shaft spline at ~1.25
+    # -- 14x the leverage, so the same pocket slop makes 14x less angle at the head. And the
+    # 2:1 step-up doubles whatever is left, which is why this joint is the one to get right.
+    horn = horn_at(p, CENTRE, G_Z1 - HORN_D, G_Z1 + 0.5)
+    shank = cyl_z(p, CENTRE, 0, M2_CLEAR, G_Z0 - 1, G_Z1 - HORN_D + 0.1)
+    cbore = cyl_z(p, CENTRE, 0, M2_HEAD, G_Z0 - 1, G_Z1 - HORN_D - HORN_ROOF)
+    return np.maximum(s, -U(horn, shank, cbore))
+
+
+def bearing(p, features=True):
+    return ring_z(p, HUB_R, BRG_OR, BRG_Z0, BRG_Z1, 0.4)
+
+
+def twist_short(p, features=True):
+    """The run the twist actually needs, drawn from where it has to stop. The ghost is the
+    finding: TWIST_HAVE of bore exists, TWIST_NEED is wanted."""
+    return ring_z(p, BORE_R - 0.9, BORE_R, TWIST_HAVE, TWIST_NEED, 0.3)
+
+
+PARTS = {
+    # The well is a large 2 mm shell: marching cubes gives ~300k faces at this step and the
+    # raw mesh is clean (1 component, watertight, manifold -- checked). A 16k target is what
+    # broke it; the decimator would not collapse that far with preservetopology on, returned
+    # its last failed attempt undecimated, and the REPORT then read 46 bodies. Read the face
+    # count against the target, not just the flags.
+    'well':     (well,     (-33, -33, JOURNAL_Z0 - 1), (33, 33, BRG_Z1 + 1), 0.34, 48000),
+    'drum':     (drum,     (-28, -28, G_Z0 - 1), (28, 28, BASE_Z + 1), 0.30, 24000),
+    'ribbon':   (ribbon,   (-WELL_OR - 13, -WELL_OR - 13, BAND_Z0 - 1),
+                           (WELL_OR + 13, WELL_OR + 13, BAND_Z1 + 1), 0.22, 14000),
+    'bay':      (bay,      (-17, -R_IN_G - 7, BAY_Z0 - 1),
+                           (CENTRE + R_IN_G + 10, SV_YC + TAB_SPAN / 2 + 5, DECK_Z0 + 1), 0.34, 26000),
+    'servo':    (servo,    (SV_X0 - 1.5, SV_YC - TAB_SPAN / 2 - 1.5, SV_Z0 - 5),
+                           (SV_X1 + 1.5, SV_YC + TAB_SPAN / 2 + 1.5, SV_Z1 + 1), 0.28, 7000),
+    'gear_in':  (gear_in,  (CENTRE - R_IN_G - 3, -R_IN_G - 3, G_Z0 - 3),
+                           (CENTRE + R_IN_G + 3, R_IN_G + 3, G_Z1 + 2), 0.28, 11500),
+    'bearing':  (bearing,  (-30, -30, BRG_Z0 - 1), (30, 30, BRG_Z1 + 1), 0.26, 7000),
+    'twist_gap': (twist_short, (-11, -11, TWIST_HAVE - 1), (11, 11, TWIST_NEED + 1), 0.30, 5000),
+}
+
+if __name__ == '__main__':
+    os.makedirs(os.path.join(OUT, 'fusion'), exist_ok=True)
+    names = [a for a in os.sys.argv[1:] if a in PARTS]
+    print(f'coil   ri {RI:.2f}  ro {RO:.2f}   U radius {U_R:.2f} = {U_R / RIBBON_T:.0f}x thickness'
+          f'  (min {MIN_BEND_R:.1f})')
+    print(f'travel {np.degrees(TRAVEL):.0f} deg of mechanism for {L_CAN:.0f} mm of ribbon in the can')
+    print(f'can    cavity {2 * WELL_IR:.0f}  outside {2 * WELL_OR:.0f}  depth {-FLOOR_Z:.0f}'
+          f'   stump depth {-BAY_Z0:.0f}')
+    print(f'gears  {N_OUT}/{N_IN} = {N_IN / N_OUT:.0f}:1   module {2 * R_OUT_G / N_OUT:.2f}'
+          f'   centres {CENTRE:.0f}   servo X {SV_X0:.1f}..{SV_X1:.1f}')
+    print(f'wraps  {L_CAN / (2 * np.pi * RI):.2f} turns on the drum at the stop')
+    print(f'TWIST  {TWIST_HAVE:.1f} mm of bore exists, {TWIST_NEED:.0f} wanted'
+          f'  -> short by {TWIST_NEED - TWIST_HAVE:.1f}')
+    lines, bundle = [], {}
+    lo_all = np.array([1e9] * 3); hi_all = -lo_all
+    for name, (fn, lo, hi, step, target) in PARTS.items():
+        if names and name not in names:
+            continue
+        f = lambda P: fn(P, True)
+        vol = sample(f, lo, hi, step)
+        v, faces, _, _ = measure.marching_cubes(vol, 0.0, spacing=(step,) * 3)
+        v = project(f, v + np.array(lo), step)
+        with quiet():
+            ms, ok = decimate(v, faces, target)
+            _, msg = report(ms)
+            ms.save_current_mesh(os.path.join(OUT, 'fusion', f'{name}.obj'), save_vertex_normal=False)
+            V = ms.current_mesh().vertex_matrix()
+            bundle[name] = {'v': base64.b64encode(V.astype('<f4').tobytes()).decode(),
+                            'f': base64.b64encode(ms.current_mesh().face_matrix().astype('<u4').tobytes()).decode()}
+        lo_all = np.minimum(lo_all, V.min(0)); hi_all = np.maximum(hi_all, V.max(0))
+        lines.append(f'fusion/{name}.obj'.ljust(22) + msg)
+        print(lines[-1], flush=True)
+    bundle['_meta'] = {'travel_deg': round(float(np.degrees(TRAVEL)), 1), 'L_can': L_CAN,
+                       'can_od': 2 * WELL_OR, 'stump_depth': -BAY_Z0,
+                       'twist_have': TWIST_HAVE, 'twist_need': TWIST_NEED,
+                       'ri': round(RI, 2), 'ro': round(RO, 2), 'u_r': round(U_R, 2)}
+    open(os.path.join(OUT, 'viewer_pan_coil_b.js'), 'w').write('window.PANCOILB=' + json.dumps(bundle) + ';')
+    env = f'ENVELOPE {lo_all.round(1)} -> {hi_all.round(1)}  size {(hi_all - lo_all).round(1)}'
+    print(env)
+    open(os.path.join(OUT, 'mesh_report.txt'), 'w').write('\n'.join(lines) + '\n' + env + '\n')

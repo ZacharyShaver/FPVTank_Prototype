@@ -1,0 +1,6 @@
+fusion/roots.obj            16000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=17.78 cm3
+fusion/spine.obj            24000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=19.52 cm3
+fusion/yoke.obj             14000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=4.93 cm3
+fusion/crank.obj             4000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.25 cm3
+fusion/rod.obj               4000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.32 cm3
+fusion/hood.obj             34000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=30.52 cm3

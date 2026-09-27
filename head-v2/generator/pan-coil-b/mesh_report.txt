@@ -1,0 +1,2 @@
+fusion/bay.obj          57200 faces  watertight=True  manifold=True  bodies=1  self-int=20  vol=20.00 cm3
+ENVELOPE [-14.  -25.7 -33.8] -> [56.2 25.7 -2.4]  size [70.2 51.3 31.4]

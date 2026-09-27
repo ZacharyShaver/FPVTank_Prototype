@@ -1,0 +1,23 @@
+Mesh QA for tree-parts/ -- generators/tree_parts.py, then print_post.py
+
+print/axle.stl                 250000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=8.10 cm3
+print/ball_minus.stl           250000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=7.93 cm3
+print/ball_plus.stl            249916 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=10.75 cm3
+print/cap_coil.stl             250000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=3.02 cm3
+print/cap_servo.stl            249960 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.76 cm3
+print/fork.stl                 249822 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=81.29 cm3
+print/roots.stl                188100 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=17.78 cm3
+fusion/axle.obj                  5000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=8.10 cm3
+fusion/axle_blank.obj            2500 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=9.25 cm3
+fusion/ball_minus.obj           18000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=7.93 cm3
+fusion/ball_minus_blank.obj      9000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=10.03 cm3
+fusion/ball_plus.obj            18000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=10.75 cm3
+fusion/ball_plus_blank.obj       9000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=12.05 cm3
+fusion/cap_coil.obj              4500 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=3.02 cm3
+fusion/cap_coil_blank.obj        2500 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=3.02 cm3
+fusion/cap_servo.obj             3500 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.76 cm3
+fusion/cap_servo_blank.obj       2000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.79 cm3
+fusion/fork.obj                 24000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=81.28 cm3
+fusion/fork_blank.obj           14000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=122.39 cm3
+fusion/roots.obj                16000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=17.78 cm3
+fusion/roots_blank.obj           8000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=20.99 cm3

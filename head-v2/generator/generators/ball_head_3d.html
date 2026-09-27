@@ -1,0 +1,218 @@
+<title>Scorpion Ball Head</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #e9eeec;
+    --panel: #f8faf9;
+    --stage: #dfe6e3;
+    --ink: #1c2321;
+    --muted: #5b6863;
+    --line: #c6d0cc;
+    --accent: #1f7d63;
+    --accent-ink: #ffffff;
+    --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #111615; --panel: #181f1d; --stage: #1d2523; --ink: #e2ebe7;
+      --muted: #93a39d; --line: #2c3834; --accent: #5dcaa5; --accent-ink: #0d1412;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #111615; --panel: #181f1d; --stage: #1d2523; --ink: #e2ebe7;
+    --muted: #93a39d; --line: #2c3834; --accent: #5dcaa5; --accent-ink: #0d1412;
+  }
+  html, body { background: var(--ground); color: var(--ink); }
+  body { font-family: var(--body); font-size: 15px; line-height: 1.55; padding-inline: 16px; padding-block: 20px 32px; }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 16px; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+  h1 { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 3vw, 30px); letter-spacing: 0.01em; margin: 0; text-wrap: balance; }
+  .tag { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+  .stage { position: relative; background: var(--stage); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; aspect-ratio: 4 / 3; max-width: 100%; max-height: 78vh; }
+  .stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  .stage canvas:active { cursor: grabbing; }
+  .hint { position: absolute; left: 12px; bottom: 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); pointer-events: none; }
+  .readout { position: absolute; right: 12px; top: 10px; font-family: var(--mono); font-size: 12px; color: var(--ink); font-variant-numeric: tabular-nums; pointer-events: none; text-align: right; }
+  .loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  aside { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 18px; }
+  .group { display: grid; gap: 8px; }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); font-weight: 500; }
+  .slider-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; }
+  .slider-row label { font-size: 14px; }
+  .slider-row output { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; min-width: 5ch; text-align: right; }
+  input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+  .views { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  button { font: 500 13px var(--body); color: var(--ink); background: transparent; border: 1px solid var(--line); border-radius: 6px; padding: 6px 4px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .toggle { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+  .toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+  dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 13px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .note { font-size: 13px; color: var(--muted); margin: 0; border-top: 1px solid var(--line); padding-top: 12px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Scorpion ball head</h1>
+    <span class="tag">CONCEPT · MG90D ×2 · UC-439 CAMERA · UNITS MM</span>
+  </header>
+  <div class="layout">
+    <div class="stage" id="stage">
+      <div class="loading" id="loading">Loading model…</div>
+      <div class="readout" id="readout">pan 0° · tilt 0°</div>
+      <div class="hint">Drag to orbit · scroll or pinch to zoom · right-drag to pan view</div>
+    </div>
+    <aside>
+      <div class="group">
+        <div class="slider-row">
+          <label for="pan">Pan</label><output id="panOut" for="pan">0°</output>
+          <input id="pan" type="range" min="-90" max="90" step="1" value="0">
+        </div>
+        <div class="slider-row">
+          <label for="tilt">Tilt (down is +)</label><output id="tiltOut" for="tilt">0°</output>
+          <input id="tilt" type="range" min="-60" max="60" step="1" value="0">
+        </div>
+        <label class="toggle" for="cut"><input id="cut" type="checkbox"> Cut away the servo-side half</label>
+        <label class="toggle" for="xray"><input id="xray" type="checkbox" checked> See through pods and pedestal</label>
+      </div>
+      <div class="group">
+        <div class="label">View</div>
+        <div class="views">
+          <button id="vIso" type="button">Iso</button>
+          <button id="vFront" type="button">Front</button>
+          <button id="vSide" type="button">Side</button>
+          <button id="vTop" type="button">Top</button>
+        </div>
+      </div>
+      <div class="group">
+        <div class="label">Key dimensions</div>
+        <dl id="dims"></dl>
+      </div>
+      <p class="note">Orange is the camera ribbon: down off the board, back under it, up to the tilt axis, out through the hollow hub into a loose two-turn coil in the left pod, then down the stem, across the turntable and down the pedestal. Tilting winds and unwinds the coil instead of twisting the ribbon.</p>
+      <p class="note">Blocky concept, not CAD. Board, hole pitch and holder height are measured; the lens and its field of view aren't modelled yet.</p>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="ball_parts.js"></script>
+<script>
+(function () {
+  const stage = document.getElementById('stage');
+  const loading = document.getElementById('loading');
+  if (!window.THREE || !window.BALL_PARTS) { loading.textContent = 'The 3D viewer could not load. Reload the page to try again.'; return; }
+  const META = window.BALL_META, H = META.H;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  stage.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 4 / 3, 1, 4000);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.12;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6f7a76, 0.75));
+  const key = new THREE.DirectionalLight(0xffffff, 0.75); key.position.set(160, 260, 140); scene.add(key);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-200, 120, -160); scene.add(fill);
+
+  const fixed = new THREE.Group(), pan = new THREE.Group(), tilt = new THREE.Group();
+  tilt.position.set(0, H, 0);
+  scene.add(fixed); scene.add(pan); pan.add(tilt);
+  const cutMeshes = { full: [], half: [] };
+  const podMats = [];
+
+  for (const p of window.BALL_PARTS) {
+    const bin = atob(p.b), buf = new ArrayBuffer(bin.length), u8 = new Uint8Array(buf);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const pos = new Float32Array(buf);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const round = p.n === 'ball' || p.n === 'ball half-shell';
+    if (round) {
+      const n = new Float32Array(pos.length);
+      for (let i = 0; i < pos.length; i += 3) {
+        const x = pos[i], y = pos[i + 1] - H, z = pos[i + 2], l = Math.hypot(x, y, z) || 1;
+        n[i] = x / l; n[i + 1] = y / l; n[i + 2] = z / l;
+      }
+      geo.setAttribute('normal', new THREE.BufferAttribute(n, 3));
+    } else {
+      geo.computeVertexNormals();
+    }
+    const mat = new THREE.MeshStandardMaterial({ color: p.col, roughness: 0.62, metalness: 0.05, side: THREE.DoubleSide });
+    const mesh = new THREE.Mesh(geo, mat);
+    if (p.pod) podMats.push(mat);
+    if (p.g === 'tilt') { geo.translate(0, -H, 0); tilt.add(mesh); }
+    else if (p.g === 'pan') pan.add(mesh);
+    else fixed.add(mesh);
+    if (p.c === 'full') cutMeshes.full.push(mesh);
+    if (p.c === 'half') cutMeshes.half.push(mesh);
+  }
+  loading.hidden = true;
+
+  const $ = (id) => document.getElementById(id);
+  const panIn = $('pan'), tiltIn = $('tilt'), cutIn = $('cut');
+  function apply() {
+    const pd = +panIn.value, td = +tiltIn.value;
+    pan.rotation.y = THREE.MathUtils.degToRad(pd);
+    tilt.rotation.z = -THREE.MathUtils.degToRad(td);
+    $('panOut').value = pd + '°'; $('tiltOut').value = td + '°';
+    $('readout').textContent = 'pan ' + (pd > 0 ? '+' : '') + pd + '° · tilt ' + (td > 0 ? td + '° down' : td < 0 ? (-td) + '° up' : '0°');
+    const cut = cutIn.checked;
+    cutMeshes.full.forEach((m) => { m.visible = !cut; });
+    cutMeshes.half.forEach((m) => { m.visible = cut; });
+    const xray = $('xray').checked;
+    podMats.forEach((m) => { m.transparent = xray; m.opacity = xray ? 0.28 : 1; m.depthWrite = !xray; m.needsUpdate = true; });
+  }
+  [panIn, tiltIn].forEach((el) => el.addEventListener('input', apply));
+  cutIn.addEventListener('change', apply);
+  $('xray').addEventListener('change', apply);
+
+  const target = new THREE.Vector3(0, H * 0.72, 0);
+  const views = {
+    vIso: [175, 120, 150], vFront: [300, H * 0.9, 0], vSide: [0, H * 0.9, 300], vTop: [0.01, 330, 0]
+  };
+  function setView(id) {
+    const v = views[id]; camera.position.set(v[0], v[1], v[2]);
+    controls.target.copy(target); controls.update();
+  }
+  Object.keys(views).forEach((id) => $(id).addEventListener('click', () => setView(id)));
+
+  const dims = [
+    ['Ball diameter', (2 * META.R).toFixed(1) + ' mm'],
+    ['Tilt axis above deck', META.H.toFixed(1) + ' mm'],
+    ['Width across pods', META.width.toFixed(1) + ' mm'],
+    ['Camera board', META.board + ' × ' + META.board + ' mm'],
+    ['Mounting hole pitch', META.pitch + ' mm'],
+    ['IR-cut holder height', META.holder + ' mm'],
+    ['Idler bearing', '6704 · 20 mm bore'],
+    ['Pod depth (bearing + coil)', META.pod + ' mm'],
+    ['Ribbon coil', '2 loose turns · r 10.5–17.5 mm']
+  ];
+  $('dims').innerHTML = dims.map((d) => '<dt>' + d[0] + '</dt><dd>' + d[1] + '</dd>').join('');
+
+  function syncTheme() {
+    const c = getComputedStyle(document.documentElement).getPropertyValue('--stage').trim() || '#dfe6e3';
+    renderer.setClearColor(new THREE.Color(c), 1);
+  }
+  syncTheme();
+  try { window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme); } catch (e) {}
+  new MutationObserver(syncTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage);
+  resize(); setView('vIso'); apply();
+  (function loop() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
+})();
+</script>

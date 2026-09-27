@@ -1,0 +1,15 @@
+print/axle.stl               128944 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=3.67 cm3  bed 19.9 x 19.9, 13.5 tall
+print/ball_minus.stl         249952 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=11.78 cm3  bed 59.2 x 61.4, 24.9 tall
+print/ball_plus.stl          250000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=11.56 cm3  bed 59.2 x 61.4, 30.3 tall
+print/cap_minus.stl          158548 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=1.87 cm3  bed 35.0 x 35.0, 3.6 tall
+print/fork.stl               249976 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=55.89 cm3  bed 70.3 x 68.0, 62.0 tall
+print/post.stl               192076 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.79 cm3  bed 35.0 x 35.0, 8.0 tall
+print/roots.stl              163012 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=17.78 cm3  bed 51.0 x 51.0, 10.5 tall
+fusion/axle.obj                4000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=3.67 cm3
+fusion/ball_minus.obj         20000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=11.78 cm3
+fusion/ball_plus.obj          20000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=11.56 cm3
+fusion/cap_minus.obj           4000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=1.87 cm3
+fusion/fork.obj               60000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=55.89 cm3
+fusion/post.obj                5000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.79 cm3
+fusion/roots.obj              16000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=17.78 cm3
+ENVELOPE (assembled) [-42.3 -34.   -0. ] -> [28.5 34.  82.7]  size [70.8 68.  82.7]

@@ -1,0 +1,2 @@
+fusion/drum.obj           57200 faces  watertight=True  manifold=True  bodies=3  self-int=21  vol=61.63 cm3
+ENVELOPE [-36.  -36.  -17.5] -> [36. 36. 20.]  size [72.  72.  37.5]
