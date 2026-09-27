@@ -6,6 +6,16 @@ run it until the preconditions hold.**
 Why: Control's `docs/chassis/` is 115 MB of tracked CAD in 196 files, and the Pi `git pull`s all of it.
 After phase B, Control keeps its code and the robot docs it needs, and the CAD lives here.
 
+**2026-09-26 evening: both repos moved off OneDrive**, from `C:\Users\<usr>\OneDrive\Documents\GitHub` to
+`C:\Users\<usr>\Documents\GitHub`. This is not phase B. Control is still this repo's sibling, so
+`tools/config.py` needed no change. The build and the regression were re-run at the new path on 2026-09-27.
+Two effects on the steps below:
+- Claude files memories by folder path. The memories are still under the old OneDrive key (Memories,
+  below); sessions at the new paths look under `C--Users-<usr>-Documents-GitHub-<repo>`. Step 6 copies
+  them into the new keys.
+- Control's old Claude worktree (`.claude/worktrees/sweet-herschel-6c6d6f`) still points at the OneDrive
+  path. `git worktree repair` in Control fixes it.
+
 ## Preconditions
 
 1. Zach's in-progress change in Control has landed.

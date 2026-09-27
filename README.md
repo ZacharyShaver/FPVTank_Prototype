@@ -31,9 +31,12 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 
 ## The current print set
 
-Head v2, ball rev 2: Zach's Fusion rev 1 plus snap pins plus post v3. It was delivered on 2026-09-25
-to `Downloads/head-v2-snap/`; its `README.txt` says what to print first and how to put it together.
-This repo regenerates the set into `head-v2/out/print/`, byte for byte.
+Head v2, ball rev 2: Zach's Fusion rev 1 plus snap pins plus post v3 (delivered 2026-09-25), plus the
+camera snap posts and the finished parts as STEP solids (2026-09-26). The set is in
+`Downloads/head-v2-snap/`; its `README.txt` says what to print first and how to put it together.
+This repo regenerates the set into `head-v2/out/`, byte for byte for the STLs, the 3MF plates' meshes
+and the pictures. The STEP files differ only in metadata (timestamp, assembly ids, colour order); their
+solids match.
 
 ## Running the tools
 
@@ -42,7 +45,7 @@ pymeshlab and the rest (`tools/requirements.txt`). Every script finds its paths 
 `tools/config.py`, so it runs from any folder:
 
 ```
-python head-v2/fixes/build_all.py      # about 3 min: halves, post, meshes, STEP, print set, 3MF, pictures
+python head-v2/fixes/build_all.py      # about 3 min: halves, post, camera posts, meshes, STEP, print set, 3MF, pictures
 python head-v2/checks/regression.py    # about 6 min: the checks, and the table they must reproduce
 python head-v2/checks/reeval.py        # a revision as drawn, before any fix
 ```

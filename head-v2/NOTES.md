@@ -5,21 +5,36 @@ As of 2026-09-26.
 
 ## Current
 
-- Ball rev 2 = Zach's Fusion rev 1 (`fusion/rev1-2026-09-24/`) + snap pins + post v3.
+- Ball rev 2 = Zach's Fusion rev 1 (`fusion/rev1-2026-09-24/`) + snap pins + post v3, plus the
+  **camera snap posts** (2026-09-26): two posts pushed in from outside through his old camera-board
+  screw tubes. They replace the screws. Scripts: `fixes/campost.py` and the steps after it in
+  `build_all.py`; check: `checks/check_campost.py`.
 - The print set he has is `Downloads/head-v2-snap/`; its `README.txt` is the index (what to print
   first, assembly).
-  - `python head-v2/fixes/build_all.py` regenerates it into `out/`. Every STL is byte-identical to
-    that set; the STEP and 3MF differ only in timestamps.
-  - `python head-v2/checks/regression.py` reproduces its checks.
-  - Both verified 2026-09-26.
-- Superseded, don't print: `Downloads/head-v2-fixes/` (rev 1, screws) and the pins in
-  `head-v2-snap/superseded - first pins, no stop/`.
+  - `python head-v2/fixes/build_all.py` regenerates it into `out/`. Every STL, both 3MF plates' meshes
+    and the pictures are byte-identical to that set. The STEP files differ only in metadata (timestamp,
+    assembly ids, colour order); their solids match. Re-verified 2026-09-26 after the camera posts.
+  - `python head-v2/checks/regression.py` reproduces its checks: all 22 rows.
+  - Both verified 2026-09-26, and again on 2026-09-27 after the repos moved off OneDrive to
+    `C:\Users\<usr>\Documents\GitHub`.
+- The hand-off also has `step/`: the finished parts as STEP solids (`fixes/step_models.py`).
+- Superseded, don't print: `Downloads/head-v2-fixes/` (rev 1, screws), the pins in
+  `head-v2-snap/superseded - first pins, no stop/`, and the pre-camera-post ball_plus and plate in
+  `head-v2-snap/superseded - before camera posts/`. `out/` still builds those: the rev-2 checks read them.
 - Before changing the ball, the post or the seam, ask Zach which files he printed.
 
 ## Open
 
 - **Pin size:** not picked yet (2026-09-26). Print two test blocks and one stop pin of each size. The
-  3MF plate carries 4 medium; if he picks soft or firm, change `PIN` in `fixes/plate3mf.py`.
+  3MF plates carry medium; if he picks soft or firm, change `PIN` in `fixes/plate3mf.py` and `PIN` and
+  `CAM` in `fixes/plate_campost.py`. The camera posts use the same grade names; he was told to match.
+- **Camera board hole size:** 2.0 is a photo value, not calipered. The camera posts' pin is 1.8
+  (`campost.R_PIN`). When he calipers a hole, set the pin 0.1 under it and rebuild.
+- **ball_plus's exact BREP doesn't survive STEP.** With the camera tubes fused in, it passes BRepCheck
+  and meshes to a clean, right-sized STL, but ShapeFix and STEP readers lose 490 mm3 from it. The
+  shipped STEP is sewn from the STL instead (`fixes/step_models.py`). The root cause, somewhere where
+  the new tube walls meet his facets, isn't found. Suspect it first if a Fusion boolean with
+  `camera_post_tools_for_fusion.step` misbehaves.
 - **Nest SDF sheets:** the nest's SDF has zero-thickness sheets at |Y| 25.0 and 26.5 in the hub bore.
   They read as "touching" but aren't material. `lens_nest.nest_sweep` steps around the 26.5 one only.
   So `checks/ball_nest.py` reports ball_plus's nearest approach as 0.10 mm: that is its hub beside the

@@ -13,6 +13,13 @@ STEPS = [
     'figure_snap.py',    # picture sheets
     'figure_stop.py',
     'figure_post.py',
+    # camera snap posts, 2026-09-26
+    'campost.py',        # new ball_plus + the six posts (BREP)
+    'export_campost.py', # ball_plus in Zach's frame, print STLs, Fusion tool STEP
+    'pins_on_bed.py',    # the seam-pin STLs dropped onto the bed
+    'plate_campost.py',  # the full plate with the camera posts
+    'step_models.py',    # the finished parts as STEP solids
+    'figure_campost.py', # picture sheet
 ]
 
 if __name__ == '__main__':

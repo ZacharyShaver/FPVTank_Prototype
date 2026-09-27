@@ -11,6 +11,11 @@
 >   - Pin size: not tested yet.
 >   - One commit at the end, after he reviews.
 > - Open questions 2 and 5 are carried in `MOVE-PLAN.md`. The next step is phase B, per `MOVE-PLAN.md`.
+>
+> **2026-09-26 evening: the GitHub folder moved off OneDrive.** Everything in
+> `C:\Users\<usr>\OneDrive\Documents\GitHub` is now in `C:\Users\<usr>\Documents\GitHub`. The OneDrive
+> paths below are the old ones. The old local folder is now `C:\Users\<usr>\Documents\GitHub\FPVTank_Prototype`,
+> with a `FPVTank_Prototype.7z` backup beside it.
 
 Written 2026-09-26 by the session that did the v2-head ball fixes (snap pins, post v3), working in
 `FPVTank_Control`. For the next session, which runs **in this folder**. Zach will start you with

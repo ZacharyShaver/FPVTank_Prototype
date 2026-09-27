@@ -27,6 +27,20 @@ def health(path):
         ok, msg = TP_.report(ms)
     return ok, msg
 
+def drop_to_bed(path):
+    """Move a mesh in place so its lowest vertex sits on z = 0; returns how far it came down.
+    BRepBndLib.Add_s gives a LOOSE box on a fresh curved shape, so an on_bed() built on it can leave a
+    part floating: the seam pins sat 0.5 mm up until 2026-09-26. New code should size with
+    BRepBndLib.AddOptimal_s; this fixes files already written."""
+    with TP_.quiet():
+        ms = ml.MeshSet(); ms.load_new_mesh(path)
+        ms.meshing_merge_close_vertices(threshold=ml.PureValue(1e-5))
+        V = ms.current_mesh().vertex_matrix().copy(); F = ms.current_mesh().face_matrix().copy()
+    dz = V[:, 2].min(); V[:, 2] -= dz
+    with TP_.quiet():
+        ms = ml.MeshSet(); ms.add_mesh(ml.Mesh(V, F)); ms.save_current_mesh(path, binary=True)
+    return dz
+
 def tidy(path):
     """Collapse the needle triangles inherited from the original export (two vertices < 1 um apart):
     merge at 0.001 mm, drop the null faces that leaves. Returns the max surface deviation it caused."""

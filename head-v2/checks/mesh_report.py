@@ -17,11 +17,14 @@ print('PRINT SET (%s)' % config.PRINT)
 for p in sorted(glob.glob(os.path.join(config.PRINT, '*.stl'))):
     ok, msg = health(p); all_ok &= ok
     print('  %-26s %s%s' % (os.path.basename(p), msg, '' if ok else '  <-- CHECK'))
-plate = os.path.join(config.PRINT, 'plate_ball_post_pins.3mf')
-xml = zipfile.ZipFile(plate).read('3D/3dmodel.model').decode() if os.path.exists(plate) else ''
-if not xml:
-    all_ok = False
-    print('  (no 3MF plate yet: run head-v2/fixes/build_all.py)')
+xml = ''
+for plate in ('plate_ball_post_pins.3mf', 'plate_full_camposts.3mf'):       # rev 2 (superseded) and with the camera posts
+    plate = os.path.join(config.PRINT, plate)
+    if not os.path.exists(plate):
+        all_ok = False
+        print('  (no %s yet: run head-v2/fixes/build_all.py)' % os.path.basename(plate))
+        continue
+    xml += zipfile.ZipFile(plate).read('3D/3dmodel.model').decode()
 for m in re.finditer(r'<object id="(\d+)" type="model" name="([^"]+)"><mesh><vertices>(.*?)</vertices><triangles>(.*?)</triangles>', xml):
     V = np.array(re.findall(r'x="([-\d.]+)" y="([-\d.]+)" z="([-\d.]+)"', m.group(3)), float)
     F = np.array(re.findall(r'v1="(\d+)" v2="(\d+)" v3="(\d+)"', m.group(4)), int)

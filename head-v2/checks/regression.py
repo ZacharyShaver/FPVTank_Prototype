@@ -14,9 +14,11 @@ import json, subprocess, time
 from record import PATH
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CHECKS = ['check_snap.py', 'freeplay.py', 'ball_nest.py', 'lens_clear.py', 'reach_check.py', 'mesh_report.py']
+CHECKS = ['check_snap.py', 'freeplay.py', 'ball_nest.py', 'lens_clear.py', 'reach_check.py', 'check_campost.py', 'mesh_report.py']
 NEEDS = ['ball_plus_snap.brep', 'ball_minus_snap.brep', 'post_v3.brep', 'BODY_NUMBA1_snap.stl',
-         'ball_minus_revised_snap.stl', 'ball_servo_post_v3.stl', os.path.join('print', 'plate_ball_post_pins.3mf')]
+         'ball_minus_revised_snap.stl', 'ball_servo_post_v3.stl', os.path.join('print', 'plate_ball_post_pins.3mf'),
+         'ball_plus_camposts.brep', 'BODY_NUMBA1_camposts.stl', 'camera_post_lower_medium.brep', 'camera_post_upper_medium.brep',
+         os.path.join('print', 'plate_full_camposts.3mf')]
 
 def f(dp):
     def fmt(x):
@@ -39,6 +41,15 @@ ROWS = [
     ('lens vs nest, full tilt, clearance, mm', 'lens_vs_nest', lambda v: (v, None), f(2), '1.95', 'none'),
     ('post: spline in the post (v3 screw tight / yours pressed), mm', ('post_v3_screw_tight', 'post_yours_pressed'), lambda v: (v[0][0], v[1][0]), f(2), '3.50', '2.13'),
     ('post: gap to the servo boss (same), mm', ('post_v3_screw_tight', 'post_yours_pressed'), lambda v: (v[0][1], v[1][1]), f(2), '0.50', '1.87'),
+    # camera snap posts, 2026-09-26 (checks/check_campost.py)
+    ('camera posts: other parts vs new ball_plus (control: rev 2), mm3', 'campost_other_parts', lambda v: v, f(2), '0.00', '0.00'),
+    ('camera posts seated vs ball_plus (designed preload), mm3', 'campost_seated', lambda v: (v, None), f(2), '0.03', 'none'),
+    ('camera posts vs camera, mm3', 'campost_vs_camera', lambda v: (v, None), f(2), '0.00', 'none'),
+    ('camera post sliding in, no barbs (control: with barbs), mm3', 'campost_slide', lambda v: v, f(3), '0.000', '0.649'),
+    ('long post in the LOWER hole (control: short in upper), mm3', 'campost_swap', lambda v: v, f(2), '2.76', '0.51'),
+    ('camera post heads from ball centre (control: ball R), mm', 'campost_head_r', lambda v: v, f(2), '30.50', '30.70'),
+    ('camera post catch: thinnest wall to outside, mm', 'campost_catch_wall', lambda v: (v, None), f(2), '0.79', 'none'),
+    ('ball_plus STEP round trip lost, sewn (control: BREP), mm3', 'campost_step_loss', lambda v: v, f(1), '0.0', '489.9'),
     ('every print mesh clean (control: ball_plus as exported)', 'print_meshes',
      lambda v: v, lambda x: x if isinstance(x, str) else ('clean' if x else 'NOT clean'), 'clean', '5 self-int + non-manifold'),
 ]

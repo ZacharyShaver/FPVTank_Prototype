@@ -3,6 +3,37 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-09-26: Camera board held by snap posts pushed in from outside
+
+Zach's rev 1 holds the camera board with two screws from outside, through tubes to the board's two +Y
+outer holes. The heads would have stood proud of the ball, like the seam screws that jammed it. Two
+snap posts now fill those tubes instead. Each is a 1.8 pin through the board, a shoulder that presses
+the board onto his wall, barbs that click behind a step in a thickened tube, and a head cut to the
+sphere 0.2 under the surface (the nest is 1.5 out). The long (upper) post is 0.4 thicker, so it can't
+go in the lower hole, where it would stand ~1 mm proud. (`head-v2/fixes/campost.py`)
+
+He asked twice for other ways. What was checked:
+- **A pin from inside, behind the wall:** it can only push the board forward, off the wall, onto the
+  tube ends, so the board isn't clamped flat. Its snap socket would be a 7 mm cantilever off the wall,
+  which can't print seam-down without a fin. And it is ~15 mm deep past the servo box to reach.
+- **Posts fixed on the wall, board snapped over them:** with the front tubes and rail removed, the
+  board can come ~2 mm forward (measured). But a snap tip that passes the board's 2.0 holes has
+  prongs ~0.6 mm thick, too thin for FDM. This reopens if the holes calliper at 2.5 or more.
+- The outside holes aren't new: they are his screw tubes, now filled flush.
+
+## 2026-09-26: ball_plus ships as a sewn STEP
+
+The finished parts ship as STEP solids so Fusion opens them as bodies. ball_plus's exact BREP (his
+facets fused with the tubes' exact surfaces) loses 490 mm3 through ShapeFix and every STEP reader.
+The ball_plus STEP is therefore sewn from the checked STL, all planar facets like his own export. It
+round-trips exactly. The other parts write straight from their BREPs. (`head-v2/fixes/step_models.py`)
+
+## 2026-09-26: Seam-pin STLs dropped onto the bed
+
+`print_export.py` sized the pins with `BRepBndLib.Add_s`, which gives a loose box on their curved
+noses. The pins shipped 0.50-0.59 mm above z = 0. `fixes/pins_on_bed.py` moves them down; new code
+sizes with `AddOptimal_s`. The shapes are unchanged.
+
 ## 2026-09-26: The CAD moves out of FPVTank_Control
 
 The Pi `git pull`s Control. Its `docs/chassis/` held 115 MB of CAD, against under 1 MB of robot code,
