@@ -38,7 +38,9 @@ sizes with `AddOptimal_s`. The shapes are unchanged.
 
 The Pi `git pull`s Control. Its `docs/chassis/` held 115 MB of CAD, against under 1 MB of robot code,
 and every regenerated mesh rode along to the Pi. Physical design now lives in this repo; Control
-keeps the code and the robot docs. The plan is in `MOVE-PLAN.md`.
+keeps the code and the robot docs. The plan is in `docs/reorg-2026-09/MOVE-PLAN.md`. Done 2026-09-27
+(phase B): the generator is in `head-v2/generator/`, the chassis parts are in `chassis-v1/`, and
+Control holds no CAD.
 
 ## 2026-09-25: Post v3, with a stop plate and the servo's centre screw
 

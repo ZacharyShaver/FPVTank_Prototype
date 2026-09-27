@@ -189,7 +189,7 @@ limit. It is **25.67**. The nest was carved to 25.0, so the two parts interfered
 voxel when both solids are more than 0.05 mm inside. The overlap is a shell ~0.5 mm thick and
 ~0.6 mm wide, wrapped round a 40° arc — 1.71 mm³ that falls between voxel centres. All eight
 `ball @ tilt … vs nest` rows read 0.00 mm³ while the parts were touching. This is the lesson in
-`../../lessons/2026-09-19-surface-sampling-is-a-vacuous-check.md` in a new costume: the row was
+`docs/lessons/2026-09-19-surface-sampling-is-a-vacuous-check.md` in a new costume: the row was
 not wrong, it was **under-resolved**, and a coarse zero looks exactly like a real one.
 
 **Fixed** by re-imposing the truncation *after* the blends, everywhere except the hub itself,

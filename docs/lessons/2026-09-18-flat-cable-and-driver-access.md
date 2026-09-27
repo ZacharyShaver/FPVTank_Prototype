@@ -54,5 +54,5 @@ were found by handling a print, and neither would have shown up in a CAD check.
   camera board, inside the ball, to the coil chamber outboard of it. It needs a round
   bore about the ribbon's width, which drives the axle and bearing choice.
 
-Related: `docs/chassis/head-v2/tree-parts/README.md`,
-`docs/chassis/head-v2/ball-head-validation-handoff.md`.
+Related: `head-v2/generator/tree-parts/README.md`,
+`head-v2/generator/ball-head-validation-handoff.md`.

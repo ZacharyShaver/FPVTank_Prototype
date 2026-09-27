@@ -1,15 +1,15 @@
 # Chassis STL part catalogue
 
-Visual index of the printable parts for the tank chassis. The STL files live in the
-sibling prototype repo:
+Visual index of the printable parts for the tank chassis. The STL files live in
+this repo (moved 2026-09-27; this note used to point at the old local folder):
 
 ```
-../FPVTank_Prototype/Version 1/3D - Model Tank/
+reference/fpv-rover-v2/
 ```
 
 The chassis is a heavily modified [FPV-Rover V2.0](https://www.printables.com/model/3150-fpv-rover-v20-tank);
 that folder also holds the original model PDF and the Instructables build guide.
-For the electronics side of the build see [HARDWARE.md](../../HARDWARE.md).
+For the electronics side of the build see `HARDWARE.md` in FPVTank_Control.
 
 ## How to read the images
 
@@ -31,7 +31,7 @@ Renders were produced by [`render_stl_views.py`](render_stl_views.py) (numpy-onl
 software rasteriser, no CAD tool required):
 
 ```bash
-python docs/chassis/render_stl_views.py "../FPVTank_Prototype/Version 1/3D - Model Tank" docs/chassis/img
+python chassis-v1/render_stl_views.py reference/fpv-rover-v2 chassis-v1/img
 ```
 
 > **Resolved 2026-08-03.** `big-bevel-gear-41-v13.stl` and

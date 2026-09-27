@@ -6,7 +6,7 @@ Fusion session, not a design spec — some items need measuring first.
 
 Baseline part: `body-rover-v13`, 207.1 × 50.0 × 110.0 mm
 (`parts/body-rover-v13.stl`). Related: `used-parts.md`,
-`../lessons/2026-08-03-drivetrain-bringup.md`.
+`docs/lessons/2026-08-03-drivetrain-bringup.md` in FPVTank_Control.
 
 ## 1. Defects in the current print — reprint required
 
@@ -85,7 +85,7 @@ This is what gives Scorpion its name.
 The tail must house:
 
 - **Raspberry Pi 5** — model available at
-  `../../../FPVTank_Prototype/Current/raspberry-pi-5-model_files/`
+  `reference/raspberry-pi-5/` in this repo (the STEP is in `reference/downloads/raspberry-pi-5/`)
   (including the **active cooler** variant; design around that one, it is
   taller)
 - **PCA9685** — a native Fusion file exists:
@@ -121,7 +121,7 @@ leaves the PCA9685 free-running its last command.
 ### Design-in from the lessons doc
 
 Two things that saved real time this session and would be lost by burying
-the electronics (see `../lessons/2026-08-03-drivetrain-bringup.md`):
+the electronics (see FPVTank_Control's `docs/lessons/2026-08-03-drivetrain-bringup.md`):
 
 - **ESC arm LEDs must stay visible.** Solid vs blinking is the only honest
   arming indicator — the beeps are inaudible at the bench. Light pipes or

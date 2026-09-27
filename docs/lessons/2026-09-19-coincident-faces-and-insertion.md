@@ -1,7 +1,7 @@
 # A cut must overrun the face it passes through — and a part must be able to reach its seat
 
 **2026-09-19.** Two faults, each hit twice in one day, on the variant B head
-(`docs/chassis/head-v2/generators/tree_parts_b.py`).
+(`head-v2/generator/generators/tree_parts_b.py`).
 
 ---
 

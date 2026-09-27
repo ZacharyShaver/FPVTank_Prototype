@@ -171,8 +171,8 @@ session that read zero while the geometry was wrong. Break the part on purpose a
 number move: camera-vs-axle scores 39.74 mm³ against the old axle and 0.00 against the new one;
 the insertion rows block within 0.5 mm on the old collars and run clear over 9 mm on the new.
 
-Both are written up in `../../lessons/2026-09-19-coincident-faces-and-insertion.md` and
-`../../lessons/2026-09-19-surface-sampling-is-a-vacuous-check.md`.
+Both are written up in `docs/lessons/2026-09-19-coincident-faces-and-insertion.md` and
+`docs/lessons/2026-09-19-surface-sampling-is-a-vacuous-check.md`.
 
 ---
 
@@ -200,7 +200,7 @@ Live parameters are at the top of `tree_parts_b.py` — read them there, not fro
 
 ## 6. Files
 
-**Generators** (`docs/chassis/head-v2/generators/`)
+**Generators** (`head-v2/generator/generators/`)
 
 - `tree_parts_b.py` — the whole variant. Parameters at the top; `PARTS` at the bottom carries
   each part's print orientation (measured, not guessed: the nest wants deck-plate-down, 11.8 %
@@ -222,4 +222,4 @@ the live version, never overwrite it**: read it first, apply only B's changes, r
 
 **Also see:** `cradle-audit.md` (the 2026-09-19 audit of `fork`, and the blind spots it
 found in the four checks), `README.md` (BOM, assembly order, fits to check, the Fusion route),
-`step/README.md`, `../../lessons/2026-09-18-flat-cable-and-driver-access.md`.
+`step/README.md`, `docs/lessons/2026-09-18-flat-cable-and-driver-access.md`.

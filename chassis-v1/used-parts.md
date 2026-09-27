@@ -9,7 +9,7 @@ robot, and how far has it drifted from the download?"
 Files live in [`parts/`](parts/). Source of record remains:
 
 ```
-../FPVTank_Prototype/Version 1/3D - Model Tank/
+reference/fpv-rover-v2/        (in this repo since 2026-09-27)
 ```
 
 ## ⚠ Baseline, not current

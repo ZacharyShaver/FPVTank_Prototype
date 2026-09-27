@@ -63,8 +63,8 @@ Mark superseded files; don't silently replace them.
 
 ## Where things are
 
-- `tools/config.py` holds every path. Until phase B (`MOVE-PLAN.md`) the generator is read from
-  Control, **read only**.
+- `tools/config.py` holds every path. The generator is in `head-v2/generator/` (moved from Control in
+  phase B, 2026-09-27). No CAD goes back into Control.
 - Run with `python` (3.10; it has cadquery). `python head-v2/fixes/build_all.py` regenerates the
   hand-off; `python head-v2/checks/regression.py` must reproduce its table.
 - Reviewing a new Fusion revision: the `review-revision` skill.

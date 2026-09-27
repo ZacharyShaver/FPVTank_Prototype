@@ -120,7 +120,7 @@ Interference is re-checked by `tree_parts_check.py`: zero overlap across tilt âˆ
 
 ## Cable routing rules
 
-From the 2026-09-18 print review (`../../lessons/2026-09-18-flat-cable-and-driver-access.md`):
+From the 2026-09-18 print review (`docs/lessons/2026-09-18-flat-cable-and-driver-access.md`):
 no creases in the camera ribbon, every turn a curve of at least 3 mm radius, and any
 out-of-plane change made as a twist over ~40 mm in a bore about the ribbon's width.
 

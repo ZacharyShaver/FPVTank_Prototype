@@ -1,7 +1,17 @@
 # Phase B: move the CAD out of FPVTank_Control
 
-Written 2026-09-26, when phase A (this repo's layout, tools and rules) was done. **Not started. Don't
-run it until the preconditions hold.**
+Written 2026-09-26, when phase A (this repo's layout, tools and rules) was done.
+
+> **Done 2026-09-27**, at Zach's word ("lets complete the move, i think its about time").
+> - Preconditions 1 and 3 held. Of the two open generator tasks, neither landed. They moved with the
+>   generator and are open items in `head-v2/NOTES.md`; the seam-screw one is moot for printing.
+> - Steps 2–4: 199 files copied, byte-identical, and the regression reproduced (see the commit).
+> - Step 5: Control's `docs/chassis/` and the three lessons were removed, with pointers left.
+> - Step 6: robot and bench memories were copied to Control's new memory key; the CAD facts came here.
+>   The personal memories weren't written to the global file. That still needs Zach's OK.
+> - Step 7: this file and `HANDOFF.md` now live in `docs/reorg-2026-09/`.
+> - Still open: renaming this folder to `FPVTank_Prototype` (not done: it would move Claude's memory
+>   key again); the as-printed chassis edits that exist only in Blender.
 
 Why: Control's `docs/chassis/` is 115 MB of tracked CAD in 196 files, and the Pi `git pull`s all of it.
 After phase B, Control keeps its code and the robot docs it needs, and the CAD lives here.

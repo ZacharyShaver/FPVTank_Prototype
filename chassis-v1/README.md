@@ -1,7 +1,7 @@
-# Chassis v1 (phase B)
+# Chassis v1
 
-These are the chassis parts as used on the robot, with their render catalogue and edit history. They
-come from FPVTank_Control's `docs/chassis/`:
+The chassis parts as used on the robot, with their render catalogue and edit history. Moved from
+FPVTank_Control's `docs/chassis/` in phase B (2026-09-27):
 - `parts/`
 - `img/`
 - `stl-parts.md`
@@ -9,4 +9,5 @@ come from FPVTank_Control's `docs/chassis/`:
 - `body-revision-brief.md`
 - `render_stl_views.py`
 
-See `MOVE-PLAN.md`. The original download these were printed from is in `reference/fpv-rover-v2/`.
+The original download these were printed from is in `reference/fpv-rover-v2/`. Zach's edits to these
+parts were made in Blender and never exported, so the as-printed versions aren't here.

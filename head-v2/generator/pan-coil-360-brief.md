@@ -103,7 +103,7 @@ width, so it can only leave the can sideways with its width still vertical —
 which is exactly what a fore-aft trough in the body wants. Stacking the can
 above the deck would need the ribbon to turn downward out of it, which costs a
 crease. (Rules 1 and 2,
-`../../lessons/2026-09-18-flat-cable-and-driver-access.md`.)
+`docs/lessons/2026-09-18-flat-cable-and-driver-access.md`.)
 
 ### The governing equation
 
@@ -526,7 +526,7 @@ large 2 mm shell that marching cubes gives ~300k faces. A 16k decimation target
 broke it — the decimator would not collapse that far, returned its last failed
 attempt undecimated, and the *report* then read 46 bodies while the raw mesh was
 one clean watertight component. Same class as
-`../../lessons/2026-09-19-coincident-faces-and-insertion.md`: **read the face
+`docs/lessons/2026-09-19-coincident-faces-and-insertion.md`: **read the face
 count against the target, not just the flags.**
 
 ## 10. Prior art in the repo
@@ -536,7 +536,7 @@ count against the target, not just the flags.**
   can and not a twist, why the coil is below the deck, and which member
   rotates. Outputs in `pan-coil/`.
 - **`coil-test/`** — the T1 rig STLs, printable.
-- **`../../lessons/2026-09-18-flat-cable-and-driver-access.md`** — the six flat
+- **`docs/lessons/2026-09-18-flat-cable-and-driver-access.md`** — the six flat
   cable and driver rules. Rules 1–4 govern everything here.
 - **`tree-parts-b/HANDOFF.md` §0.3** — where this item came from.
 - **`ball-head-validation-handoff.md`** — the camera measurements and the

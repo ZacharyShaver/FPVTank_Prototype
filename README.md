@@ -16,9 +16,9 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 | `head-v2/fusion/rev1-2026-09-24/` | Zach's Fusion exports, the source of truth |
 | `head-v2/fixes/` | the scripts that turn a Fusion revision into its fixed version and the hand-off |
 | `head-v2/checks/` | fit checks, each with its negative control. `regression.py` runs them |
-| `head-v2/generator/` | *(phase B)* the SDF generator, which is in FPVTank_Control for now |
+| `head-v2/generator/` | the SDF generator: the cradle, the 360° pan coil and the older forks |
 | `head-v2/out/` | *(untracked)* everything the fixes write: print STLs, 3MF, STEP, pictures |
-| `chassis-v1/` | *(phase B)* the chassis parts as used on the robot |
+| `chassis-v1/` | the chassis parts as used on the robot |
 | `reference/fpv-rover-v2/` | the original FPV-Rover V2.0 download, by Markus_p |
 | `reference/raspberry-pi-5/` | Pi 5 fit-check models |
 | `reference/solids/` | fit-check dummies: servo, camera, bearing, screw heads |
@@ -27,7 +27,7 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 | `docs/decisions.md` | why each design went the way it did |
 | `docs/lessons/` | lessons |
 | `tools/` | shared Python: STL to exact solid, booleans, ray and slice probes, renders, mesh report, export |
-| `HANDOFF.md`, `MOVE-PLAN.md` | the reorganisation. Phase A is done; phase B, the move out of Control, is still to do |
+| `docs/reorg-2026-09/` | the reorganisation: phase A (this layout) and phase B (the move out of Control), both done |
 
 ## The current print set
 
@@ -50,8 +50,7 @@ python head-v2/checks/regression.py    # about 6 min: the checks, and the table 
 python head-v2/checks/reeval.py        # a revision as drawn, before any fix
 ```
 
-Until phase B, the generator (`tree_parts.py`, `tree_parts_b.py` and the camera dummy) is read from
-`../FPVTank_Control/docs/chassis/head-v2/`. That is read only: nothing here writes there.
+The generator lives in `head-v2/generator/` (since phase B, 2026-09-27). FPVTank_Control holds no CAD.
 
 ## Git on Windows
 

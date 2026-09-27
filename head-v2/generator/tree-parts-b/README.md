@@ -92,7 +92,7 @@ Mouth-up looks like the natural way to print a bowl and it would fall over.
 **13 M2 screws.** The camera board's four are gone: it is **captured**, sliding
 into a rail in each ball half, which also means the fit depends on the board's
 **outline** rather than its hole pattern — the easier thing to measure. See
-`../../lessons/2026-09-18-flat-cable-and-driver-access.md`.
+`docs/lessons/2026-09-18-flat-cable-and-driver-access.md`.
 
 **The tilt servo's two tab screws are back, and this is why.** They were dropped
 on the grounds that the servo was captured instead: *"the tabs drop into a

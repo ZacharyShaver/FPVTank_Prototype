@@ -1,7 +1,7 @@
 # head-v2: live state
 
 Drained, not grown: when an item is done, take it out. Its record goes to `docs/decisions.md` or git.
-As of 2026-09-26.
+As of 2026-09-27.
 
 ## Current
 
@@ -38,9 +38,13 @@ As of 2026-09-26.
 - **Nest SDF sheets:** the nest's SDF has zero-thickness sheets at |Y| 25.0 and 26.5 in the hub bore.
   They read as "touching" but aren't material. `lens_nest.nest_sweep` steps around the 26.5 one only.
   So `checks/ball_nest.py` reports ball_plus's nearest approach as 0.10 mm: that is its hub beside the
-  25.0 sheet (Y 25.08, 8.9 from the tilt axis), not the nest. "Deepest" isn't affected. A fix in the
-  generator was started from Control.
-- **Seam screw heads in the generator:** `tree_parts_b.py` still has the screw-pocket bug. A task was
-  started from Control.
+  25.0 sheet (Y 25.08, 8.9 from the tilt axis), not the nest. "Deepest" isn't affected. Unfixed; the
+  generator is here now (`generator/generators/tree_parts_b.py`).
+- **Seam screw heads in the generator:** `tree_parts_b.py` still has the screw-pocket bug. Moot for
+  printing (the ball is Zach's model, with snap pins), but it matters if the generator's ball is used.
 - **The generator doesn't have Zach's revision.** Porting it was offered and hasn't been answered.
-- **Phase B:** move the generator and the chassis files here (`MOVE-PLAN.md`).
+- **Cradle bottom onto the 360° pan coil:** `generator/pan-coil-360-brief.md` §6.2 lists the changes
+  (horn pocket and centre hole out, 3 × M3 at r 20, ribbon groove onto the axis). Blocked on where the
+  ribbon's quarter twist goes (§5.0): 21 mm of run against ~40 needed. Zach leans to twisting inside
+  the nest (2026-09-27); not yet modelled. The cradle blank route didn't work for him: the cradle is
+  edited in the generator.

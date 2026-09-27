@@ -11,4 +11,4 @@ Nothing is stored here yet. Until then:
 - the camera is read from the generator's `camera/camera_dummy.step`;
 - the bearing comes from the generator's `bearing_dummy.py`.
 
-Export them here once phase B brings the generator over.
+The generator is in `head-v2/generator/` now; export them here when a check needs them as files.
