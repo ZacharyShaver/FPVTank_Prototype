@@ -9,7 +9,7 @@ import re, zipfile
 import numpy as np
 import pymeshlab as ml
 import tree_parts as TP_
-PIN = 'snap_pin_stop_medium'            # the size the plate carries -- swap once Zach picks one
+PIN = 'snap_pin_stop_medium'            # Zach's pick (2026-09-27, docs/decisions.md)
 CAM = 'medium'                          # likewise for the camera posts
 
 def load_mesh(path):

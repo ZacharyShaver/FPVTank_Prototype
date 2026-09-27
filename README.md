@@ -18,6 +18,7 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 | `head-v2/checks/` | fit checks, each with its negative control. `regression.py` runs them |
 | `head-v2/generator/` | the SDF generator: the cradle, the 360° pan coil and the older forks |
 | `head-v2/out/` | *(untracked)* everything the fixes write: print STLs, 3MF, STEP, pictures |
+| `sim/mujoco/` | the head as a MuJoCo physics model: servo sliders, shove it by hand, a camera at the lens |
 | `chassis-v1/` | the chassis parts as used on the robot |
 | `reference/fpv-rover-v2/` | the original FPV-Rover V2.0 download, by Markus_p |
 | `reference/raspberry-pi-5/` | Pi 5 fit-check models |

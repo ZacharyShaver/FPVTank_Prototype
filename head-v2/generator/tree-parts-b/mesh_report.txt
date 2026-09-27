@@ -13,3 +13,6 @@ fusion/fork.obj               60000 faces  watertight=True  manifold=True  bodie
 fusion/post.obj                5000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.79 cm3
 fusion/roots.obj              16000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=17.78 cm3
 ENVELOPE (assembled) [-42.3 -34.   -0. ] -> [28.5 34.  82.7]  size [70.8 68.  82.7]
+print/fork.stl             550000 faces  watertight=True  manifold=True  bodies=1  self-int=26  vol=55.61 cm3   <-- CHECK
+fusion/fork.obj             60000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=55.61 cm3
+ENVELOPE [-42.3 -34.   10.5] -> [28.  34.  72.5]  size [70.3 68.  62. ]

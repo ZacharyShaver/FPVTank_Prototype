@@ -37,6 +37,8 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
   feature first. Rev 1's first review got three verdicts wrong by assuming the old model.
 - Check the hardware as well as the parts: screw heads, pins, the real servo and camera solids. The
   seam screws jammed because the pocket rule ignored the ball's curve under the head.
+- Zero overlap isn't a fit. Where parts join, also probe the bolt axes, bores and cable paths for open
+  space, with the old version as the control (`docs/lessons/2026-09-27-zero-overlap-is-not-a-fit.md`).
 - Locate a small nonzero overlap before calling it anything. 3.8 mm³ dismissed as "skin" was the servo
   tabs hitting the seam posts.
 - Use exact OCC booleans on his STLs (`tools/kit.py`), not voxels, for anything you ship.
@@ -68,3 +70,4 @@ Mark superseded files; don't silently replace them.
 - Run with `python` (3.10; it has cadquery). `python head-v2/fixes/build_all.py` regenerates the
   hand-off; `python head-v2/checks/regression.py` must reproduce its table.
 - Reviewing a new Fusion revision: the `review-revision` skill.
+- The head's MuJoCo model is in `sim/mujoco/` (`build_head.py`; rebuild it after a CAD change).

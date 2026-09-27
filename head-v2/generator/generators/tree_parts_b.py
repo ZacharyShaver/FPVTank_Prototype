@@ -249,8 +249,29 @@ def _rear_angle(p):
 _ta = np.radians(180.0 + abs(TRACK_ANG_LO))          # polar angle of the track's lower end
 _TX, _TZ = (SHROUD_R0 + 1.2) * np.cos(_ta), H + (SHROUD_R0 + 1.2) * np.sin(_ta)
 _TD = (np.sin(np.radians(abs(TRACK_ANG_LO))), -np.cos(np.radians(abs(TRACK_ANG_LO))))
-TROUGH_PATH = [(_TX, _TZ), (_TX + 8.0 * _TD[0], _TZ + 8.0 * _TD[1]),
-               (5.0, BASE_Z + 0.6), (9.0, BASE_Z - 1.5)]
+# The cradle sits on the 360-degree pan coil's drum (pan-coil-360-brief.md section 6), not on a
+# pan-servo pedestal. 2026-09-27, Zach. False rebuilds the superseded pedestal version: a pan-horn
+# pocket and a 5.6 shaft hole in the underside, and the groove landing 9 mm forward of the axis.
+PAN_COIL = True
+TROUGH_PATH_PEDESTAL = [(_TX, _TZ), (_TX + 8.0 * _TD[0], _TZ + 8.0 * _TD[1]),
+                        (5.0, BASE_Z + 0.6), (9.0, BASE_Z - 1.5)]
+# On the coil the groove turns straight down ON the axis, into the drum's 18 bore. The ribbon keeps
+# lying across Y (width along Y), which is what the drum wants: it drops down the bore and makes ONE
+# soft 45-degree fold at the drum's side slot, set once at assembly -- no twist (decision 2026-09-27).
+# The turn is a bend about Y and it FINISHES inside the drum's bore (Z 5), which makes its tightest
+# radius 6.3 -- ending at the underside instead gave 2.4, too tight if the ribbon calipers at 0.3
+# (minimum 10 x thickness). Below the cradle the path stays within X 0..-2.4, where the 18 bore's
+# chord is still 17.2 for the 16 ribbon. The cut below BASE_Z only removes air.
+TROUGH_PATH_COIL = [(_TX, _TZ), (_TX + 2.5 * _TD[0], _TZ + 2.5 * _TD[1]),
+                    (0.0, BASE_Z + 1.5), (0.0, BASE_Z - 5.5)]
+TROUGH_PATH = TROUGH_PATH_COIL if PAN_COIL else TROUGH_PATH_PEDESTAL
+# The coil drum's three M3 pilots (pan_coil_b.MATE_SCREW_R / MATE_SCREWS, 7 deep). The cradle is
+# 15-16 mm thick over them and open above (probed 2026-09-27), so each takes a clearance hole
+# through the bottom 5.5 mm and a head recess opening into the bowl, driven from above BEFORE the
+# ball goes in. M3 x 12: 5.5 through, ~6.5 into the drum.
+MATE_SCREW_R, MATE_SCREWS = 20.0, [0.0, 120.0, 240.0]
+MATE_CLAMP = 5.5                                   # cradle material under each screw head
+MATE_HEAD_R = 3.2                                  # 6.4 recess for a 5.5 M3 socket head
 
 def trunk(p):
     raw = bezier(TRUNK_P, 400)
@@ -402,10 +423,16 @@ def fork(p, features=True):
                                       POD_M_Y1 - 1, POD_M_Y1 + 9))
     cuts = [np.where(plus, arm, coll),
             trough(p, TROUGH_W / 2, TROUGH_T / 2),
-            track(p),
-            U(cyl_z(p, 0, 0, HORN_C / 2, BASE_Z - 1, BASE_Z + HORN_D),
-              rbox(p, (-HORN_L / 2, -HORN_W / 2, BASE_Z - 1), (HORN_L / 2, HORN_W / 2, BASE_Z + HORN_D), 1.0)),
-            cyl_z(p, 0, 0, 2.8, BASE_Z - 1, BASE_Z + 14)]
+            track(p)]
+    if PAN_COIL:
+        for a in np.radians(MATE_SCREWS):
+            x, y = MATE_SCREW_R * np.cos(a), MATE_SCREW_R * np.sin(a)
+            cuts += [cyl_z(p, x, y, M3_CLEAR, BASE_Z - 1, BASE_Z + MATE_CLAMP + 0.1),
+                     cyl_z(p, x, y, MATE_HEAD_R, BASE_Z + MATE_CLAMP, H)]       # overruns the bowl
+    else:                                                                       # SUPERSEDED 2026-09-27
+        cuts += [U(cyl_z(p, 0, 0, HORN_C / 2, BASE_Z - 1, BASE_Z + HORN_D),
+                   rbox(p, (-HORN_L / 2, -HORN_W / 2, BASE_Z - 1), (HORN_L / 2, HORN_W / 2, BASE_Z + HORN_D), 1.0)),
+                 cyl_z(p, 0, 0, 2.8, BASE_Z - 1, BASE_Z + 14)]
     return np.maximum(s, -U(*cuts))
 
 def rin(p):

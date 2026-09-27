@@ -56,3 +56,7 @@ were found by handling a print, and neither would have shown up in a CAD check.
 
 Related: `head-v2/generator/tree-parts/README.md`,
 `head-v2/generator/ball-head-validation-handoff.md`.
+
+> **Clarified 2026-09-27 (Zach):** rule 1 over-reads him. A soft fold in the middle of the cable, made in
+> place and never flexed, is fine. What he rejected was folding the stiffened connector end, or a fold
+> that must be made first and then threaded through a tight space. See `docs/decisions.md`, 2026-09-27.

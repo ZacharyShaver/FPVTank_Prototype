@@ -3,6 +3,73 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-09-27: MuJoCo for simulating the head, not Isaac Sim (for now)
+
+For moving the pan/tilt head by hand and later training on it, the head is modelled in MuJoCo
+(`sim/mujoco/`). Isaac Sim was the other candidate: Control's roadmap plans a ROS 2 twin in it.
+- **Isaac Sim pins old NVIDIA drivers**, rolling the machine's driver back about ten versions. Zach
+  doesn't want that. MuJoCo needs only OpenGL, and the pip install touched nothing already installed.
+- **It's light.** It runs on the CPU and is quick to fiddle with. The RTX 5070 has 12 GB, which is
+  tight for camera-based training in Isaac.
+- **Isaac isn't ruled out.** The same joints, masses and meshes can become a URDF for Isaac Sim when
+  learning from rendered camera images needs it.
+
+The first model is two servo joints plus the 2:1 pan gear pair. Its masses are guesses until the
+slicer gives PETG-GF grams. A finding from it: the tilt piece balances within about 1 mm of the tilt
+axis, so gravity costs the tilt servo almost nothing.
+
+## 2026-09-27: Seam pins and camera posts are medium
+
+Zach doesn't need the stiffness test: medium, for the seam pins and the camera posts both. The 3MF
+plates already carried medium (`PIN` in `fixes/plate3mf.py`, `PIN` and `CAM` in
+`fixes/plate_campost.py`), so nothing was rebuilt. The soft and firm STLs still build; they're just not
+the pick.
+
+## 2026-09-27: The cradle bolts onto the 360° pan coil's drum
+
+The cradle (`fork`) no longer sits on a pan-servo pedestal (`roots`): it bolts straight onto the pan
+coil drum's mounting disc (both Ø51, meeting at Z 10.5). In `head-v2/generator/generators/tree_parts_b.py`
+(`PAN_COIL = True`):
+- **3 × M3 × 12** at r 20, 0/120/240°: a 3.4 clearance through the bottom 5.5 mm, and a 6.4 head recess
+  opening into the bowl. They are driven from above before the ball goes in. The cradle is 15–16 mm
+  thick there and open above (probed).
+- **The ribbon groove comes down on the centre line** into the drum's 18 mm bore. It used to land 9 mm
+  forward, at the bore's edge. The bend finishes inside the bore, at a tightest radius of 6.3 mm, safe
+  even if the ribbon calipers at 0.3. The ribbon's full 16 mm width is clear along the whole path
+  (probed).
+- **The pan-horn pocket and the Ø5.6 shaft hole are gone.**
+
+Checks: `build_b.py --check` is green, including ball vs nest at every tilt. `pan_coil_b_check.py`
+reads 0 clashes. The bolt and ribbon probes read open on the new cradle and closed on the old one,
+their negative control.
+
+**The ribbon needs no twist.** It lies across Y all the way down, and one soft 45° fold at the drum's
+side slot turns it on edge. The fold is made by hand with the drum out. The pan-coil brief's §5.0
+twist problem assumed no folds at all. The drum goes on with its side slot facing forward (+X): the
+bolt pattern allows three ways round.
+
+**Superseded:** the pedestal cradle, with the pan horn pocketed in its underside (`PAN_COIL = False`
+rebuilds it).
+
+## 2026-09-27: Mid-cable folds in the camera ribbon are allowed
+
+Zach, clarifying what he meant on 2026-09-18 when he turned down a 45° fold. The rule is about where
+a fold goes, not about folds as such:
+- **Never fold the stiffened end,** the connector section with the plastic backing that must stay
+  straight to plug in.
+- **Don't design a fold that has to be made first and then threaded through a tight space.**
+- **A fold in the middle of the cable is fine,** made in place where there is room. Keep it soft
+  (rounded, not pressed flat), and only where the cable never flexes: never in the tilt loop behind
+  the ball or in the pan coil.
+
+This matters for the 360° pan coil. The ribbon has to turn from flat to on edge between the ball and
+the coil, and a quarter twist wants ~40 mm of run where only 21 mm exists (pan-coil brief §5.0). A
+mid-cable fold in the stretch that turns with the head does the same job in almost no length.
+
+**Superseded:** "no folds in the flat cable, ever" (2026-09-18, in `docs/lessons/2026-09-18-flat-cable-and-driver-access.md`
+rule 1 and the variant-B notes). That over-read his objection, which was about folding the stiffened
+end to fit it through a hole.
+
 ## 2026-09-26: Camera board held by snap posts pushed in from outside
 
 Zach's rev 1 holds the camera board with two screws from outside, through tubes to the board's two +Y

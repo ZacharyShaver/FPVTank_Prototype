@@ -8,7 +8,7 @@ import pymeshlab as ml
 import tree_parts as TP_
 from export import tidy, health
 OUTP = config.PRINT
-PIN = 'snap_pin_stop_medium'            # the size the plate carries -- swap once Zach picks one
+PIN = 'snap_pin_stop_medium'            # Zach's pick (2026-09-27, docs/decisions.md)
 names = ['ball_plus', 'ball_minus', 'post_v3', 'snap_pin_stop_soft', 'snap_pin_stop_medium', 'snap_pin_stop_firm']
 for nm in names:
     dev = tidy(os.path.join(OUTP, nm + '.stl'))

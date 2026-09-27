@@ -25,9 +25,6 @@ As of 2026-09-27.
 
 ## Open
 
-- **Pin size:** not picked yet (2026-09-26). Print two test blocks and one stop pin of each size. The
-  3MF plates carry medium; if he picks soft or firm, change `PIN` in `fixes/plate3mf.py` and `PIN` and
-  `CAM` in `fixes/plate_campost.py`. The camera posts use the same grade names; he was told to match.
 - **Camera board hole size:** 2.0 is a photo value, not calipered. The camera posts' pin is 1.8
   (`campost.R_PIN`). When he calipers a hole, set the pin 0.1 under it and rebuild.
 - **ball_plus's exact BREP doesn't survive STEP.** With the camera tubes fused in, it passes BRepCheck
@@ -43,8 +40,8 @@ As of 2026-09-27.
 - **Seam screw heads in the generator:** `tree_parts_b.py` still has the screw-pocket bug. Moot for
   printing (the ball is Zach's model, with snap pins), but it matters if the generator's ball is used.
 - **The generator doesn't have Zach's revision.** Porting it was offered and hasn't been answered.
-- **Cradle bottom onto the 360° pan coil:** `generator/pan-coil-360-brief.md` §6.2 lists the changes
-  (horn pocket and centre hole out, 3 × M3 at r 20, ribbon groove onto the axis). Blocked on where the
-  ribbon's quarter twist goes (§5.0): 21 mm of run against ~40 needed. Zach leans to twisting inside
-  the nest (2026-09-27); not yet modelled. The cradle blank route didn't work for him: the cradle is
-  edited in the generator.
+- **Pan coil test print (2026-09-27):** the cradle bolts onto the drum now (`docs/decisions.md`). The
+  test set is `out/print-pan/` (`fixes/pan_print_set.py`): cradle, drum, well, gear bay, input gear, a
+  3MF plate and a README. **Printing since 2026-09-27**: ask Zach what fit before changing any of it. Open: the input gear's horn pocket is a placeholder (Zach
+  re-cuts it in Fusion); the ribbon thickness is uncalipered; where the fixed base screws to the tank
+  is undecided (the old deck screws sat under the bearing, brief §6.3).
