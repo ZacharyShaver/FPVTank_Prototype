@@ -81,7 +81,10 @@ rows.append(('camera vs tilt servo', overlap(camera_solid, servo_solid, (0, -20,
 rows.append(('camera vs ball_plus', overlap(camera_solid, B.ball_plus, (0, -20, H - 22), (34, 34, H + 22))))
 rows.append(('camera vs ball_minus', overlap(camera_solid, B.ball_minus, (0, -20, H - 22), (34, 34, H + 22))))
 rows.append(('ball halves vs each other', overlap(B.ball_plus, B.ball_minus, (-33, -2, H - 33), (35, 2, H + 33))))
-# the rolling-loop track has to stay open through the nest wall, and clear of the ball at both ends
+# the rolling-loop track has to stay open through the nest wall, and clear of the ball at both ends.
+# These two rows only prove each cut exists: a cut can't overlap the part it was cut from. They read 0
+# while the groove never opened into the track (docs/lessons/2026-09-27-two-clear-cuts-need-not-meet.md).
+# Whether the ribbon and the servo plug can actually get through is head-v2/checks/plug_passage.py.
 rows.append(('ribbon track vs nest', overlap(B.track, B.fork, *NEST)))
 rows.append(('ribbon trough vs nest', overlap(lambda p: B.trough(p, B.TROUGH_W / 2, B.TROUGH_T / 2), B.fork,
                                               (-46, -14, 8), (16, 14, H + 6))))

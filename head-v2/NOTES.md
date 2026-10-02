@@ -23,6 +23,13 @@ As of 2026-09-27.
   `head-v2-snap/superseded - before camera posts/`. `out/` still builds those: the rev-2 checks read them.
 - Before changing the ball, the post or the seam, ask Zach which files he printed.
 
+- **Head rev 2 (2026-09-27):** Zach's Fusion rev 2 (`fusion/rev2-2026-09-27/`, its README), with the
+  camera posts rebuilt for his moved tubes and the IR cutout extended 2 mm. The hand-off is
+  `out/print-rev2/`. Build order: `fixes/campost_rev2.py`, `ball_plus_rev2.py`,
+  `export_campost_rev2.py`, `figure_rev2.py`. Checks: `checks/check_campost_rev2.py`, `rev2_nest.py`
+  (in `regression.py`). The 3D view shows it: https://claude.ai/artifact/NKDFgbD3YuAp3xg7JZudVj
+  (`fixes/fit_view.py`).
+
 ## Open
 
 - **Camera board hole size:** 2.0 is a photo value, not calipered. The camera posts' pin is 1.8
@@ -48,3 +55,27 @@ As of 2026-09-27.
   fit before changing any of it. Open: the input gear's horn pocket is a placeholder (Zach re-cuts it in
   Fusion; the servo's shaft must end inside the horn); the ribbon thickness is uncalipered; where the
   base screws to the tank is undecided (the old deck screws sat under the bearing, brief §6.3).
+- **Cradle plug chute (2026-09-27, later):** the cradle has a 4 mm groove plus a straight plug chute
+  (`tree_parts_b.CHUTE_T`, `chute()`; hand-off `fixes/cradle_chute.py`; check `checks/plug_passage.py`).
+  The old groove never opened into the track. Zach's servo connector: **14 long × 8 wide** (calipered);
+  thickness not measured. Set 3's drum passes it (side slot top Z 2.0); set 2's jams at 3.0 thick.
+- **Pan coil set 3 (2026-09-28; tab block 2026-09-29):** built on Zach's MG90S model
+  (`generator/pan-coil-b/MG90S.3MF`, check `checks/pan_servo_fit.py`), plus a slide-in tab block under the
+  servo's window-end tab, whose screw had nothing to bite (`pan_coil_b.tab_block`). Reprint base and
+  drum, print the tab block. Open: the input gear's horn pocket is still
+  the placeholder. With the horn's hub on the block face, its arms sit 2.5–4.5 mm below the gear's top
+  (1.5 of roof); Zach re-cuts it in Fusion. Open too: he doesn't have the tilt axis's 2 × 6704 and asked
+  to use a 6809 (he has 10). Where it goes wasn't settled: he mentioned "under the coil on the post, size
+  the post to match", then dismissed the clarifying question.
+- **Servo wire route, round 1 (2026-10-02):** the stub replaces the −Y axle and cap; a 5 mm wire hole runs
+  down the cradle's −Y wall (`tree_parts_b.WIRE_*`, `stub`; check `checks/wire_route.py`; hand-off
+  `fixes/wire_route_r1.py`). Reprint the cradle and print the stub (`out/print-pan/plate_wire_route_r1.3mf`).
+  The servo's lead and plug stay coiled in the ball, and Dupont jumpers run down. Open: the 0.24 running
+  gap; jumper length (~24 cm to the base bottom, so get 40 cm).
+- **Pan coil set 4 = wire route round 2 (2026-10-02):** the wires' own lane under the ribbon (9 mm gap,
+  shelf, drum core hole, exit boss at −145°; `pan_coil_b.LANE_*` etc., `fixes/wire_route_r2.py`, check
+  `checks/wire_route.py` round 2). Reprint the base and drum (`plate_pan_coil_set4.3mf`). Set 3's are in
+  `superseded - set 3 before wire lane/`. Open: lane height 3.5 and 74 mm of wire in it are guesses.
+- **Rev 2 mesh faults:** his ball_plus export has 11 self-intersections (X 19–22, Z ~36, above the
+  lower tube) and non-manifold edges at the back (X −21.3, Y 19.4). They ship as exported; ask him to
+  clean them in Fusion on the next export.

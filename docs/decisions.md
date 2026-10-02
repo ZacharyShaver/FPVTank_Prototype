@@ -3,6 +3,126 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-10-02: The tilt servo's wires get their own route (round 1: stub and cradle hole)
+
+Taping the tilt servo's lead to the ribbon spoiled the ribbon's fold (Zach). The lead gets its own hidden
+way down instead:
+- **The servo's own lead and plug stay coiled inside the ball,** behind the camera board on the −Y side
+  (about 17 cm³ free, measured). Zach's Dupont jumper wires plug into it, and only they run down. This
+  was his idea. His plug has no visible latches, so it can't be depinned, and this avoids cutting the
+  lead. It replaced the plan to cut, solder and use a printed joint cover.
+- **On the tilt axis:** a fixed hollow stub (`tree_parts_b.stub`) replaces both the −Y axle and the end
+  cap. The ball turns on it, and the wires run through its middle, so they twist instead of bending.
+  His socket is r 10.04 and the axle was r 9.95; that 0.09 mm is why the axle "doesn't fit". The stub
+  is r 9.80. It is held by 3 × M2 × 6 in the cap's old holes, which also clock its wire hole.
+- **A 5 mm hole down inside the cradle's −Y wall** (`WIRE_PTS`, `wire_tube`). It passes under the drum
+  screw's head and ends in the plug chute's mouth above the drum's bore. The wall is only ~5.8 mm thick
+  across its slope, so a 1.6 mm conduit ridge grows on its outside.
+- **The holes are sized for a bare Dupont pin beside two wires** (the shell comes off the threaded end).
+  With the shells on, the 14 mm rigid housings won't take the bends in a hole that fits the wall.
+- **Round 2 (pan coil set 4, built the same day at Zach's "lets do the next round"):** the wires roll in
+  their own lane under the ribbon (`pan_coil_b.LANE_*`, `SHELF_T`, `DRUM_WIRE_PTS`, `BASE_WIRE_PTS`).
+  - The lane is 3.5 tall, with its own wall at r 21, a 9 mm gap. So the moving U is ~3.6 mm radius
+    instead of ~2 (Zach OK'd).
+  - The ribbon sits on a fixed 0.8 shelf over the lane.
+  - The floor drops 4.3. The bay's roof under the can was 7.6 thick, so the gears, the servo, the floor
+    plate and the tab block don't move. The barrel's journal grows from 5 to 6.6.
+  - The drum reaches down to be the lane's inner wall, standing 0.4 off the floor (set 3's touched it). A
+    5 mm hole runs down its core.
+  - The wires exit through a boss at −145°, 3 mm off the ribbon's slot.
+  - 74 mm of wire in the lane gives the ribbon's 540° of travel.
+
+Check: `head-v2/checks/wire_route.py`. Hand-off: `head-v2/fixes/wire_route_r1.py`. The fit view draws the
+route (`fixes/cable_idea.py`).
+
+## 2026-09-28: Pan coil set 3 is built on Zach's MG90S model
+
+Zach printed set 2: "servo does not fit in there". The pan servo was the datasheet box: its length
+(22.8) used as its height, a 4 mm shaft stub, and nothing past the case face. He then sent the MG90S
+model he has been using ("it matches well", `head-v2/generator/pan-coil-b/MG90S.3MF`):
+- the case is 22.4 tall;
+- a 15 × 12.2 block, 6.0 tall, sits on the shaft end of the case face;
+- the shaft tip is 10.0 past the face;
+- the tabs' shaft-side face is 1.9 below the case face, and the tab screws are 26.86 apart.
+
+The base and drum follow it (`pan_coil_b.SV_*`, `TAB_*`):
+- **The gear plane sits 0.5 under the block,** 5.6 lower than set 2, as Zach suggested ("make the barrel
+  a bit taller or send the stem lower"). The drum's barrel and the bay grow; the gears and floor keep
+  their shape.
+- **The tab shelf is at the model's tabs, 4.6 higher than the datasheet guess.**
+- **The block and the shaft get a pocket and a channel out through the side window.**
+- **The drum's side slot top goes from Z 0.5 to 2.0,** for Zach's servo connector (14 × 8, calipered).
+  It jammed at 3.0 thick turning from the bore into the slot; 2.0 passes 3.5.
+
+**The servo's +Y tab gets a slide-in tab block** (2026-09-29, Zach: "change that now please"). The
+servo slides in through the window at that end, so there was no plastic under that tab, and its M2
+pilot was cut in air (0% plastic round it, set 2 as well). A 15.4 × 6.7 × 5 block
+(`pan_coil_b.tab_block`) follows the servo in on two rails, in grooves in the pocket's side walls that
+end blind as its stop. The tab's own M2 × 6 then goes into it: 89% plastic round the screw, 3 mm of
+thread. Control: rails 0.5 too wide for the grooves read BLOCKED.
+
+Check: `head-v2/checks/pan_servo_fit.py`, with his mesh as the servo, seated and sliding in. Controls: the
+servo 4.6 higher, and 1.5 lower while sliding in.
+
+**Superseded:**
+- set 2's base and drum;
+- set 3's first cut, made the same day from the tilt servo's measured numbers (a Ø6.9 boss 5.0 tall,
+  tabs 6.5 below the face): its tab shelf would have held his servo 4.6 too high.
+
+Both are in `out/print-pan/superseded - */`.
+
+## 2026-09-27: The cradle gets a plug chute and a 4 mm groove
+
+Zach found the cradle's way down into the drum had no room for the ribbon and the tilt servo's plug
+together. Measured:
+- **The groove never opened into the ribbon track.** They met at a corner, with 0.00 mm of opening
+  (`docs/lessons/2026-09-27-two-clear-cuts-need-not-meet.md`).
+- **A rigid plug can't turn the groove's 6.3 mm bend at any slot thickness,** 3 or 4.
+
+The fix (generator, `tree_parts_b.py`: `CHUTE_T`, `chute()`):
+- **The groove is 4.0 thick** (Zach: "wire bundle is 3mm lets make it 4 so the head comes through").
+  It keeps its curve, so the ribbon still lands on the drum's axis, where the 18 bore is wide enough
+  for 16 mm.
+- **A straight 4.0 chute runs beside it**, 50° from vertical and 22 wide. It goes from the bowl's
+  floor behind the ball into the drum's bore, exiting at X −1.5. The plug is fed down it with the ball
+  out. At 40–46° the two cuts left a fin between them, held only at the sides; 50° leaves none.
+- **The chute leaves the groove's inner wall**, the one the ribbon bends round, as it was.
+- **`TROUGH_T` stays 3.0**, because it also sizes the ball's ribbon slot.
+- Cradle volume 55.61 → 55.02 cm³.
+
+Check: `head-v2/checks/plug_passage.py`. With the plug's thickness taken as 3.0 plus the 0.2 ribbon,
+a plug up to 18 long passes the cradle. The drum then limits it to 13 long, where its bore turns into
+the side slot. Raising the side slot's top from Z 0.5 to 3.0 would pass 18. That drum change is not
+made: set 2 may be printing, and the plug hasn't been calipered.
+
+**Superseded:** the cradle with the 3.0 groove (set 1 and set 2's `cradle.stl`), kept in
+`out/print-pan/superseded - cradle before plug chute/`.
+
+## 2026-09-27: Head rev 2: the lens is centred on the board's holes
+
+Zach's Fusion rev 2 (`head-v2/fusion/rev2-2026-09-27/`) booleans in the shipped fixes. It also:
+- moves both camera-post tubes up 2.00 mm;
+- removes the rib between them;
+- reshapes the IR opening.
+
+He explained the move: "the lens is directly center to the posts, your camera model had it sitting off
+center", centred by hand.
+- **The camera model's lens is centred on its holes** (`camera_dummy.py`, `LENS_OFF` 0). The photo
+  value, 1.6, is kept as `LENS_OFF_PHOTO` for `camera_dummy.*`, because the rev-1 regression rows were
+  run with it. New checks use `kit.camera(centred=True)`.
+- **The pins place the board**, so the lens sits 0.40 above the tilt axis. The tubes are not nudged
+  to fix that: it is inside his by-hand margin, and the lens clears the nest by 1.83 (was 1.95).
+- **Tube axes: Z from fitting the tube tools, Y from his wall holes** (Y 14.70, Z 37.95 / 66.85).
+- **The camera posts are regenerated** (`fixes/campost_rev2.py`). The pin tip steps down to 1.48
+  inside his 1.78 wall holes.
+- **The IR cutout is extended 2.0 toward +Y** at his request ("about 2 mm short on the left side",
+  the post side). It is his 32 mm circle shifted, trimmed to Z 42.4–62.4 so it stays 1 mm off both
+  tubes (`fixes/ball_plus_rev2.py`, `CUT_plus_ir_extend`).
+- His export's 11 self-intersections and 8 non-manifold edges ship as they are, and are located in
+  the README. Repairing them in pymeshlab opened a hole every time.
+
+**Superseded:** the rev-1 camera posts (`head-v2-snap`), made for tubes 2 mm lower.
+
 ## 2026-09-27: The pan coil comes apart to go together (print set 2)
 
 Zach asked how the small gear gets into its hole. It couldn't. Set 1 (the first pan-coil print set) had

@@ -19,7 +19,7 @@ import pan_coil_b as P
 
 # 2026-09-27: well + bay print fused as `base`, with the floor and the drum's gear as their own parts.
 # Superseded: 'well', 'bay' printed separately -- the gears could not get into the closed bay.
-PRINTED = ['drum', 'base', 'floor', 'gear_in', 'gear_out']
+PRINTED = ['drum', 'base', 'floor', 'gear_in', 'gear_out', 'tab_block']
 OUT = os.path.join(P.OUT, 'print')
 MAX_STEP = 0.28                    # finer than the viewer's 0.30-0.34 where the part table is coarser
 OVERHANG = np.cos(np.radians(45))  # a face pointing down more steeply than 45 degrees needs support

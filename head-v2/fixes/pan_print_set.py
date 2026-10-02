@@ -26,12 +26,16 @@ SRC = {'cradle': os.path.join(GEN, 'tree-parts-b', 'print', 'fork.stl'),
        'base': os.path.join(GEN, 'pan-coil-b', 'print', 'base.stl'),
        'floor': os.path.join(GEN, 'pan-coil-b', 'print', 'floor.stl'),
        'small_gear': os.path.join(GEN, 'pan-coil-b', 'print', 'gear_out.stl'),
-       'input_gear': os.path.join(GEN, 'pan-coil-b', 'print', 'gear_in.stl')}
-# The plate: only what changed since set 1. Layout in mm from the plate centre (a 220 x 220 bed).
-PLATE = ['base', 'drum', 'floor', 'small_gear']
-SPOT = {'base': (-48, 45), 'drum': (58, 50), 'floor': (-40, -55), 'small_gear': (50, -45)}
+       'input_gear': os.path.join(GEN, 'pan-coil-b', 'print', 'gear_in.stl'),
+       'tab_block': os.path.join(GEN, 'pan-coil-b', 'print', 'tab_block.stl')}
+# The plate: only what changed since the last set. Set 3 (2026-09-28): Zach's MG90S model
+# dropped the gear plane 5.7 mm, so base and drum change; the floor and both gears keep their shape.
+# Set 4 (2026-10-02): the tilt servo's wires get their own lane under the ribbon: base and drum again.
+# Layout in mm from the plate centre (a 220 x 220 bed).
+PLATE = ['base', 'drum']
+SPOT = {'base': (-48, 45), 'drum': (58, 50), 'tab_block': (0, -20), 'floor': (-40, -55), 'small_gear': (50, -45)}
 COL = {'cradle': (216, 195, 154), 'drum': (62, 156, 143), 'base': (163, 168, 162), 'floor': (180, 184, 178),
-       'input_gear': (79, 174, 158), 'small_gear': (79, 174, 158)}
+       'input_gear': (79, 174, 158), 'small_gear': (79, 174, 158), 'tab_block': (163, 168, 162)}
 OUT = os.path.dirname(config.out('print-pan', 'x'))
 
 
@@ -95,7 +99,7 @@ if __name__ == '__main__':
           '<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')
     rels = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
             '<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
-    plate = os.path.join(OUT, 'plate_pan_coil_set2.3mf')
+    plate = os.path.join(OUT, 'plate_pan_coil_set4.3mf')
     with zipfile.ZipFile(plate, 'w', zipfile.ZIP_DEFLATED) as z:
         z.writestr('[Content_Types].xml', ct); z.writestr('_rels/.rels', rels); z.writestr('3D/3dmodel.model', model)
     print('wrote %s (%.1f MB)' % (os.path.basename(plate), os.path.getsize(plate) / 1e6))

@@ -7,11 +7,25 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
 ## Zach
 
 - Talk to him in the second person. Documents and commit messages stay third person.
-- He isn't an engineer. Use plain words, and define a term inline the first time it comes up ("spline,
-  the ridged metal stub the horn grips"). Pictures help. Be brief: lead with the finding or the action.
-- It's a prototype phase. Find failures; don't chase precision.
-- He designs in **Fusion now; his model is the source of truth.** Blender is only for mesh surgery on
-  downloaded STLs.
+- He's a software engineer of many years, not a mechanical one. Programming terms and analogies are
+  fine (diff, regression test, negative control, refactor). Define mechanical terms inline the first
+  time they come up ("spline, the ridged metal stub the horn grips"). Be brief: lead with the finding
+  or the action.
+- Show a new or changed design as an interactive 3D model before he prints it (the fit view,
+  `head-v2/fixes/fit_view.py`). Put beside it the list of every guessed number in the part, for him to
+  OK or measure. For quick change summaries, use pictures and graphics.
+- It's a prototype phase. Find failures; don't chase precision. Keep the process light too: add a check
+  only where a real failure happened, and keep the writing short.
+- He designs in **Fusion now; his model is the source of truth** for the ball and the post. The cradle
+  and the pan coil are generator parts, edited here: he found the cradle blank too inaccurate to edit.
+  Blender is only for mesh surgery on downloaded STLs.
+- **Don't design around a datasheet or photo number when he may own the part.** Ask for his model
+  (he had the MG90S all along) or a caliper number. Set 2's servo (a datasheet box) and the camera
+  posts (a photo's lens offset) both cost a reprint.
+- Start a session by asking what the last print showed, before touching anything it covers. If a
+  part still has open guesses, say so before he prints it, so he can print the settled parts first.
+- When one of his rules blocks the design, ask what exactly he rejected before designing around it.
+  "No folds, ever" was really "not the connector end, and not pre-folded through a gap".
 - Trust his caliper numbers over anything read off a photo. Tell his measurements apart from offhand
   guesses, and don't build on the guesses.
 - "Ish" means fill in the exact value yourself: measure the feature, pick the number, and say what you
@@ -23,6 +37,10 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
   bodies (Deliverables).
 - He edits between sessions. Check file dates before trusting anything derived, and re-run the checks
   rather than trusting an earlier pass.
+- **Before designing any screwed or bearing joint, ask him what screws and bearings he has on hand**,
+  and size the part to those. Stock changes, so ask each time rather than trusting an old list.
+- A print is almost always running. Before changing a part, ask what he's printed or is printing, and
+  mark what the change supersedes.
 
 ## Frame (head v2)
 
@@ -39,6 +57,11 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
   seam screws jammed because the pocket rule ignored the ball's curve under the head.
 - Zero overlap isn't a fit. Where parts join, also probe the bolt axes, bores and cable paths for open
   space, with the old version as the control (`docs/lessons/2026-09-27-zero-overlap-is-not-a-fit.md`).
+- Seated isn't assembled. Slide each part in along its real path, in assembly order; measure gear
+  play; check that each bearing's turning race touches only turning parts
+  (`docs/lessons/2026-09-27-seated-is-not-assembled.md`).
+- Place a part by the feature it actually has to pass through, measured directly (the pin in the wall
+  hole), not by a proxy fit.
 - Locate a small nonzero overlap before calling it anything. 3.8 mm³ dismissed as "skin" was the servo
   tabs hitting the seam posts.
 - Use exact OCC booleans on his STLs (`tools/kit.py`), not voxels, for anything you ship.

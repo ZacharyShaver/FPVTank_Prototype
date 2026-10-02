@@ -52,7 +52,29 @@ TRAVEL = L_CAN * (1 / RI + 1 / RO) # rad -- 540 deg of mechanism, software limit
 
 CH_Z0, CH_Z1 = -20.0, -2.0         # chamber
 BAND_Z0, BAND_Z1 = -19.0, -3.0     # where the 16 mm ribbon sits
-FLOOR_Z = -22.0
+
+# ---- the tilt servo's wires: their own lane under the ribbon (round 2, 2026-10-02) ----------
+# Taped to the ribbon, the servo lead spoilt its fold (Zach). The wires (three Dupont jumpers, see
+# tree_parts_b.WIRE_*) come down the drum's bore beside the ribbon, down a hole in the drum's core, and
+# roll in a lane of their own below the ribbon, under a fixed shelf the ribbon now sits on. The lane
+# has its own wall at r 21, past the ribbon's 18: a 9 mm gap, so the moving U is ~3.6 mm radius, not
+# ~2 (Zach OK'd). The floor drops 4.3; the bay's roof under the can was 7.6 thick, so the gears, the
+# servo and the floor plate stay where they are. They leave through a boss at -135 deg, clear of the
+# ribbon's slot at -90.
+WIRE_L = 74.0                      # wire length to leave in the lane: the same 540 deg of travel as the
+                                   # ribbon, TRAVEL / (1/12.85 + 1/20.25)
+SHELF_T = 0.8
+LANE_H = 3.5                       # a ~2.8 bundle of three ~1.3 jumper wires
+LANE_Z1 = CH_Z0 - SHELF_T          # -20.8: the shelf's underside
+LANE_Z0 = LANE_Z1 - LANE_H         # -24.3: the lane's floor
+LANE_ZC = (LANE_Z0 + LANE_Z1) / 2
+LANE_R = 21.0                      # the lane's outer wall
+LANE_WALL = 2.0
+SHELF_R0 = DRUM_R + 0.6            # the shelf stops 0.6 off the turning drum
+DRUM_LIFT = 0.4                    # the drum's bottom face stands this far off the lane's floor
+FLOOR_Z = LANE_Z0 - 2.0            # -26.3 (was -22.0)
+WIRE_R = 2.5                       # holes: a bare Dupont pin beside two wires (as in the cradle)
+WIRE_EXIT_DEG = -145.0            # the boss's near corner stays 3 mm off the ribbon's slot (|X| 8.8)
 
 # ------------------------------------------------------------- above the deck
 # FLANGE_R was 19.6 and ploughed 270 mm3 through the deck ring, which starts at 19.0.
@@ -104,7 +126,7 @@ TWIST_HAVE = BALL_UNDER            # from the flange top (Z 0) to the ball's und
 # Running the barrel in a journal 24 mm lower takes the same slop to 0.48 deg and 0.66 mm.
 BARREL_R = 5.0
 JOURNAL_R = BARREL_R + 0.25        # 5.25 bore around the 10 mm barrel
-JOURNAL_Z0 = -25.0                 # 5 mm of sleeve, clearing the output gear by 0.5
+JOURNAL_Z0 = -30.9                 # 0.5 above the output gear (G_Z1 -31.4); 6.6 of journal since the lane
 N_OUT, N_IN = 20, 40               # 2:1 step-up
 CENTRE = 31.0                      # set by the servo clearing the can, not by the gears
 R_OUT_G = CENTRE * N_OUT / (N_OUT + N_IN)   # 10.33
@@ -119,19 +141,37 @@ GEAR_GAP = 0.3
 # The servo lies with its LONG axis along Y. The tabs stick out at the ends of that axis
 # (TAB_SPAN is measured along it), and with the body along X the far tab tip landed at
 # X 20.25 -- 0.25 mm outside the cup. Turned 90 deg it clears by 4.9.
-SW, SL, S2S = A.SERVO_W, A.SERVO_L, A.SHAFT_TO_END              # 12.2, 22.8, 5.9
-TAB_SPAN, TAB_FROM_TOP, TAB_PITCH = A.TAB_SPAN, A.TAB_FROM_TOP, A.TAB_PITCH   # 32.5, 6.5, 27.5
-TAB_T = 3.0                                                     # MEASURED by Zach 2026-09-18
+# The pan servo is Zach's MG90S model (2026-09-28, "been using this it matches well"; the file is
+# head-v2/generator/pan-coil-b/MG90S.3MF), not the datasheet numbers in tree_parts.
+SW, SL, S2S = 12.2, 23.0, 6.1                                   # case width, length, shaft-end -> shaft axis
+TAB_SPAN, TAB_FROM_TOP, TAB_PITCH = 33.0, 1.9, 26.86            # tab face nearest the shaft, from the case face
+TAB_T = 3.0                                                     # MEASURED by Zach 2026-09-18 (his model: 2.5)
 FIT, M2_PILOT, M2_CLEAR, M2_HEAD = A.FIT, A.M2_PILOT, A.M2_CLEAR, A.M2_HEAD
 HORN_L, HORN_W, HORN_C, HORN_D = A.HORN_L, A.HORN_W, A.HORN_C, A.HORN_D   # GENERIC -- see below
 HORN_ROOF = 1.5                    # material between the screw head and the horn
+# Zach, 2026-09-27: "servo does not fit in there". The datasheet box used its LENGTH (22.8) as its
+# height and had nothing past the case face. His MG90S has a 15 x 12.2 block 6.0 tall on the shaft end
+# of the case face and the shaft 10.0 past the face, so the gear plane sits 0.5 under the block: the
+# drum's barrel and the gear bay grew 5.6 (set 3). The gears themselves keep their shape.
+SV_CASE = 22.4                     # case, face -> far end
+SV_HUMP_L, SV_HUMP_H = 15.0, 6.0   # the block on the case face, from the shaft end, full width
+SV_SHAFT_R, SV_SHAFT = 2.325, 10.0 # output shaft, case face -> tip
 SV_Z1 = DECK_Z0 - 0.1              # body top, tucked under the deck plate
-SV_Z0 = SV_Z1 - SL                 # -25.0: the shaft face, pointing DOWN
+SV_Z0 = SV_Z1 - SV_CASE            # -24.9: the case face, pointing DOWN
 SV_X0, SV_X1 = CENTRE - SW / 2, CENTRE + SW / 2                 # 24.9 .. 37.1
 SV_Y0, SV_Y1 = -S2S, SL - S2S                                   # -5.9 .. 16.9
 SV_YC = (SV_Y0 + SV_Y1) / 2                                     # 5.5, the tab centre
-TAB_Z0 = SV_Z0 + TAB_FROM_TOP      # -18.5, the shelf the tabs land on
-G_Z1, G_Z0 = SV_Z0 - 0.5, SV_Z0 - 6.5                           # -25.5 .. -31.5
+TAB_Z0 = SV_Z0 + TAB_FROM_TOP      # -23.0, the shelf the tabs land on
+# The +Y tab had nothing under it: the servo slides in through that end, so its M2 pilot was cut in
+# air (found 2026-09-29, in set 2 as well). A separate tab block slides in through the window after the
+# servo, on two rails in grooves in the pocket's side walls, and stops under the tab; the tab's own
+# M2 x 6 then drives down through the tab into it. Rails at the bottom, so it prints flat.
+TB_Y0 = SV_Y1 + 0.3                # 17.2: 0.3 off the case end
+TB_Y1 = SV_YC + TAB_SPAN / 2 + 2.0 # 23.9: just inside the tower's end
+TB_H, TB_RAIL_H, TB_RAIL = 5.0, 4.0, 1.5   # block height under the tab; rails: height, reach into each wall
+TB_SLIDE = 0.15                    # per side, in the channel and in the grooves (the slide rule)
+G_Z1 = SV_Z0 - SV_HUMP_H - 0.5                                  # -31.4: 0.5 under the block
+G_Z0 = G_Z1 - 6.0                                               # -37.5
 BAY_Z0 = G_Z0 - 2.0                                             # -33.5
 
 # ---- how it goes together (2026-09-27) --------------------------------------------------
@@ -215,6 +255,62 @@ def gear(p, R, n, x0, z0, z1, phase=0.0):
     return _cyl(np.hypot(p[0] - x0, p[1]) - rr, np.abs(p[2] - (z0 + z1) / 2) - (z1 - z0) / 2)
 
 
+def at_angle(p, deg):
+    """Evaluate a shape drawn pointing along +X as if it pointed at deg."""
+    a = -np.radians(deg); ca, sa = np.cos(a), np.sin(a)
+    return (p[0] * ca - p[1] * sa, p[0] * sa + p[1] * ca, p[2])
+
+
+def _pol(r, deg, z):
+    return (r * np.cos(np.radians(deg)), r * np.sin(np.radians(deg)), z)
+
+
+# The wires' holes, as centrelines (smoothed the way the cradle's are, tree_parts_b._centripetal).
+# Drum: from the bore's floor at -X (the ribbon's slot is at +X), spiralling down and out (CW from above)
+# and leaving the face at the lane's height, already heading along it. It stays inside r 8.5 until the
+# lane so the face the ribbon wraps keeps 1 mm of wall. Base: from the lane out through the boss, heading
+# the way the lane's outer wrap runs (CCW), clear of the ribbon's exit at -90.
+DRUM_WIRE_PTS = [_pol(6.5, 185, 0.0), _pol(6.6, 184, -3.0), _pol(7.0, 178, -9.0), _pol(7.5, 171, -15.0),
+                 _pol(8.0, 164, -19.0), _pol(9.4, 157, LANE_ZC + 0.6), _pol(11.4, 151, LANE_ZC),
+                 _pol(14.0, 147, LANE_ZC)]
+# Starts at r 20.5, not inside the lane: a 5 mm hole is taller than the 3.5 lane, and further in its top
+# would shave the shelf to a skin under the ribbon. At r >= 18 the wall and the boss stand over it.
+BASE_WIRE_PTS = [_pol(20.5, WIRE_EXIT_DEG - 6, LANE_ZC), _pol(21.8, WIRE_EXIT_DEG - 2, LANE_ZC),
+                 _pol(23.5, WIRE_EXIT_DEG + 2, LANE_ZC), _pol(27.5, WIRE_EXIT_DEG + 7, LANE_ZC)]
+
+
+def _centripetal(P, per=6):
+    P = np.asarray(P, float); Q = np.vstack([2 * P[0] - P[1], P, 2 * P[-1] - P[-2]]); out = []
+    for i in range(1, len(Q) - 2):
+        q = Q[i - 1:i + 3]; t = np.r_[0, np.cumsum(np.linalg.norm(np.diff(q, axis=0), axis=1) ** 0.5)]
+        for u in np.linspace(t[1], t[2], per, endpoint=False):
+            A_ = [((t[j + 1] - u) * q[j] + (u - t[j]) * q[j + 1]) / (t[j + 1] - t[j]) for j in range(3)]
+            B_ = [((t[j + 2] - u) * A_[j] + (u - t[j]) * A_[j + 1]) / (t[j + 2] - t[j]) for j in range(2)]
+            out.append(((t[2] - u) * B_[0] + (u - t[1]) * B_[1]) / (t[2] - t[1]))
+    out.append(P[-1]); return np.array(out)
+
+
+DRUM_WIRE = _centripetal(DRUM_WIRE_PTS)
+BASE_WIRE = _centripetal(BASE_WIRE_PTS)
+
+
+def wire_hole(p, line, r=WIRE_R):
+    """A round hole of radius r along a centreline (capsule chain); far points skip the work."""
+    X, Y, Z = (np.asarray(a, float) for a in p)
+    d = np.full(np.broadcast(X, Y, Z).shape, 1e3)
+    lo, hi = line.min(0) - r - 1, line.max(0) + r + 1
+    m = (X >= lo[0]) & (X <= hi[0]) & (Y >= lo[1]) & (Y <= hi[1]) & (Z >= lo[2]) & (Z <= hi[2])
+    if not m.any():
+        return d
+    q = np.stack([np.broadcast_to(X, d.shape)[m], np.broadcast_to(Y, d.shape)[m], np.broadcast_to(Z, d.shape)[m]], 1)
+    best = np.full(len(q), 1e3)
+    for a, b in zip(line[:-1], line[1:]):
+        ab = b - a; t = np.clip(((q - a) @ ab) / (ab @ ab), 0, 1)
+        best = np.minimum(best, np.linalg.norm(q - (a + t[:, None] * ab), axis=1))
+    d[m] = best - r
+    return d
+
+
 def well(p, features=True):
     # Hard union, not smin. These four rings genuinely overlap, and blending them left a
     # sub-resolution film between the cup and the bearing seat: 45 bodies and a decimator
@@ -223,23 +319,32 @@ def well(p, features=True):
     # count, not just watertight/manifold.
     # The cup wall stops 0.4 BELOW the hub, not level with it. Taken to Z 0 it shared
     # Z -0.4..0 with the rotating hub's r 22.5 -- 60 mm3, and a rubbing face even at zero.
-    wall = ring_z(p, WELL_IR, WELL_OR, FLOOR_Z, DECK_Z1 - 0.4, 0.6)
-    floor = ring_z(p, JOURNAL_R, WELL_OR, FLOOR_Z, CH_Z0, 0.6)
-    sleeve = ring_z(p, JOURNAL_R, JOURNAL_R + 2.75, JOURNAL_Z0, CH_Z0, 0.4)
+    wall = ring_z(p, WELL_IR, WELL_OR, LANE_Z1, DECK_Z1 - 0.4, 0.6)
+    # the wires' lane below the ribbon: its own wall, the floor under it, the shelf over it, and the boss
+    # their exit runs through. The lane itself is cut out of all of it.
+    lane_wall = ring_z(p, LANE_R, LANE_R + LANE_WALL, FLOOR_Z, CH_Z0, 0.6)
+    shelf = ring_z(p, SHELF_R0, LANE_R + LANE_WALL, LANE_Z1, CH_Z0, 0.3)
+    floor = ring_z(p, JOURNAL_R, LANE_R + LANE_WALL, FLOOR_Z, LANE_Z0, 0.6)
+    sleeve = ring_z(p, JOURNAL_R, JOURNAL_R + 2.75, JOURNAL_Z0, LANE_Z0, 0.4)
+    boss = rbox(at_angle(p, WIRE_EXIT_DEG), (WELL_IR + 1.0, -6.5, FLOOR_Z), (LANE_R + 5.0, 6.5, -18.5), 1.5)
     deck = ring_z(p, DECK_IR, BOSS_R, DECK_Z0, DECK_Z1, 0.6)
     seat = ring_z(p, SEAT_BORE_R, BOSS_R, DECK_Z0, BRG_Z1, 0.6)
-    s = U(wall, floor, deck, seat, sleeve)
+    s = U(wall, lane_wall, shelf, floor, deck, seat, sleeve, boss)
+    s = np.maximum(s, -ring_z(p, DRUM_R - 1.0, LANE_R, LANE_Z0, LANE_Z1, 0.0))
     relief = ring_z(p, RELIEF_R0, RELIEF_R1, DECK_Z1 - RELIEF_D, DECK_Z1 + 1.0, 0.0)
     s = np.maximum(s, -relief)
     if features:
         slot = box(at_exit(p), (-WELL_OR - 2, -(RIBBON_W + 1.6) / 2, BAND_Z0 - 0.4),
                    (-WELL_IR + 1, (RIBBON_W + 1.6) / 2, BAND_Z1 + 0.4))
-        s = np.maximum(s, -slot)
+        s = np.maximum(s, -U(slot, wire_hole(p, BASE_WIRE)))
     return s
 
 
+ANCHOR_Z1 = 2.0
+
+
 def drum(p, features=True):
-    face = cyl_z(p, 0, 0, DRUM_R, CH_Z0, 0.0)
+    face = cyl_z(p, 0, 0, DRUM_R, LANE_Z0 + DRUM_LIFT, 0.0)   # down past the shelf: the lane's inner wall
     flange = cyl_z(p, 0, 0, FLANGE_R, CH_Z1, 0.0)
     hub = cyl_z(p, 0, 0, HUB_FIT_R, BRG_Z0, BRG_Z1)
     # The stand-in trunk is GONE. Above the bearing the drum ends in a disc the size of the
@@ -248,7 +353,7 @@ def drum(p, features=True):
     mate = cyl_z(p, 0, 0, MATE_R, BRG_Z1, BASE_Z)
     # The gear used to be moulded on here, and it could not pass the journal (see SEAT_R).
     # The barrel now ends in a D-shaped seat the separate gear_out pushes onto from below.
-    barrel = cyl_z(p, 0, 0, BARREL_R, G_Z1, CH_Z0)
+    barrel = cyl_z(p, 0, 0, BARREL_R, G_Z1, LANE_Z0 + DRUM_LIFT)
     seat = np.maximum(cyl_z(p, 0, 0, SEAT_R, SEAT_Z0, G_Z1 + 0.5), p[0] - SEAT_FLAT)
     # HARD union between the three stacks, not smin. Blending the flange into the hub bulged
     # the surface to r 19.84 -- past its named 17.7 -- and 133 mm3 of it ended up inside the
@@ -261,11 +366,13 @@ def drum(p, features=True):
     s = U(smin(face, flange, 1.0), hub, mate, barrel, seat)
     if features:
         bore = cyl_z(p, 0, 0, BORE_R, CH_Z1 - 0.5, BASE_Z + 1)
+        # Top at 2.0, was 0.5: the tilt servo's connector (14 x 8, Zach 2026-09-27) jammed turning
+        # from the bore into this slot at 3.0 thick. 2.0 passes 3.5 (head-v2/checks/plug_passage.py).
         anchor = box(p, (DRUM_R - 5.5, -(RIBBON_W + 1.0) / 2, BAND_Z0),
-                     (DRUM_R + 1, (RIBBON_W + 1.0) / 2, 0.5))
+                     (DRUM_R + 1, (RIBBON_W + 1.0) / 2, ANCHOR_Z1))
         # the gear screw's pilot, 1 mm past the tip of an M3 x 8
         pilot = cyl_z(p, 0, 0, M3_PILOT, SEAT_Z0 - 1, G_Z0 + SCREW_L + 1)
-        cuts = [bore, anchor, pilot]
+        cuts = [bore, anchor, pilot, wire_hole(p, DRUM_WIRE)]
         for a in np.radians(MATE_SCREWS):
             cuts.append(cyl_z(p, MATE_SCREW_R * np.cos(a), MATE_SCREW_R * np.sin(a), M3_PILOT,
                               BASE_Z - 7.0, BASE_Z + 1))
@@ -307,18 +414,36 @@ def bay(p, features=True):
     # the servo shaft. It runs r 3.5 from under the bay's floor all the way to the servo,
     # so rule 6 is satisfied by accident, not by design -- shorten it and the screw
     # becomes unreachable with nothing to show it. Checked: 0 mm3 of bay on that axis.
-    shaftway = cyl_z(p, CENTRE, 0, 3.5, BAY_Z0 - 1, SV_Z0 + 0.1)
+    shaftway = cyl_z(p, CENTRE, 0, 3.75, BAY_Z0 - 1, SV_Z0 + 0.1)
     # The drum's barrel runs up through the shell's top slab on its way to the can.
     barrelway = cyl_z(p, 0, 0, JOURNAL_R + 3.35, G_Z1, FLOOR_Z + 1)
     tabs = box(p, (SV_X0 - FIT, SV_YC - TAB_SPAN / 2 - FIT, TAB_Z0), (SV_X1 + FIT, win_y, 1.0))
     # The body window is not enough on its own: sliding in, the OUTPUT SHAFT sweeps through
     # the shell's +Y wall between the gear cavity and the outside, 4 mm below the pocket
     # floor. Found by the insertion sweep, not by the pair check -- seated, it is clear.
-    shaftslot = box(p, (CENTRE - 3.2, tip + 0.5, SV_Z0 - 4.6), (CENTRE + 3.2, win_y + 2, SV_Z0 + 0.4))
-    cuts = [pocket, tabs, shaftway, barrelway, shaftslot]
+    # The MG90S's block and shaft reach 6.0 and 10.0 below the case face, through the slab over the gear
+    # cavity that the old 4 mm stub cleared. Both get a channel out through the window (2026-09-28).
+    humpway = box(p, (SV_X0 - FIT, SV_Y0 - FIT, SV_Z0 - SV_HUMP_H - 0.3), (SV_X1 + FIT, win_y, SV_Z0 + 0.1))
+    shaftslot = box(p, (CENTRE - 3.75, 0.0, SV_Z0 - SV_SHAFT - 0.5), (CENTRE + 3.75, win_y + 2, SV_Z0 + 0.4))
+    # The tab block's grooves: blind at the -Y end (its stop), out through the window.
+    grooves = box(p, (SV_X0 - FIT - TB_RAIL - TB_SLIDE, TB_Y0 - TB_SLIDE, TAB_Z0 - TB_H - TB_SLIDE),
+                  (SV_X1 + FIT + TB_RAIL + TB_SLIDE, win_y + 1, TAB_Z0 - TB_H + TB_RAIL_H + TB_SLIDE))
+    cuts = [pocket, tabs, shaftway, barrelway, humpway, shaftslot, grooves]
     for ty in (SV_YC - TAB_PITCH / 2, SV_YC + TAB_PITCH / 2):
         cuts.append(cyl_z(p, CENTRE, ty, M2_PILOT, TAB_Z0 - 6.0, TAB_Z0 + 0.2))
     return np.maximum(s, -U(*cuts))
+
+
+def tab_block(p, features=True):
+    """Slides in under the servo's +Y tab after the servo; the tab's M2 x 6 screws into it."""
+    x0, x1 = SV_X0 - FIT + TB_SLIDE, SV_X1 + FIT - TB_SLIDE
+    z0 = TAB_Z0 - TB_H
+    body = box(p, (x0, TB_Y0, z0), (x1, TB_Y1, TAB_Z0))
+    rails = box(p, (x0 - TB_RAIL, TB_Y0, z0), (x1 + TB_RAIL, TB_Y1, z0 + TB_RAIL_H))
+    s = U(body, rails)
+    if not features:
+        return s
+    return np.maximum(s, -cyl_z(p, CENTRE, SV_YC + TAB_PITCH / 2, M2_PILOT, z0 + 0.5, TAB_Z0 + 1))
 
 
 def floor_screws():
@@ -370,8 +495,9 @@ def screw_out(p, features=True):
 def servo(p, features=True):
     body = rbox(p, (SV_X0, SV_Y0, SV_Z0), (SV_X1, SV_Y1, SV_Z1), 1.0)
     tabs = rbox(p, (SV_X0, SV_YC - TAB_SPAN / 2, TAB_Z0), (SV_X1, SV_YC + TAB_SPAN / 2, TAB_Z0 + TAB_T), 0.8)
-    shaft = cyl_z(p, CENTRE, 0, 2.5, SV_Z0 - 4.0, SV_Z0 + 0.5)     # 4 mm of shaft, into the gear
-    return U(body, tabs, shaft)
+    hump = box(p, (SV_X0, SV_Y0, SV_Z0 - SV_HUMP_H), (SV_X1, SV_Y0 + SV_HUMP_L, SV_Z0 + 0.5))
+    shaft = cyl_z(p, CENTRE, 0, SV_SHAFT_R, SV_Z0 - SV_SHAFT, SV_Z0 - SV_HUMP_H + 0.1)
+    return U(body, tabs, hump, shaft)
 
 
 def horn_at(p, x0, z0, z1):
@@ -431,7 +557,7 @@ PARTS = {
                            (WELL_OR + 13, WELL_OR + 13, BAND_Z1 + 1), 0.22, 14000),
     'bay':      (bay,      (-17, -R_IN_G - 7, BAY_Z0 - 1),
                            (CENTRE + R_IN_G + 10, SV_YC + TAB_SPAN / 2 + 5, DECK_Z0 + 1), 0.34, 26000),
-    'servo':    (servo,    (SV_X0 - 1.5, SV_YC - TAB_SPAN / 2 - 1.5, SV_Z0 - 5),
+    'servo':    (servo,    (SV_X0 - 1.5, SV_YC - TAB_SPAN / 2 - 1.5, SV_Z0 - SV_SHAFT - 1),
                            (SV_X1 + 1.5, SV_YC + TAB_SPAN / 2 + 1.5, SV_Z1 + 1), 0.28, 7000),
     'gear_in':  (gear_in,  (CENTRE - R_IN_G - 3, -R_IN_G - 3, G_Z0 - 3),
                            (CENTRE + R_IN_G + 3, R_IN_G + 3, G_Z1 + 2), 0.28, 11500),
@@ -444,6 +570,7 @@ PARTS = {
                            0.25, 12000),
     'gear_out': (gear_out, (-R_OUT_G - 3, -R_OUT_G - 3, G_Z0 - 1), (R_OUT_G + 3, R_OUT_G + 3, G_Z1 + 1),
                            0.20, 9000),
+    'tab_block': (tab_block, (SV_X0 - 3, TB_Y0 - 1, TAB_Z0 - TB_H - 1), (SV_X1 + 3, TB_Y1 + 1, TAB_Z0 + 1), 0.15, 4000),
     'screw_out': (screw_out, (-4, -4, G_Z0 - M3_BUTTON_H - 1), (4, 4, G_Z0 + SCREW_L + 1), 0.20, 3000),
     'twist_gap': (twist_short, (-11, -11, TWIST_HAVE - 1), (11, 11, TWIST_NEED + 1), 0.30, 5000),
 }

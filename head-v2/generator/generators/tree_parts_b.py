@@ -272,6 +272,18 @@ TROUGH_PATH = TROUGH_PATH_COIL if PAN_COIL else TROUGH_PATH_PEDESTAL
 MATE_SCREW_R, MATE_SCREWS = 20.0, [0.0, 120.0, 240.0]
 MATE_CLAMP = 5.5                                   # cradle material under each screw head
 MATE_HEAD_R = 3.2                                  # 6.4 recess for a 5.5 M3 socket head
+# The tilt servo's plug has to come down the same way as the ribbon, and it could not (Zach,
+# 2026-09-27): the groove was 3.0 thick with a 6.3 bend, and it met the bowl through a 1.5 slit.
+# A rigid plug can't turn that bend at any slot thickness. So the cradle's groove is now CHUTE_T
+# (Zach's 4, his wire bundle is 3) and a straight chute runs beside it, from the bowl's floor behind
+# the ball straight into the drum's bore. The plug drops down the chute with the ball out; the ribbon
+# still follows the groove's curve, whose inner wall -- the one it bends round -- the chute leaves
+# alone. 50 deg from vertical and exiting at X -1.5 is the angle that leaves no loose sliver between
+# the two cuts (40-46 left fins held only at the sides). TROUGH_T stays: it also sizes the ball's
+# ribbon slot. Checked by head-v2/checks/plug_passage.py (a plug slid and turned through the cut).
+CHUTE_T = 4.0
+CHUTE_ANG, CHUTE_X = 50.0, -1.5                    # deg from vertical (heading +X going down); X at BASE_Z
+CHUTE_Z0, CHUTE_Z1 = 4.0, 22.0                     # overruns the drum's bore below and the bowl above
 
 def trunk(p):
     raw = bezier(TRUNK_P, 400)
@@ -297,6 +309,83 @@ def trough(p, half_w, perp_r):
         di = np.hypot(p[0] - cx, p[2] - cz) - perp_r
         d2 = di if d2 is None else np.minimum(d2, di)
     return _cyl(d2, np.abs(p[1] - TROUGH_Y) - half_w)
+
+def chute(p, half_w=TROUGH_W / 2, t=CHUTE_T):
+    """The servo plug's straight way down through the cradle (see CHUTE_T)."""
+    s, c = np.sin(np.radians(CHUTE_ANG)), -np.cos(np.radians(CHUTE_ANG))
+    ax, az = CHUTE_X + s * (CHUTE_Z1 - BASE_Z) / c, CHUTE_Z1
+    vx, vz = s * (CHUTE_Z0 - CHUTE_Z1) / c, CHUTE_Z0 - CHUTE_Z1
+    k = np.clip(((p[0] - ax) * vx + (p[2] - az) * vz) / (vx * vx + vz * vz), 0.0, 1.0)
+    return _cyl(np.hypot(p[0] - ax - k * vx, p[2] - az - k * vz) - t / 2, np.abs(p[1] - TROUGH_Y) - half_w)
+
+# ---- the tilt servo's own wire route, round 1 (2026-10-02). Taping the servo lead to the ribbon spoilt
+# the ribbon's fold (Zach). The servo's lead and plug now stay coiled inside the ball; his thin jumper
+# wires plug into it and run alone: through the middle of a fixed hollow STUB that replaces the -Y axle
+# (on the tilt axis they twist, they don't bend), down a hole inside the cradle's -Y wall, and into the
+# plug chute's mouth above the drum's bore. The stub also replaces the axle that never fitted: Zach's
+# ball socket is r 10.04 and the axle r 9.95. The stub doesn't turn; the ball turns on it.
+WIRE_ROUTE = True
+WIRE_R = 2.5                       # 5 mm hole: three ~1.3 jumper wires plus one bare Dupont crimp (~1.8)
+WIRE_WALL = 1.6                    # the conduit's wall: the -Y wall is only ~5.8 thick across its slope,
+                                   # so a ridge grows on its OUTSIDE where the hole would break through
+STUB_R = 9.8                       # in Zach's socket, r 10.04 (measured on his rev 2 ball_minus): 0.24 running gap
+STUB_Y1 = -19.0                    # the socket ends at Y -18.6
+STUB_RING_R = 13.4                 # fills the empty 6704 seat (r 13.55): 0.15, his slide fit
+STUB_RING_Y1 = BRG_M_Y0 - 0.1      # 0.1 short of the seat's shoulder: no shared face
+# Hand-placed along the wall's measured middle (X -5 keeps 1.6 mm off the cap's bottom M2 pilot), pushed
+# 1.2 outward where the conduit carries the outer wall, and passing the 240 deg drum screw BELOW its
+# head recess (Z 16). Ends in the chute's mouth (air), level over the drum's bore lip, then straight down.
+WIRE_PTS = [(0.0, -17.0, H), (0.0, -23.5, H), (-0.6, -27.4, H - 1.2), (-2.0, -29.9, H - 4.8),
+            (-3.8, -30.2, H - 9.0), (-5.0, -29.7, 38.5), (-5.0, -29.0, 35.0), (-5.0, -29.0, 31.0),
+            (-5.0, -27.8, 28.0), (-5.0, -25.0, 25.0), (-4.8, -22.6, 21.5), (-3.8, -21.0, 17.8),
+            (-3.4, -19.6, 15.6), (-3.0, -16.4, 14.3), (-2.5, -12.6, 14.0), (-2.1, -9.6, 13.6),
+            (-2.0, -7.0, 13.0), (-1.8, -5.2, 10.8), (-1.5, -4.6, 7.5)]
+
+def _centripetal(P, per=6):
+    """Centripetal Catmull-Rom through P: smooth, and no overshoot where points bunch."""
+    P = np.asarray(P, float); Q = np.vstack([2 * P[0] - P[1], P, 2 * P[-1] - P[-2]]); out = []
+    for i in range(1, len(Q) - 2):
+        q = Q[i - 1:i + 3]; t = np.r_[0, np.cumsum(np.linalg.norm(np.diff(q, axis=0), axis=1) ** 0.5)]
+        for u in np.linspace(t[1], t[2], per, endpoint=False):
+            A = [((t[j + 1] - u) * q[j] + (u - t[j]) * q[j + 1]) / (t[j + 1] - t[j]) for j in range(3)]
+            Bb = [((t[j + 2] - u) * A[j] + (u - t[j]) * A[j + 1]) / (t[j + 2] - t[j]) for j in range(2)]
+            out.append(((t[2] - u) * Bb[0] + (u - t[1]) * Bb[1]) / (t[2] - t[1]))
+    out.append(P[-1]); return np.array(out)
+
+WIRE_LINE = _centripetal(WIRE_PTS)
+
+def wire_tube(p, r=WIRE_R, line=None):
+    """A round hole of radius r along WIRE_LINE (capsule chain). Points far from it skip the work."""
+    line = WIRE_LINE if line is None else line
+    X, Y, Z = (np.asarray(a, float) for a in p)
+    d = np.full(np.broadcast(X, Y, Z).shape, 1e3)
+    lo, hi = line.min(0) - r - 1, line.max(0) + r + 1
+    m = (X >= lo[0]) & (X <= hi[0]) & (Y >= lo[1]) & (Y <= hi[1]) & (Z >= lo[2]) & (Z <= hi[2])
+    if not m.any():
+        return d
+    q = np.stack([np.broadcast_to(X, d.shape)[m], np.broadcast_to(Y, d.shape)[m], np.broadcast_to(Z, d.shape)[m]], 1)
+    best = np.full(len(q), 1e3)
+    for a, b in zip(line[:-1], line[1:]):
+        ab = b - a; t = np.clip(((q - a) @ ab) / (ab @ ab), 0, 1)
+        best = np.minimum(best, np.linalg.norm(q - (a + t[:, None] * ab), axis=1))
+    d[m] = best - r
+    return d
+
+def stub(p, features=True):
+    """The fixed hollow stub: the cap's flange, a ring filling the empty bearing seat, and the tube the ball
+    turns on. Three M2 x 6 through the cap's old holes hold it, and they also set its turn, so its wire
+    channel lines up with the cradle's hole."""
+    face = POD_M_Y1
+    flange = _cyl(np.hypot(p[0], p[2] - H) - (FLANGE_R - 0.6),
+                  np.abs(p[1] - (face + FLANGE_REC / 2)) - (FLANGE_REC / 2 - 0.6)) - 0.6
+    ring = cyl_y(p, 0, H, STUB_RING_R, face + FLANGE_REC - 0.6, STUB_RING_Y1)
+    tube = cyl_y(p, 0, H, STUB_R, STUB_RING_Y1 - 0.5, STUB_Y1)
+    s = U(flange, ring, tube)
+    if not features:
+        return s
+    holes = [cyl_y(p, SCREW_R * np.cos(a), H + SCREW_R * np.sin(a), M2_CLEAR, face - 1, face + FLANGE_REC + 1)
+             for a in np.radians(SCREW_A)]
+    return np.maximum(s, -U(wire_tube(p), *holes))
 
 def collar(p, y0, y1, r=COLLAR_R, rnd=3.0):
     """Plain rounded disc, not a pointed pod: it is a swelling of the nest wall, not a box."""
@@ -378,6 +467,8 @@ def fork(p, features=True):
     s = smin(cyl_z(p, 0, 0, PED_R, BASE_Z, BASE_Z + 6.0), trunk(p), 6.0)
     s = smin(s, cradle(p), 7.0)
     s = smin(s, collar(m, POD_Y0 - 1.0, POD_P_Y1), 7.0)
+    if WIRE_ROUTE and PAN_COIL:                         # the conduit: only below the collar's seat
+        s = smin(s, wire_tube(p, WIRE_R + WIRE_WALL, WIRE_LINE[WIRE_LINE[:, 2] < 40.0]), 1.5)
     s = np.maximum(s, BASE_Z - p[2])
     s = np.maximum(s, np.abs(p[1]) - POD_P_Y1)          # flat outer faces for the two flange plates
     bezel_sweep = smax(cyl_y(p, 0, H, FRONT_SWEEP, -11.0, 11.0),
@@ -422,9 +513,12 @@ def fork(p, features=True):
         coll = np.minimum(coll, cyl_y(p, SCREW_R * np.cos(a), H + SCREW_R * np.sin(a), M2_PILOT,
                                       POD_M_Y1 - 1, POD_M_Y1 + 9))
     cuts = [np.where(plus, arm, coll),
-            trough(p, TROUGH_W / 2, TROUGH_T / 2),
+            trough(p, TROUGH_W / 2, (CHUTE_T if PAN_COIL else TROUGH_T) / 2),
             track(p)]
     if PAN_COIL:
+        cuts.append(chute(p))
+        if WIRE_ROUTE:
+            cuts.append(wire_tube(p))
         for a in np.radians(MATE_SCREWS):
             x, y = MATE_SCREW_R * np.cos(a), MATE_SCREW_R * np.sin(a)
             cuts += [cyl_z(p, x, y, M3_CLEAR, BASE_Z - 1, BASE_Z + MATE_CLAMP + 0.1),
@@ -624,6 +718,7 @@ PARTS = {
     'post':       (post,       (-20, 14, H - 20), (20, POD_P_Y1 + 3, H + 20), 0.18, 5000, rx(-1)),
     'axle':       (axle,       (-10.5, AXLE_Y0 - 1, H - 10.5), (10.5, AXLE_Y1 + 1, H + 10.5), 0.18, 4000, rx(+1)),
     'cap_minus':  (cap_minus,  (-20, POD_M_Y1 - 3, H - 20), (20, AXLE_Y0 + 1.5, H + 20), 0.18, 4000, rx(+1)),
+    'stub':       (stub,       (-19, POD_M_Y1 - 1.5, H - 19), (19, STUB_Y1 + 1, H + 19), 0.15, 6000, rx(+1)),
 }
 
 if __name__ == '__main__':

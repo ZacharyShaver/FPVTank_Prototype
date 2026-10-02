@@ -26,6 +26,10 @@ PANS = (-270, -135, 0, 135, 270)
 
 # (a, b, note). Pairs that are MEANT to touch are listed with an allowance.
 PAIRS = [
+    ('tab_block', 'base',   0.0, 'rails in the grooves, 0.15 each side'),
+    ('tab_block', 'servo',  0.0, 'MEANT to touch: the tab sits on it'),
+    ('tab_block', 'gear_in', 0.0, ''),
+    ('tab_block', 'drum',   0.0, ''),
     ('servo', 'well',    0.0, 'the servo sits beside the can; it must not enter it'),
     ('servo', 'bay',     0.0, 'the bay is a shell around the gears, not around the servo'),
     ('servo', 'drum',    0.0, ''),
@@ -50,7 +54,7 @@ PAIRS = [
     ('floor', 'servo',    0.0, ''),
     ('bearing', 'well',   0.0, 'the 6809 in its seat, +0.1 on the diameter'),
     ('bearing', 'drum',   0.0, 'the drum hub in the 6809, -0.1 on the diameter'),
-    ('gear_in', 'servo', 13.0, 'KNOWN 12.6: the 4 mm shaft stub ends 0.8 below the PLACEHOLDER horn pocket'),
+    ('gear_in', 'servo', 13.0, 'KNOWN: the MG90S shaft runs past the PLACEHOLDER horn pocket'),
 ]
 ROTATES = {'drum', 'ribbon', 'gear_out', 'screw_out'}
 
@@ -219,7 +223,8 @@ def assembly(fns, box, broken=False):
     # the horn. The `gear_in vs servo` row above keeps that on record until Zach re-cuts the pocket.
     f['servo_case'] = lambda q, features=True: U(
         P.rbox(q, (P.SV_X0, P.SV_Y0, P.SV_Z0), (P.SV_X1, P.SV_Y1, P.SV_Z1), 1.0),
-        P.rbox(q, (P.SV_X0, P.SV_YC - P.TAB_SPAN / 2, P.TAB_Z0), (P.SV_X1, P.SV_YC + P.TAB_SPAN / 2, P.TAB_Z0 + P.TAB_T), 0.8))
+        P.rbox(q, (P.SV_X0, P.SV_YC - P.TAB_SPAN / 2, P.TAB_Z0), (P.SV_X1, P.SV_YC + P.TAB_SPAN / 2, P.TAB_Z0 + P.TAB_T), 0.8),
+        P.box(q, (P.SV_X0, P.SV_Y0, P.SV_Z0 - P.SV_HUMP_H), (P.SV_X1, P.SV_Y0 + P.SV_HUMP_L, P.SV_Z0 + 0.5)))   # the MG90S block
     b['servo_case'] = box['servo']
     if broken:
         f['drum'] = lambda q, features=True: U(P.drum(q, features), P.gear_out(q, features))
@@ -233,6 +238,8 @@ def assembly(fns, box, broken=False):
                  f, b, (0, 0, 1), 20)
     bad += sweep('small gear + M3 up onto the drum from below', ['gear_out', 'screw_out'],
                  ['base', 'drum', 'servo'], f, b, (0, 0, 1), 20)
+    bad += sweep('tab block in through the window after the servo', ['tab_block'], ['base', 'servo', 'gear_in'],
+                 f, b, (0, -1, 0), 20)
     bad += sweep('floor plate up from below', ['floor'], ['base', 'drum', 'gear_in', 'gear_out', 'screw_out', 'servo'],
                  f, b, (0, 0, 1), 15)
     print(f'{bad} blocked' + ('   [NEGATIVE CONTROL -- every row SHOULD be blocked]' if broken else ''))

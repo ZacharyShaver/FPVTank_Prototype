@@ -41,7 +41,7 @@ label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
 <div class="wrap">
   <header>
     <h1>Head and pan coil fit</h1>
-    <p class="sub">Pan coil <b>set 2</b>, with your ball halves, post and the cradle, all in their real positions (mm, Z up from the deck top). <b>Pull apart</b> spreads the parts out the way each one goes in. The base (well and gear bay, one print) is see-through.</p>
+    <p class="sub"><b>New: the servo wires' own route.</b> Round 1 (the stub and the cradle's wire hole) and round 2 (the wires' own lane in the pan coil, set 4) are built and checked. Head <b>rev 2</b> (your halves, the IR cutout extended, the new camera posts and the board) and pan coil <b>set 4</b>, with the post and the cradle, all in their real positions (mm, Z up from the deck top). <b>Pull apart</b> spreads the parts out the way each one goes in. The base (well and gear bay, one print) is see-through.</p>
   </header>
   <div class="main">
     <div class="stage" id="stage">
@@ -52,8 +52,27 @@ label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
       <div class="hint">drag to turn · scroll to zoom · right-drag to pan</div>
     </div>
     <div class="side">
+      <section class="card" aria-labelledby="h-cable">
+        <h2 id="h-cable">Servo wires: their own route</h2>
+        <div class="issue"><span class="tag ok">rounds 1 + 2</span><p class="t">The whole way down, hidden</p><p>Parts go see-through. Your servo's own lead and plug stay coiled in the ball (dark grey). Three jumper wires (red) plug into it and run down 5 mm holes. Nothing cut, nothing soldered.</p><button data-go="cable">Show</button></div>
+        <div class="issue"><span class="tag ok">round 1: stub</span><p class="t">On the axis: they twist, they don't bend</p><p>The green stub replaces the −Y axle and the cap. Your socket is <span class="num">r 10.04</span>; the old axle was 9.95 (why it never fitted), the stub is <span class="num">9.80</span>. It doesn't turn: your ball turns on it. The wires run through its middle, then drop into the cradle. 3 × M2 × 6 in the cap's old holes.</p><button data-go="cabletilt">Show</button></div>
+        <div class="issue"><span class="tag ok">round 1: cradle</span><p class="t">Down inside the wall, under the drum screw</p><p>A 5 mm hole down the −Y wall (a 1.6 mm ridge outside where the wall was thin), under the drum screw's head, into the plug chute's mouth and down the drum's hole beside the ribbon. Checked: a 4.4 mm probe rides the whole way with <span class="num">2.4 mm</span> to spare; thinnest wall <span class="num">0.6</span>.</p><button data-go="cablecradle">Show</button></div>
+        <div class="issue"><span class="tag ok">round 2: set 4</span><p class="t">Their own rolling loop, under the ribbon</p><p>Down a 5 mm hole in the drum's core into a lane of their own: 3.5 tall, its own wall at <span class="num">r 21</span> (a 9 mm gap, so the moving U is <span class="num">3.6 mm</span> radius), under a fixed 0.8 shelf the ribbon sits on. Out through a boss at −145°, clear of the ribbon's slot. The floor dropped 4.3; gears, servo, floor plate and tab block didn't move. Leave <span class="num">74 mm</span> of wire in the lane.</p><button data-go="cablepan">Show</button></div>
+      </section>
+      <section class="card" aria-labelledby="h-chute">
+        <h2 id="h-chute">Cradle: servo plug chute (new)</h2>
+        <div class="issue"><span class="tag fix">was stuck</span><p class="t">The plug couldn't get down</p><p>The groove was <span class="num">3.0</span> thick with a <span class="num">6.3 mm</span> bend, and it met the ribbon track only as a hairline near the centre line. Now the groove is <span class="num">4.0</span> and a straight <span class="num">4.0</span> chute, <span class="num">50°</span> from vertical and 22 wide, runs from the bowl's floor into the drum's hole. Feed the plug down it with the ball out.</p><button data-go="chute">Show</button></div>
+        <div class="issue"><span class="tag fix">set 3 drum</span><p class="t">Your 14 × 8 connector passes the drum</p><p>On set 2's drum it jammed at <span class="num">3.0</span> thick, turning from the hole into the side slot. Set 3's side slot is <span class="num">1.5 mm</span> taller: it passes up to 3.5 thick.</p><button data-go="chute">Show</button></div>
+      </section>
+      <section class="card" aria-labelledby="h-rev2">
+        <h2 id="h-rev2">Head rev 2</h2>
+        <div class="issue"><span class="tag ok">rebuilt</span><p class="t">Camera posts on your moved tubes</p><p>Both tubes <span class="num">+2.00</span> in Z (Y 14.70, Z 37.95 / 66.85). The lens sits centred between them, <span class="num">0.40</span> above the tilt axis. Pin tip <span class="num">1.48</span> in your 1.78 wall holes.</p><button data-go="campost">Show</button></div>
+        <div class="issue"><span class="tag fix">extended</span><p class="t">IR cutout, 2 mm toward the posts</p><p>Your 32 mm circle moved <span class="num">2.0</span> toward +Y, Z 42.4–62.4, 1 mm off both tubes. Edge at Y 18.0 (was 16.0).</p><button data-go="ir">Show</button></div>
+      </section>
       <section class="card" aria-labelledby="h-set2">
-        <h2 id="h-set2">What changed in set 2</h2>
+        <h2 id="h-set2">What changed in sets 2 and 3</h2>
+        <div class="issue"><span class="tag fix">set 3: didn't fit</span><p class="t">Your MG90S, gears 5.6 mm lower</p><p>Built on your MG90S model. Its <span class="num">15 × 12.2</span> block and shaft ran into the input gear, and its tabs sat <span class="num">4.6</span> higher than the datasheet box. The gear plane dropped <span class="num">5.6</span>, the drum's barrel and the bay grew to match, and the window slot takes the boss. Reprint base and drum; the gears and floor are unchanged.</p><button data-go="servo">Show</button></div>
+        <div class="issue"><span class="tag fix">screw in air</span><p class="t">Tab block under the window-end tab</p><p>The servo slides in through that end, so its tab screw had no plastic under it (set 2 too). The orange block slides in after the servo on two rails, and the tab's own M2 × 6 goes into it: <span class="num">3 mm</span> of thread.</p><button data-go="servo">Show</button></div>
         <div class="issue"><span class="tag fix">was stuck</span><p class="t">Small gear is its own part</p><p>It was moulded onto the drum, <span class="num">22.6 mm</span> across, under a <span class="num">10.5 mm</span> hole. Now it pushes up onto a D-shaped stub (one flat side) from below, with one M3 × 8 button head.</p><button data-go="apart">Show</button></div>
         <div class="issue"><span class="tag fix">was closed</span><p class="t">Floor comes off</p><p>The gear bay was a closed box. Its floor is now a plate on 4 × M2 × 6, so both gears go in from underneath.</p><button data-go="gears">Show</button></div>
         <div class="issue"><span class="tag ok">one print</span><p class="t">Well and gear bay fused</p><p>Nowhere on the well could take a screw, so they print as one base.</p><button data-go="base">Show</button></div>
@@ -61,9 +80,9 @@ label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
         <div class="issue"><span class="tag fix">would drag</span><p class="t">Bearing sits on its outer ring only</p><p>The 6809's turning inner ring sat on the fixed ledge. A <span class="num">0.4 mm</span> recess now clears it. Seat <span class="num">58.1</span>, hub <span class="num">44.9</span>, and a sharp step where it seats on the drum.</p><button data-go="bearing">Show</button></div>
       </section>
       <section class="card" aria-labelledby="h-meet">
-        <h2 id="h-meet">Cradle to drum (unchanged)</h2>
+        <h2 id="h-meet">Cradle to drum</h2>
         <div class="issue"><span class="tag ok">fixed</span><p class="t">Three bolt holes</p><p>M3 × 12 at <span class="num">20 mm</span> out, <span class="num">0°/120°/240°</span>, matching the drum. A 3.4 hole through the bottom <span class="num">5.5 mm</span>, then a 6.4 recess open to the bowl, so a driver reaches from above before the ball goes in.</p><button data-go="bolts">Show</button></div>
-        <div class="issue"><span class="tag ok">fixed</span><p class="t">Ribbon path open</p><p>The groove now drops straight into the drum's <span class="num">18 mm</span> hole. The ribbon's full 16 mm width is clear the whole way, and the tightest bend is <span class="num">6.3 mm</span> radius. The old horn pocket and pin hole are gone.</p><button data-go="bore">Show</button></div>
+        <div class="issue"><span class="tag fix">was wrong</span><p class="t">Ribbon path open</p><p>The groove drops straight into the drum's <span class="num">18 mm</span> hole, and the tightest bend is <span class="num">6.3 mm</span> radius. <b>Superseded:</b> "clear the whole way" missed the groove's entry, a hairline from the track. The plug chute opens it.</p><button data-go="bore">Show</button></div>
         <div class="issue"><span class="tag ok">fixed</span><p class="t">Groove on the centre line</p><p>It used to land <span class="num">9 mm</span> forward, at the hole's edge. One soft 45° fold at the drum's side slot then turns the ribbon on edge, so no twist and no fold pocket are needed. Bolt the drum with that slot facing forward.</p><button data-go="groove">Show</button></div>
         <div class="issue"><span class="tag ok">fine</span><p class="t">Nothing collides</p><p>The coil's clash check reads <span class="num">0.00 mm³</span> for the cradle against all six coil parts. The cradle's base and the drum's disc are the same size (<span class="num">Ø51</span>).</p><button data-go="lift">Show</button></div>
         <div class="issue"><span class="tag ok">no longer needed</span><p class="t">The 40 mm twist</p><p>The orange ghost is the run a quarter twist would have needed, running up into the ball. One fold at the drum replaces it.</p><button data-go="twist">Show</button></div>
@@ -80,11 +99,11 @@ label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
 <script>/*DATA*/</script>
 <script>
 (function(){
-const COL={ball_plus:0x7f9cb8,ball_minus:0x93aac2,post:0xa9b7c6,axle:0x8e98a3,cap_minus:0x8e98a3,fork:0xd8c39a,drum:0x3e9c8f,bearing:0x6f8a86,gear_in:0x4fae9e,gear_out:0x2f8f80,screw_out:0x3a3f44,floor:0xc9b27c,servo:0x5a6470,ribbon:0xe07a2f,well:0xa3a8a2,bay:0xa3a8a2,twist_gap:0xe07a2f};
+const COL={camera:0x2d7d4b,campost_upper:0xf08c28,campost_lower:0xf08c28,ball_plus:0x7f9cb8,ball_minus:0x93aac2,post:0xa9b7c6,axle:0x8e98a3,cap_minus:0x8e98a3,fork:0xd8c39a,plug:0xe0443e,drum:0x3e9c8f,bearing:0x6f8a86,gear_in:0x4fae9e,gear_out:0x2f8f80,screw_out:0x3a3f44,floor:0xc9b27c,tab_block:0xe07a2f,servo:0x5a6470,ribbon:0xe07a2f,well:0xa3a8a2,bay:0xa3a8a2,twist_gap:0xe07a2f,tilt_servo:0x5a6470,cable:0xe0443e,stub:0x3fae6a,lane:0xe0443e,servo_lead:0x3a3f44,servo_plug:0x222222};
 // Pull apart: each part moved back along the way it goes in (pan_coil_b_check.assembly)
 const APART={drum:[0,0,45],bearing:[0,0,30],ribbon:[0,0,45],servo:[0,45,0],gear_in:[0,0,-22],gear_out:[0,0,-22],screw_out:[0,0,-36],floor:[0,0,-50]};
 const APART_HEAD=[0,0,70];
-const GROUPS=[['head','Head'],['cradle','Cradle'],['coil','360° pan coil']];
+const GROUPS=[['cable','Servo cable (idea)'],['head','Head'],['cradle','Cradle'],['coil','360° pan coil']];
 const stage=document.getElementById('stage');
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.localClippingEnabled=true;
@@ -100,10 +119,10 @@ const meshes={},lifters=[],base={};
 function dec(b64,T){const s=atob(b64),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new T(u.buffer);}
 for(const k in FIT){const p=FIT[k];const g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(dec(p.v,Float32Array),3));g.setIndex(new THREE.BufferAttribute(dec(p.f,Uint32Array),1));g.computeVertexNormals();
-  const ghost=k==='twist_gap';
+  const ghost=k==='twist_gap'||k==='lane';
   const m=new THREE.MeshStandardMaterial({color:COL[k]||0x999999,roughness:.65,metalness:.05,side:THREE.DoubleSide,transparent:ghost||k==='well'||k==='bay',opacity:ghost?.28:(k==='well'||k==='bay')?.55:1,depthWrite:!(ghost)});
-  const mesh=new THREE.Mesh(g,m);scene.add(mesh);meshes[k]=mesh;mesh.userData.lifts=p.group!=='coil';}
-for(const k in meshes)base[k]=(APART[k]||(FIT[k].group!=='coil'?APART_HEAD:[0,0,0]));
+  const mesh=new THREE.Mesh(g,m);scene.add(mesh);meshes[k]=mesh;mesh.userData.lifts=p.group==='head'||p.group==='cradle';}
+for(const k in meshes)base[k]=(APART[k]||(FIT[k].group==='head'||FIT[k].group==='cradle'?APART_HEAD:[0,0,0]));
 function mat(c,o){return new THREE.MeshStandardMaterial({color:c,roughness:.5,transparent:o<1,opacity:o,side:THREE.DoubleSide});}
 const mk={};
 mk.bolts=new THREE.Group();[0,120,240].forEach(a=>{const r=a*Math.PI/180;const c=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,14,20),mat(0xc0392b,1));c.rotation.x=Math.PI/2;c.position.set(20*Math.cos(r),20*Math.sin(r),7.5);mk.bolts.add(c);});
@@ -115,8 +134,8 @@ const box=new THREE.Box3();Object.values(meshes).forEach(m=>box.expandByObject(m
 const ctr=box.getCenter(new THREE.Vector3());
 function view(dir,t,dist){const target=t||ctr.clone();const d=dist||260;cam.position.copy(target).add(dir.clone().normalize().multiplyScalar(d));ctl.target.copy(target);ctl.update();}
 const V={front:[new THREE.Vector3(1,0,.12)],side:[new THREE.Vector3(0,1,.12)],under:[new THREE.Vector3(.35,.25,-1)],iso:[new THREE.Vector3(1,-1.1,.7)]};
-document.getElementById('v-front').onclick=()=>view(V.front[0]);document.getElementById('v-side').onclick=()=>view(V.side[0]);
-document.getElementById('v-under').onclick=()=>view(V.under[0],new THREE.Vector3(0,0,10),170);document.getElementById('v-iso').onclick=()=>view(V.iso[0]);
+document.getElementById('v-front').onclick=()=>{setCut(cutOn);view(V.front[0]);};document.getElementById('v-side').onclick=()=>{setCut(cutOn);view(V.side[0]);};
+document.getElementById('v-under').onclick=()=>{setCut(cutOn);view(V.under[0],new THREE.Vector3(0,0,10),170);};document.getElementById('v-iso').onclick=()=>{setCut(cutOn);view(V.iso[0]);};
 let lifted=false,cutOn=false,lift=0,liftTo=0,apart=0,apartTo=0;
 function setApart(on){apartTo=on?1:0;document.getElementById('t-apart').setAttribute('aria-pressed',on);}
 function setCut(on){cutOn=on;document.getElementById('t-cut').setAttribute('aria-pressed',on);Object.values(meshes).forEach(m=>m.material.clippingPlanes=on?[cut]:[]);Object.values(mk).forEach(o=>o.traverse(c=>{if(c.material)c.material.clippingPlanes=on?[cut]:[];}));}
@@ -130,10 +149,14 @@ GROUPS.forEach(([g,name])=>{const d=document.createElement('div');d.className='g
     l.innerHTML='<input type="checkbox" id="'+id+'" checked><span class="sw" style="background:#'+(COL[k]||0x999999).toString(16).padStart(6,'0')+'"></span>'+FIT[k].label;
     l.querySelector('input').onchange=e=>{meshes[k].visible=e.target.checked;};d.appendChild(l);}
   partsEl.appendChild(d);});
-function show(k,on){meshes[k].visible=on;const i=document.getElementById('p-'+k);if(i)i.checked=on;}
-const HEAD=['ball_plus','ball_minus','post','axle','cap_minus'];
+function show(k,on){if(!meshes[k])return;meshes[k].visible=on;const i=document.getElementById('p-'+k);if(i)i.checked=on;}
+const HEAD=['ball_plus','ball_minus','post','axle','cap_minus','camera','campost_upper','campost_lower'];
 function marks(on){Object.values(mk).forEach(o=>o.visible=on);}
+const cutFront=new THREE.Plane(new THREE.Vector3(-1,0,0),16.2);   // keeps X < 16.2: the ball's front shell off
+function frontOff(){['ball_plus','ball_minus'].forEach(k=>{if(meshes[k])meshes[k].material.clippingPlanes=[cutFront];});}
 const GO={
+ campost:()=>{marks(false);setCut(false);setLift(false);setApart(false);Object.keys(meshes).forEach(k=>show(k,['ball_plus','camera','campost_upper','campost_lower'].includes(k)));frontOff();view(new THREE.Vector3(1,.35,.1),new THREE.Vector3(14,10,52),150);},
+ ir:()=>{marks(false);setLift(false);setApart(false);setCut(false);Object.keys(meshes).forEach(k=>show(k,['ball_plus','camera','campost_upper','campost_lower'].includes(k)));frontOff();view(new THREE.Vector3(1,.05,.05),new THREE.Vector3(14,6,52),120);},
  apart:()=>{marks(false);setCut(false);setLift(false);setApart(true);Object.keys(meshes).forEach(k=>show(k,k!=='twist_gap'));view(new THREE.Vector3(1,-1.1,.55),new THREE.Vector3(18,0,5),330);},
  gears:()=>{marks(false);setCut(false);setLift(false);setApart(false);Object.keys(meshes).forEach(k=>show(k,k!=='floor'&&k!=='twist_gap'));view(new THREE.Vector3(.35,.25,-1),new THREE.Vector3(18,0,-28),240);},
  base:()=>{marks(false);setCut(false);setLift(false);setApart(false);Object.keys(meshes).forEach(k=>show(k,k==='well'||k==='bay'));view(new THREE.Vector3(1,-1.1,.7),new THREE.Vector3(18,0,-12),220);},
@@ -141,13 +164,26 @@ const GO={
  bearing:()=>{marks(false);setLift(false);setApart(false);setCut(true);Object.keys(meshes).forEach(k=>show(k,['well','bay','drum','bearing'].includes(k)));view(new THREE.Vector3(0,1,.12),new THREE.Vector3(-22,0,-2),170);},
  bolts:()=>{setApart(false);marks(true);setCut(false);setLift(true);['ball_plus','ball_minus','post','axle','cap_minus'].forEach(k=>show(k,false));view(new THREE.Vector3(.5,-.6,.9),new THREE.Vector3(0,0,14),190);},
  bore:()=>{marks(true);setLift(false);setCut(true);['ball_plus','ball_minus','post','axle','cap_minus'].forEach(k=>show(k,true));view(new THREE.Vector3(0,1,.08),new THREE.Vector3(0,0,14),200);},
+ servo:()=>{marks(false);setLift(false);setApart(false);setCut(true);Object.keys(meshes).forEach(k=>show(k,['servo','tab_block','well','bay','drum','gear_in','gear_out','floor','bearing'].includes(k)));view(new THREE.Vector3(-0.35,1,.25),new THREE.Vector3(31,10,-22),130);},
+ chute:()=>{marks(false);setLift(false);setApart(false);setCut(true);Object.keys(meshes).forEach(k=>show(k,['fork','plug','drum','well','bay','bearing'].includes(k)));view(new THREE.Vector3(0,1,.05),new THREE.Vector3(-2,0,12),120);},
  groove:()=>{marks(true);setLift(false);setCut(true);view(new THREE.Vector3(0,1,.05),new THREE.Vector3(2,0,16),150);},
  lift:()=>{marks(true);setApart(false);setCut(false);setLift(true);Object.keys(meshes).forEach(k=>show(k,true));view(V.iso[0],null,300);},
  twist:()=>{marks(true);setLift(false);setCut(true);show('twist_gap',true);view(new THREE.Vector3(0,1,.1),new THREE.Vector3(0,0,28),200);}
 };
+const GHOST=['stub','ribbon','fork','ball_plus','ball_minus','drum','well','bay','floor','bearing','gear_in','gear_out','servo','tab_block','post','camera','campost_upper','campost_lower'];
+const CABLE=['cable','lane','servo_lead','servo_plug'];
+function ghost(on){GHOST.forEach(k=>{const m=meshes[k];if(!m)return;const o=m.userData.o0??(m.userData.o0=[m.material.transparent,m.material.opacity,m.material.depthWrite]);
+  if(on){m.material.transparent=true;m.material.opacity=k==='fork'?.22:k==='ribbon'?.5:k==='stub'?.35:.14;m.material.depthWrite=false;}else{[m.material.transparent,m.material.opacity,m.material.depthWrite]=o;}m.material.needsUpdate=true;});}
+function cableScene(t,dir,dist,coilOnly){marks(false);setCut(false);setLift(false);setApart(false);ghost(true);
+  Object.keys(meshes).forEach(k=>show(k,!['axle','cap_minus','twist_gap','plug'].includes(k)&&(!coilOnly||FIT[k].group==='coil'||k==='cable'||k==='lane')));view(dir,t,dist);}
+GO.cable=()=>cableScene(new THREE.Vector3(0,-6,18),new THREE.Vector3(-.55,-1,.35),330);
+GO.cabletilt=()=>cableScene(new THREE.Vector3(-2,-24,44),new THREE.Vector3(-.35,-1,.25),150);
+GO.cablecradle=()=>cableScene(new THREE.Vector3(-3,-18,18),new THREE.Vector3(-1,-.45,.2),150);
+GO.cablepan=()=>cableScene(new THREE.Vector3(0,-4,-20),new THREE.Vector3(-.25,-.55,1),150,true);
+for(const k in GO){if(k.startsWith('cable'))continue;const f=GO[k];GO[k]=()=>{ghost(false);CABLE.forEach(c=>show(c,false));f();};}
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>GO[b.dataset.go]());
 function size(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
-new ResizeObserver(size).observe(stage);size();view(V.iso[0],null,300);
+new ResizeObserver(size).observe(stage);size();GO.cable();
 (function loop(){requestAnimationFrame(loop);lift+=reduce?(liftTo-lift):(liftTo-lift)*.14;apart+=reduce?(apartTo-apart):(apartTo-apart)*.12;
   for(const k in meshes){const b=base[k],m=meshes[k];m.position.set(b[0]*apart,b[1]*apart,b[2]*apart+(m.userData.lifts?lift:0));}
   Object.values(mk).forEach(o=>{o.position.z=(o===mk.groove?lift:0)+APART_HEAD[2]*apart;});ctl.update();renderer.render(scene,cam);})();

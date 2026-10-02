@@ -49,6 +49,8 @@ pymeshlab and the rest (`tools/requirements.txt`). Every script finds its paths 
 python head-v2/fixes/build_all.py      # about 3 min: halves, post, camera posts, meshes, STEP, print set, 3MF, pictures
 python head-v2/checks/regression.py    # about 6 min: the checks, and the table they must reproduce
 python head-v2/checks/reeval.py        # a revision as drawn, before any fix
+python head-v2/checks/plug_passage.py  # about 1 min: can the servo plug and the ribbon get from the bowl into the coil
+python head-v2/checks/wire_route.py    # ~3 min: tilt servo wires' own route (stub + cradle hole): passage, walls, stub fit
 ```
 
 The generator lives in `head-v2/generator/` (since phase B, 2026-09-27). FPVTank_Control holds no CAD.
