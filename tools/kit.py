@@ -12,7 +12,9 @@ from OCP.STEPControl import STEPControl_Reader
 from occ_load import load, vol
 import tree_parts as A, tree_parts_b as B
 
-CAM_STEP = os.path.join(config.CAMERA, 'camera_dummy.step')
+CAM_STEP = os.path.join(config.CAMERA, 'camera_dummy.step')                 # lens 1.6 off the board's centre (photo):
+                                                                            # SUPERSEDED, kept for the rev-1 regression
+CAM_STEP_CENTRED = os.path.join(config.CAMERA, 'camera_dummy_centred.step')  # lens centred on the holes (Zach, 2026-09-27)
 
 def bx(p0, p1):
     p0, p1 = np.minimum(p0, p1), np.maximum(p0, p1)
@@ -71,9 +73,11 @@ def servo(top=21.24, spline_r=2.4, ears=True, front_ear=True, parts=False):
     keep = [body, boss, spline] + ([ear_r] if ears else []) + ([ear_f] if ears and front_ear else [])
     return fuse(*keep)
 
-def camera(dx=0.0):
-    r = STEPControl_Reader(); r.ReadFile(CAM_STEP); r.TransferRoots(); s = r.OneShape()
-    return moved(s, dx=dx) if dx else s
+def camera(dx=0.0, centred=False, dz=0.0, dy=0.0):
+    """the camera board, lens on Z = B.H before dz. centred=True is the real board (lens midway between
+    the holes); the default is the superseded photo model the rev-1 checks were run with."""
+    r = STEPControl_Reader(); r.ReadFile(CAM_STEP_CENTRED if centred else CAM_STEP); r.TransferRoots(); s = r.OneShape()
+    return moved(s, dx=dx, dy=dy, dz=dz) if (dx or dy or dz) else s
 
 _cache = {}
 def part(name, path=None):

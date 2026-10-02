@@ -20,7 +20,9 @@ GEN = os.path.join(REPO, 'head-v2', 'generator', 'generators')
 CAMERA = os.path.join(REPO, 'head-v2', 'generator', 'camera')
 
 # Zach's Fusion export the fixes apply to. His model is the source of truth; a new revision gets a
-# new folder next to this one, and FUSION moves to it.
+# new folder next to this one. FUSION stays on rev 1 because build_all.py and the rev-1 regression rows
+# rebuild from it. His rev 2 (2026-09-27, fusion/rev2-2026-09-27/) already has those fixes booleaned in;
+# its scripts read it directly (fixes/campost_rev2.py: BALL_PLUS, BALL_MINUS).
 FUSION = os.path.join(REPO, 'head-v2', 'fusion', 'rev1-2026-09-24')
 ZACH = {'ball_plus': 'BODY_NUMBA1 (1) (1).stl',
         'ball_minus': 'ball_minus_revised.stl',

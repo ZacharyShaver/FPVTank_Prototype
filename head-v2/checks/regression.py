@@ -14,11 +14,14 @@ import json, subprocess, time
 from record import PATH
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-CHECKS = ['check_snap.py', 'freeplay.py', 'ball_nest.py', 'lens_clear.py', 'reach_check.py', 'check_campost.py', 'mesh_report.py']
+CHECKS = ['check_snap.py', 'freeplay.py', 'ball_nest.py', 'lens_clear.py', 'reach_check.py', 'check_campost.py', 'mesh_report.py',
+          'check_campost_rev2.py', 'rev2_nest.py']
 NEEDS = ['ball_plus_snap.brep', 'ball_minus_snap.brep', 'post_v3.brep', 'BODY_NUMBA1_snap.stl',
          'ball_minus_revised_snap.stl', 'ball_servo_post_v3.stl', os.path.join('print', 'plate_ball_post_pins.3mf'),
          'ball_plus_camposts.brep', 'BODY_NUMBA1_camposts.stl', 'camera_post_lower_medium.brep', 'camera_post_upper_medium.brep',
-         os.path.join('print', 'plate_full_camposts.3mf')]
+         os.path.join('print', 'plate_full_camposts.3mf'),
+         os.path.join('rev2', 'ball_plus_rev2.brep'), os.path.join('rev2', 'camera_post_upper_medium.brep'),
+         os.path.join('rev2', 'camera_post_lower_medium.brep')]
 
 def f(dp):
     def fmt(x):
@@ -50,6 +53,19 @@ ROWS = [
     ('camera post heads from ball centre (control: ball R), mm', 'campost_head_r', lambda v: v, f(2), '30.50', '30.70'),
     ('camera post catch: thinnest wall to outside, mm', 'campost_catch_wall', lambda v: (v, None), f(2), '0.79', 'none'),
     ('ball_plus STEP round trip lost, sewn (control: BREP), mm3', 'campost_step_loss', lambda v: v, f(1), '0.0', '489.9'),
+    # Zach's Fusion rev 2, 2026-09-27 (checks/check_campost_rev2.py, rev2_nest.py): his halves, the IR
+    # cutout extension and the camera posts rebuilt for his tubes, with the real board (lens centred)
+    ('rev 2: tube tools left in his plastic (control: rev-1 axes), mm3', 'r2_tube_fit', lambda v: v, f(2), '3.97', '136.31'),
+    ('rev 2: IR extension removed (control: inside the tool), mm3', 'r2_ir_extend', lambda v: v, f(1), '80.4', '80.4'),
+    ('rev 2: other parts vs ball_plus (control: shipped ball), mm3', 'r2_other_parts', lambda v: v, f(2), '0.00', '0.00'),
+    ('rev 2: posts seated vs ball_plus (designed preload), mm3', 'r2_campost_seated', lambda v: (v, None), f(3), '0.007', 'none'),
+    ('rev 2: posts vs the real board (control: photo board), mm3', 'r2_campost_vs_board', lambda v: v, f(2), '0.00', '29.87'),
+    ('rev 2: post sliding in, no barbs (control: with barbs), mm3', 'r2_campost_slide', lambda v: v, f(3), '0.018', '0.681'),
+    ('rev 2: long post in the LOWER hole (control: short in upper), mm3', 'r2_campost_swap', lambda v: v, f(2), '3.67', '0.54'),
+    ('rev 2: post heads from ball centre (control: ball R), mm', 'r2_campost_head_r', lambda v: v, f(2), '30.50', '30.70'),
+    ('rev 2: post catch, thinnest wall to outside, mm', 'r2_campost_catch_wall', lambda v: (v, None), f(2), '1.17', 'none'),
+    ('rev 2: halves vs nest, deepest (control: shipped), mm', 'r2_nest_deepest', lambda v: v, f(4), '0.0000', '0.0000'),
+    ('rev 2: lens vs nest, clearance (control: photo board), mm', 'r2_lens_vs_nest', lambda v: v, f(2), '1.83', '1.95'),
     ('every print mesh clean (control: ball_plus as exported)', 'print_meshes',
      lambda v: v, lambda x: x if isinstance(x, str) else ('clean' if x else 'NOT clean'), 'clean', '5 self-int + non-manifold'),
 ]

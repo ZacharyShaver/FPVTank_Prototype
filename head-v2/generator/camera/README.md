@@ -5,8 +5,17 @@ Convert Mesh) and STL.
 
 | file | frame |
 |---|---|
-| `camera_dummy.step` / `.stl` | the **head's** frame — **lens axis** on Z 52.0, board back face at X 8.0, lens tip at X 29.0 |
-| `camera_dummy_origin.step` / `.stl` | board **back face at the origin**, lens along +X |
+| `camera_dummy_centred.step` / `.stl` | **use this one.** The head's frame, lens midway between the board's holes |
+| `camera_dummy_centred_origin.step` / `.stl` | the same, board back face at the origin |
+| `camera_dummy.step` / `.stl` | **superseded 2026-09-27**: lens 1.6 off the board's centre (a photo value). Kept because the rev-1 regression table was run with it |
+| `camera_dummy_origin.step` / `.stl` | the superseded one, board back face at the origin |
+
+All four: the **head's** frame puts the **lens axis** on Z 52.0, the board back face at X 8.0 and the
+lens tip at X 29.0 (`kit.camera(2.5)` moves it onto Zach's wall at X 10.5).
+
+**2026-09-27: the lens is centred on the holes.** Zach: "the lens is directly center to the posts, your
+camera model had it sitting off center". He moved his rev-2 post tubes +2.0 to match, by hand. The
+photo put the lens 1.6 above the board's centre (`LENS_OFF_PHOTO`); it is 0 now (`LENS_OFF`).
 
 The part is the Arducam OV5647 IR-CUT day-night module (`HARDWARE.md`): board, the round
 motorised IR-CUT holder, the fisheye dome, the CSI ribbon socket, and the day/night light

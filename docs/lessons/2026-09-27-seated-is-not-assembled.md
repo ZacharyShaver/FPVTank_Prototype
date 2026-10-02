@@ -48,3 +48,13 @@ row can't tell a running clearance from a rubbing face or a jam.
 **Do:** for every pair of surfaces that move against each other, measure the gap or the play itself,
 and say what it should be (`gear_play()` wants 0.5–4°). For every bearing, check that the rotating race
 touches only rotating parts and the fixed race only fixed ones (`bearing_races()`).
+
+## Fit to the feature that constrains the part, not a proxy
+
+Placing the camera posts on Zach's moved tubes, the axes were first fitted by sliding the tube-bore tool
+until it sat in empty space. That gave the lower tube Y 14.85. The post then grazed his wall hole with
+its pin tip: 0.15 mm³, located at X 10.0–10.5. Rayed directly, both wall holes are centred on Y 14.70.
+The bore is double-D, and its facets had biased the fit sideways.
+
+**Do:** place a part by the feature it actually has to pass through (here, the pin in the wall hole),
+measured directly. Use a proxy fit only to find the neighbourhood.

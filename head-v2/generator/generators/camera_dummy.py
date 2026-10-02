@@ -74,8 +74,13 @@ BOARD_W = 36.2           # across, along the tilt axis
 BOARD_H = 36.0           # the other way. Both round to 36 x 36, which is very likely what
                          # it is -- but these are the measured numbers, not the guess.
 BOARD_R = 1.0            # corner round -- ASSUMED, too small to read off the photo
-LENS_OFF = 1.6           # lens axis, from the board's centre TOWARD THE HEADER EDGE.
-                         # Was 5.3 while the axis sat on the highlight.
+LENS_OFF_PHOTO = 1.6     # lens axis, from the board's centre TOWARD THE HEADER EDGE, off the
+                         # photo. Was 5.3 while the axis sat on the highlight. SUPERSEDED
+                         # 2026-09-27: kept only for camera_dummy.* (the rev-1 regression).
+LENS_OFF = 0.0           # Zach, 2026-09-27: "the lens is directly center to the posts" -- the
+                         # lens sits midway between the board's holes. He moved his post tubes
+                         # +2.0 to match, by hand, "so it could be off a tiny bit".
+                         # camera_dummy_centred.* is this one.
 HOLE_D = 2.0             # M2 clearance
 PAD_D = 4.0              # the gold annulus around it -- not modelled, recorded for the pegs
 HOLE_SETS = [(29.4, 28.9),    # outer four, at the corners
@@ -117,11 +122,11 @@ X_FRONT = B.BOARD_X0 + BOARD_T           # 10.0
 LENS_TIP_X = X_FRONT + STANDOFF          # 29.0
 CONNECTOR_DOWN = True                    # flip to put the socket at the top
 SGN = -1.0 if CONNECTOR_DOWN else 1.0    # + Z toward the connector edge
-Z_MID = H + SGN * LENS_OFF               # board centre: NOT on the tilt axis
-Z0, Z1 = Z_MID - BOARD_H / 2, Z_MID + BOARD_H / 2
 
 
-def camera():
+def camera(lens_off=LENS_OFF):
+    z_mid = H + SGN * lens_off           # board centre, from the lens axis
+    Z0, Z1 = z_mid - BOARD_H / 2, z_mid + BOARD_H / 2
     board = rbox((X_BACK, -BOARD_W / 2, Z0), (X_FRONT, BOARD_W / 2, Z1), BOARD_R)
     holder = cyl_x(0, H, HOLDER_D / 2, X_FRONT, HOLDER_X1)
     # the fisheye: a short barrel capped with a sphere that ENDS on the measured tip
@@ -136,14 +141,13 @@ def camera():
     for py, pz in HOLE_SETS:
         for sy in (-1, 1):
             for sz in (-1, 1):
-                bores.append(cyl_x(sy * py / 2, Z_MID + sz * pz / 2, HOLE_D / 2,
+                bores.append(cyl_x(sy * py / 2, z_mid + sz * pz / 2, HOLE_D / 2,
                                    X_BACK - 1.0, X_FRONT + 1.0))
     return cut(U(board, holder, dome, socket, ldr), *bores)
 
 
-if __name__ == '__main__':
-    os.makedirs(OUT, exist_ok=True)
-    s = camera()
+def write(base, lens_off):
+    s = camera(lens_off)
     # A part that comes out in two pieces is a part with a gap in it, and a gap you cannot
     # see in a render is a gap you ship. The light sensor was exactly this: modelled with a
     # stand-off above the board it floated free, and nothing said so.
@@ -155,16 +159,25 @@ if __name__ == '__main__':
                   % (i, b.Volume(), bb.xmin, bb.xmax, bb.ymin, bb.ymax, bb.zmin, bb.zmax))
         raise SystemExit('camera_dummy came out in %d pieces -- something is not touching '
                          'the board. See the list above.' % len(bodies))
-    for name, solid in (('camera_dummy', s),
-                        ('camera_dummy_origin', s.moved(cq.Location(cq.Vector(-X_BACK, 0, -H))))):
+    for name, solid in ((base, s),
+                        (base + '_origin', s.moved(cq.Location(cq.Vector(-X_BACK, 0, -H))))):
         for ext in ('step', 'stl'):
             cq.exporters.export(cq.Workplane(obj=solid), os.path.join(OUT, name + '.' + ext))
     bb = s.BoundingBox()
-    print('camera_dummy: %.1f x %.1f x %.1f mm, %.0f mm3, %d faces'
-          % (bb.xlen, bb.ylen, bb.zlen, s.Volume(), len(s.Faces())))
+    Z0, Z1 = H + SGN * lens_off - BOARD_H / 2, H + SGN * lens_off + BOARD_H / 2
+    print('%s: %.1f x %.1f x %.1f mm, %.0f mm3, %d faces'
+          % (base, bb.xlen, bb.ylen, bb.zlen, s.Volume(), len(s.Faces())))
     print('  board %.1f x %.1f, lens axis on Z %.1f, board Z %.1f .. %.1f (%+.1f / %+.1f)'
           % (BOARD_W, BOARD_H, H, Z0, Z1, Z0 - H, Z1 - H))
     zl = H - SGN * LDR_OFF_Z
     print('  light sensor centre Z %.1f -- board edge is Z %.1f, so it overhangs by %.1f'
           % (zl, Z1, (zl + LDR_D / 2) - Z1))
     print('  written to %s' % os.path.normpath(OUT))
+
+
+if __name__ == '__main__':
+    os.makedirs(OUT, exist_ok=True)
+    # camera_dummy.* keeps the photo offset: SUPERSEDED, but the rev-1 regression table reads it.
+    # camera_dummy_centred.* is the lens centred on the holes (Zach, 2026-09-27): use this one.
+    for base, off in (('camera_dummy', LENS_OFF_PHOTO), ('camera_dummy_centred', LENS_OFF)):
+        write(base, off)
