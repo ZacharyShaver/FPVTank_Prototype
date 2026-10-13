@@ -1,0 +1,11 @@
+C:\Users\<usr>\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\LocalCache\local-packages\Python310\site-packages\scipy\stats\_qmc.py:993: UserWarning: The balance properties of Sobol' points require n to be a power of 2.
+  sample = self._random(n, workers=workers)
+50/400  11 s
+100/400  20 s
+150/400  29 s
+200/400  37 s
+250/400  47 s
+300/400  55 s
+350/400  63 s
+400/400  74 s
+P(upright) range 0.26..0.76, quartiles [0.365, 0.405, 0.47], 74 s

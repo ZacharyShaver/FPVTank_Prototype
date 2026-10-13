@@ -1,0 +1,40 @@
+{
+ "baseline_failures": [],
+ "mutants": 22,
+ "historical_mutants": 14,
+ "S0_pairs_only": {
+  "killed": 12,
+  "of": 22,
+  "historical_killed": 7
+ },
+ "S1_full_suite": {
+  "killed": 21,
+  "of": 22,
+  "historical_killed": 14
+ },
+ "S2_plus_screw_alignment": {
+  "killed": 22,
+  "of": 22,
+  "historical_killed": 14
+ },
+ "survivors_S1": [
+  "M20"
+ ],
+ "survivors_S2": [],
+ "kills_per_check": {
+  "pairs": 12,
+  "insertion": 2,
+  "assembly": 12,
+  "gear_play": 3,
+  "bearing_races": 6,
+  "screw_threads": 2,
+  "block_air": 2,
+  "wire_axis": 3,
+  "merged_shelf": 2,
+  "screw_alignment": 6
+ },
+ "vacuous_checks": [],
+ "errors": {},
+ "wall_s": 0,
+ "cpu_s": 0
+}

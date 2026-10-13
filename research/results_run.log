@@ -1,0 +1,54 @@
+10/207  1023 s
+20/207  1971 s
+30/207  2403 s
+40/207  2905 s
+50/207  3089 s
+60/207  3207 s
+70/207  3227 s
+80/207  3232 s
+90/207  3236 s
+100/207  3237 s
+110/207  3239 s
+120/207  3241 s
+130/207  3242 s
+140/207  3244 s
+150/207  3246 s
+160/207  3248 s
+170/207  3249 s
+180/207  3251 s
+190/207  3253 s
+200/207  3255 s
+{
+ "baseline_failures": [],
+ "mutants": 22,
+ "historical_mutants": 14,
+ "S0_pairs_only": {
+  "killed": 12,
+  "of": 22,
+  "historical_killed": 7
+ },
+ "S1_full_suite": {
+  "killed": 21,
+  "of": 22,
+  "historical_killed": 14
+ },
+ "survivors_S1": [
+  "M20"
+ ],
+ "kills_per_check": {
+  "pairs": 12,
+  "insertion": 2,
+  "assembly": 12,
+  "gear_play": 3,
+  "bearing_races": 6,
+  "screw_threads": 2,
+  "block_air": 2,
+  "wire_axis": 3,
+  "merged_shelf": 2
+ },
+ "vacuous_checks": [],
+ "errors": {},
+ "wall_s": 3271,
+ "cpu_s": 19577
+}
+wrote C:\Users\<usr>\Documents\GitHub\FPVTank_Prototype-github\research\figures\mutation.png

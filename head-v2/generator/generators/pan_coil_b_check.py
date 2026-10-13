@@ -186,6 +186,7 @@ def main(broken=False):
         bad += wire_axis()
     if P.SHELF_MERGED:
         bad += merged_shelf()
+    bad += screw_alignment()
     return bad
 
 
@@ -406,6 +407,42 @@ def merged_shelf():
           f'{100 * now[2]:.0f}% solid, the old exit hole {100 * now[3]:.0f}% filled, boss {100 * now[4]:.0f}% '
           f'(100 / 100 / 100 / 100 / 0 wanted); set 10 control: floor {100 * ctrl[0]:.0f}%, hole {100 * ctrl[3]:.0f}% filled '
           + ('' if ok else '<== ' + ('CONTROL READS MERGED' if ctrl[0] or ctrl[3] >= 0.9 else 'NOT MERGED')))
+    return 0 if ok else 1
+
+
+def screw_alignment(broken=False):
+    """Every screw's way must be open where it threads in. A probe 0.3 under the hole's radius, on the screw's nominal
+    axis (set by the part it clamps), must find no material in the part it threads into or passes through.
+    Added 2026-10-13: the mutation harness (research/harness) found that a tab block slid 0.6 mm out of place passed
+    every check while its pilot sat 0.6 off the servo tab's screw. Interference checks catch parts that are too close,
+    not holes that miss. CONTROL: the probes moved 0.6 off their axes must read material."""
+    TB_Z0 = P.TAB_Z0 - P.TB_H
+    ways = [('servo tab -Y into the bay', P.base, [(P.CENTRE, P.SV_YC - P.TAB_PITCH / 2)], P.TAB_Z0 - 5.5, P.TAB_Z0 - 0.3, P.M2_PILOT),
+            ('servo tab +Y into the tab block', P.tab_block, [(P.CENTRE, P.SV_YC + P.TAB_PITCH / 2)], TB_Z0 + 0.8, P.TAB_Z0 - 0.3, P.M2_PILOT),
+            ('floor plate M2s into the bay', P.base, P.floor_screws(), P.SPLIT_Z + 0.3, P.SPLIT_Z + P.SCREW_BOSS_H, P.M2_PILOT),
+            ('floor plate M2s through the floor', P.floor, P.floor_screws(), P.BAY_Z0 + 0.3, P.SPLIT_Z - 0.3, P.M2_CLEAR)]
+    if P.HOLLOW_AXIS:
+        ways += [('gear M3s through the small gear', P.gear_out, P.ax_screws(), P.G_Z0 + 0.3, P.AX_JOINT_Z - 0.3, P.AX_CLEAR_R),
+                 ('gear M3s into the drum', P.drum, P.ax_screws(), P.AX_JOINT_Z + 0.3, P.G_Z0 + P.AX_SCREW_L - 0.3, P.AX_PILOT_R)]
+    a = np.linspace(0, 2 * np.pi, 24, endpoint=False)
+    def blocked(off):
+        hits = []
+        for label, fn, axes, z0, z1, r in ways:
+            z = np.arange(z0, z1, 0.2); rp = r - 0.3
+            for x, y in axes:
+                for rr in (0.0, rp * 0.5, rp):
+                    q = (x + rr * np.cos(a)[None, :] + 0 * z[:, None], y + off + rr * np.sin(a)[None, :] + 0 * z[:, None],
+                         z[:, None] + 0 * a[None, :])
+                    if (fn(q) < 0).any():
+                        hits.append(label); break
+                else:
+                    continue
+                break
+        return hits
+    now, ctrl = blocked(0.0), blocked(0.6)
+    ok = not now and len(ctrl) == len(ways)
+    print(f'{"screw ways open on their axes":<46}   blocked: {now or "none"}; 0.6-off control blocked {len(ctrl)}/{len(ways)} '
+          + ('' if ok else '<== ' + ('MISALIGNED' if now else 'CONTROL READS OPEN')))
     return 0 if ok else 1
 
 

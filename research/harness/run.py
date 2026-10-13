@@ -17,8 +17,11 @@ import numpy as np
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 GEN = os.path.abspath(os.path.join(ROOT, '..', 'head-v2', 'generator', 'generators'))
-CHECKS = ['pairs', 'insertion', 'assembly', 'gear_play', 'bearing_races', 'screw_threads', 'block_air', 'wire_axis', 'merged_shelf']
+CHECKS = ['pairs', 'insertion', 'assembly', 'gear_play', 'bearing_races', 'screw_threads', 'block_air', 'wire_axis', 'merged_shelf',
+          'screw_alignment']
 S0 = ['pairs']
+S1 = CHECKS[:9]          # the suite as it stood when the harness first ran (2026-10-13)
+# S2 = all of CHECKS: S1 + screw_alignment, written after M20 survived S1 (an escape becomes a check)
 
 
 def task(mid, check):
@@ -61,11 +64,12 @@ def task(mid, check):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument('--workers', type=int, default=6); a = ap.parse_args()   # memory-bound: 4+ workers barely add throughput here
+    ap = argparse.ArgumentParser(); ap.add_argument('--workers', type=int, default=6)   # memory-bound: 4+ workers barely add throughput here
+    ap.add_argument('--only', nargs='*', help='run just these checks and merge them into the existing matrix'); a = ap.parse_args()
     sys.path.insert(0, os.path.dirname(__file__))
     import mutants as MU
     ids = ['none'] + list(MU.MUTANTS)
-    jobs = [(m, c) for m in ids for c in CHECKS]
+    jobs = [(m, c) for m in ids for c in (a.only or CHECKS)]
     jobs.sort(key=lambda j: -{'assembly': 3, 'insertion': 2, 'pairs': 1}.get(j[1], 0))   # long ones first
     res, t0 = [], time.time()
     with ProcessPoolExecutor(max_workers=a.workers) as ex:
@@ -75,22 +79,31 @@ def main():
             if i % 10 == 0:
                 print(f'{i}/{len(jobs)}  {time.time() - t0:.0f} s', flush=True)
     K = {(m, c): (k, s, d) for m, c, k, s, d in res}
+    if a.only:                                       # keep the earlier results for the checks not re-run
+        import csv
+        for row in csv.DictReader(open(os.path.join(ROOT, 'results', 'mutation_matrix.csv'), encoding='utf-8')):
+            for c in CHECKS:
+                if c not in a.only and c in row:
+                    K[(row['mutant'], c)] = (int(row[c]), 0.0, '')
     base_fail = [c for c in CHECKS if K[('none', c)][0]]
     os.makedirs(os.path.join(ROOT, 'results'), exist_ok=True)
     with open(os.path.join(ROOT, 'results', 'mutation_matrix.csv'), 'w', encoding='utf-8') as fh:
-        fh.write('mutant,' + ','.join(CHECKS) + ',killed_by_S0,killed_by_S1,expected,historical,description\n')
+        fh.write('mutant,' + ','.join(CHECKS) + ',killed_by_S0,killed_by_S1,killed_by_S2,expected,historical,description\n')
         for m in ids:
             row = [str(K[(m, c)][0]) for c in CHECKS]
-            s0 = int(any(K[(m, c)][0] for c in S0)); s1 = int(any(K[(m, c)][0] for c in CHECKS))
+            s0 = int(any(K[(m, c)][0] for c in S0)); s1 = int(any(K[(m, c)][0] for c in S1))
+            s2 = int(any(K[(m, c)][0] for c in CHECKS))
             d = MU.MUTANTS.get(m, (None, 'unmutated design', '', None))
-            fh.write(f'{m},' + ','.join(row) + f',{s0},{s1},"{d[2]}","{d[3] or ""}","{d[1]}"\n')
+            fh.write(f'{m},' + ','.join(row) + f',{s0},{s1},{s2},"{d[2]}","{d[3] or ""}","{d[1]}"\n')
     M = [m for m in ids if m != 'none']
     hist = [m for m in M if MU.MUTANTS[m][3]]
     sc = lambda suite, ms: sum(any(K[(m, c)][0] for c in suite) for m in ms)
     S = {'baseline_failures': base_fail, 'mutants': len(M), 'historical_mutants': len(hist),
          'S0_pairs_only': {'killed': sc(S0, M), 'of': len(M), 'historical_killed': sc(S0, hist)},
-         'S1_full_suite': {'killed': sc(CHECKS, M), 'of': len(M), 'historical_killed': sc(CHECKS, hist)},
-         'survivors_S1': [m for m in M if not any(K[(m, c)][0] for c in CHECKS)],
+         'S1_full_suite': {'killed': sc(S1, M), 'of': len(M), 'historical_killed': sc(S1, hist)},
+         'S2_plus_screw_alignment': {'killed': sc(CHECKS, M), 'of': len(M), 'historical_killed': sc(CHECKS, hist)},
+         'survivors_S1': [m for m in M if not any(K[(m, c)][0] for c in S1)],
+         'survivors_S2': [m for m in M if not any(K[(m, c)][0] for c in CHECKS)],
          'kills_per_check': {c: sum(K[(m, c)][0] for m in M) for c in CHECKS},
          'vacuous_checks': [c for c in CHECKS if not any(K[(m, c)][0] for m in M)],
          'errors': {f'{m}/{c}': K[(m, c)][2] for m in ids for c in CHECKS if K[(m, c)][2].startswith('error')},
@@ -112,9 +125,11 @@ def figure(K, ids, M, MU):
         for j, c in enumerate(CHECKS):
             if A[i, j]:
                 ax.text(j, i, 'x', ha='center', va='center', fontsize=8, color='#123')
-    s0 = sum(any(K[(m, c)][0] for c in S0) for m in M); s1 = sum(any(K[(m, c)][0] for c in CHECKS) for m in M)
-    ax.set_title(f'Seeded faults caught: pairs check alone {s0}/{len(M)}, full suite {s1}/{len(M)}  (* = a real past mistake)',
-                 fontsize=8.5, loc='left')
+    s0 = sum(any(K[(m, c)][0] for c in S0) for m in M); s1 = sum(any(K[(m, c)][0] for c in S1) for m in M)
+    s2 = sum(any(K[(m, c)][0] for c in CHECKS) for m in M)
+    ax.axvline(len(S1) - 0.5, color='#555', lw=0.8, ls='--')
+    ax.set_title(f'Seeded faults caught: pairs alone {s0}/{len(M)}; suite {s1}/{len(M)}; + screw alignment {s2}/{len(M)}\n'
+                 '(* = a real past mistake; right of the dashed line: the check written after M20 survived)', fontsize=8, loc='left')
     plt.tight_layout()
     os.makedirs(os.path.join(ROOT, 'figures'), exist_ok=True)
     p = os.path.join(ROOT, 'figures', 'mutation.png'); plt.savefig(p, dpi=200); plt.close(fig); print('wrote', p)
