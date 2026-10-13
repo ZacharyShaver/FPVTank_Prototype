@@ -1,91 +1,91 @@
-run,body_icon,start,drop,mark,rest_state,note
-1,oval,"nose down",1,N,nose down,"N written over a struck mark"
-1,oval,"nose down",2,X,inverted,""
-1,oval,"nose down",3,X,inverted,""
-1,oval,"nose down",4,X,inverted,""
-1,oval,"nose down",5,X,inverted,""
-1,oval,"tail down",1,X,inverted,""
-1,oval,"tail down",2,N,nose down,""
-1,oval,"tail down",3,T,nose up,""
-1,oval,"tail down",4,X,inverted,""
-1,oval,"tail down",5,O,upright,""
-1,oval,"left side down",1,X,inverted,""
-1,oval,"left side down",2,R,right side,""
-1,oval,"left side down",3,X,inverted,""
-1,oval,"left side down",4,X,inverted,""
-1,oval,"left side down",5,X,inverted,""
-1,oval,"right side down",1,X,inverted,""
-1,oval,"right side down",2,X,inverted,"sloppy X"
-1,oval,"right side down",3,X,inverted,""
-1,oval,"right side down",4,X,inverted,""
-1,oval,"right side down",5,X,inverted,"overwritten mark; Zach: X"
-1,oval,"upside down",1,X,inverted,""
-1,oval,"upside down",2,X,inverted,""
-1,oval,"upside down",3,X,inverted,""
-1,oval,"upside down",4,X,inverted,""
-1,oval,"upside down",5,X,inverted,""
-1,oval,"upside down, 45 to the left",1,L,left side,"a struck mark before the L is not a drop"
-1,oval,"upside down, 45 to the left",2,X,inverted,""
-1,oval,"upside down, 45 to the left",3,X,inverted,""
-1,oval,"upside down, 45 to the left",4,X,inverted,""
-1,oval,"upside down, 45 to the left",5,X,inverted,""
-1,rounded_square,"nose down",1,X,inverted,""
-1,rounded_square,"nose down",2,T,nose up,""
-1,rounded_square,"nose down",3,R,right side,""
-1,rounded_square,"nose down",4,O,upright,""
-1,rounded_square,"nose down",5,R,right side,""
-1,rounded_square,"tail down",1,O,upright,""
-1,rounded_square,"tail down",2,O,upright,""
-1,rounded_square,"tail down",3,O,upright,""
-1,rounded_square,"tail down",4,X,inverted,""
-1,rounded_square,"tail down",5,O,upright,""
-1,rounded_square,"left side down",1,O,upright,"O written over another mark"
-1,rounded_square,"left side down",2,R,right side,""
-1,rounded_square,"left side down",3,X,inverted,""
-1,rounded_square,"left side down",4,X,inverted,""
-1,rounded_square,"left side down",5,R,right side,""
-1,rounded_square,"right side down",1,N,nose down,""
-1,rounded_square,"right side down",2,X,inverted,""
-1,rounded_square,"right side down",3,X,inverted,""
-1,rounded_square,"right side down",4,X,inverted,""
-1,rounded_square,"right side down",5,T,nose up,""
-1,rounded_square,"upside down",1,X,inverted,""
-1,rounded_square,"upside down",2,X,inverted,""
-1,rounded_square,"upside down",3,X,inverted,""
-1,rounded_square,"upside down",4,X,inverted,""
-1,rounded_square,"upside down",5,X,inverted,""
-1,rounded_square,"upside down, 45 to the left",1,N,nose down,""
-1,rounded_square,"upside down, 45 to the left",2,X,inverted,""
-1,rounded_square,"upside down, 45 to the left",3,F,nose down,"F; Zach: front (read as nose down)"
-1,rounded_square,"upside down, 45 to the left",4,X,inverted,""
-1,rounded_square,"upside down, 45 to the left",5,T,nose up,""
-1,hill,"nose down",1,X,inverted,""
-1,hill,"nose down",2,X,inverted,""
-1,hill,"nose down",3,X,inverted,""
-1,hill,"nose down",4,X,inverted,""
-1,hill,"nose down",5,X,inverted,""
-1,hill,"tail down",1,X,inverted,""
-1,hill,"tail down",2,X,inverted,""
-1,hill,"tail down",3,O,upright,""
-1,hill,"tail down",4,O,upright,""
-1,hill,"tail down",5,X,inverted,""
-1,hill,"left side down",1,X,inverted,""
-1,hill,"left side down",2,O,upright,""
-1,hill,"left side down",3,X,inverted,""
-1,hill,"left side down",4,O,upright,""
-1,hill,"left side down",5,R,right side,""
-1,hill,"right side down",1,X,inverted,""
-1,hill,"right side down",2,X,inverted,""
-1,hill,"right side down",3,O,upright,""
-1,hill,"right side down",4,R,right side,""
-1,hill,"right side down",5,X,inverted,""
-1,hill,"upside down",1,X,inverted,""
-1,hill,"upside down",2,X,inverted,""
-1,hill,"upside down",3,X,inverted,""
-1,hill,"upside down",4,X,inverted,""
-1,hill,"upside down",5,X,inverted,""
-1,hill,"upside down, 45 to the left",1,X,inverted,""
-1,hill,"upside down, 45 to the left",2,X,inverted,""
-1,hill,"upside down, 45 to the left",3,X,inverted,""
-1,hill,"upside down, 45 to the left",4,X,inverted,""
-1,hill,"upside down, 45 to the left",5,X,inverted,""
+run,body,body_icon,mass,start,drop,mark,rest_state,note
+1,E2_dome,oval,high,nose down,1,N,nose down,N written over a struck mark
+1,E2_dome,oval,high,nose down,2,X,inverted,
+1,E2_dome,oval,high,nose down,3,X,inverted,
+1,E2_dome,oval,high,nose down,4,X,inverted,
+1,E2_dome,oval,high,nose down,5,X,inverted,
+1,E2_dome,oval,high,tail down,1,X,inverted,
+1,E2_dome,oval,high,tail down,2,N,nose down,
+1,E2_dome,oval,high,tail down,3,T,nose up,
+1,E2_dome,oval,high,tail down,4,X,inverted,
+1,E2_dome,oval,high,tail down,5,O,upright,
+1,E2_dome,oval,high,left side down,1,X,inverted,
+1,E2_dome,oval,high,left side down,2,R,right side,
+1,E2_dome,oval,high,left side down,3,X,inverted,
+1,E2_dome,oval,high,left side down,4,X,inverted,
+1,E2_dome,oval,high,left side down,5,X,inverted,
+1,E2_dome,oval,high,right side down,1,X,inverted,
+1,E2_dome,oval,high,right side down,2,X,inverted,sloppy X
+1,E2_dome,oval,high,right side down,3,X,inverted,
+1,E2_dome,oval,high,right side down,4,X,inverted,
+1,E2_dome,oval,high,right side down,5,X,inverted,overwritten mark; Zach: X
+1,E2_dome,oval,high,upside down,1,X,inverted,
+1,E2_dome,oval,high,upside down,2,X,inverted,
+1,E2_dome,oval,high,upside down,3,X,inverted,
+1,E2_dome,oval,high,upside down,4,X,inverted,
+1,E2_dome,oval,high,upside down,5,X,inverted,
+1,E2_dome,oval,high,"upside down, 45 to the left",1,L,left side,a struck mark before the L is not a drop
+1,E2_dome,oval,high,"upside down, 45 to the left",2,X,inverted,
+1,E2_dome,oval,high,"upside down, 45 to the left",3,X,inverted,
+1,E2_dome,oval,high,"upside down, 45 to the left",4,X,inverted,
+1,E2_dome,oval,high,"upside down, 45 to the left",5,X,inverted,
+1,E3_tall,rounded_square,high,nose down,1,X,inverted,
+1,E3_tall,rounded_square,high,nose down,2,T,nose up,
+1,E3_tall,rounded_square,high,nose down,3,R,right side,
+1,E3_tall,rounded_square,high,nose down,4,O,upright,
+1,E3_tall,rounded_square,high,nose down,5,R,right side,
+1,E3_tall,rounded_square,high,tail down,1,O,upright,
+1,E3_tall,rounded_square,high,tail down,2,O,upright,
+1,E3_tall,rounded_square,high,tail down,3,O,upright,
+1,E3_tall,rounded_square,high,tail down,4,X,inverted,
+1,E3_tall,rounded_square,high,tail down,5,O,upright,
+1,E3_tall,rounded_square,high,left side down,1,O,upright,O written over another mark
+1,E3_tall,rounded_square,high,left side down,2,R,right side,
+1,E3_tall,rounded_square,high,left side down,3,X,inverted,
+1,E3_tall,rounded_square,high,left side down,4,X,inverted,
+1,E3_tall,rounded_square,high,left side down,5,R,right side,
+1,E3_tall,rounded_square,high,right side down,1,N,nose down,
+1,E3_tall,rounded_square,high,right side down,2,X,inverted,
+1,E3_tall,rounded_square,high,right side down,3,X,inverted,
+1,E3_tall,rounded_square,high,right side down,4,X,inverted,
+1,E3_tall,rounded_square,high,right side down,5,T,nose up,
+1,E3_tall,rounded_square,high,upside down,1,X,inverted,
+1,E3_tall,rounded_square,high,upside down,2,X,inverted,
+1,E3_tall,rounded_square,high,upside down,3,X,inverted,
+1,E3_tall,rounded_square,high,upside down,4,X,inverted,
+1,E3_tall,rounded_square,high,upside down,5,X,inverted,
+1,E3_tall,rounded_square,high,"upside down, 45 to the left",1,N,nose down,
+1,E3_tall,rounded_square,high,"upside down, 45 to the left",2,X,inverted,
+1,E3_tall,rounded_square,high,"upside down, 45 to the left",3,F,nose down,F; Zach: front (read as nose down)
+1,E3_tall,rounded_square,high,"upside down, 45 to the left",4,X,inverted,
+1,E3_tall,rounded_square,high,"upside down, 45 to the left",5,T,nose up,
+1,E1_tub,hill,high,nose down,1,X,inverted,
+1,E1_tub,hill,high,nose down,2,X,inverted,
+1,E1_tub,hill,high,nose down,3,X,inverted,
+1,E1_tub,hill,high,nose down,4,X,inverted,
+1,E1_tub,hill,high,nose down,5,X,inverted,
+1,E1_tub,hill,high,tail down,1,X,inverted,
+1,E1_tub,hill,high,tail down,2,X,inverted,
+1,E1_tub,hill,high,tail down,3,O,upright,
+1,E1_tub,hill,high,tail down,4,O,upright,
+1,E1_tub,hill,high,tail down,5,X,inverted,
+1,E1_tub,hill,high,left side down,1,X,inverted,
+1,E1_tub,hill,high,left side down,2,O,upright,
+1,E1_tub,hill,high,left side down,3,X,inverted,
+1,E1_tub,hill,high,left side down,4,O,upright,
+1,E1_tub,hill,high,left side down,5,R,right side,
+1,E1_tub,hill,high,right side down,1,X,inverted,
+1,E1_tub,hill,high,right side down,2,X,inverted,
+1,E1_tub,hill,high,right side down,3,O,upright,
+1,E1_tub,hill,high,right side down,4,R,right side,
+1,E1_tub,hill,high,right side down,5,X,inverted,
+1,E1_tub,hill,high,upside down,1,X,inverted,
+1,E1_tub,hill,high,upside down,2,X,inverted,
+1,E1_tub,hill,high,upside down,3,X,inverted,
+1,E1_tub,hill,high,upside down,4,X,inverted,
+1,E1_tub,hill,high,upside down,5,X,inverted,
+1,E1_tub,hill,high,"upside down, 45 to the left",1,X,inverted,
+1,E1_tub,hill,high,"upside down, 45 to the left",2,X,inverted,
+1,E1_tub,hill,high,"upside down, 45 to the left",3,X,inverted,
+1,E1_tub,hill,high,"upside down, 45 to the left",4,X,inverted,
+1,E1_tub,hill,high,"upside down, 45 to the left",5,X,inverted,
