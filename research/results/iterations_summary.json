@@ -1,0 +1,48 @@
+{
+ "period": [
+  "2026-09-27",
+  "2026-10-12"
+ ],
+ "design_findings": 26,
+ "by_found_by": {
+  "bench": 16,
+  "review": 6,
+  "check": 2,
+  "agent review": 1,
+  "slicer": 1
+ },
+ "caught_before_printing": 10,
+ "found_at_bench": 16,
+ "slipped_past_a_passing_check": 5,
+ "cycle_hours_exact": {
+  "n": 20,
+  "median": 1.6083333333333334,
+  "iqr": [
+   0.5666666666666667,
+   2.470833333333333
+  ],
+  "bench_median": 1.9333333333333333,
+  "within_3h": 15
+ },
+ "bench_categories": {
+  "routing": 3,
+  "friction": 3,
+  "tolerance": 2,
+  "print process": 2,
+  "model assumption": 1,
+  "access": 1,
+  "geometry": 1,
+  "strength": 1,
+  "material": 1,
+  "retention": 1
+ },
+ "print_failures": 2,
+ "electronics_drivetrain_escapes": 6,
+ "check_failures": {
+  "n": 10,
+  "false_pass": 7,
+  "false_fail": 2,
+  "weak_control": 1
+ },
+ "note": "retrospective; cycle = finding to fix ready (sliced or superseding files written); exact rows only"
+}
