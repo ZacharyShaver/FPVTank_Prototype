@@ -1,14 +1,18 @@
-fusion/well.obj         48000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=15.57 cm3
-fusion/drum.obj         24000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=25.81 cm3
+fusion/well.obj         55198 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=27.72 cm3
+fusion/drum.obj         24000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=24.58 cm3
 fusion/ribbon.obj       14000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.95 cm3
-fusion/bay.obj          57200 faces  watertight=True  manifold=True  bodies=1  self-int=17  vol=20.31 cm3
+fusion/bay.obj          26000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=18.97 cm3
 fusion/servo.obj         7000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=7.76 cm3
-fusion/gear_in.obj      11500 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=7.45 cm3
+fusion/gear_in.obj      11500 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=6.80 cm3
 fusion/bearing.obj       7000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=7.33 cm3
-fusion/base.obj        132000 faces  watertight=True  manifold=True  bodies=1  self-int=35  vol=35.77 cm3
-fusion/floor.obj        13798 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=4.84 cm3
-fusion/gear_out.obj      9000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=1.66 cm3
+fusion/bearing688.obj    5000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.75 cm3
+fusion/horn.obj          5000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.32 cm3
+fusion/base.obj        132000 faces  watertight=True  manifold=True  bodies=1  self-int=55  vol=45.17 cm3
+fusion/floor.obj        12000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=4.49 cm3
+fusion/gear_out.obj      9000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=2.54 cm3
 fusion/tab_block.obj     4000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.49 cm3
-fusion/screw_out.obj     3000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.08 cm3
+fusion/screw_out.obj     6600 faces  watertight=True  manifold=True  bodies=3  self-int=2  vol=0.36 cm3
+fusion/bearing6704.obj   6000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=1.03 cm3
+fusion/shelf_ring.obj   24000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=4.88 cm3
 fusion/twist_gap.obj     5000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=0.90 cm3
 ENVELOPE [-31.  -32.  -39.4] -> [56.2 31.  40. ]  size [87.2 63.  79.4]

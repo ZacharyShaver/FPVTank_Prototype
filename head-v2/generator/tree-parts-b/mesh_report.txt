@@ -29,3 +29,14 @@ fusion/fork.obj             60000 faces  watertight=True  manifold=True  bodies=
 print/stub.stl             250000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=6.72 cm3
 fusion/stub.obj              6000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=6.72 cm3
 ENVELOPE [-42.3 -34.   10.5] -> [28.  34.  72.5]  size [70.3 68.  62. ]
+print/fork.stl             550000 faces  watertight=True  manifold=True  bodies=1  self-int=44  vol=54.69 cm3   <-- CHECK
+fusion/fork.obj             60000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=54.69 cm3
+ENVELOPE [-42.3 -34.   10.5] -> [28.  34.  72.5]  size [70.3 68.  62. ]
+print/fork.stl             550000 faces  watertight=True  manifold=True  bodies=1  self-int=40  vol=55.79 cm3   <-- CHECK
+fusion/fork.obj             60000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=55.79 cm3
+print/stub.stl             250000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=6.02 cm3
+fusion/stub.obj              6000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=6.02 cm3
+ENVELOPE [-42.3 -34.   10.5] -> [28.  34.  72.5]  size [70.3 68.  62. ]
+print/fork.stl             550000 faces  watertight=True  manifold=True  bodies=1  self-int=40  vol=56.52 cm3   <-- CHECK
+fusion/fork.obj             60000 faces  watertight=True  manifold=True  bodies=1  self-int=0  vol=56.52 cm3
+ENVELOPE [-42.3 -34.   10.5] -> [28.  34.  72.5]  size [70.3 68.  62. ]

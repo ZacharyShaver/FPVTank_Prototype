@@ -3,21 +3,290 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-10-12: Bench stand v2, and the head's pocket in the body (nose section)
+
+Zach: "more room for the gears on height and a spot to pin the black wires to the base so they dont fly in the gears"
+(the tilt servo's wires, out of the bottom of the pan axis since set 10), then "the stand should be like a section out of"
+the body. Stand v2 (`head-v2/fixes/bench_stand.py`, `RAISED`): the head 12 up on a hollow riser; the floor plate on a
+ledge chamfered 30 deg underneath; a slotted post under the axis (bore r 2.4, inside the M3 heads' sweep from r 3.05)
+takes the wires straight down; a door at its foot, an arch toward +X (the servo side, his PCA9685), a V cleat. The
+ledge is trimmed clear of the M3 heads (they turn 0.35 inside the floor plate's 18.7 hole and read 0.59 off v1's ledge).
+Printed 2026-10-12 (1 h 7 m). The screws are reached by lifting the head out now. Marching cubes made zero-area folds
+where v2's planes fell on grid nodes, so its grid is offset 0.0371 and its print mesh isn't decimated.
+
+The body (`chassis-v2/nose.py`, the Trainer: rugged.py on wheels) stands the base on the nose floor, so it needs the same
+pocket. Two ways drawn: A, the pocket hangs 12 under the nose floor (the belly under the head 30 off the ground, was
+42; level with the pack bays' 32) and the wires come up a chimney aft of the base; B, the head 12 higher on the pocket.
+He said print it, so A's tub forward of X 26 prints first. Holding the head for a tumble: the turret deck ring gets a
+1.8 lip over the base's rim (the bearing seat's ring) and four M3 x 12 into posts from the nose floor. Found on the way:
+rugged.tub()'s turret-deck ledges floated 4.2 over the walls (the deck rose 10 with the head, the walls didn't);
+nose.py raises the walls forward of the glacis to the deck. A vs B is still open.
+
+## 2026-10-12: The shelf ring goes back into the base (set 11)
+
+Set 10 assembled, the pan turned its full sweep at the bench ("We fixed it!", a video of 500 <-> 2500 us). Zach then
+asked to merge "the piece for the cable wrap" (set 7's drop-in shelf ring) into the base: it "has a chance of falling
+out of its lock if its gone upside down" (the base goes upside down for the small gear and the floor plate, and only a
+2.5 mm rib keyed it), and it "doesnt need to be an extra piece if the wire just runs through the bottom now". And close
+the wires' old exit hole on the outside.
+
+Set 7 split the ring off only because the lane under the shelf needed supports that couldn't be got out. Set 10 emptied
+the lane, so it fills solid up to the ribbon's floor (Z -20) and nothing overhangs inside the can; the ring's cup wall
+stands on the fill, its ribbon notch and the slit unchanged. The rib, the boss at -145 deg and the exit hole go. The 6704
+(27 across) still drops in from above before the drum, so the fill leaves a 27.5 hole round the drum (0.25 a side of the
+bearing; 1.75 off the drum's face, where the ring's shelf left 0.6). The ribbon's bottom edge stands 1.0 over the floor
+and its inner wrap rides on the drum. Set 10's drum, small gear and floor plate are unchanged; only the base reprints
+(1 h 21 m, 39 g, supports on; none land inside the can).
+
+He also wrote "im going to leave the well off for this one". Read as: he's leaving the loose ring out of this build. The
+ribbon's cup wall is kept (the coil is sized to it); if he meant that wall, dropping it is the `cup` line in `_well_set7`.
+
+Checks (`pan_coil_b_check.py`): `merged_shelf` (the floor, the old lane and the cup solid; the exit hole filled; the boss
+gone; control: set 10's base reads no floor and the hole open), and the 6704's way down through the shelf in the
+assembly order. **Superseded:** `shelf_ring` as a part (`RING_PART`; `SHELF_MERGED = False` gets set 10 back), the rib
+(`KEY_*`), the boss and `BASE_WIRE`'s hole. `checks/wire_route.py` checks the lane route of set 10 and before.
+
+## 2026-10-11: The servo wires go straight down the pan axis (set 10)
+
+Set 9 at the bench: meshed, the pan moved only over 500..800 us; bare, the servo turned its full 180 deg, so the drag
+is the head's. Zach found the jumper wires squashed in the lane once everything was screwed down, and the jumpers
+spring back like solid wire. He asked why the wires leave the drum sideways at all, and proposed moving the axis
+screw out to several screws round a plate the gear bolts to.
+
+Both earlier rejections of the axis route fall together: set 8's (the gear's M3 sat on the axis) and set 9's of a
+6704 (its 20 mm barrel ran into set 8's off-axis wire hole). The 688 was the bottleneck: hollowed out, its 7.9
+barrel left no wall for screws. So the 688 becomes a 6704 (20 × 27 × 4; he has ~6) at the same height, the barrel
+19.9 and hollow, a 6 mm hole from the cone's point straight down through the barrel, the small gear and the floor
+plate's existing hole. The gear bolts to the barrel's end on three M3 × 16 at r 5.9. It carries a solid hub on top (22.4 across) that meets
+the barrel's end face to face 0.4 under the 6704's inner ring, which is what keeps the drum in the base now; the
+button heads sit under the gear and turn in an 18.7 mm hole in the floor plate. The first draft, the same day and never
+printed, sank the heads into the gear (0.9 of wall to the wire hole and the teeth) and centred it with a 1.1 collar;
+Zach: "the connection for the gear looks extremely flimsy". Now every hole has ~1.4 of wall for the gear's full 8.7.
+M3 × 16 because he has few M2 left and "quite a few" of those: 7.3 of thread in the barrel. The wire hole is 5.5. The 6704 can't pass the shelf ring's 25.2 hole, so it goes in first.
+The lane, shelf ring and exit hole stay, empty. Zach is also buying 28 AWG silicone wire to replace the springy
+jumpers.
+
+Checks (`pan_coil_b_check.py`): `wire_axis` (control: set 9 blocked by the drum and the M3), `races_6704` (control:
+the lip in to r 10.0), `screw_threads_6704` (control: an M3 × 12 reads 3.3), the 6704 rows and the assembly order.
+**Superseded:** the 688 (`BARREL_688`), the square stub and the axis M3 (`SEAT_SQUARE`, `SCREW_THRU`), set 8's
+straight hole and groove (`STRAIGHT_WIRE`); `HOLLOW_AXIS = False` gets set 9 back. `checks/wire_route.py` still
+checks the lane route.
+
+## 2026-10-10: The input gear carries the servo's horn; the barrel runs in a 688 (set 9)
+
+First bench run of the v2 head (FPVTank_Control `docs/bench/2026-10-10-v2-head-first-power.md`): tilt works, but the
+pan servo can't turn the drum. Bare, it turns its full travel (5 teeth per 500 µs), so the fault is mechanical. Zach
+found five things by hand: the input gear slips on the spline (the screw turns, the gear doesn't); it rubs the wall
+above it, more as its screw tightens; there's more drag when the head leans; the drum isn't bearing-smooth with the
+6809ZZ in; and every screw trades drag for slip.
+
+**Input gear.** Set 6's press bore wore smooth: PLA doesn't hold a metal spline. And the screw set the gear's height:
+set 6's own note expected the real 9.0 spline (1.0 shorter than his MG90S model) to let the screw pull the gear 1.0 up
+"with room for it", but the gear's top was 0.5 under the servo's block, so the screw clamped the gear against the
+servo. Now the servo's own double-arm horn sits in a pocket of its exact outline (Arm02 from Zach's measured MG90S
+model; his caliper matched its length, arms, hub and height), at zero offset, the 2026-09-19 rule, which prefers
+gripping the arms to the shaft. The spline stops on the horn's web, which sets the height; the gear's top is 1.0
+under the block. One M2 × 6 comes up through the gear's floor and the horn's web, 3.1 mm into the spline. The gear is
+an exact solid (`fixes/gear_horn_set9.py`): the generator's tooth formula, extruded, with the horn's outline cut
+in OCC. Sewing the generator's mesh into a solid came out invalid, and the cut silently did nothing; the control
+(the blank against the horn) caught it. **Superseded:** set 6's spline in the gear (`HORN_GEAR = False`).
+
+**Barrel.** It ran in a PLA journal, 0.25 a side, and bore on it as the head leaned. Now it runs through a 688
+(8 × 16 × 5; he has many) seated in the base, its top level with the lane's floor, on a lip under its outer ring.
+The drum's underside stays 0.4 clear, so the 6809 still carries the drum and the 688 only keeps it upright. The drum
+goes in from above through the bearing, so everything below it has to pass the 8 mm bore: the barrel is 7.9 and set
+8's 7.0 square stub is 6.0 (corners r 3.91). Rejected: a 6704 (it needs a 20 mm barrel, which runs into the drum's
+wire hole 8 mm off the axis). **Superseded:** the journal (`BARREL_688 = False`) and the 7.0 square.
+
+Checks: `pan_coil_b_check.block_air()` (control: set 6's gear pulled 1.0 up reads −0.5) and `races_688()`.
+
+**Reprinted the same day.** The 0.05 small gear was so tight on the 6.0 square that pulling it off tore the square
+off the drum; the 0.10 was "not that bad", so 0.10 is the fit (`SQ_FIT`). The zero-offset horn pocket was so tight the
+horn flew out of it and hit Zach in the eye: the pocket grows 0.10 a side now, with a 0.15 gear to try
+(`HORN_FITS`). It is the horn's whole outline carried 3.4 mm deep through PLA, not the shallow pocket the zero-offset
+rule was found on. And the horn kit's own screw (3 mm head, 5 long) couldn't get through the gear's floor: the floor
+is open under the horn's centre now (5.0 across), the screw seats on the horn's web as designed, 4.5 mm into the
+spline, and nothing clamps the gear (the floor plate sits 0.5 under it). **Superseded:** zero offset on this pocket,
+the M2 × 6 under a 1.5 floor, and the 0.05 small gear.
+
+2026-10-11, Zach: the 688 "fits beautifully, feeling very smooth"; the 0.10 pocket "fits well enough with still
+being a bit tight, which is good"; the 0.15 is too loose. 0.10 is the fit, and CLAUDE.md's zero-offset rule now names
+this exception.
+
+## 2026-10-09: The small gear's screw threads above the step; a square seat; a straight wire hole (set 8)
+
+Zach: the seat at the end of the drum's barrel "keeps snapping", when he tightens the screw (his photo: the broken
+seat still on the screw inside the small gear). The M3 × 8 had 4.2 of its 6.2 mm of thread in the seat, below the
+step the gear pushes up on. So tightening pulled the seat off the barrel across its layers (the drum prints upside
+down) at a sharp corner. Now the seat has a clear hole, and an M3 × 12 threads 5.8 mm into the barrel above the step:
+tightening squeezes the step. `pan_coil_b_check.screw_threads()` checks it, with set 7's drum as its control.
+Rejected: a fillet at the step (the gear's bore would need a matching chamfer, and the seat would still be in tension).
+
+He asked for "a square going in so it grips better". The gear could turn 7.5° on the D before its flat bit; a
+square 7.0 across with r 0.8 corners turns 2.2° at 0.05 a side. The corners reach r 4.62, so the step stays all round
+and the seat still passes down the journal. Two gears to try, 0.05 and 0.10 a side.
+
+Threading was "a massive pain", stuck at the cone: set 6's hole started at the cone's point and bent from straight
+down to sideways out of sight. Now a straight vertical hole starts under where the wires already come down the notch
+(r 8, −127°, behind the ribbon) and leaves through the drum's underside, where an open groove takes them to the lane.
+Rejected: running the wires straight down the pan axis through a hollow barrel (kinder to solid wire than the
+rolling loop, but the gear's screw sits on that axis, and the screw is what keeps the drum in the base). Moving the
+exit also fixed the loop's range: with 74 mm in the lane, set 6's exit let the head turn only 150° one way, however
+the loop was laid; set 8's allows 214° and 325°. **Superseded:** the D seat (`SEAT_SQUARE = False`), the pilot from the
+seat's end with an M3 × 8 (`SCREW_THRU = False`), and set 6's curved hole (`STRAIGHT_WIRE = False`).
+
+## 2026-10-05: Wheels for training, at least for now; the fenders go
+
+Zach: "the side portions covering the top of the tracks have to go. for training the robot. at least for now. we
+have to use wheels tracks get too complicated and we need to be able to run en mass to train." A track in a
+simulator is a closed loop of links (the v2 design: ~120 bodies and ~70 contacts); four wheels are four hinges and
+four contacts, so many copies can run at once, and the real robot has to match what was trained. The chassis
+brainstorm now builds the rugged body on four identical corner modules (`chassis-v2/wheels.py`, `trainer.py`): each
+gearmotor rides outside the hull in a printed pod, because the nose holds the head and the packs, with a dish wheel
+over it. No fenders, no suspension. The v2 tracks (`legs_v2.py`) are on hold, not dropped.
+
+## 2026-10-04: The shelf drops into the base (set 7)
+
+Zach: Orca's supports in the base's wire lane, under the shelf, are impossible to get out. With his settings Orca
+filled the lane all round (3850 support moves): the shelf stuck 8.4 mm in over a 3.5 mm lane. He wants that
+overhang support-free. A slope can't carry the shelf: at his 30° off vertical, crossing the lane needs 14.5 mm of
+drop, and the lane is 3.5 tall with the ribbon's floor on top of it. He agreed to a drop-in shelf.
+
+So the shelf and the ribbon cup's wall left the base as one part, `shelf_ring`. It prints shelf face down with no
+overhang and drops in from above onto a 1.5 mm ledge on the lane wall, with a 0.15 slide. A notch in its shelf's rim
+fits a rib on the ledge, which keys it against the ribbon's drag and lines its ribbon notch up with the base's slit. Its cup wall
+is 0.3 wider (18.3), so the drum's flange keeps 0.45 with the ring fully off centre. For the ring to pass, the deck
+ring's hole widened to r 22.65. That also took the deck ring out from under the drum's hub, which had sat flush on
+it at r 19.5–20.4 since set 2: the relief stopped at r 20.5. Found the same day after Zach called the pan finicky
+(he also had no 6809 in it at all). `pan_coil_b_check.hub_face()` now checks for this, with set 5 as its control.
+
+The deck ring now stands on a skirt, with a cone 30° off vertical under its outer part, so the supports outside the
+cup are gone too. The first slices still had supports under the old 17.6 window's roof, in the wires' 5 mm exit hole,
+and then under the cone's free edge over a channel for a key tab. Past the ring's notch the ribbon only runs straight
+out, on edge, so it leaves the base by a 2 mm slit with a pointed roof (open to the top under the bearing's inner
+race, where the deck is relieved anyway), the key became a rib on the ledge, and the exit hole has a pointed top. The
+boss round the hole grew 3 mm so that point stays inside it. Rejected: one piece
+with a breakaway wall under the shelf's edge (bridges to 34 mm, and a cleanup edge 0.6 from the turning drum), and
+printing the base upside down (the deck ring and the servo tower would start in mid-air). Not changed: the supports
+under the gear bay's ceiling and round the journal, which come out from below, and over the servo pocket, which
+come out through its window. **Superseded:** set 5's well (`INSERT = False` still builds it).
+
+## 2026-10-03: The drum's bore floor is a cone; the input gear takes the spline straight in (set 6)
+
+Zach assembled set 5. **Drum:** it prints top face down, so the bore's flat floor was an 18 mm ceiling, and
+the tree supports under it couldn't be got out. He asked for it "circular at an angle no greater than
+30deg". The floor is now a cone 30° off vertical, 15.6 deep. A cone that steep can't fit under set 5's hole,
+whose mouth sat in the floor near the wall, so the hole now starts at the cone's point and leaves into the lane
+where set 5's did. The cone is the funnel: wherever the wires drop, they slide to the hole. The notch floor
+went from 55° to 60° from horizontal (30° off vertical) and now meets the cone's rim. Orca with his
+settings: the bore's ceiling contacts are gone (set 5: 188), and the drum slices to 35 min with supports
+off. What's still over air is the ribbon slot's roof (a 17 mm bridge, open to the side) and the 5 mm hole's
+arch. The slot's roof can't slope at 30° inside the drum's height without opening the slot into the wire lane.
+**Superseded:** set 5's flat floor and its funnel (`DRUM_WIRE_PTS_SET5`, `HANDOVER_PTS_SET5`). The hole from
+the cone's point is itself **superseded 2026-10-09 (set 8)**: the wires jammed in its bend.
+
+**Input gear:** "no screw long enough to reach". The horn pocket was always a placeholder of generic numbers,
+to be re-cut in Fusion with his horn, and his MG90S's shaft ran 0.8 mm into its roof, so the gear hung low.
+No horn model of his was found on the machine, and he said to do the usual boolean fit, "whatever". So the
+spline presses straight into the gear, as it does into post v3: post v3's bore (2.22, the flats of his
+faceted 4.5), a 1.5 lip under the spline's tip, and the screw through the lip from a 5.2 counterbore. This
+grips the shaft, not the horn's arms (the 2026-09-19 rule's preference). The tilt post has always done the
+same, and he chose speed here. If the spline strips or the head wobbles, a horn pocket cut from his real
+horn model is the next step. The gear prints bottom face down (`pan_coil_b_print.WAY_UP`), so no support
+can land in the bore. **Superseded:** the placeholder horn pocket (`SPLINE_GEAR = False` still builds it).
+
+## 2026-10-03: The +Y hub becomes a sleeve, so the ball drops in
+
+Zach: the cradle's +Y arm "keeps snapping. it has to be bent for it to fit". His ball_plus's hub (r 8.0..9.95,
+the ring the +Y 6704 rides on) stood from the ball's flat face at Y 24.5 out to 30.3, while the collar's face
+is at Y 25.1. The −Y side gives under 1 mm, so the arm spread ~5 mm every time the ball went in.
+
+His idea was to move the bearing into a cup inside ball_plus, as on −Y. It doesn't fit round the servo: the
+gear tower fills the axis out to Y ≈ 26 with its gear bump at r 8.9, and the 6704's bore is r 10, so the post
+can't pass between them; the servo would have moved back ~6 mm. A split collar with a cap would have put a
+joint where the arm breaks. **Chosen (his pick): the hub is its own part.** It is cut off his ball, leaving a
+1.5 mm socket keyed by a flat on the lens side, and printed as a sleeve with his hub's sizes and notch. The
+sleeve goes in from outside after the ball, like the −Y stub, then the 6704 and post v3 as before. Cradle,
+post, servo and bearings are unchanged (`fixes/plus_sleeve.py`, `checks/plus_sleeve_fit.py`).
+The sleeve is a press fit in the 6704 (20.0 and 20.1 to try), stopped by a lip on its outer end that
+touches only the inner ring: on the 19.9 slip of his hub the sleeve just turned inside a still inner ring.
+**Superseded the same day:** the first, slip-fit sleeve (never printed), and its socket: 2.0 deep left 0.19 of
+plate at the bottom of the face, and its gaps were under his 0.15 slide rule (now 1.5 deep, 0.15 a side, 0.3
+to the floor; `checks/plus_sleeve_fit.py` rows 6 and 7).
+
+Found on the way, not changed: the collar's shoulder (r 10.45 out) faces the 6704's turning inner ring as
+well as the outer one; and the ribbon track's top lip reaches ~1 mm over the ball's widest point at the back.
+
+## 2026-10-02: The cradle's wire ridge blends into the wall (looks only)
+
+The round 1 cradle printed well. As a final touch Zach asked to even out the "snickers vein": the conduit
+round the wire hole stood out of the −Y wall as a narrow ridge, with a notch where it left the collar. Its
+smooth-union radius (`tree_parts_b.CONDUIT_K`) went 1.5 → 6 mm, so the ridge swells into the wall, and its
++Y twin follows. Every hole and clearance is cut after the blend, so none of them moved. It adds 720 mm³ on
+the outsides, the surface moving out 1.1 mm at most, and removes nothing (`fixes/cradle_blend.py` lists each
+lump). `wire_tube` gained a `pad`: its shortcut for far points sat 1 mm out and cut a crease into a wider
+blend.
+
+## 2026-10-02: Set 5's drum takes the wires round the ribbon's edge
+
+Zach saw that the wires had nowhere good to go out of the cradle. The cradle's hole (round 1) lets them
+out in front of the ribbon, where the ribbon bends down into the drum's bore. Set 4's drum hole starts
+behind it. The 18 mm bore leaves the 16 mm ribbon only 0.7 mm at each edge, so the wires couldn't get
+round. The cradle is printed and threads well, so the fix goes in the drum:
+- **A notch in the bore wall** on −Y, from −150° to −72°. The wires pass the ribbon's edge there.
+  ~~Out to r 12.3, flat floor at Z 3~~ **superseded the same day, before printing:** out to r 14, its
+  floor sloping 55° down to the bore. The cradle's 22 mm groove lets the 16 mm ribbon sit 3 mm off
+  centre, and at r 12.3 that left room for only a 1.4 mm bundle. The flat floor was also a 3.3 mm
+  overhang, since the drum prints upside down.
+- **A funnel** on the drum hole's mouth (7 mm across, 2 mm deep), following the hole's own line. The
+  first cut was centred on the mouth and left a 0.26 mm ledge lower down.
+- **Threading before the cradle is bolted down,** by eye. This replaces "thread last, blind".
+
+Rejected: starting the drum's hole on its top face, outside the bore. Claude suggested it first. The
+bore floor's edge and the chamber's top leave 3.0 mm, and the hole is 5 mm. Check: `wire_route.py`
+row 7, a flood fill for the widest bundle that gets through. Lesson: `docs/lessons/2026-09-27-two-clear-cuts-need-not-meet.md`, second section.
+
+## 2026-10-02: Test prints in PLA, the final head and drum in ASA
+
+Every print so far has been PLA, and PLA stays for test prints. The final head and pan drum will be ASA,
+for outdoor driving. An Ashby-style comparison of printable filaments found that stiffness per gram
+barely differs between them (about ±20%). Heat, UV and impact toughness are what decide:
+- PLA sags at about 55 °C. PETG (about 70 °C) sits just outside what sun plus the Pi's heat needs.
+- ABS meets the heat and toughness needs but degrades in sunlight.
+- ASA meets all three and prints well on Zach's enclosed Creality K2 Pro. At 1.07 g/cm³ it is about 20%
+  lighter than the PETG-GF the sim assumes.
+- PC and nylon-CF were rejected as harder to print, and nylon goes soft when damp.
+
+Every tested fit (the zero-offset horn pocket, 0.15 per side on the 21 mm slide) was found in PLA. ASA
+shrinks more, so print an ASA test piece of those fits before any final part. The sim still weighs parts
+as PETG-GF; Zach said to leave that for now.
+
 ## 2026-10-02: The tilt servo's wires get their own route (round 1: stub and cradle hole)
 
 Taping the tilt servo's lead to the ribbon spoiled the ribbon's fold (Zach). The lead gets its own hidden
 way down instead:
 - **The servo's own lead and plug stay coiled inside the ball,** behind the camera board on the −Y side
   (about 17 cm³ free, measured). Zach's Dupont jumper wires plug into it, and only they run down. This
-  was his idea. His plug has no visible latches, so it can't be depinned, and this avoids cutting the
+  was his idea. ~~His plug has no visible latches, so it can't be depinned~~ **superseded 2026-10-02:** the
+  Dupont-style split works on his servo's plug too, so its own wires can come out of the housing and
+  might run down without jumpers (lead length unmeasured). This avoids cutting the
   lead. It replaced the plan to cut, solder and use a printed joint cover.
 - **On the tilt axis:** a fixed hollow stub (`tree_parts_b.stub`) replaces both the −Y axle and the end
   cap. The ball turns on it, and the wires run through its middle, so they twist instead of bending.
   His socket is r 10.04 and the axle was r 9.95; that 0.09 mm is why the axle "doesn't fit". The stub
   is r 9.80. It is held by 3 × M2 × 6 in the cap's old holes, which also clock its wire hole.
+- **The −Y bearing moved into the ball** (same day). Zach caught it: with the stub screwed down, nothing
+  turned in the collar's 6704 seat, so a bearing there was dead weight. His fix: "a small divot inside of
+  the minus of the ball to catch it", for "same bearing as the other side" (a 6704; he has 10 now). A cup
+  inside his ball_minus's flat face holds the outer ring, which turns with the ball. The bearing presses
+  in from outside until it stops on a lip. The stub runs through the inner ring and shoulders on it, and
+  the collar is a plain bore (`fixes/ball_minus_cup.py`: `ADD_minus_bearing_cup`,
+  `CUT_minus_bearing_pocket`). The cup stops 0.9 short of the camera board. The turning ring keeps 1.5
+  off the stub and 1.2 off the cradle; the fixed ring keeps 0.55 off the ball.
 - **A 5 mm hole down inside the cradle's −Y wall** (`WIRE_PTS`, `wire_tube`). It passes under the drum
   screw's head and ends in the plug chute's mouth above the drum's bore. The wall is only ~5.8 mm thick
-  across its slope, so a 1.6 mm conduit ridge grows on its outside.
+  across its slope, so a 1.6 mm conduit ridge grows on its outside. A solid mirror of the ridge sits on
+  the +Y wall, for looks (Zach: "for the sake of visuals ... put one on the other side as well").
 - **The holes are sized for a bare Dupont pin beside two wires** (the shell comes off the threaded end).
   With the shells on, the 14 mm rigid housings won't take the bends in a hole that fits the wall.
 - **Round 2 (pan coil set 4, built the same day at Zach's "lets do the next round"):** the wires roll in
@@ -131,7 +400,8 @@ gear bay was a closed box, so the 43.3 mm input gear couldn't get in either. Eve
 In `head-v2/generator/generators/pan_coil_b.py`:
 - **The small gear is its own part** (`gear_out`). The barrel steps from r 5 to a D-shaped r 4 seat
   below the journal (flat at 3.2, 0.15 slide per side). The gear pushes up onto it from below, clamped
-  to the step by one M3 × 8 button head through a 1.5 mm web.
+  to the step by one M3 × 8 button head through a 1.5 mm web. **Superseded 2026-10-09 (set 8):** the seat
+  snapped when the screw was tightened; it's a square now, and an M3 × 12 threads above the step.
 - **The gear bay's floor is a separate plate** (`floor`, below Z −32) on 4 × M2 × 6 into corner bosses.
   Both gears go in from underneath. Holes under both axes: the M3 head turns in one, and a driver
   reaches the horn screw through the other.

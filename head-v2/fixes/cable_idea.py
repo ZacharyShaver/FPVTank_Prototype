@@ -150,8 +150,13 @@ def lane_built(PC):
     z = PC.LANE_ZC; ri, ro = PC.DRUM_R + WIRES_R + 0.1, PC.LANE_R - WIRES_R - 0.1
     pol = lambda r, d: (r * np.cos(np.radians(d)), r * np.sin(np.radians(d)), z)
     th_mouth, th_exit = 147.0, 360.0 + PC.WIRE_EXIT_DEG - 8.0
+    if PC.STRAIGHT_WIRE:   # set 8 (2026-10-09): down the straight hole, out along the groove under the drum
+        g = PC.GROOVE_LINE; k = int(np.argmax(np.hypot(g[:, 0], g[:, 1]) >= PC.DRUM_R))
+        th_mouth = 360.0 + np.degrees(np.arctan2(g[k, 1], g[k, 0]))
+        pts = [(*PC.DROP_XY, -5.0), (*PC.DROP_XY, z + 2.0)] + [tuple(q) for q in g[:k:4]]
+    else:
+        pts = list(PC.DRUM_WIRE_PTS[:-2])
     thU = np.degrees((np.radians(th_mouth) * ri + np.radians(th_exit) * ro - PC.WIRE_L) / (ri + ro))
-    pts = list(PC.DRUM_WIRE_PTS[:-2])
     pts += [pol(ri, d) for d in np.arange(th_mouth - 9, thU + 3, -10.0)]
     c, r = (ri + ro) / 2, (ro - ri) / 2
     er = np.array([np.cos(np.radians(thU)), np.sin(np.radians(thU)), 0.0]); ecw = np.array([er[1], -er[0], 0.0])
@@ -171,9 +176,21 @@ def build(out):
     files['servo_lead'] = (p, 'Servo lead, coiled in the ball (stays there)')
     V, F = box(PLUG_C - [4.0, 2.0, 7.0], PLUG_C + [4.0, 2.0, 7.0]); p = os.path.join(out, '_servo_plug.obj'); write_obj(p, V, F)
     files['servo_plug'] = (p, 'Servo plug, with the jumper wires plugged in')
-    route = [tuple(PLUG_C - [0, 0, 7.0]), (-5.0, -16.0, 44.0), (-1.5, -15.0, 50.0)] + list(B.WIRE_PTS)[:-1] + \
-            [(-1.5, -4.6, 7.5), (-4.0, -2.0, 3.0)]
-    C = smooth(route + lane_built(PC), 10)
+    # down the cradle's hole to Z 13, then set 5's handover (past the ribbon's edge, down the drum's notch
+    # behind it, into the funnel; pan_coil_b.HANDOVER_PTS), then the drum's hole below the funnel and the lane
+    # set 8: from the notch's foot straight down into the drum's straight hole
+    route = [tuple(PLUG_C - [0, 0, 7.0]), (-5.0, -16.0, 44.0), (-1.5, -15.0, 50.0)] + list(B.WIRE_PTS)[:-2]
+    if getattr(PC, 'HOLLOW_AXIS', False):
+        # set 10 (2026-10-11): set 6's handover down the cone to its point, then straight down the axis, through the
+        # barrel, the small gear and the floor plate, and on down out of the head
+        tail = [(0.0, 0.0, -14.0), (0.0, 0.0, -20.0), (0.0, 0.0, PC.G_Z0), (0.0, 0.0, PC.BAY_Z0 - 6.0),
+                (0.0, 0.0, PC.BAY_Z0 - 18.0)]
+        C = smooth(route + list(PC.HANDOVER_PTS[1:]) + tail, 10)
+        label = 'Servo wires: through the stub, the cradle, then straight down the pan axis (set 10)'
+    else:
+        hand = list(PC.HANDOVER_PTS_SET5[1:5]) + [(*PC.DROP_XY, 1.0)] if PC.STRAIGHT_WIRE else list(PC.HANDOVER_PTS[1:])
+        C = smooth(route + hand + [q for q in lane_built(PC) if q[2] <= -5.0], 10)
+        label = 'Jumper wires: through the stub, the cradle, the drum and their own lane'
     V, F = tube(C, WIRES_R); p = os.path.join(out, '_cable.obj'); write_obj(p, V, F)
-    files['cable'] = (p, 'Jumper wires: through the stub, the cradle, the drum and their own lane')
+    files['cable'] = (p, label)
     return files

@@ -1,6 +1,7 @@
 """The tilt servo's wire route, round 2 (2026-10-02): the wires' own lane in the pan coil. Tool bodies and a
-before/after picture sheet, into head-v2/out/print-pan/. The print files are pan coil set 4
-(fixes/pan_print_set.py: base.stl, drum.stl, plate_pan_coil_set4.3mf).
+before/after picture sheet, into head-v2/out/print-pan/. The print files were pan coil set 4
+(fixes/pan_print_set.py: base.stl, drum.stl, plate_pan_coil_set4.3mf). Set 5 superseded the drum
+(fixes/drum_notch_set5.py); its base carries on. Rerun now, this sheet's "set 4" drum would be set 5's.
 
 The wires come down the drum's bore beside the ribbon, down a 5 mm hole in the drum's core, and roll in a
 lane of their own under the ribbon: 3.5 tall, its own wall at r 21 (a 9 mm gap, so the moving U is ~3.6

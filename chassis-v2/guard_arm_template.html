@@ -1,0 +1,223 @@
+<title>Scorpion Guard Arm</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same tokens as the hull, tail-arms, rugged and v2-legs pages. Model left, findings right. */
+:root{--bg:#EEF0EC;--panel:#FFFFFF;--ink:#1C211E;--muted:#5E6862;--line:#D4D9D3;--accent:#D9622B;--warn:#B8332A;--warn-bg:#F8E7E4;--ok:#2F7A5A;--ok-bg:#E3F1EA;--canvas:#E4E7E2;--bar:#C9CFC8;--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Barlow",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--bar:#3A433E}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--bar:#3A433E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:18px 28px}
+.wrap{max-width:1360px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:23px;font-weight:600;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:3px 0 0;max-width:92ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:14px;align-items:start}
+@media (max-width:980px){.main{grid-template-columns:1fr}}
+.stage{position:sticky;top:12px;background:var(--canvas);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:min(84vh,820px);min-height:440px}
+@media (max-width:980px){.stage{position:relative;top:0;height:min(72vh,580px)}}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.bar{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:auto}
+.row .lab{font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;min-width:40px}
+button{font:500 13px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.pick{position:absolute;right:10px;top:96px;max-width:300px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13.5px;line-height:1.4;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pick b{display:block;font-size:14px;margin-bottom:2px}
+.cap{position:absolute;left:12px;bottom:12px;max-width:min(560px,80%);font-size:13.5px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.hint{position:absolute;right:12px;bottom:14px;font:12px var(--mono);color:var(--muted)}
+@media (max-width:760px){.hint{display:none}.pick{left:10px;right:10px;max-width:none;top:auto;bottom:60px}}
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;min-width:0}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.card p{margin:0 0 8px}.card p:last-child{margin:0}
+ul,ol{margin:0;padding-left:19px;display:grid;gap:6px;font-size:14px}
+li b{font-weight:600}
+.goal{display:grid;gap:10px}
+.g1{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding-top:9px;border-top:1px solid var(--line)}
+.g1:first-child{border-top:0;padding-top:0}
+.g1 .t{font-weight:600}
+.g1 .ba{font:500 13px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.g1 .ba s{color:var(--muted);text-decoration:none}
+.g1 .ba b{color:var(--ok)} .g1 .ba i{color:var(--warn);font-style:normal}
+.g1 .d{grid-column:1/-1;color:var(--muted);font-size:13.5px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td,th{padding:5px 4px;border-top:1px solid var(--line);vertical-align:top;text-align:left}
+th{font-weight:600;font-size:12.5px}
+td.v,td.n{text-align:right;font:500 12.5px var(--mono);white-space:nowrap;padding-left:10px;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font:500 11px var(--mono);padding:1px 6px;border-radius:4px;margin-left:4px}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.meter{display:inline-block;width:70px;height:8px;background:var(--bar);border-radius:3px;vertical-align:middle;margin-right:6px;overflow:hidden}
+.meter span{display:block;height:100%;background:var(--ok)}
+.guess{color:var(--accent);font-weight:600}
+.full{grid-column:1/-1}
+img.fig{width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#fff}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.scroll{overflow-x:auto}
+.mini{font:500 12px var(--mono);color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Scorpion: guard arm (option E)</h1>
+    <p class="sub">An arm at the tail built to replace the roll cage, on the rugged body with v2 legs, the hoops, brow bar and skirts removed. It guards the head while driving, braces so the robot doesn't roll, and pushes it upright when it does. It still carries the camera and gripper. Pick a situation; click a part to name it. <span class="guess">Orange</span> numbers are guesses; parts marked * are not bought yet.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="bar">
+        <div class="row" role="toolbar" aria-label="Situation"><span class="lab">Doing</span><span id="b-sit" style="display:contents"></span></div>
+        <div class="row" role="toolbar" aria-label="View"><span class="lab">View</span>
+          <button id="v-iso">3/4</button><button id="v-rear">Rear 3/4</button><button id="v-side">Side</button><button id="v-front">Head-on</button><button id="v-top">Top</button></div>
+      </div>
+      <div class="pick" id="pick" hidden></div>
+      <div class="cap" id="cap"></div>
+      <div class="hint">click a part · drag to turn · scroll to zoom</div>
+    </div>
+    <div class="side">
+      <section class="card" aria-labelledby="h-jobs">
+        <h2 id="h-jobs">Its four jobs</h2>
+        <div class="goal" id="jobs"></div>
+      </section>
+      <section class="card" aria-labelledby="h-vs">
+        <h2 id="h-vs">Against the roll cage (same body, v2 legs)</h2>
+        <div class="goal" id="vs"></div>
+      </section>
+    </div>
+    <section class="card full" aria-labelledby="h-pics">
+      <h2 id="h-pics">The arm at work</h2>
+      <img class="fig" id="sheet" alt="Four renders: driving with the arm arched over the head onto the left claw; bracing with the jaw caps planted beside the track; bracing behind the tail; righting the robot from upside down.">
+    </section>
+    <div class="two full">
+      <section class="card" aria-labelledby="h-right">
+        <h2 id="h-right">Righting from every place it can come to rest</h2>
+        <table id="right"></table>
+        <p class="mini" style="margin-top:8px">The arm leaves the guard pose, the robot settles on its bare body, and the arm reaches the ground and pushes it over the edge towards upright, at 1.2× the force that balances it. The load is the worst servo's share of its stall torque; under 80 % passes.</p>
+      </section>
+      <section class="card" aria-labelledby="h-soft">
+        <h2 id="h-soft">The software: a tip monitor</h2>
+        <ul>
+          <li><b>Always:</b> from the IMU's tilt, the arm's pose and the known centre of mass, it works out the degrees left before tipping in each direction, many times a second.</li>
+          <li><b>Margin shrinking:</b> slow the tracks; bring the arm low and to the uphill side; refuse the periscope pose on a slope.</li>
+          <li><b>Before a step or a steep cross-slope:</b> plant the brace, behind or on the downhill side.</li>
+          <li><b>Tipping anyway, or falling:</b> stop the tracks and go to the guard pose (90° in ~0.25 s); the peg and the stops take the landing.</li>
+          <li><b>Landed:</b> read which way is down, leave the guard, and run the righting move for that rest (the table on the left), then check it's upright.</li>
+        </ul>
+      </section>
+    </div>
+    <div class="two full">
+      <section class="card" aria-labelledby="h-servo">
+        <h2 id="h-servo">Joints and loads</h2>
+        <table id="servo"></table>
+      </section>
+      <section class="card scroll" aria-labelledby="h-shop">
+        <h2 id="h-shop">Shopping list for the arm</h2>
+        <table id="shop"></table>
+      </section>
+    </div>
+    <section class="card" aria-labelledby="h-chk">
+      <h2 id="h-chk">Fit checks</h2>
+      <p style="font-size:13px;color:var(--muted)">Overlap in 1 mm cubes. Zero is clear; each control must read above zero, or the check would be blind.</p>
+      <table id="checks"></table>
+    </section>
+    <div class="side">
+      <section class="card" aria-labelledby="h-guess">
+        <h2 id="h-guess">Guesses to confirm</h2>
+        <ul>
+          <li>Servo stall torques at about 7 V: DS3235 <span class="guess">35</span>, DS3218 <span class="guess">21</span> kg·cm; the N20 worm drive <span class="guess">~20 kg·cm</span> at the turntable.</li>
+          <li>Arm masses: base with servos <span class="guess">225 g</span>, links and tool <span class="guess">160 g</span>, payload 100 g.</li>
+          <li>Links: upper arm <span class="guess">140</span>, forearm <span class="guess">175</span>, tool <span class="guess">62</span> mm. The guard pose and the reach come from these.</li>
+          <li>Righting assumes the jaw caps grip the ground (TPU) and ignores the robot's bounce. A bench test settles it.</li>
+          <li>The slip clutch's setting: about <span class="guess">40 kg·cm</span>, just over the shoulder servo's stall.</li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="h-q">
+        <h2 id="h-q">Questions for you</h2>
+        <ul>
+          <li><b>The guard rest</b> is a peg on the left claw: the arm comes down past the ball's front-left. OK in the camera's view, or rest it further back?</li>
+          <li><b>The yaw drive</b>: a worm gearmotor (self-locking, slower) instead of a servo. OK?</li>
+          <li><b>Software</b>: the tip monitor lives in your Control repo. Want a spec for it next?</li>
+          <li><b>First test</b>: the shoulder with its clutch and stop, on a bench stand, pushed by hand?</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+function dec(s,T){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new T(u.buffer);}
+const st=document.getElementById('stage'), $=id=>document.getElementById(id);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+st.prepend(renderer.domElement);
+const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(26,1,1,8000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x5d625e,0.78));
+const d1=new THREE.DirectionalLight(0xffffff,0.62);d1.position.set(260,-320,420);scene.add(d1);
+const d2=new THREE.DirectionalLight(0xffffff,0.34);d2.position.set(-300,260,-260);scene.add(d2);
+const grid=new THREE.GridHelper(1400,28,0x8a948d,0xb9c0ba);grid.rotation.x=Math.PI/2;grid.position.z=D.ground-0.5;scene.add(grid);
+const robot=new THREE.Group();scene.add(robot);
+function geo(p){const g=new THREE.BufferGeometry();const q=dec(p.v,Int16Array),v=new Float32Array(q.length);for(let i=0;i<q.length;i++)v[i]=q[i]*0.02;
+  g.setAttribute('position',new THREE.BufferAttribute(v,3));g.setIndex(new THREE.BufferAttribute(p.i32?dec(p.f,Uint32Array):dec(p.f,Uint16Array),1));g.computeVertexNormals();return g;}
+const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.6,metalness:.06,side:THREE.DoubleSide});
+const meshes=[];
+for(const k in D.m){const p=D.m[k];if(p.grp==='elec'&&!['antenna','estop','imu'].includes(k))continue;
+  const m=new THREE.Mesh(geo(p),mat(p.c));m.userData={label:p.label,note:p.note};robot.add(m);meshes.push(m);}
+const ARM={};
+for(const k in D.sit){const g=new THREE.Group();D.sit[k].arm.forEach(p=>{const m=new THREE.Mesh(geo(p),mat(p.c));m.userData={label:'Guard arm',note:''};g.add(m);meshes.push(m);});
+  g.visible=false;robot.add(g);ARM[k]=g;}
+const CAPS={guard:'Driving: the arm arches from the tail over the head, its jaws holding the peg on the left claw. A landing load goes into the peg and the shoulder stop.',
+  brace_side:'Bracing beside: the jaw caps planted '+Math.round(D.brace_side.past)+' mm past the track. It now tips sideways at '+Math.round(D.brace_side.braced)+'° instead of '+Math.round(D.brace_side.free)+'°.',
+  brace_back:'Bracing behind, like a wheelie bar for steps: it tips back at '+Math.round(D.brace_back.braced)+'° instead of '+Math.round(D.brace_back.free)+'°.',
+  pick:'Picking up beside the left track.', periscope:'Periscope: the arm camera 0.5 m up. The tip monitor keeps it off slopes.'};
+let cur='guard';
+function setSit(k){cur=k;for(const a in ARM)ARM[a].visible=a===k;const s=D.sit[k];
+  const m=new THREE.Matrix4();const R=s.R;m.set(R[0][0],R[0][1],R[0][2],0,R[1][0],R[1][1],R[1][2],0,R[2][0],R[2][1],R[2][2],s.dz,0,0,0,1);
+  robot.matrixAutoUpdate=false;robot.matrix.copy(m);robot.updateMatrixWorld(true);
+  Object.keys(D.sit).forEach(a=>$('s-'+a).setAttribute('aria-pressed',a===k));
+  $('cap').textContent=CAPS[k]||(s.name+': the arm reaches the ground and pushes the robot over the edge towards upright.');}
+const bs=$('b-sit');Object.keys(D.sit).forEach(k=>{const b=document.createElement('button');b.id='s-'+k;b.textContent=D.sit[k].name;b.onclick=()=>setSit(k);bs.appendChild(b);});
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
+  const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ptr,cam);
+  const vis=meshes.filter(m=>{let o=m;while(o){if(!o.visible)return false;o=o.parent;}return true;});
+  const hits=ray.intersectObjects(vis,false);const pk=$('pick');if(!hits.length){pk.hidden=true;return;}const u=hits[0].object.userData;
+  pk.innerHTML='<b>'+u.label+'</b>'+(u.note||'');pk.hidden=false;});
+// findings
+const f0=x=>Math.round(x), deg=x=>f0(x)+'°';
+const row=(t,a,b,d,bad)=>'<div class="g1"><span class="t">'+t+'</span><span class="ba">'+(a?'<s>'+a+'</s> → ':'')+(bad?'<i>':'<b>')+b+(bad?'</i>':'</b>')+'</span><span class="d">'+d+'</span></div>';
+const frag=o=>Object.values(o.fragile).reduce((a,b)=>a+b,0);
+const okR=D.righting.filter(r=>r.ok).length, worst=Math.max(...D.righting.filter(r=>r.ok).map(r=>r.load));
+const restsG=D.rests_guard.filter(r=>!r.name.startsWith('upright'));
+$('jobs').innerHTML=[
+  row('Guard: head hit first',null,frag(D.contact).toFixed(0)+' %','Over 4000 fall directions, the tracks, the arm and the bumpers take every one. The arm’s camera rides on the tool’s inner face, out of the way.'),
+  row('Prevent: brace beside','tips at '+deg(D.brace_side.free),deg(D.brace_side.braced),'The jaw caps planted '+f0(D.brace_side.past)+' mm past the track, holding '+D.brace_side.F.toFixed(0)+' N at 60 % of the servos.'),
+  row('Prevent: brace behind','tips at '+deg(D.brace_back.free),deg(D.brace_back.braced),'Planted behind the tail, holding '+D.brace_back.F.toFixed(0)+' N: a wheelie bar for steps.'),
+  row('Recover: rights itself from',null,okR+' of '+D.righting.length+' rests','The worst push takes '+f0(worst*100)+' % of a servo’s stall torque.'),
+  row('Work: holds 100 g out straight',null,f0(100*D.holding.shoulder/D.servos.shoulder[1])+' % shoulder','Elbow '+f0(100*D.holding.elbow/D.servos.elbow[1])+' %. Camera and gripper as before; it reaches the ground beside and behind.'),
+].join('');
+const cg=D.climb_guard, cc=D.climb_cage, s=D.size;
+$('vs').innerHTML=[
+  row('Mass*',f0(D.mass_cage)+' g',f0(D.mass)+' g','The cage weighed 187 g; this arm is '+f0(D.arm_mass)+' g with its servos, and it replaces the tail arm too.',D.mass>D.mass_cage),
+  row('Width',f0(s.W0)+' mm',f0(s.W)+' mm','No skirts: the fenders end at the tracks.'),
+  row('Height, driving',f0(s.H0)+' mm',f0(s.H)+' mm','The arm’s arch is the top now.',s.H>s.H0),
+  row('Tips back / forward / sideways',deg(cc.up_flat)+' / '+deg(cc.down_flat)+' / '+deg(cc.side),deg(cg.up_flat)+' / '+deg(cg.down_flat)+' / '+deg(cg.side),'With the arm in its guard pose, before any bracing.',cg.up_flat<cc.up_flat),
+  row('Rights itself',' by shape','with the arm','The cage did it with no power. The arm needs the software and the servos working, so the flippers next round are its backup.',true),
+].join('');
+$('right').innerHTML='<tr><th>Resting</th><th>Push</th><th>Load</th></tr>'+D.righting.map(r=>'<tr><td>'+r.rest+'</td><td class="n">'+(r.ok?r.F.toFixed(1)+' N':'—')+'</td><td class="n">'+(r.ok?'<span class="meter"><span style="width:'+Math.min(100,r.load*100)+'%"></span></span>'+f0(r.load*100)+' %':'<span class="tag warn">can’t</span>')+'</td></tr>').join('');
+$('servo').innerHTML='<tr><th>Joint</th><th>Part*</th><th>Stall</th></tr>'+Object.entries(D.servos).map(([j,v])=>'<tr><td>'+j+'</td><td>'+v[0]+'</td><td class="n">'+v[1]+' kg·cm</td></tr>').join('')+
+  '<tr><td colspan="3" class="mini">Holding 100 g out straight: shoulder '+D.holding.shoulder.toFixed(1)+', elbow '+D.holding.elbow.toFixed(1)+' kg·cm.</td></tr>';
+$('shop').innerHTML='<tr><th>Part</th><th>Qty</th><th>Why</th></tr>'+D.shop.map(r=>'<tr><td>'+r[0]+'</td><td class="n">'+r[1]+'</td><td style="color:var(--muted)">'+r[2]+'</td></tr>').join('');
+$('sheet').src='data:image/png;base64,'+D.sheet;
+$('checks').innerHTML=D.checks.map(c=>{const ctl_=c.what.includes('(control)');const ok=ctl_?c.mm3>0:c.mm3===0;
+  return '<tr><td>'+c.what+(c.why?'<br><span style="color:var(--muted);font-size:12.5px">'+c.why+'</span>':'')+'</td><td class="v">'+(c.mm3>=1000?(c.mm3/1000).toFixed(1)+' cm³':c.mm3.toFixed(0)+' mm³')+'<span class="tag '+(ok?'ok':'warn')+'">'+(ok?(ctl_?'reads':'clear'):(ctl_?'blind':'hits'))+'</span></td></tr>';}).join('');
+// views
+const Cn=new THREE.Vector3(...D.centre);
+function view(dir,dist){const d=new THREE.Vector3(...dir).normalize();ctl.target.copy(Cn);cam.position.copy(Cn).addScaledVector(d,dist||1300);ctl.update();}
+$('v-iso').onclick=()=>view([1,-1.1,.65],1500);$('v-rear').onclick=()=>view([-1,-1,.6],1500);$('v-side').onclick=()=>view([0,-1,.05],1400);
+$('v-front').onclick=()=>view([1,0.001,.05],1250);$('v-top').onclick=()=>view([0.001,-0.03,1],1350);
+function size(){const w=st.clientWidth,h=st.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(st);size();setSit('guard');view([1,-1.1,.65],1500);
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam);})();
+</script>

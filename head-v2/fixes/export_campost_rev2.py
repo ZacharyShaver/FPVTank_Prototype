@@ -1,6 +1,9 @@
 """Rev-2 hand-off (2026-09-27): Zach's Fusion rev 2 halves plus the camera posts regenerated for his
 moved tubes. Writes head-v2/out/print-rev2/:
-  ball_plus_rev2.stl, ball_minus_rev2.stl        his parts (+ the IR cutout extension), seam face down
+  ball_plus_rev2.stl, ball_minus_rev2.stl        his parts (+ the IR cutout extension), seam face down.
+                                                 BOTH SUPERSEDED: ball_minus by ball_minus_cup (2026-10-02),
+                                                 ball_plus by plus_sleeve.py's ball_plus_sleeve (2026-10-03);
+                                                 after running this, run plus_sleeve.py again
   post_v3.stl, snap_pin_stop_medium.stl          unchanged, copied from out/print/
   camera_post_<upper|lower>_<grade>.stl          NEW: lying on the flat, angled head up
   plate_rev2_full.3mf                            both halves, post, 4 pins, the 2 medium posts

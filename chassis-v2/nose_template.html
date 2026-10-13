@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scorpion Nose Section</title>
+<style>
+:root{--bg:#f4f3ef;--panel:#fffdf8;--ink:#23241f;--mute:#62645c;--line:#d9d6cc;--accent:#2f6f5e;--warn:#a4472e;--chip:#ece9df;--num:#1d4f73}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17181a;--panel:#202226;--ink:#e8e6df;--mute:#a3a49c;--line:#34363b;--accent:#7cc4a9;--warn:#e08a6c;--chip:#2b2d32;--num:#8fc1e8}}
+:root[data-theme="dark"]{--bg:#17181a;--panel:#202226;--ink:#e8e6df;--mute:#a3a49c;--line:#34363b;--accent:#7cc4a9;--warn:#e08a6c;--chip:#2b2d32;--num:#8fc1e8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:24px;margin:0 0 6px}
+.sub{color:var(--mute);margin:0 0 16px;max-width:900px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;min-height:560px;overflow:hidden}
+.stage canvas{display:block;width:100%;height:100%}
+.bar{position:absolute;top:10px;left:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;z-index:2}
+button{font:inherit;font-size:13px;padding:5px 10px;border-radius:7px;border:1px solid var(--line);background:var(--chip);color:var(--ink);cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+.hint{position:absolute;bottom:8px;right:12px;font-size:12px;color:var(--mute)}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 8px}
+.card p{margin:6px 0}
+.num{font-variant-numeric:tabular-nums;color:var(--num);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:5px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--mute);font-weight:500}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;background:var(--chip);color:var(--mute);margin-right:4px}
+.warn{color:var(--warn)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Scorpion nose section</h1>
+  <p class="sub">Today's head on the Trainer body, with the bench stand's wire pocket built into the nose floor. The tilt servo's wires (red) drop straight down a slotted post under the pan axis, clear of the spinning screw heads, then leave toward the gear bay's end, which points aft. Two ways to make room for the pocket. Switch between them with <b>A</b> and <b>B</b>, and use <b>Cut in half</b> to see inside.</p>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="bar" role="toolbar" aria-label="View">
+        <button id="vA" aria-pressed="true">A: pocket under the floor</button><button id="vB" aria-pressed="false">B: head 12 higher</button>
+        <button id="t-cut" aria-pressed="true">Cut in half</button><button id="t-ghost" aria-pressed="false">See-through body</button>
+        <button id="c-close">Close up</button><button id="c-side">Side</button><button id="c-under">Underneath</button><button id="c-iso">Whole robot</button>
+      </div>
+      <div class="hint">drag to turn · scroll to zoom · right-drag to pan</div>
+    </div>
+    <div class="side">
+      <section class="card"><h2>A: pocket under the nose floor</h2>
+        <p>The head stays where it is. The pocket hangs <span class="num">12</span> under the nose floor, and the wires come up a chimney just aft of the base, into the tub.</p>
+        <table><tr><th>Under the head</th><td><span class="num" id="nA"></span> off the ground (the nose floor: <span class="num" id="nN"></span>; the pack bays' floor: <span class="num" id="nBay"></span>)</td></tr>
+        <tr><th>Head height</th><td>unchanged</td></tr></table>
+        <p class="warn">The pocket hangs into the front of the belly tunnel, and gives back most of the nose floor's 10 mm rock raise, under the head only.</p></section>
+      <section class="card"><h2>B: head 12 higher</h2>
+        <p>Like the stand: the head stands on the pocket, and the nose floor stays whole. The wires leave through an arch into the tub at floor level.</p>
+        <table><tr><th>Under the head</th><td><span class="num" id="nB"></span> off the ground (unchanged)</td></tr>
+        <tr><th>Head height</th><td>ball, lens and turret deck up <span class="num">12</span></td></tr></table>
+        <p class="warn">Everything that meets the head goes up with it: the turret deck ring (drawn raised), its side lids, the glacis's front edge, the claws. The centre of mass rises too.</p></section>
+      <section class="card"><h2>Holding the head down</h2>
+        <p>On the stand the base just drops in; in a tumble it would come out. The turret deck's ring round the head now has a <span class="num">1.8</span> lip over the base's top rim (the bearing seat's ring) and is held by four M3 × 12 into four posts from the nose floor, two beside the gear bay and two ahead of the rim. The tub's walls forward of the glacis now rise to the deck: they stopped 8 under it, and the deck's ledges floated.</p>
+        <table id="clamp"></table></section>
+      <section class="card"><h2>First print: nose section + deck ring</h2>
+        <p>Version A's tub forward of body X <span class="num" id="sx"></span>: the floor and nose wall round the head, the pocket and post, the four posts, the front wheel pads and the front of the pack bays, <span class="num" id="ssz"></span> mm. With the deck ring beside it (printed lip down, <span class="num" id="rsz"></span> mm): one plate, <span class="num">3 h 35 m</span>, <span class="num">104 g</span>, supports only outside the pocket. Uploaded to the K2 as <b>nose_A_ring</b>. It tests the head's fit and hold, the wires' way and a wheel pod's pad.</p></section>
+      <section class="card"><h2>Guesses</h2>
+        <p><span class="tag">*</span>The Trainer body is still a brainstorm: the pack bays, the motor pods and the deck can all move. The base isn't fastened down here: it drops into an 8 mm socket as on the stand. Holding it in for a tumble (the turret deck ring over its rim, or screws) is the next question. The chimney's and arch's positions, aft along the centre line, toward the Pi and the PCA9685.</p></section>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.localClippingEnabled=true;
+stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(32,1,2,5000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x555555,0.85));
+const sun=new THREE.DirectionalLight(0xffffff,0.75);sun.position.set(300,-400,600);scene.add(sun);
+const sun2=new THREE.DirectionalLight(0xffffff,0.3);sun2.position.set(-300,300,200);scene.add(sun2);
+const clip=new THREE.Plane(new THREE.Vector3(0,1,0),-D.yc);   // keeps Y < yc: the cut through the pan axis
+const noClip=[];
+function geo(p){
+  const vb=Uint8Array.from(atob(p.v),c=>c.charCodeAt(0));const V=new Int16Array(vb.buffer);
+  const fb=Uint8Array.from(atob(p.f),c=>c.charCodeAt(0));const F=p.i32?new Uint32Array(fb.buffer):new Uint16Array(fb.buffer);
+  const pos=new Float32Array(V.length);for(let i=0;i<V.length;i++)pos[i]=V[i]*0.02;
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setIndex(new THREE.BufferAttribute(F,1));g.computeVertexNormals();return g;
+}
+const groups={shared:[],A:[],B:[]};
+function add(p,key,set){
+  const m=new THREE.MeshStandardMaterial({color:p.c,roughness:.62,metalness:.05,side:THREE.DoubleSide,clippingPlanes:[clip]});
+  const mesh=new THREE.Mesh(geo(p),m);mesh.userData={key,grp:p.grp,body:p.body};scene.add(mesh);groups[set].push(mesh);return mesh;
+}
+for(const [k,p] of Object.entries(D.m))add(p,k,'shared');
+for(const v of ['A','B'])for(const [k,p] of Object.entries(D.v[v]))add(p,k,v);
+let state={v:'A',cut:true,ghost:false};
+function apply(){
+  for(const s of ['A','B'])groups[s].forEach(m=>m.visible=(s===state.v));
+  const all=[...groups.shared,...groups.A,...groups.B];
+  all.forEach(m=>{
+    const body=m.userData.body;
+    m.material.clippingPlanes=state.cut?[clip]:noClip;
+    m.material.transparent=state.ghost&&body;m.material.opacity=(state.ghost&&body)?0.25:1;m.material.depthWrite=!(state.ghost&&body);m.material.needsUpdate=true;
+  });
+  document.getElementById('vA').setAttribute('aria-pressed',state.v==='A');document.getElementById('vB').setAttribute('aria-pressed',state.v==='B');
+  document.getElementById('t-cut').setAttribute('aria-pressed',state.cut);document.getElementById('t-ghost').setAttribute('aria-pressed',state.ghost);
+}
+function view(dir,target,dist){const d=new THREE.Vector3(...dir).normalize();const t=new THREE.Vector3(...target);cam.position.copy(t).addScaledVector(d,dist);ctl.target.copy(t);ctl.update();}
+const H=D.head;   // the pan axis in world coordinates, and the coil deck's height
+const views={close:()=>view([0.05,-1,0.12],[H[0]-12,D.yc,H[2]-22],400),side:()=>view([0,-1,0.05],[H[0]-60,D.yc,H[2]-10],620),
+  under:()=>view([0.25,-0.5,-1],[H[0]-20,D.yc,H[2]-40],420),iso:()=>view([1,-0.95,0.6],[D.centre[0],D.centre[1],D.centre[2]],720)};
+document.getElementById('vA').onclick=()=>{state.v='A';apply();};
+document.getElementById('vB').onclick=()=>{state.v='B';apply();};
+document.getElementById('t-cut').onclick=()=>{state.cut=!state.cut;apply();};
+document.getElementById('t-ghost').onclick=()=>{state.ghost=!state.ghost;apply();};
+document.getElementById('c-close').onclick=views.close;document.getElementById('c-side').onclick=views.side;
+document.getElementById('c-under').onclick=views.under;document.getElementById('c-iso').onclick=views.iso;
+const f0=x=>Math.round(x);
+document.getElementById('nA').textContent=f0(D.n.A.under_head)+' mm';document.getElementById('nB').textContent=f0(D.n.B.under_head)+' mm';
+document.getElementById('nN').textContent=f0(D.n.nose_belly)+' mm';document.getElementById('nBay').textContent=f0(D.n.bays_belly)+' mm';
+const S=D.n.section;document.getElementById('sx').textContent=f0(S.x[0]);
+document.getElementById('ssz').textContent=f0(S.x[1]-S.x[0])+' × '+f0(S.y[1]-S.y[0])+' × '+f0(S.z[1]-S.z[0]);
+const Rg=D.n.ring;document.getElementById('rsz').textContent=f0(Rg.x[1]-Rg.x[0])+' × '+f0(Rg.y[1]-Rg.y[0])+' × 4';
+document.getElementById('clamp').innerHTML=D.n.clamp.map(r=>`<tr><th>${r.label}</th><td><span class="num">${(+r.v).toFixed(2)}</span>${r.ok?'':' <span class="warn">check</span>'}<br><span style="color:var(--mute);font-size:12px">${r.note}</span></td></tr>`).join('');
+function size(){const w=stage.clientWidth,h=Math.max(560,Math.min(760,w*0.72));stage.style.height=h+'px';renderer.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(stage);size();apply();views.close();
+(function loop(){ctl.update();renderer.render(scene,cam);requestAnimationFrame(loop);})();
+</script>
+</body>
+</html>

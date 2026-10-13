@@ -1,0 +1,205 @@
+<meta charset="utf-8">
+<title>Scorpion Chassis Concept</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the model fills the left, the story and the numbers run down the right (stacked on phones).
+   Same tokens as the head fit view, so the project's pages read as one set. */
+:root{--bg:#EEF0EC;--panel:#FFFFFF;--ink:#1C211E;--muted:#5E6862;--line:#D4D9D3;--accent:#D9622B;--warn:#B8332A;--warn-bg:#F8E7E4;--ok:#2F7A5A;--ok-bg:#E3F1EA;--canvas:#E4E7E2;--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Barlow",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:18px 28px}
+.wrap{max-width:1320px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:23px;font-weight:600;margin:0;text-wrap:balance;letter-spacing:.01em}
+.sub{color:var(--muted);margin:3px 0 0;max-width:86ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+.stage{position:sticky;top:12px;background:var(--canvas);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:min(82vh,800px);min-height:420px}
+@media (max-width:900px){.stage{position:relative;top:0;height:min(70vh,560px)}}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.bar{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button{font:500 13px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button[aria-pressed="false"].grp{opacity:.55}
+.ex{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 9px;font-size:13px}
+.ex input{width:110px;accent-color:var(--accent)}
+.legend{position:absolute;left:10px;bottom:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px}
+.legend button{display:inline-flex;align-items:center;gap:6px;padding:4px 9px}
+.sw{width:11px;height:11px;border-radius:3px;flex:none;display:inline-block}
+.pick{position:absolute;right:10px;top:54px;max-width:300px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13.5px;line-height:1.4;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pick b{display:block;font-size:14px;margin-bottom:2px}
+.pick .g{font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.hint{position:absolute;right:12px;bottom:52px;font:12px var(--mono);color:var(--muted)}
+@media (max-width:760px){.hint{display:none}.pick{left:10px;right:10px;max-width:none;top:auto;bottom:96px}}
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.card p{margin:0 0 8px}.card p:last-child{margin:0}
+ul,ol{margin:0;padding-left:19px;display:grid;gap:6px;font-size:14px}
+li b{font-weight:600}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px}
+.kv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;font-size:14px}
+.kv span:nth-child(even){font:500 13px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td{padding:5px 0;border-top:1px solid var(--line);vertical-align:top}
+td.v{text-align:right;font:500 12.5px var(--mono);white-space:nowrap;padding-left:10px}
+.tag{display:inline-block;font:500 11px var(--mono);padding:1px 6px;border-radius:4px;margin-left:4px}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.guess{color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Scorpion: chassis concept</h1>
+    <p class="sub">A brainstorm, not a print set. Your TEST-PRINT-2 body and the v1 legs are in exactly, bolted on by their real screw holes; head v2 and every part the robot carries are placed; the new parts (green-grey) are what it takes to fit them all. Click any part to name it. <span class="guess">Orange</span> numbers are guesses.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="bar" role="toolbar" aria-label="View">
+        <button id="v-iso">3/4</button><button id="v-rear">Rear 3/4</button><button id="v-side">Side</button><button id="v-top">Top</button><button id="v-front">Front</button>
+        <button id="t-cut" aria-pressed="false">Cut down the middle</button>
+        <button id="t-tools" aria-pressed="false">Your cuts</button>
+        <button id="t-orig" aria-pressed="false">Your body as exported</button>
+        <label class="ex" for="s-ex">Pull apart <input type="range" id="s-ex" min="0" max="1" step="0.01" value="0"></label>
+      </div>
+      <div class="pick" id="pick" hidden></div>
+      <div class="hint">click a part · drag to turn · scroll to zoom</div>
+      <div class="legend" id="legend" aria-label="Show or hide groups"></div>
+    </div>
+    <div class="side">
+      <section class="card" aria-labelledby="h-idea">
+        <h2 id="h-idea">The idea</h2>
+        <ul>
+          <li><b>Your band and legs stay.</b> The v1 pods, outer frames, sprockets, rollers and motors bolt on unmodified. Your body only loses material (5 named cuts).</li>
+          <li><b>It grows up, not out.</b> A hull over the tracks (sponsons) and a power bay add 2.1 L to your body's 1.4 L, without touching the legs. The deck sits where the head's well tops out, so the head turns in a ring flush with the deck.</li>
+          <li><b>Three zones, front to back:</b> the head; the brain (Pi + Hailo + PCA9685 on a mezzanine over the packs); the power bay (ESCs, UBEC, switches, alarm, e-stop).</li>
+          <li><b>The tail earns its place.</b> It holds the WiFi antenna 100 mm over the deck in an RF-clear stinger, away from the packs and motors, and folds flat.</li>
+          <li><b>Batteries come out the back.</b> A door under the tail; both packs slide out along a spine. No screws to charge or swap.</li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="h-size">
+        <h2 id="h-size">Sizes</h2>
+        <div class="kv" id="sizes"></div>
+      </section>
+      <section class="card" aria-labelledby="h-new">
+        <h2 id="h-new">On board now, not in TEST-PRINT-2</h2>
+        <ul>
+          <li><b>2 drive motors + 4:1 bevels</b>, inside the pods (as v1). They stand ~4 mm into the body through the pods' windows.</li>
+          <li><b>2 ESCs</b>, power bay, LEDs behind the back panel. <span class="guess">46 × 34 × 18</span></li>
+          <li><b>UBEC 5 V / 5 A</b> for the Pi only, power bay. <span class="guess">45 × 26 × 12</span></li>
+          <li><b>INA219</b> pack monitor (jumper it off 0x40), <b>LiPo alarm</b> on the back panel, <b>Pi switch</b>.</li>
+          <li><b>E-stop</b> on the rear deck: cuts both ESC feeds, leaves the Pi up.</li>
+          <li><b>M.2 HAT+ with the Hailo-8L</b> over the Pi's cooler. <span class="guess">stack 30 tall</span></li>
+          <li><b>PCA9685</b> (your Adafruit file) beside the Pi.</li>
+          <li><b>USB WiFi + external antenna</b>: adapter in the power bay, antenna in the tail.</li>
+          <li><b>Accessory rail</b>, 118 long on the spine, and 70 × 118 × 75 kept clear over it.</li>
+          <li><b>Headlight / IR pods</b> in the glacis; <b>charge and balance ports</b> on the back.</li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="h-asm">
+        <h2 id="h-asm">How it goes together</h2>
+        <ol>
+          <li>Cut your body (the 5 CUT_ bodies in the STEP).</li>
+          <li>Motor and ESC lead onto each pod, then the pods onto the body: 3 × M3 × 12 top, 3 × M3 × 10 bottom, from inside (the v1 guide's high version).</li>
+          <li>Outer frames, sprockets, rollers, tracks: v1 as built.</li>
+          <li>Mezzanine on its posts and spine.</li>
+          <li>Power bay on the back of the body; ESCs, UBEC, switches into it.</li>
+          <li>Pi + HAT and the PCA9685 onto the mezzanine; head base bolts to its front.</li>
+          <li>Turret section on (stays on), then the drum, cradle and ball.</li>
+          <li>Shell on: magnets or 2 thumbscrews. Rail on the shell, tail on its clevis.</li>
+          <li>Packs in from the back, door shut.</li>
+        </ol>
+      </section>
+      <section class="card" aria-labelledby="h-chk">
+        <h2 id="h-chk">Fit checks</h2>
+        <p style="font-size:13px;color:var(--muted)">Body material overlapping, counted in 1 mm cubes. Zero is clear; each control must read above zero, or the check would be blind.</p>
+        <table id="checks"></table>
+      </section>
+      <section class="card" aria-labelledby="h-guess">
+        <h2 id="h-guess">Guesses to confirm</h2>
+        <ul>
+          <li>ESC <span class="guess">46 × 34 × 18</span> and UBEC <span class="guess">45 × 26 × 12</span>: caliper yours (or name the UBEC).</li>
+          <li>Motor can <span class="guess">Ø36 × 52</span>, sitting <span class="guess">14 mm</span> into the pod from its closed face.</li>
+          <li>HAT+ standoffs <span class="guess">16 mm</span> over the Pi; the stack's real height.</li>
+          <li>Batteries 141 × 45.7 × 26: your model's numbers. Measured?</li>
+          <li>Head axis <span class="guess">X 100</span> (my pick from the placement page; you haven't set it).</li>
+          <li>Deck <span class="guess">Z 86</span>, set by the head's well top with the base standing on the mezzanine.</li>
+          <li>The rail: assumed a Picatinny-style accessory rail. What is it?</li>
+          <li>Sprocket width on the axle and the track's lugs: drawn, not measured.</li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="h-q">
+        <h2 id="h-q">Open questions</h2>
+        <ul>
+          <li><b>The rail</b>: what mounts on it (arm? launcher? sensors?), how long, and does it need power or signal?</li>
+          <li><b>Camera ribbon</b>: 30 cm from the well's side to the Pi's CSI port, after the coil takes its share. The Pi sits as far forward as the mezzanine allows; a 50 cm ribbon removes the worry.</li>
+          <li><b>The tracks run 1.8° nose-down</b> to the body: the pod's open side is turned 1.83° in the v1 files. On the floor the body sits nose-up 1.8°. Intended by the v1 designer?</li>
+          <li><b>Departure angle</b> is ~25° behind (the power bay hangs 37 mm past the rear sprocket). Fine for floors; for kerbs, shorten it or chamfer under the door.</li>
+          <li><b>The tail</b> fills part of the camera's view looking aft. Stinger could carry a rear camera instead.</li>
+          <li><b>The arm</b>: on the rail? It wants its own UBEC: the sponsons have room.</li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="h-tp">
+        <h2 id="h-tp">First test prints</h2>
+        <ol>
+          <li><b>Mezzanine + spine</b> in your cut body with both packs: does the drawer slide?</li>
+          <li><b>A turret coupon</b>: the deck ring and the base's 4 feet on a scrap of mezzanine.</li>
+          <li><b>One sponson section</b> over a leg: fender clearance to a running track.</li>
+          <li><b>Tail segment + clevis</b>: the pin joint and the antenna lead.</li>
+        </ol>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+function dec(s,T){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new T(u.buffer);}
+const st=document.getElementById('stage'), $=id=>document.getElementById(id);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.localClippingEnabled=true;
+st.prepend(renderer.domElement);
+const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(26,1,1,6000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x5d625e,0.78));
+const d1=new THREE.DirectionalLight(0xffffff,0.62);d1.position.set(260,-320,420);scene.add(d1);
+const d2=new THREE.DirectionalLight(0xffffff,0.28);d2.position.set(-300,260,-120);scene.add(d2);
+const clip=new THREE.Plane(new THREE.Vector3(0,1,0),1e6);
+const meshes={}, GRP={};
+for(const k in D.m){const p=D.m[k];const g=new THREE.BufferGeometry();
+  const q=dec(p.v,Int16Array), v=new Float32Array(q.length);for(let i=0;i<q.length;i++)v[i]=q[i]*0.02;
+  g.setAttribute('position',new THREE.BufferAttribute(v,3));g.setIndex(new THREE.BufferAttribute(p.i32?dec(p.f,Uint32Array):dec(p.f,Uint16Array),1));g.computeVertexNormals();
+  const m=new THREE.MeshStandardMaterial({color:p.c,roughness:.62,metalness:.06,side:THREE.DoubleSide,transparent:p.ghost,opacity:p.ghost?(p.grp==='cuts'?.42:.18):1,depthWrite:!p.ghost,clippingPlanes:[clip]});
+  const mesh=new THREE.Mesh(g,m);mesh.userData={k,ex:p.ex,grp:p.grp,label:p.label,note:p.note};scene.add(mesh);meshes[k]=mesh;(GRP[p.grp]=GRP[p.grp]||[]).push(mesh);}
+const GROUPS=[['legs','Legs (yours)',0x2B2F33,true],['body','Your body',0x9AA3AE,true],['hull','New hull',0x7C8C7A,true],['elec','Electronics',0x3C9A4C,true],['head','Head v2',0x4F7FBF,true],['tail','Tail',0xD9622B,true],['reserved','Kept clear',0x7FB3D5,true]];
+const on={};GROUPS.forEach(([g,,,d])=>on[g]=d);on.cuts=false;on.orig=false;
+function vis(){for(const g in GRP)GRP[g].forEach(m=>m.visible=!!on[g]);}
+const lg=$('legend');GROUPS.forEach(([g,lab,c])=>{const b=document.createElement('button');b.className='grp';b.setAttribute('aria-pressed','true');
+  b.innerHTML='<span class="sw" style="background:#'+c.toString(16).padStart(6,'0')+'"></span>'+lab;b.onclick=()=>{on[g]=!on[g];b.setAttribute('aria-pressed',on[g]);vis();};lg.appendChild(b);});
+function tog(id,f){const b=$(id);b.onclick=()=>{const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);f(v);};}
+tog('t-cut',v=>{clip.constant=v?-D.yc:1e6;});
+tog('t-tools',v=>{on.cuts=v;vis();});
+tog('t-orig',v=>{on.orig=v;vis();});
+$('s-ex').addEventListener('input',e=>{const f=+e.target.value;for(const k in meshes){const m=meshes[k],x=m.userData.ex;m.position.set(x[0]*f,x[1]*f,x[2]*f);}});
+// picking
+const ray=new THREE.Raycaster(), ptr=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
+  const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ptr,cam);
+  const hits=ray.intersectObjects(Object.values(meshes).filter(m=>m.visible&&!m.material.transparent),false).filter(h=>clip.distanceToPoint(h.point)>=0);
+  const pk=$('pick');if(!hits.length){pk.hidden=true;return;}const u=hits[0].object.userData;
+  const gl=(GROUPS.find(g=>g[0]===u.grp)||[0,u.grp])[1];pk.innerHTML='<span class="g">'+gl+'</span><b>'+u.label+'</b>'+(u.note||'');pk.hidden=false;});
+// sizes + checks
+$('sizes').innerHTML=D.sizes.map(([k,v])=>'<span>'+k+'</span><span>'+v+'</span>').join('');
+$('checks').innerHTML=D.checks.map(c=>{const ctl_=c.what.includes('(control)');const ok=ctl_?c.mm3>0:c.mm3===0;
+  return '<tr><td>'+c.what+(c.why?'<br><span style="color:var(--muted);font-size:12.5px">'+c.why+'</span>':'')+'</td><td class="v">'+(c.mm3>=1000?(c.mm3/1000).toFixed(1)+' cm³':c.mm3.toFixed(0)+' mm³')+'<span class="tag '+(ok?'ok':'warn')+'">'+(ok?(ctl_?'reads':'clear'):(ctl_?'blind':'hits'))+'</span></td></tr>';}).join('');
+// views
+const C=new THREE.Vector3(...D.centre);
+function view(dir,dist){const d=new THREE.Vector3(...dir).normalize();ctl.target.copy(C);cam.position.copy(C).addScaledVector(d,dist||900);ctl.update();}
+$('v-iso').onclick=()=>view([1,-1.15,.72],1000);$('v-rear').onclick=()=>view([-1,-1,.62],1000);$('v-side').onclick=()=>view([0,-1,.03],820);
+$('v-top').onclick=()=>view([0.001,-0.03,1],860);$('v-front').onclick=()=>view([1,0.001,.06],720);
+function size(){const w=st.clientWidth,h=st.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(st);size();vis();view([1,-1.15,.72],1000);
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam);})();
+</script>

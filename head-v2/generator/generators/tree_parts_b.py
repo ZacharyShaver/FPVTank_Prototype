@@ -323,15 +323,24 @@ def chute(p, half_w=TROUGH_W / 2, t=CHUTE_T):
 # wires plug into it and run alone: through the middle of a fixed hollow STUB that replaces the -Y axle
 # (on the tilt axis they twist, they don't bend), down a hole inside the cradle's -Y wall, and into the
 # plug chute's mouth above the drum's bore. The stub also replaces the axle that never fitted: Zach's
-# ball socket is r 10.04 and the axle r 9.95. The stub doesn't turn; the ball turns on it.
+# ball socket is r 10.04 and the axle r 9.95. The stub doesn't turn; the ball turns round it.
+# The -Y bearing moved INTO THE BALL (Zach, 2026-10-02): with the stub screwed down nothing turned in the
+# collar's 6704 seat, so a bearing there was dead. Now a cup in his ball_minus holds a 6704's outer ring
+# (it turns with the ball) and the stub runs through its inner ring and shoulders against it. The
+# collar is a plain bore. The cup is a fix to his ball: head-v2/fixes/ball_minus_cup.py.
 WIRE_ROUTE = True
 WIRE_R = 2.5                       # 5 mm hole: three ~1.3 jumper wires plus one bare Dupont crimp (~1.8)
 WIRE_WALL = 1.6                    # the conduit's wall: the -Y wall is only ~5.8 thick across its slope,
                                    # so a ridge grows on its OUTSIDE where the hole would break through
-STUB_R = 9.8                       # in Zach's socket, r 10.04 (measured on his rev 2 ball_minus): 0.24 running gap
-STUB_Y1 = -19.0                    # the socket ends at Y -18.6
-STUB_RING_R = 13.4                 # fills the empty 6704 seat (r 13.55): 0.15, his slide fit
-STUB_RING_Y1 = BRG_M_Y0 - 0.1      # 0.1 short of the seat's shoulder: no shared face
+CONDUIT_K = 6.0                    # how wide the ridge blends into the wall (smin radius). The first print
+                                   # had 1.5: a narrow "vein" with a notch under the collar. Zach, 2026-10-02:
+                                   # "extend around it to blend it in better". 6 swells it into the wall; the
+                                   # surface moves out 1.1 mm at most, and only outside (fixes/cradle_blend.py)
+STUB_BORE_R = 11.0                 # the collar's plain bore (was the 6704 seat)
+STUB_BODY_R = STUB_BORE_R - 0.15   # 10.85 in it: his slide fit. Its end is the shoulder on the inner ring
+STUB_R = HUB_R                     # 9.95 through the 6704's 20.0 bore, the same light slip as the +Y hub
+STUB_SHOULDER_Y = -24.1            # 0.1 off the bearing's outer face (-24.0, set by the cup's lip)
+STUB_Y1 = -18.6                    # just past the cup's lip (-19.0); the camera board starts at Y -18.1
 # Hand-placed along the wall's measured middle (X -5 keeps 1.6 mm off the cap's bottom M2 pilot), pushed
 # 1.2 outward where the conduit carries the outer wall, and passing the 240 deg drum screw BELOW its
 # head recess (Z 16). Ends in the chute's mouth (air), level over the drum's bore lip, then straight down.
@@ -354,12 +363,13 @@ def _centripetal(P, per=6):
 
 WIRE_LINE = _centripetal(WIRE_PTS)
 
-def wire_tube(p, r=WIRE_R, line=None):
-    """A round hole of radius r along WIRE_LINE (capsule chain). Points far from it skip the work."""
+def wire_tube(p, r=WIRE_R, line=None, pad=1.0):
+    """A round hole of radius r along WIRE_LINE (capsule chain). Points further than pad outside its box
+    skip the work, so pad must cover any blend radius used with it."""
     line = WIRE_LINE if line is None else line
     X, Y, Z = (np.asarray(a, float) for a in p)
     d = np.full(np.broadcast(X, Y, Z).shape, 1e3)
-    lo, hi = line.min(0) - r - 1, line.max(0) + r + 1
+    lo, hi = line.min(0) - r - pad, line.max(0) + r + pad
     m = (X >= lo[0]) & (X <= hi[0]) & (Y >= lo[1]) & (Y <= hi[1]) & (Z >= lo[2]) & (Z <= hi[2])
     if not m.any():
         return d
@@ -372,15 +382,15 @@ def wire_tube(p, r=WIRE_R, line=None):
     return d
 
 def stub(p, features=True):
-    """The fixed hollow stub: the cap's flange, a ring filling the empty bearing seat, and the tube the ball
-    turns on. Three M2 x 6 through the cap's old holes hold it, and they also set its turn, so its wire
-    channel lines up with the cradle's hole."""
+    """The fixed hollow stub: the cap's flange, a body located in the collar's plain bore whose end
+    shoulders on the 6704's inner ring, and the tube through that ring. Three M2 x 6 through the cap's old
+    holes hold it, and they also set its turn, so its wire channel lines up with the cradle's hole."""
     face = POD_M_Y1
     flange = _cyl(np.hypot(p[0], p[2] - H) - (FLANGE_R - 0.6),
                   np.abs(p[1] - (face + FLANGE_REC / 2)) - (FLANGE_REC / 2 - 0.6)) - 0.6
-    ring = cyl_y(p, 0, H, STUB_RING_R, face + FLANGE_REC - 0.6, STUB_RING_Y1)
-    tube = cyl_y(p, 0, H, STUB_R, STUB_RING_Y1 - 0.5, STUB_Y1)
-    s = U(flange, ring, tube)
+    body = cyl_y(p, 0, H, STUB_BODY_R, face + FLANGE_REC - 0.6, STUB_SHOULDER_Y)
+    tube = cyl_y(p, 0, H, STUB_R, STUB_SHOULDER_Y - 0.5, STUB_Y1)
+    s = U(flange, body, tube)
     if not features:
         return s
     holes = [cyl_y(p, SCREW_R * np.cos(a), H + SCREW_R * np.sin(a), M2_CLEAR, face - 1, face + FLANGE_REC + 1)
@@ -468,7 +478,10 @@ def fork(p, features=True):
     s = smin(s, cradle(p), 7.0)
     s = smin(s, collar(m, POD_Y0 - 1.0, POD_P_Y1), 7.0)
     if WIRE_ROUTE and PAN_COIL:                         # the conduit: only below the collar's seat
-        s = smin(s, wire_tube(p, WIRE_R + WIRE_WALL, WIRE_LINE[WIRE_LINE[:, 2] < 40.0]), 1.5)
+        low = WIRE_LINE[WIRE_LINE[:, 2] < 40.0]
+        s = smin(s, wire_tube(p, WIRE_R + WIRE_WALL, low, CONDUIT_K + 1), CONDUIT_K)
+        # and its mirror on the +Y wall, solid, for looks only (Zach, 2026-10-02: "put one on the other side")
+        s = smin(s, wire_tube((p[0], -p[1], p[2]), WIRE_R + WIRE_WALL, low, CONDUIT_K + 1), CONDUIT_K)
     s = np.maximum(s, BASE_Z - p[2])
     s = np.maximum(s, np.abs(p[1]) - POD_P_Y1)          # flat outer faces for the two flange plates
     bezel_sweep = smax(cyl_y(p, 0, H, FRONT_SWEEP, -11.0, 11.0),
@@ -503,12 +516,17 @@ def fork(p, features=True):
     for a in np.radians(SCREW_A):
         arm = np.minimum(arm, cyl_y(p, SCREW_R * np.cos(a), H + SCREW_R * np.sin(a), M2_PILOT,
                                     POD_P_Y1 - 9, POD_P_Y1 + 1))
-    # -Y collar: bearing seat, axle bore, flange recess and screws
-    coll = U(td_y(p, 0, H, AXLE_R + 0.45, BRG_M_Y1, -POD_Y0 + 1.5),
-             td_y(p, 0, H, BRG_OD / 2, BRG_M_Y1, BRG_M_Y0),
-             td_y(p, 0, H, BRG_PASS, POD_M_Y1 + FLANGE_REC - 0.1, BRG_M_Y1 + 0.1),  # bearing's way in
-             td_y(p, 0, H, AXLE_R + 0.45, POD_M_Y1 - 1, BRG_M_Y1),
-             cyl_y(p, 0, H, FLANGE_R + 0.25, POD_M_Y1 - 1, POD_M_Y1 + FLANGE_REC))
+    # -Y collar: bearing seat, axle bore, flange recess and screws. With the wire route the seat is gone
+    # (the bearing is in the ball now): one plain bore for the stub, the flange recess and the screws.
+    if WIRE_ROUTE and PAN_COIL:
+        coll = U(td_y(p, 0, H, STUB_BORE_R, POD_M_Y1 - 1, -POD_Y0 + 1.5),
+                 cyl_y(p, 0, H, FLANGE_R + 0.25, POD_M_Y1 - 1, POD_M_Y1 + FLANGE_REC))
+    else:
+        coll = U(td_y(p, 0, H, AXLE_R + 0.45, BRG_M_Y1, -POD_Y0 + 1.5),
+                 td_y(p, 0, H, BRG_OD / 2, BRG_M_Y1, BRG_M_Y0),
+                 td_y(p, 0, H, BRG_PASS, POD_M_Y1 + FLANGE_REC - 0.1, BRG_M_Y1 + 0.1),  # bearing's way in
+                 td_y(p, 0, H, AXLE_R + 0.45, POD_M_Y1 - 1, BRG_M_Y1),
+                 cyl_y(p, 0, H, FLANGE_R + 0.25, POD_M_Y1 - 1, POD_M_Y1 + FLANGE_REC))
     for a in np.radians(SCREW_A):
         coll = np.minimum(coll, cyl_y(p, SCREW_R * np.cos(a), H + SCREW_R * np.sin(a), M2_PILOT,
                                       POD_M_Y1 - 1, POD_M_Y1 + 9))

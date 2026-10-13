@@ -1,0 +1,264 @@
+<meta charset="utf-8">
+<title>Plus Hub Sleeve</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same system as the Head and Pan Coil Fit page: a working stage on the left, notes on the right. */
+:root{--bg:#EEF0EC;--panel:#FFFFFF;--ink:#1C211E;--muted:#5E6862;--line:#D4D9D3;--accent:#D9622B;--warn:#B8332A;--warn-bg:#F8E7E4;--ok:#2F7A5A;--ok-bg:#E3F1EA;--canvas:#E4E7E2;--new:#9B2E7A;--new-bg:#F4E4EF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--new:#E08AC4;--new-bg:#36202F}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--new:#E08AC4;--new-bg:#36202F}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Barlow",system-ui,sans-serif;padding-inline:16px;padding-block:18px 28px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:22px;font-weight:600;margin:0;text-wrap:balance;letter-spacing:.01em}
+.sub{color:var(--muted);margin:2px 0 0;max-width:72ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+@media (max-width:880px){.main{grid-template-columns:1fr}}
+.left{display:grid;gap:10px;min-width:0}
+.stage{position:relative;background:var(--canvas);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:min(68vh,640px);min-height:360px}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.bar{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;border-radius:0}
+button{font:500 13px "Barlow",sans-serif;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.status{position:absolute;left:10px;bottom:10px;max-width:calc(100% - 20px);font:500 13px "Barlow",sans-serif;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:5px 10px}
+.status.bad{color:var(--warn);border-color:var(--warn);background:var(--warn-bg)}
+.status.good{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+.hint{position:absolute;right:10px;bottom:12px;font:12px "IBM Plex Mono",monospace;color:var(--muted)}
+@media (max-width:600px){.hint{display:none}}
+.steps{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}
+.steps .row{display:flex;align-items:center;gap:10px}
+.steps input[type=range]{flex:1;min-width:0;accent-color:var(--accent)}
+.ticks{display:grid;grid-template-columns:repeat(5,1fr);font-size:12px;color:var(--muted);text-align:center}
+.ticks span:first-child{text-align:left}.ticks span:last-child{text-align:right}
+.ticks b{color:var(--ink);font-weight:600}
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:6px}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.card p{margin:0;font-size:14px}
+.tag{justify-self:start;font:500 11px "IBM Plex Mono",monospace;padding:1px 7px;border-radius:4px;letter-spacing:.02em}
+.tag.bad{background:var(--warn-bg);color:var(--warn)}.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.new{background:var(--new-bg);color:var(--new)}
+.card button{justify-self:start;padding:3px 9px;font-size:12px}
+ol,ul{margin:0;padding-left:20px;font-size:14px;display:grid;gap:3px}
+.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:13px}
+.key{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px}
+.key label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.sw{width:11px;height:11px;border-radius:3px;flex:none}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px}
+dt{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+dd{margin:0;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>+Y hub as a sleeve</h1>
+    <p class="sub">The cradle's +Y arm snaps because the hub on your ball_plus stands <b>5.8 mm</b> past the ball's flat face, into the collar. The fix you picked: the hub comes off and is printed as a sleeve that goes in from outside after the ball, like the −Y stub. The print files are in <span class="num">head-v2/out/print-rev2/</span> (plate_plus_sleeve.3mf). Use the slider to put the head together, and switch to <b>Today</b> to watch the arm bend. All parts sit where your geometry puts them (mm, Z up from the deck).</p>
+  </header>
+  <div class="main">
+    <div class="left">
+      <div class="stage" id="stage">
+        <div class="bar" role="toolbar" aria-label="View">
+          <span class="seg" role="group" aria-label="Version"><button id="m-now" aria-pressed="false">Today</button><button id="m-new" aria-pressed="true">Hub as sleeve</button></span>
+          <button id="v-iso">3/4</button><button id="v-front">From the lens</button><button id="v-side">From +Y</button>
+          <button id="t-cut" aria-pressed="true">Cut in half</button><button id="t-ghost" aria-pressed="false">See-through ball</button>
+        </div>
+        <div class="status" id="status" aria-live="polite"></div>
+        <div class="hint">drag to turn · scroll to zoom · right-drag to pan</div>
+      </div>
+      <div class="steps">
+        <div class="row"><button id="play">Play</button><input id="t" type="range" min="0" max="4" step="0.01" value="4" aria-label="Assembly step"></div>
+        <div class="ticks"><span>apart</span><span><b>1</b> ball in</span><span><b>2</b> sleeve + 6704</span><span><b>3</b> post</span><span><b>4</b> −Y stub</span></div>
+      </div>
+      <div class="key" id="key"></div>
+    </div>
+    <div class="side">
+      <section class="card">
+        <span class="tag bad">today</span>
+        <h2>Why the arm bends</h2>
+        <p>The hub (r <span class="num">8.0–9.95</span>) runs from the flat face at Y <span class="num">24.5</span> out to <span class="num">30.3</span>. The collar's inner face is at Y <span class="num">25.1</span>. The −Y side gives under 1 mm, so the +Y arm has to spread about <span class="num">5 mm</span> while the hub goes past, then snap back round it.</p>
+        <button data-go="now">Show it bend</button>
+      </section>
+      <section class="card">
+        <span class="tag new">chosen</span>
+        <h2>What changes</h2>
+        <ul>
+          <li><b>ball_plus</b> (your rev 2, IR cutout extended)<b>:</b> the hub cut off flush, and a 1.5 mm socket in the flat face, with a flat on the lens side as a key.</li>
+          <li><b>Sleeve (new, ~10 min print):</b> your hub's bore (<span class="num">16.0</span>) and the notch for the servo's gear bump, <span class="num">8.6</span> long. The 6704 presses on (<span class="num">20.0</span> or <span class="num">20.1</span>, two to try) up to a lip, so the bearing really turns.</li>
+          <li><b>Unchanged:</b> cradle, post v3, both 6704s, the servo, the −Y stub.</li>
+        </ul>
+        <button data-go="sleeve">Show the sleeve</button>
+      </section>
+      <section class="card">
+        <h2>Putting it together</h2>
+        <ol>
+          <li>Ball straight down into the nest. Nothing bends.</li>
+          <li>On the bench, press the 6704 onto the sleeve from the flat end until it stops on the lip.</li>
+          <li>Sleeve and bearing together in from outside, flat to the lens side, until the sleeve drops into the socket.</li>
+          <li>Post v3 on, 3 × M2 as before.</li>
+          <li>−Y stub in, 3 × M2 × 6 as before.</li>
+        </ol>
+      </section>
+      <section class="card">
+        <span class="tag ok">checked</span>
+        <h2>What was measured</h2>
+        <ul>
+          <li><b>Drop:</b> today, <span class="num">1,520</span> columns of the hub hit the +Y collar on the way down. With the sleeve: <span class="num">0</span>.</li>
+          <li><b>In place:</b> both sleeves touch nothing but the 6704's inner ring (the press): cut ball, post v3, the cradle, the outer ring, your MG90S, all <span class="num">0 mm³</span>. Controls: <span class="num">0.3</span> deeper it hits the ball (<span class="num">21.5 mm³</span>); without the notch it hits the servo's gear bump (<span class="num">11.4 mm³</span>).</li>
+          <li><b>Way in:</b> the sleeve with the 6704 on slides in from +Y unblocked. Control: into today's ball, <span class="num">4,733</span> lines blocked.</li>
+        </ul>
+      </section>
+      <section class="card">
+        <span class="tag bad">guessed</span>
+        <h2>Numbers to OK or measure</h2>
+        <dl>
+          <dt>20.0 / 20.1</dt><dd>the press: the sleeve's outside under the 6704</dd>
+          <dt>r 11.0</dt><dd>the stop lip; a 6704's inner ring is about 22.6 across</dd>
+          <dt>1.5 mm</dt><dd>socket depth; your plate is ~2.2 thick at the bottom, so <span class="num">0.69</span> is left there</dd>
+          <dt>0.15</dt><dd>every sliding gap at the socket (your slide rule); 0.3 to its floor</dd>
+          <dt>X 9.0</dt><dd>the key's flat, socket and sleeve</dd>
+          <dt>0.3 mm</dt><dd>sleeve end to the post's flange, so it can't walk out</dd>
+          <dt>Y 26.24</dt><dd>servo tower top, taken from post v3's fit</dd>
+          <dt>Y 27.0</dt><dd>where the notch stops: past post v3's inner end, so the bearing presses onto a full 2 mm wall</dd>
+        </dl>
+      </section>
+      <section class="card">
+        <h2>Also found</h2>
+        <p>The collar's shoulder (r <span class="num">10.45</span> out) faces the 6704's inner ring (r <span class="num">10.0–11.3</span>) as well as its outer one, so a fixed face rubs the turning ring. It always has; this change doesn't touch it.</p>
+        <p>In both versions the ribbon track's top lip at the back reaches about <span class="num">1 mm</span> over the ball's widest point (X <span class="num">−30</span>, Z <span class="num">66</span>). It's a small snag, not the 5 mm one.</p>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+(function () {
+  const H = 52, $ = id => document.getElementById(id);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const stage = $('stage');
+  const renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.localClippingEnabled = true;
+  stage.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 1, 2000);
+  camera.up.set(0, 0, 1);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 8, 52);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8f8c, 0.75));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(80, 60, 160); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-90, -40, 40); scene.add(fill);
+  const clip = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0);
+
+  const LOOK = {
+    cradle: ['Cradle', '#9AA39C'], ball_now: ['Ball +, today (hub on)', '#4A7FC1'], ball_new: ['Ball +, hub cut off', '#4A7FC1'],
+    ball_minus: ['Ball −', '#7FA6D6'], servo: ['Tilt servo (your MG90S)', '#3B4046'], post: ['Post v3', '#D9622B'],
+    sleeve: ['Sleeve (new)', '#B8338C'], brg_in: ['6704, +Y', '#C9A43A'], brg_out: ['', '#C9A43A'],
+    stub: ['−Y stub', '#2F8A63'], brg_minus: ['6704, −Y', '#C9A43A']};
+  const dec = (b, T) => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return new T(u.buffer); };
+  const mesh = {};
+  for (const k in LOOK) {
+    const g = new THREE.BufferGeometry();
+    const v = dec(PARTS[k].v, Float32Array);
+    g.setAttribute('position', new THREE.BufferAttribute(v, 3));
+    g.setIndex(new THREE.BufferAttribute(dec(PARTS[k].f, Uint32Array), 1));
+    g.computeVertexNormals();
+    const m = new THREE.MeshStandardMaterial({color: LOOK[k][1], roughness: 0.62, metalness: k.startsWith('brg') ? 0.35 : 0.04,
+      side: THREE.DoubleSide, clippingPlanes: [clip], vertexColors: k === 'cradle'});
+    const o = new THREE.Mesh(g, m); o.userData.base = v.slice(); scene.add(o); mesh[k] = o;
+  }
+  // the cradle's +Y arm bends as one: weight 0 at the nest, 1 at the collar
+  const cr = mesh.cradle, cv = cr.userData.base, n = cv.length / 3, wt = new Float32Array(n);
+  const ss = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  for (let i = 0; i < n; i++) wt[i] = ss(13, 22, cv[3 * i + 1]) * ss(24, 52, cv[3 * i + 2]);
+  const col = new Float32Array(3 * n); cr.geometry.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  cr.material.color.set('#ffffff');
+  const grey = new THREE.Color('#9AA39C'), red = new THREE.Color('#C0392B');
+  let lastBend = -1;
+  function bendArm(b) {
+    if (Math.abs(b - lastBend) < 1e-3) return; lastBend = b;
+    const p = cr.geometry.attributes.position.array, c = new THREE.Color();
+    for (let i = 0; i < n; i++) {
+      p[3 * i + 1] = cv[3 * i + 1] + b * wt[i];
+      c.copy(grey).lerp(red, Math.min(1, wt[i] * 1.6) * (b / 5.3));
+      col[3 * i] = c.r; col[3 * i + 1] = c.g; col[3 * i + 2] = c.b;
+    }
+    cr.geometry.attributes.position.needsUpdate = true; cr.geometry.attributes.color.needsUpdate = true;
+    cr.geometry.computeBoundingSphere();
+  }
+
+  // legend with visibility toggles
+  const hidden = {};
+  const key = $('key');
+  [['cradle'], ['ball_new', 'ball_now'], ['ball_minus'], ['servo'], ['sleeve'], ['brg_in', 'brg_out', 'brg_minus'], ['post'], ['stub']].forEach(ks => {
+    const id = 'show-' + ks[0], lab = document.createElement('label');
+    lab.innerHTML = '<input type="checkbox" id="' + id + '" checked><span class="sw" style="background:' + LOOK[ks[0]][1] + '"></span>' +
+      (ks[0] === 'ball_new' ? 'Ball +' : ks[0] === 'brg_in' ? '6704s' : LOOK[ks[0]][0]);
+    key.appendChild(lab);
+    lab.querySelector('input').addEventListener('change', e => { ks.forEach(k => hidden[k] = !e.target.checked); draw(); });
+  });
+
+  let mode = 'new', t = 4, ghost = false;
+  const lerp = (a, b, x) => a + (b - a) * x, ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
+  function place() {
+    const s1 = ease(t), dz = 45 * (1 - s1);
+    for (const k of ['ball_now', 'ball_new', 'ball_minus', 'servo', 'brg_minus']) mesh[k].position.set(0, 0, dz);
+    const s2 = 42 * (1 - ease(t - 1));   // the sleeve with the 6704 pressed on (today: the 6704 alone)
+    mesh.sleeve.position.set(0, s2, 0);
+    mesh.brg_in.position.y = mesh.brg_out.position.y = s2;
+    mesh.post.position.set(0, 30 * (1 - ease(t - 2)), 0);
+    mesh.stub.position.set(0, -32 * (1 - ease(t - 3)), 0);
+    // today: the hub meets the collar's top once dz < 30.4 and rides down its inner face to the bore
+    const bend = mode === 'now' ? 5.3 * Math.min(1, Math.max(0, (30.4 - dz) / 2)) * Math.min(1, Math.max(0, dz / 0.6)) : 0;
+    bendArm(bend);
+    const vis = {ball_now: mode === 'now', ball_new: mode === 'new', sleeve: mode === 'new'};
+    for (const k in mesh) {
+      mesh[k].visible = !hidden[k] && (vis[k] !== false);
+      const g = ghost && (k.startsWith('ball'));
+      mesh[k].material.transparent = g; mesh[k].material.opacity = g ? 0.22 : 1; mesh[k].material.depthWrite = !g;
+    }
+    const st = $('status');
+    if (mode === 'now' && bend > 0.05) { st.className = 'status bad'; st.textContent = 'Today: the hub is past the collar\'s face, so the +Y arm is spread ' + bend.toFixed(1) + ' mm'; }
+    else if (mode === 'now') { st.className = 'status'; st.textContent = t < 1 ? 'Today: lowering the ball' : 'Today: the hub sits in the collar; the 6704 and post go on from outside'; }
+    else if (t < 1) { st.className = 'status good'; st.textContent = 'Hub as sleeve: the ball drops straight in. Nothing stands past its flat faces'; }
+    else { st.className = 'status good'; st.textContent = t < 2 ? 'The sleeve, 6704 pressed on, goes in from outside, flat to the lens side' : t < 3 ? 'Post v3 on, as before' : 'The −Y stub in, as before'; }
+  }
+  function draw() { place(); renderer.render(scene, camera); }
+
+  const views = {iso: [95, 120, 105], front: [190, 6, 54], side: [8, 190, 54]};
+  function view(v) { const p = views[v]; camera.position.set(p[0], p[1], p[2]); controls.target.set(0, 8, 50); controls.update(); draw(); }
+  function size() { const r = stage.getBoundingClientRect(); renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); draw(); }
+  new ResizeObserver(size).observe(stage);
+  controls.addEventListener('change', draw);
+
+  const setMode = m => { mode = m; $('m-now').setAttribute('aria-pressed', m === 'now'); $('m-new').setAttribute('aria-pressed', m === 'new'); draw(); };
+  $('m-now').onclick = () => setMode('now'); $('m-new').onclick = () => setMode('new');
+  $('v-iso').onclick = () => view('iso'); $('v-front').onclick = () => view('front'); $('v-side').onclick = () => view('side');
+  const tog = (id, f) => { const b = $(id); b.onclick = () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); f(on); draw(); }; };
+  tog('t-cut', on => { clip.constant = on ? 0 : 1e4; });
+  tog('t-ghost', on => { ghost = on; });
+  const slider = $('t');
+  slider.oninput = () => { t = +slider.value; stop(); draw(); };
+  let raf = 0, t0 = 0;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; $('play').textContent = 'Play'; }
+  function tick(now) {
+    t = Math.min(4, (now - t0) / 1000 * 0.62); slider.value = t; draw();
+    if (t < 4) raf = requestAnimationFrame(tick); else stop();
+  }
+  $('play').onclick = () => {
+    if (raf) return stop();
+    if (reduce) { t = 4; slider.value = 4; return draw(); }
+    $('play').textContent = 'Pause'; t0 = performance.now() - (t >= 4 ? 0 : t / 0.62 * 1000); raf = requestAnimationFrame(tick);
+  };
+  document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => {
+    stop();
+    if (b.dataset.go === 'now') { setMode('now'); t = 0.62; slider.value = t; view('side'); }
+    else { setMode('new'); t = 4; slider.value = 4; view('front'); camera.position.set(110, 70, 70); controls.target.set(0, 24, 52); controls.update(); draw(); }
+    stage.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block: 'nearest'});
+  });
+  view('iso'); size();
+})();
+</script>

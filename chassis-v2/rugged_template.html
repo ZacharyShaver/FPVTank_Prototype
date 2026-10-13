@@ -1,0 +1,218 @@
+<title>Scorpion Rugged Body</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same tokens as the hull and tail-arms pages, so the project's pages read as one set. Model left, findings right. */
+:root{--bg:#EEF0EC;--panel:#FFFFFF;--ink:#1C211E;--muted:#5E6862;--line:#D4D9D3;--accent:#D9622B;--warn:#B8332A;--warn-bg:#F8E7E4;--ok:#2F7A5A;--ok-bg:#E3F1EA;--canvas:#E4E7E2;--bar:#C9CFC8;--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Barlow",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--bar:#3A433E}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--bar:#3A433E}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:18px 28px}
+.wrap{max-width:1360px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:23px;font-weight:600;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:3px 0 0;max-width:92ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:14px;align-items:start}
+@media (max-width:980px){.main{grid-template-columns:1fr}}
+.stage{position:sticky;top:12px;background:var(--canvas);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:min(84vh,820px);min-height:440px}
+@media (max-width:980px){.stage{position:relative;top:0;height:min(72vh,580px)}}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.bar{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button{font:500 13px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button[aria-pressed="false"].grp{opacity:.55}
+.legend{position:absolute;left:10px;bottom:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px}
+.legend button{display:inline-flex;align-items:center;gap:6px;padding:4px 9px}
+.sw{width:11px;height:11px;border-radius:3px;flex:none;display:inline-block}
+.pick{position:absolute;right:10px;top:54px;max-width:300px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13.5px;line-height:1.4;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pick b{display:block;font-size:14px;margin-bottom:2px}
+.pick .g{font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.hint{position:absolute;right:12px;bottom:52px;font:12px var(--mono);color:var(--muted)}
+@media (max-width:760px){.hint{display:none}.pick{left:10px;right:10px;max-width:none;top:auto;bottom:96px}}
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;min-width:0}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.card p{margin:0 0 8px}.card p:last-child{margin:0}
+ul,ol{margin:0;padding-left:19px;display:grid;gap:6px;font-size:14px}
+li b{font-weight:600}
+.goal{display:grid;gap:10px}
+.g1{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding-top:9px;border-top:1px solid var(--line)}
+.g1:first-child{border-top:0;padding-top:0}
+.g1 .t{font-weight:600}
+.g1 .ba{font:500 13px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.g1 .ba s{color:var(--muted);text-decoration:none}
+.g1 .ba b{color:var(--ok)}
+.g1 .d{grid-column:1/-1;color:var(--muted);font-size:13.5px}
+.bars{display:grid;gap:5px;font-size:13px}
+.brow{display:grid;grid-template-columns:150px minmax(0,1fr) 46px;gap:8px;align-items:center}
+.brow .tr{height:10px;background:var(--bar);border-radius:3px;overflow:hidden}
+.brow .fl{height:100%;border-radius:3px}
+.brow .v{font:500 12px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td{padding:5px 0;border-top:1px solid var(--line);vertical-align:top}
+td.v{text-align:right;font:500 12.5px var(--mono);white-space:nowrap;padding-left:10px}
+.tag{display:inline-block;font:500 11px var(--mono);padding:1px 6px;border-radius:4px;margin-left:4px}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.guess{color:var(--accent);font-weight:600}
+.full{grid-column:1/-1}
+img.fig{width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#fff}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.mini{font:500 12px var(--mono);color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Scorpion: rugged body</h1>
+    <p class="sub">The tail-arms body, made to take falls, rolls and knock-overs, climb steeper and keep dust out. Same v1 legs, same head. Each claim below is measured against the old body; <span class="guess">orange</span> numbers are guesses. Click a part to name it.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="bar" role="toolbar" aria-label="View">
+        <button id="v-iso">3/4</button><button id="v-rear">Rear 3/4</button><button id="v-side">Side</button><button id="v-front">Head-on</button><button id="v-under">Underside</button>
+        <button id="t-cut" aria-pressed="false">Cut down the middle</button>
+      </div>
+      <div class="pick" id="pick" hidden></div>
+      <div class="hint">click a part · drag to turn · scroll to zoom</div>
+      <div class="legend" id="legend" aria-label="Show or hide groups"></div>
+    </div>
+    <div class="side">
+      <section class="card" aria-labelledby="h-goal">
+        <h2 id="h-goal">What changed, old body → rugged</h2>
+        <div class="goal" id="goals"></div>
+      </section>
+      <section class="card" aria-labelledby="h-fall">
+        <h2 id="h-fall">First to touch the ground, over 4000 fall directions</h2>
+        <div class="bars" id="fall"></div>
+        <p class="mini" style="margin-top:8px" id="fall0"></p>
+      </section>
+      <section class="card" aria-labelledby="h-cost">
+        <h2 id="h-cost">What it costs</h2>
+        <div id="cost"></div>
+      </section>
+    </div>
+    <section class="card full" aria-labelledby="h-how">
+      <h2 id="h-how">Why it rolls back upright</h2>
+      <p style="max-width:95ch">Lying on any face, the robot stays only if its centre of mass sits over that face. The skirts and both hoops lie on one outline round the centre of mass. From the tracks' bottom edges up to the top, that outline only gets farther from the centre of mass. So whatever it lands on, gravity rolls it towards the tracks, the nearest part of the outline. The left chart is that outline seen head-on, which is what it rolls on; the right one is the belly.</p>
+      <img class="fig" id="fig" alt="Left: head-on outlines of the old and rugged bodies with the centre of mass, and the circle of the track edges' distance. Right: belly clearance along the robot, old and rugged.">
+    </section>
+    <div class="two full">
+      <section class="card" aria-labelledby="h-rest">
+        <h2 id="h-rest">Where it can come to rest after a tumble</h2>
+        <table id="rests"></table>
+        <p class="mini" style="margin-top:8px">Stable faces of the whole robot's outline (its convex hull), with the tilt needed to knock it off each. Faces it leaves with under 1.5° of tilt are mesh slivers, not rests, and are left out.</p>
+      </section>
+      <section class="card" aria-labelledby="h-parts">
+        <h2 id="h-parts">The new parts</h2>
+        <ul>
+          <li><b>Roll hoops</b>, front and rear: Ø13 tube on the outline, TPU sleeves on top. The front one stands behind the head, out of the cradle's sweep. The rear one leans back so it won't stand on its tail, and carries the WiFi antenna inside its top.</li>
+          <li><b>Brow bar</b>: from the front hoop's top over the ball, so a nose-dive lands on it and not on the camera.</li>
+          <li><b>Side skirts</b>: armour outside the tracks, on the outline, 7–15 mm from the outer frames. They roll it off its side, take side hits and keep thrown dirt off the top. Their ends sweep up, so they don't set the approach or departure angle.</li>
+          <li><b>TPU bumpers</b> where it lands: hoop tops, rub strips on the skirts, claw caps, tail corners.</li>
+          <li><b>Shock</b>: the Pi on 4 TPU isolators; TPU-faced clamp bars hold the packs down; the cargo bed is screwed on, not held by magnets.</li>
+          <li><b>Layout</b>: the packs stand on edge in bays along the walls, 73 mm further forward, beside the head. The ESCs come down from the sponsons to the floor behind them. The deck is 15 lower, and the whole body sits 15 further forward on the legs.</li>
+          <li><b>Belly</b>: a tunnel down the middle, its roof 47 over the ground. The nose floor is raised 10 with the head, and a 28° ramp at the tail. Packs lift out from the top: carapace and two turret-deck side lids off.</li>
+          <li><b>Dust</b>: a gasket under the bed and along the tub-to-carapace seam, a TPU wiper ring from the deck onto the drum, boots round the motor windows, grommets where the head's leads pass. Air for the Pi's cooler comes in high through a foam-filtered hood on the tail and leaves through louvres facing aft under the overhang.</li>
+        </ul>
+      </section>
+    </div>
+    <section class="card" aria-labelledby="h-chk">
+      <h2 id="h-chk">Fit checks</h2>
+      <p style="font-size:13px;color:var(--muted)">Overlap in 1 mm cubes. Zero is clear; each control must read above zero, or the check would be blind.</p>
+      <table id="checks"></table>
+    </section>
+    <div class="side">
+      <section class="card" aria-labelledby="h-guess">
+        <h2 id="h-guess">Guesses to confirm</h2>
+        <ul>
+          <li>Masses: printed walls <span class="guess">90 %</span> solid, hoop tubes <span class="guess">45 %</span>, lumps <span class="guess">40 %</span>; packs <span class="guess">300 g</span> each, head <span class="guess">210 g</span>. The outline is sized from the centre of mass, so weigh the real parts when they exist.</li>
+          <li>A printed Ø13 hoop may crack in a hard landing. A <span class="guess">10 mm aluminium or carbon tube</span> inside it is the safe version.</li>
+          <li>ESC <span class="guess">46 × 34 × 18</span>, on edge in a sealed bay: its heat needs the air path. Arm UBEC <span class="guess">50 × 30 × 15</span>.</li>
+          <li>TPU isolators and gaskets: Shore 95A, the TPU you print tracks with.</li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="h-q">
+        <h2 id="h-q">Questions for you</h2>
+        <ul>
+          <li><b>Is the cage size OK?</b> Rolling back upright on its own needs the top about 207 over the ground and the skirts 270 wide. A smaller cage only protects, and leaves the righting to the flippers next round.</li>
+          <li><b>The hoops and the brow bar cross the head camera's view</b> up and back, and up and ahead. Thin, and above the lens, but there.</li>
+          <li><b>Packs</b> now come out the top (carapace and side lids off), not the back. OK?</li>
+          <li><b>Climbing</b>: the v1 track's flat contact is only 77 mm long, and that sets the tip angles. The arm at the tail costs 12°. The bigger tracks would raise all of it.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+function dec(s,T){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new T(u.buffer);}
+const st=document.getElementById('stage'), $=id=>document.getElementById(id);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.localClippingEnabled=true;
+st.prepend(renderer.domElement);
+const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(26,1,1,8000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x5d625e,0.78));
+const d1=new THREE.DirectionalLight(0xffffff,0.62);d1.position.set(260,-320,420);scene.add(d1);
+const d2=new THREE.DirectionalLight(0xffffff,0.34);d2.position.set(-300,260,-260);scene.add(d2);
+const clip=new THREE.Plane(new THREE.Vector3(0,1,0),1e6);
+const meshes={}, GRP={};
+for(const k in D.m){const p=D.m[k];const g=new THREE.BufferGeometry();
+  const q=dec(p.v,Int16Array), v=new Float32Array(q.length);for(let i=0;i<q.length;i++)v[i]=q[i]*0.02;
+  g.setAttribute('position',new THREE.BufferAttribute(v,3));g.setIndex(new THREE.BufferAttribute(p.i32?dec(p.f,Uint32Array):dec(p.f,Uint16Array),1));g.computeVertexNormals();
+  const m=new THREE.MeshStandardMaterial({color:p.c,roughness:.6,metalness:.06,side:THREE.DoubleSide,clippingPlanes:[clip]});
+  const mesh=new THREE.Mesh(g,m);mesh.userData={grp:p.grp,label:p.label,note:p.note};scene.add(mesh);meshes[k]=mesh;(GRP[p.grp]=GRP[p.grp]||[]).push(mesh);}
+const GROUPS=[['legs','Legs (yours)',0x2B2F33],['hull','Hull',0x6B7A69],['cage','Roll hoops',0x24272A],['tpu','TPU bumpers',0xDB8F29],['seal','Seals',0x299EA8],['elec','Electronics',0x3C9A4C],['head','Head v2',0x4F7FBF]];
+const on={legs:true,hull:true,cage:true,tpu:true,seal:true,elec:false,head:true};
+function vis(){for(const g in GRP)GRP[g].forEach(m=>m.visible=!!on[g]);}
+const lg=$('legend');GROUPS.forEach(([g,lab,c])=>{const b=document.createElement('button');b.className='grp';b.setAttribute('aria-pressed',on[g]);
+  b.innerHTML='<span class="sw" style="background:#'+c.toString(16).padStart(6,'0')+'"></span>'+lab;b.onclick=()=>{on[g]=!on[g];b.setAttribute('aria-pressed',on[g]);vis();};lg.appendChild(b);});
+$('t-cut').onclick=()=>{const b=$('t-cut');const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);clip.constant=v?-D.yc:1e6;};
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
+  const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ptr,cam);
+  const hits=ray.intersectObjects(Object.values(meshes).filter(m=>m.visible),false).filter(h=>clip.distanceToPoint(h.point)>=0);
+  const pk=$('pick');if(!hits.length){pk.hidden=true;return;}const u=hits[0].object.userData;
+  const gl=(GROUPS.find(g=>g[0]===u.grp)||[0,u.grp])[1];pk.innerHTML='<span class="g">'+gl+'</span><b>'+u.label+'</b>'+(u.note||'');pk.hidden=false;});
+// findings
+const f0=x=>Math.round(x), deg=x=>f0(x)+'°';
+const cl=D.climb, cb=D.climb_before, rs=D.rests, rb=D.rests_before;
+const goals=[
+  ['Rolls back upright', rb.length+' rests', rs.length===1?'1: upright only':rs.length+' rests',
+   'From either side, upside down, its nose or its tail, it rolls back onto the tracks. It takes '+deg(rs[0].tilt)+' of tilt to knock it off them (was '+deg(rb[0].tilt)+').'],
+  ['Falls: head, antenna, e-stop hit first in', Object.values(D.contact_before.fragile).reduce((a,b)=>a+b,0).toFixed(0)+' %', Object.values(D.contact.fragile).reduce((a,b)=>a+b,0).toFixed(0)+' %',
+   'The whip antenna was the first contact in 1 fall in 8. Now the bumpers, hoops, tracks and skirts take every direction.'],
+  ['Climbing: tips back at', deg(cb.up_flat), deg(cl.up_flat),
+   'Forward: '+deg(cb.down_flat)+' → '+deg(cl.down_flat)+', now balanced: the centre of mass sits over the middle of the tracks&rsquo; flat contact (X '+f0(cl.flat[0])+' to '+f0(cl.flat[1])+'), '+f0(cl.cog[2])+' up. With a 300 g arm at the tail: '+deg(D.climb_arm.up_flat)+' back.'],
+  ['Rocks: belly under the middle', f0(D.belly_before.centre)+' mm', f0(D.belly.centre)+'–47 mm',
+   'The nose floor '+f0(D.belly.centre)+' over the ground, the tunnel roof 47. The pack bays stay at '+f0(D.belly.lowest)+'. Approach '+deg(D.ends_before[0])+' → '+deg(D.ends[0])+', departure '+deg(D.ends_before[1])+' → '+deg(D.ends[1])+'.'],
+  ['Dust: openings sealed', 'none', '7', 'Both seams, the turret, the motor windows, the cable passes, and a filtered air path in and out for the Pi.'],
+];
+$('goals').innerHTML=goals.map(g=>'<div class="g1"><span class="t">'+g[0]+'</span><span class="ba"><s>'+g[1]+'</s> → <b>'+g[2]+'</b></span><span class="d">'+g[3]+'</span></div>').join('');
+const COL={'TPU bumpers':'#DB8F29','roll hoops':'#4A4F55','tracks and legs':'#2B2F33','tracks':'#2B2F33','skirts':'#6B7A69','body shell':'#9E8F70','claws':'#7D8590','the head':'#B8332A','antenna, lights, e-stop':'#B8332A'};
+const fb=D.contact.by, fbb=D.contact_before.by;
+$('fall').innerHTML='<div class="brow"><span class="mini">rugged</span><span></span><span></span></div>'+Object.entries(fb).map(([k,v])=>'<div class="brow"><span>'+k+'</span><span class="tr"><span class="fl" style="display:block;width:'+v+'%;background:'+COL[k]+'"></span></span><span class="v">'+v.toFixed(0)+' %</span></div>').join('')+
+  '<div class="brow" style="margin-top:6px"><span class="mini">old body</span><span></span><span></span></div>'+Object.entries(fbb).map(([k,v])=>'<div class="brow"><span>'+k+'</span><span class="tr"><span class="fl" style="display:block;width:'+v+'%;background:'+(COL[k]||'#888')+'"></span></span><span class="v">'+v.toFixed(0)+' %</span></div>').join('');
+$('fall0').textContent='Old body, fragile first contacts: '+Object.entries(D.contact_before.fragile).map(([k,v])=>k+' '+v+' %').join(', ')+'.';
+const s=D.size;
+$('cost').innerHTML='<div class="goal">'+[
+  ['Mass*',f0(D.mass_before)+' g',f0(D.mass)+' g','The cage, skirts and bumpers; partly offset by the lower deck.'],
+  ['Length',f0(s.L0)+' mm',f0(s.L)+' mm','Brow bar ahead, raked rear hoop behind, body 15 forward.'],
+  ['Width',f0(s.W0)+' mm',f0(s.W)+' mm','The skirts sit outside the tracks.'],
+  ['Height',f0(s.H0)+' mm',f0(s.H)+' mm','The old height was its whip antenna; now the hoops.']
+].map(g=>'<div class="g1"><span class="t">'+g[0]+'</span><span class="ba"><s>'+g[1]+'</s> → '+g[2]+'</span><span class="d">'+g[3]+'</span></div>').join('')+'</div>';
+const restRow=r=>'<tr><td>'+r.name+'</td><td class="v">'+r.tilt.toFixed(1)+'°</td></tr>';
+$('rests').innerHTML='<tr><td><b>Rugged</b></td><td class="v">tilt to leave</td></tr>'+rs.map(restRow).join('')+'<tr><td><b>Old body</b></td><td></td></tr>'+rb.map(restRow).join('');
+$('fig').src='data:image/png;base64,'+D.fig;
+$('checks').innerHTML=D.checks.map(c=>{const ctl_=c.what.includes('(control)');const ok=ctl_?c.mm3>0:c.mm3===0;
+  return '<tr><td>'+c.what+(c.why?'<br><span style="color:var(--muted);font-size:12.5px">'+c.why+'</span>':'')+'</td><td class="v">'+(c.mm3>=1000?(c.mm3/1000).toFixed(1)+' cm³':c.mm3.toFixed(0)+' mm³')+'<span class="tag '+(ok?'ok':'warn')+'">'+(ok?(ctl_?'reads':'clear'):(ctl_?'blind':'hits'))+'</span></td></tr>';}).join('');
+// views
+const C=new THREE.Vector3(...D.centre);
+function view(dir,dist){const d=new THREE.Vector3(...dir).normalize();ctl.target.copy(C);cam.position.copy(C).addScaledVector(d,dist||1200);ctl.update();}
+$('v-iso').onclick=()=>view([1,-1.1,.65],1350);$('v-rear').onclick=()=>view([-1,-1,.6],1350);$('v-side').onclick=()=>view([0,-1,.03],1250);
+$('v-front').onclick=()=>view([1,0.001,.04],1100);$('v-under').onclick=()=>view([0.25,-0.35,-1],1150);
+function size(){const w=st.clientWidth,h=st.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(st);size();vis();view([1,-1.1,.65],1350);
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam);})();
+</script>

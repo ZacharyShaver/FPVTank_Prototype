@@ -36,7 +36,7 @@ def open_mask(W):
     ok = np.ones(X.shape, bool)
     for y in np.linspace(-W / 2, W / 2, 7):
         p = (X, np.full_like(X, y), Z)
-        ok &= (B.fork(p) > 0) & (P.drum(p) > 0) & (P.base(p) > 0)
+        ok &= (B.fork(p) > 0) & (P.drum(p) > 0) & (P.fixed(p) > 0)   # set 7: base + the drop-in ring
     return ok
 
 

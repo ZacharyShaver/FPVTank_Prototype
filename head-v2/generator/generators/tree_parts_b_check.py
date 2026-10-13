@@ -41,9 +41,16 @@ for pan in (45, 90):
                  overlap(lambda p, a=pan: B.fork(rot_z(p, a)), A.roots, (-50, -50, 0), (50, 50, 12))))
 rows.append(('post vs nest', overlap(B.post, B.fork, (-22, 13, H - 22), (22, 40, H + 22))))
 rows.append(('post vs ball', overlap(B.post, ball, (-22, 13, H - 22), (22, 36, H + 22))))
-rows.append(('axle vs nest', overlap(B.axle, B.fork, (-12, B.AXLE_Y0 - 1, H - 12), (12, -13, H + 12))))
-rows.append(('cap vs nest', overlap(B.cap_minus, B.fork, (-22, B.POD_M_Y1 - 4, H - 22), (22, -20, H + 22))))
-rows.append(('cap vs axle', overlap(B.cap_minus, B.axle, (-12, B.POD_M_Y1 - 2, H - 12), (12, -13, H + 12))))
+if B.WIRE_ROUTE and B.PAN_COIL:
+    # 2026-10-02: the stub replaced the -Y axle and cap (and filled the collar's bearing seat, which the
+    # cap's ring sat in). The bearing joint itself is checked in head-v2/checks/wire_route.py.
+    rows.append(('stub vs nest', overlap(B.stub, B.fork, (-19, B.POD_M_Y1 - 2, H - 19), (19, B.STUB_Y1 + 1, H + 19))))
+    # not vs B.ball_minus: the printed ball is Zach's, with the 6704 cup (fixes/ball_minus_cup.py); the
+    # generator's ball has no cup and reads ~19 mm3 against the stub's shoulder, which means nothing.
+else:
+    rows.append(('axle vs nest', overlap(B.axle, B.fork, (-12, B.AXLE_Y0 - 1, H - 12), (12, -13, H + 12))))
+    rows.append(('cap vs nest', overlap(B.cap_minus, B.fork, (-22, B.POD_M_Y1 - 4, H - 22), (22, -20, H + 22))))
+    rows.append(('cap vs axle', overlap(B.cap_minus, B.axle, (-12, B.POD_M_Y1 - 2, H - 12), (12, -13, H + 12))))
 # The tilt servo is a solid object, not just a pocket. The post reaches in past the bearing to
 # meet its spline, so it has to stop short of the case -- this row is what caught the post's horn
 # pocket sitting 9 mm inside the servo body.

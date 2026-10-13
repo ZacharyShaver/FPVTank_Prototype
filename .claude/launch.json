@@ -6,6 +6,18 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8765", "--directory", "head-v2/out/fit-view"],
       "port": 8765
+    },
+    {
+      "name": "chassis-out",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8766", "--directory", "chassis-v1/out"],
+      "port": 8766
+    },
+    {
+      "name": "chassis-v2-out",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8767", "--directory", "chassis-v2/out"],
+      "port": 8767
     }
   ]
 }

@@ -19,10 +19,17 @@ import pan_coil_b as P
 
 # 2026-09-27: well + bay print fused as `base`, with the floor and the drum's gear as their own parts.
 # Superseded: 'well', 'bay' printed separately -- the gears could not get into the closed bay.
-PRINTED = ['drum', 'base', 'floor', 'gear_in', 'gear_out', 'tab_block']
+PRINTED = ['drum', 'base', 'floor', 'gear_in', 'gear_out', 'tab_block', 'shelf_ring']   # shelf_ring: set 7
+if not P.RING_PART:   # set 11 (2026-10-12): the shelf ring is part of the base again
+    PRINTED.remove('shelf_ring')
 OUT = os.path.join(P.OUT, 'print')
 MAX_STEP = 0.28                    # finer than the viewer's 0.30-0.34 where the part table is coarser
 OVERHANG = np.cos(np.radians(45))  # a face pointing down more steeply than 45 degrees needs support
+# Parts whose way up is set by a fit, not by the overhang count. Set 6's input gear (2026-10-03) takes the
+# servo's spline in a press bore: bottom face down, the bore opens upward and its lip bridges the screw head's
+# counterbore, as post v3's does (flange down). Flipped scores less overhang, but its lip would bridge over
+# the spline bore, and a support in there spoils the press.
+WAY_UP = {'gear_in': 'as modelled'}
 
 
 def score(V, F):
@@ -52,6 +59,9 @@ def clean(ms):
 
 
 def build(name):
+    if name == 'gear_in' and P.HORN_GEAR:   # set 9: an exact solid with the horn's exact pocket, not this mesh
+        print('gear_in  skipped: set 9 builds it exactly, python head-v2/fixes/gear_horn_set9.py', flush=True)
+        return True
     fn, lo, hi, step = P.PARTS[name][:4]
     step = min(step, MAX_STEP)
     f = lambda Q: fn(Q, True)
@@ -66,7 +76,7 @@ def build(name):
     V, F = ms.current_mesh().vertex_matrix(), ms.current_mesh().face_matrix()
     ways = {'as modelled': V, 'flipped': V * np.array([1, -1, -1])}
     scored = {k: score(W, F) for k, W in ways.items()}
-    best = min(scored, key=lambda k: (round(scored[k][0], 0), -scored[k][1]))
+    best = WAY_UP.get(name) or min(scored, key=lambda k: (round(scored[k][0], 0), -scored[k][1]))
     W = ways[best]
     W = W - np.array([(W[:, 0].min() + W[:, 0].max()) / 2, (W[:, 1].min() + W[:, 1].max()) / 2, W[:, 2].min()])
     with quiet():

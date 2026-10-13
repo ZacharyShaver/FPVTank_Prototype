@@ -113,7 +113,8 @@ posts to look at.
 ## What's a guess
 
 - **Every mass.** Printed parts are volume × 1.35 g/cm³ (PETG-GF) × 0.8 fill. Replace them with slicer
-  grams in `SLICER` at the top of `build_head.py`. The camera's 6 g is a guess too.
+  grams in `SLICER` at the top of `build_head.py`. The camera's 6 g is a guess too. The final parts
+  will be ASA (1.07 g/cm³, `docs/decisions.md` 2026-10-02); not applied yet.
 - **The servos** are the MG90D datasheet at 4.8 V: 0.196 N·m stall, 60° in 0.10 s. The 5° "pushing
   flat out" band and the motor inertia are guesses. Measure the real servo's speed and overshoot, and
   tune `DEADBAND` and `ROTOR` until the sim matches.

@@ -1,15 +1,22 @@
 """The tilt servo's own wire route, round 1 (2026-10-02): the cradle with the wire hole and the fixed hollow
-stub. Print files, plate, tool bodies, a picture sheet. Writes into head-v2/out/print-pan/, and moves the
-cradle it replaces into "superseded - cradle before wire route/".
+stub. Print files, plate, tool bodies, a picture sheet. Writes into head-v2/out/print-pan/. When the cradle
+changes, the one it replaces moves to OLD_DIR with its plate and picture (the first time, "superseded -
+cradle before wire route/"; since the blended ridge, fixes/cradle_blend.py, the round 1 cradle he printed).
 
 The servo's lead and plug stay coiled inside the ball. Zach's Dupont jumper wires plug into it and run
 alone: through the middle of the stub (on the tilt axis, so they twist instead of bending), down a 5 mm
 hole inside the cradle's -Y wall, and into the plug chute's mouth above the drum's bore. The stub replaces
 both the -Y axle (r 9.95 in his r 10.04 socket: it never fitted) and the end cap. It is held by three
-M2 x 6 through the cap's old holes. Round 2, the drum and base with the wires' own lane, comes later.
+M2 x 6 through the cap's old holes. Round 2 is the drum and base with the wires' own lane (set 4).
+
+The -Y 6704 is in the BALL now (Zach, 2026-10-02): with the stub screwed down, nothing turned in the
+collar's seat. His ball_minus gets a cup (fixes/ball_minus_cup.py): ball_minus_cup.stl on this plate, and
+ADD_minus_bearing_cup / CUT_minus_bearing_pocket in the STEP for his Fusion model. The collar is a plain
+bore, and the stub shoulders on the bearing's inner ring.
 
 The parts are the generator's (tree_parts_b: WIRE_*, wire_tube(), stub()). Run first:
     python head-v2/generator/generators/tree_parts_b.py fork stub     # ~5 min
+    python head-v2/fixes/ball_minus_cup.py                             # his ball + the cup, exact booleans
     python head-v2/fixes/wire_route_r1.py
     python head-v2/checks/wire_route.py                                # the check, with its controls
 """
@@ -26,11 +33,15 @@ from export import health
 from vox import load_stl
 import slices
 from pan_print_set import load, fix_self_intersections, SRC, OUT
+from export import write_stl, tidy, rd
+from print_export import rot_x, on_bed
+import ball_minus_cup as CUP
 
-OLD_DIR = os.path.join(OUT, 'superseded - cradle before wire route')
+OLD_DIR = os.path.join(OUT, 'superseded - cradle before the blended ridge (printed 2026-10-02)')
+OLD_WITH = ('plate_wire_route_r1.3mf', 'wire_route_r1.png')    # moved with it: they show the old cradle
 STUB_SRC = os.path.join(config.REPO, 'head-v2', 'generator', 'tree-parts-b', 'print', 'stub.stl')
 PLATE = os.path.join(OUT, 'plate_wire_route_r1.3mf')
-SPOT = {'cradle': (-30, 0), 'stub': (50, 0)}
+SPOT = {'cradle': (-40, 30), 'stub': (50, 45), 'ball_minus_cup': (40, -40)}
 BALL_MINUS = os.path.join(config.REPO, 'head-v2', 'fusion', 'rev2-2026-09-27', 'ball_minus_revised_27.stl')
 
 
@@ -52,8 +63,11 @@ def tools():
     """Tool bodies in the head frame (X lens, Y tilt axis, Z up, tilt axis Z 52), for reference in Fusion."""
     line = B._centripetal(B.WIRE_PTS, 2)
     low = line[line[:, 2] < 40.0]
+    conduit = tube_solid(low, B.WIRE_R + B.WIRE_WALL)
     return {'CUT_wire_hole_5mm': tube_solid(line, B.WIRE_R),
-            'ADD_wire_conduit': tube_solid(low, B.WIRE_R + B.WIRE_WALL)}
+            'ADD_wire_conduit': conduit,
+            'ADD_ridge_plus_y_for_looks': conduit.mirror('XZ'),
+            **{k: cq.Shape.cast(v) for k, v in CUP.tools().items()}}
 
 
 def save(V, F, path):
@@ -69,7 +83,7 @@ def sheet(path):
     for row in (0, 1):
         B.WIRE_ROUTE = bool(row)
         # 1. section at X -5, looking from behind: the hole down the wall
-        ax = axs[row, 0]; YS = np.arange(-38, -2, 0.1); ZS = np.arange(6, 60, 0.1); Y, Z = np.meshgrid(YS, ZS)
+        ax = axs[row, 0]; YS = np.arange(-38, 38, 0.1); ZS = np.arange(6, 60, 0.1); Y, Z = np.meshgrid(YS, ZS)
         p = (np.full_like(Y, -5.0), Y, Z)
         ax.contourf(YS, ZS, B.fork(p), levels=[-99, 0], colors=['#b9b2a2'])
         ax.contourf(YS, ZS, P.drum(p), levels=[-99, 0], colors=['#3e9c8f'])
@@ -80,18 +94,24 @@ def sheet(path):
             ax.contourf(YS, ZS, B.axle(p), levels=[-99, 0], colors=['#8e98a3'])
             ax.contourf(YS, ZS, B.cap_minus(p), levels=[-99, 0], colors=['#6e7883'])
         ax.set_title('%s: section at X -5 (looking from behind)' % ('AFTER' if row else 'BEFORE'), fontsize=10)
-        ax.set_xlim(-38, -2); ax.set_ylim(6, 60)
+        ax.set_xlim(-38, 38); ax.set_ylim(6, 60)
         ax.set_xlabel('Y'); ax.set_ylabel('Z')
         # 2. section at X 0: stub (or axle) in his ball's socket
         ax = axs[row, 1]; YS = np.arange(-38, -12, 0.05); ZS = np.arange(36, 68, 0.05); Y, Z = np.meshgrid(YS, ZS)
         p = (np.zeros_like(Y), Y, Z)
         ax.contourf(YS, ZS, B.fork(p), levels=[-99, 0], colors=['#b9b2a2'])
         m, u, v, _ = slices.slice2d(T, 0, 0.0, (-38, 36), (-12, 68), h=0.05)
-        ax.contourf(u, v, m.T.astype(float), levels=[0.5, 2], colors=['#93aac2'])
+        if not row:
+            ax.contourf(u, v, m.T.astype(float), levels=[0.5, 2], colors=['#93aac2'])
         if row:
+            Uy, Vz = np.meshgrid(u, v, indexing='ij'); q = (np.zeros_like(Uy), Uy, Vz)
+            cupped = (m | (CUP.sdf_add(q) < 0)) & ~(CUP.sdf_cut(q) < 0)
+            ax.contourf(u, v, cupped.T.astype(float), levels=[0.5, 2], colors=['#93aac2'])
             ax.contourf(YS, ZS, B.stub(p), levels=[-99, 0], colors=['#3fae6a'])
+            for d in CUP.bearing_rings(p):
+                ax.contourf(YS, ZS, d, levels=[-99, 0], colors=['#c9a227'])
             ax.plot(L[:, 1], L[:, 2], color='#e0443e', lw=1.4)
-            ax.text(-37, 66, 'stub r %.2f in your socket r 10.04: 0.24 gap\nring fills the empty bearing seat' % B.STUB_R, fontsize=8.5, va='top')
+            ax.text(-37, 66, '6704 (gold) in a cup in your ball: its outer ring\nturns with the ball, the stub shoulders on its\ninner ring. Collar: a plain bore.', fontsize=8.5, va='top')
         else:
             ax.contourf(YS, ZS, B.axle(p), levels=[-99, 0], colors=['#8e98a3'])
             ax.contourf(YS, ZS, B.cap_minus(p), levels=[-99, 0], colors=['#6e7883'])
@@ -114,8 +134,8 @@ def sheet(path):
         for ax in axs[row]:
             ax.set_aspect('equal'); ax.grid(alpha=0.3)
     B.WIRE_ROUTE = True
-    fig.text(0.01, 0.005, 'Grey: cradle. Green: the new stub (old axle and cap in slate). Teal: drum. Red: the wires\' path, '
-             '5 mm hole. Where the wall was too thin for the hole, a 1.6 mm ridge grows on its outside.', fontsize=10)
+    fig.text(0.01, 0.005, 'Grey: cradle. Green: the new stub (old axle and cap in slate). Blue: your ball. Gold: the 6704. Teal: drum. Red: the wires\' path, '
+             '5 mm hole. Where the wall was too thin for the hole, a 1.6 mm ridge grows on its outside; a solid twin on the +Y wall matches it.', fontsize=10)
     plt.tight_layout(rect=(0, 0.02, 1, 1)); plt.savefig(path, dpi=75); plt.close(fig)
 
 
@@ -150,18 +170,28 @@ if __name__ == '__main__':
             os.makedirs(OLD_DIR, exist_ok=True)
             if not os.path.exists(os.path.join(OLD_DIR, 'cradle.stl')):
                 shutil.move(dst, os.path.join(OLD_DIR, 'cradle.stl'))
-                for f in ('plate_cradle_chute.3mf', 'cradle_chute.png', 'cradle_chute_tools_for_fusion.step'):
+                for f in OLD_WITH:
                     if os.path.exists(os.path.join(OUT, f)):
-                        shutil.move(os.path.join(OUT, f), os.path.join(OLD_DIR, f))
-                print('moved the old cradle and its plate, picture and STEP to "%s"' % os.path.basename(OLD_DIR))
+                        shutil.copy2(os.path.join(OUT, f), os.path.join(OLD_DIR, f))   # copied: rebuilt below
+                print('moved the old cradle, with copies of its plate and picture, to "%s"' % os.path.basename(OLD_DIR))
         os.replace(tmp, dst)
         ok, msg = health(dst); bad += not ok
         print('%-7s %5.1f x %5.1f x %5.1f mm  %s%s' % (name, *(V.max(0) - V.min(0)), msg, '' if ok else '  <-- CHECK'))
         meshes[name] = (V, F)
+    # his ball_minus with the 6704 cup, seam face down like every half
+    bm = os.path.join(OUT, 'ball_minus_cup.stl')
+    write_stl(on_bed(rot_x(rd(config.out('rev2', 'ball_minus_cup.brep')), -90.0)), bm, lin=0.01, ang=0.05)
+    moved_mm = tidy(bm)
+    ms = load(bm); V = ms.current_mesh().vertex_matrix().copy(); F = ms.current_mesh().face_matrix().copy()
+    V -= np.array([(V[:, 0].min() + V[:, 0].max()) / 2, (V[:, 1].min() + V[:, 1].max()) / 2, V[:, 2].min()])
+    save(V, F, bm)
+    ok, msg = health(bm); bad += not ok
+    print('%-7s %5.1f x %5.1f x %5.1f mm  %s%s (needle repair moved %.4f)' % ('ball_minus_cup', *(V.max(0) - V.min(0)), msg, '' if ok else '  <-- CHECK', moved_mm))
+    meshes['ball_minus_cup'] = (V, F)
     plate(meshes); print('wrote', os.path.basename(PLATE))
     asm = cq.Assembly(name='wire_route_r1')
     for nm, s in tools().items():
-        asm.add(cq.Workplane(obj=s), name=nm, color=cq.Color(0.85, 0.2, 0.2, 0.6) if nm.startswith('CUT') else cq.Color(0.2, 0.6, 0.3, 0.6))
+        asm.add(cq.Workplane(obj=s if isinstance(s, cq.Shape) else cq.Shape.cast(s)), name=nm, color=cq.Color(0.85, 0.2, 0.2, 0.6) if nm.startswith('CUT') else cq.Color(0.2, 0.6, 0.3, 0.6))
     asm.save(os.path.join(OUT, 'wire_route_r1_tools_for_fusion.step')); print('wrote wire_route_r1_tools_for_fusion.step')
     sheet(os.path.join(OUT, 'wire_route_r1.png')); print('wrote wire_route_r1.png')
     shutil.copyfile(os.path.join(config.FIXES, 'pan_print_set_README.txt'), os.path.join(OUT, 'README.txt'))

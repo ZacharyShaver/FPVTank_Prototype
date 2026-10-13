@@ -34,6 +34,11 @@ PRINT = os.path.join(OUT, 'print')
 FIXES = os.path.join(REPO, 'head-v2', 'fixes')
 
 
+# Zach's Creality K2 Pro: its stock Moonraker (Klipper's HTTP API), on his LAN, no login. tools/k2.py
+# drives it. The address is what Creality Print found (deviceInfo.json); a DHCP change moves it.
+PRINTER = 'http://192.0.2.12:7125'
+
+
 def zach(name):
     """path of one of Zach's parts: 'ball_plus', 'ball_minus' or 'post'"""
     return os.path.join(FUSION, ZACH[name])

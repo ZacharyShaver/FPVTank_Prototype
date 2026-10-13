@@ -1,0 +1,186 @@
+<meta charset="utf-8">
+<title>Scorpion Head Placement</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the 3D stage on the left, controls and live readouts beside it (stacked on phones). Same tokens as the head fit view. */
+:root{--bg:#EEF0EC;--panel:#FFFFFF;--ink:#1C211E;--muted:#5E6862;--line:#D4D9D3;--accent:#D9622B;--warn:#B8332A;--warn-bg:#F8E7E4;--ok:#2F7A5A;--ok-bg:#E3F1EA;--canvas:#E4E7E2;--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Barlow",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--warn:#E8756A;--warn-bg:#3A2220;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:18px 28px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:14px}
+h1{font-size:22px;font-weight:600;margin:0;text-wrap:balance;letter-spacing:.01em}
+.sub{color:var(--muted);margin:2px 0 0;max-width:78ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:1fr}}
+.stage{position:relative;background:var(--canvas);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:min(76vh,720px);min-height:380px}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.bar{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+button{font:500 13px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.hint{position:absolute;right:10px;bottom:8px;font:12px var(--mono);color:var(--muted)}
+.legend{position:absolute;left:10px;bottom:8px;display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;color:var(--muted);max-width:calc(100% - 330px)}
+@media (max-width:760px){.hint{display:none}.legend{max-width:calc(100% - 20px)}}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.ctl{display:grid;gap:2px;margin-bottom:10px}
+.ctl:last-of-type{margin-bottom:6px}
+.ctl .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ctl label{font-weight:600;font-size:14px}
+.ctl output{font:500 13px var(--mono);font-variant-numeric:tabular-nums}
+.ctl small{color:var(--muted);font-size:12.5px;line-height:1.35}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;border-top:1px solid var(--line);padding:8px 0}
+.row:first-of-type{border-top:0;padding-top:0}
+.row .k{font-size:14px}
+.row .v{font:500 13px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.row .note{grid-column:1/-1;color:var(--muted);font-size:12.5px;line-height:1.35}
+.tag{display:inline-block;font:500 11px var(--mono);padding:1px 7px;border-radius:4px;letter-spacing:.02em;margin-left:6px;vertical-align:1px}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.sw{width:11px;height:11px;border-radius:3px;flex:none;display:inline-block}
+ul.src{margin:0;padding-left:18px;display:grid;gap:5px;font-size:13.5px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Head v2 in your TEST-PRINT-2 body</h1>
+    <p class="sub">Slide the head forward and drop it into the body. <b style="color:var(--warn)">Red</b> is body material inside the base: what the body would have to give up to take it. <b style="color:#B03A9E">Magenta</b> is body material the cradle and ball pass through at this pan angle. It opens on my pick for "drop it in, bring it forward a bit": pan axis <span class="num">X 100</span> (11.5 ahead of the well sitting flush with the nose) and dropped <span class="num">20</span>, which is as far as it goes before the gear bay's floor reaches the battery tops.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="bar" role="toolbar" aria-label="View">
+        <button id="v-side">Side</button><button id="v-top">Top</button><button id="v-front">Front</button><button id="v-iso">3/4</button>
+        <button id="t-cut" aria-pressed="false">Cut through the axis</button><button id="t-body" aria-pressed="false">Solid body</button><button id="t-old" aria-pressed="false">Old head</button>
+      </div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="sw" style="background:#9AA3AE"></i>body</span><span><i class="sw" style="background:#E0B040"></i>batteries</span><span><i class="sw" style="background:#7A90AC"></i>base</span><span><i class="sw" style="background:#D49A4A"></i>cradle</span><span><i class="sw" style="background:#4F7FBF"></i>ball</span>
+      </div>
+      <div class="hint">drag to turn · scroll to zoom · right-drag to pan</div>
+    </div>
+    <div class="side">
+      <section class="card" aria-labelledby="h-place">
+        <h2 id="h-place">Placement</h2>
+        <div class="ctl"><div class="top"><label for="s-x">Pan axis, X</label><output id="o-x"></output></div>
+          <input type="range" id="s-x" min="50" max="140" step="0.5" value="100"><small>Forward is +X. The nose is at <span class="num" id="o-nose"></span>.</small></div>
+        <div class="ctl"><div class="top"><label for="s-drop">Drop into the body</label><output id="o-drop"></output></div>
+          <input type="range" id="s-drop" min="0" max="50" step="0.5" value="20"><small>0 = the base's floor sitting on the deck top (Z 57.4).</small></div>
+        <div class="ctl"><div class="top"><label for="s-turn">Base turned</label><output id="o-turn"></output></div>
+          <input type="range" id="s-turn" min="-180" max="180" step="15" value="180"><small>180° puts the gear bay at the back. Only the base turns: the head keeps facing forward.</small></div>
+        <div class="ctl"><div class="top"><label for="s-pan">Pan the head</label><output id="o-pan"></output></div>
+          <input type="range" id="s-pan" min="-180" max="180" step="5" value="0"><small>Turns the drum, cradle and ball to check the sweep.</small></div>
+        <div class="presets">
+          <button data-p="100,20,180">My pick</button><button data-p="106.9,0,180">On the deck, old axis</button><button data-p="88.5,0,180">On the deck, flush</button>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="h-hits" aria-live="polite">
+        <h2 id="h-hits">What it hits</h2>
+        <div class="row"><span class="k">Body inside the base<span id="g-body" class="tag"></span></span><span class="v" id="r-body"></span><span class="note">The red points. Cut from the body, or the base is reshaped around it.</span></div>
+        <div class="row"><span class="k">Batteries<span id="g-batt" class="tag"></span></span><span class="v" id="r-batt"></span><span class="note">Gap from the lowest part of the base above a battery down to its top.</span></div>
+        <div class="row"><span class="k">Head at this pan angle<span id="g-head" class="tag"></span></span><span class="v" id="r-head"></span></div>
+        <div class="row"><span class="k">Head, worst over a full turn<span id="g-sweep" class="tag"></span></span><span class="v" id="r-sweep"></span><span class="note">Checked every 10°.</span></div>
+        <div class="row"><span class="k">Past the nose</span><span class="v" id="r-nose"></span><span class="note">Front of the base against the body's nose.</span></div>
+        <div class="row"><span class="k">Heights</span><span class="v" id="r-z"></span><span class="note">Base floor · tilt axis (lens height) · top of the ball. The old head's top was Z 104.</span></div>
+      </section>
+      <section class="card" aria-labelledby="h-src">
+        <h2 id="h-src">Where the numbers come from</h2>
+        <ul class="src">
+          <li>Body, batteries, Pi and old head: your TEST-PRINT-2 STLs from 2026-10-04, where Fusion put them. Batteries are <span class="num">141 × 45.7 × 26</span> in your model: measured, or a datasheet box?</li>
+          <li>Deck top <span class="num">Z 57.4</span>: where the old pan cap sits. Old pan axis <span class="num">X 106.9, Y 3.4</span>, read off the cap's exact bore. The head stays on Y 3.4.</li>
+          <li>Head v2: the generator's current base, drum and cradle, and your rev 2 ball halves.</li>
+          <li>The counts use 1 mm cubes, and each part is filled from its lowest to its highest point in every vertical column. So they read a little high, never low.</li>
+          <li>Not in the model: tracks, frames, motors, a top deck, wiring, and the camera ribbon's run to the Pi.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+function dec(s,T){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new T(u.buffer);}
+const AY=D.oldAxis[1], DECK=D.deck, NOSE=D.nose;
+const st=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.localClippingEnabled=true;
+st.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(28,1,1,5000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x6b7069,0.75));
+const d1=new THREE.DirectionalLight(0xffffff,0.7);d1.position.set(120,-160,220);scene.add(d1);
+const d2=new THREE.DirectionalLight(0xffffff,0.3);d2.position.set(-160,120,-60);scene.add(d2);
+const clip=new THREE.Plane(new THREE.Vector3(0,1,0),-AY);let cutOn=false;
+const COL={body:0x9AA3AE,batt_l:0xE0B040,batt_r:0xE0B040,pi:0x3C9A4C,old:0xC05050,well:0x7A90AC,bay:0x6F86A3,floor:0x6F86A3,gear_in:0xB8BDC4,servo:0x2F5FB0,drum:0xC9763A,bearing:0x8C9196,gear_out:0xB8BDC4,cradle:0xD49A4A,ball_p:0x4F7FBF,ball_m:0x4672AD};
+const baseG=new THREE.Group(), turnG=new THREE.Group();scene.add(baseG,turnG);
+const meshes={};
+for(const k in D.meshes){const p=D.meshes[k];const g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(dec(p.v,Float32Array),3));g.setIndex(new THREE.BufferAttribute(dec(p.f,Uint32Array),1));g.computeVertexNormals();
+  const ghost=k==='body'||k==='old';
+  const m=new THREE.MeshStandardMaterial({color:COL[k]||0x999999,roughness:.65,metalness:.05,side:THREE.DoubleSide,transparent:ghost,opacity:k==='body'?.42:k==='old'?.35:1,depthWrite:!ghost,clippingPlanes:[clip]});
+  const mesh=new THREE.Mesh(g,m);meshes[k]=mesh;
+  (p.group==='base'?baseG:p.group==='turn'?turnG:scene).add(mesh);}
+meshes.old.visible=false;
+function pts(color){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(0),3));
+  const p=new THREE.Points(g,new THREE.PointsMaterial({color,size:1.25,sizeAttenuation:true,depthTest:false,transparent:true,opacity:.9,clippingPlanes:[clip]}));p.renderOrder=10;scene.add(p);return p;}
+const redP=pts(0xD62F2F), magP=pts(0xB03A9E);
+// clash data
+const VX=D.vox, bits=dec(VX.bits,Uint8Array), [NX,NY,NZ]=VX.n, [X0,Y0,Z0v]=VX.lo;
+function inBody(x,y,z){const i=Math.floor(x-X0),j=Math.floor(y-Y0),k=Math.floor(z-Z0v);
+  if(i<0||j<0||k<0||i>=NX||j>=NY||k>=NZ)return false;const n=(i*NY+j)*NZ+k;return (bits[n>>3]>>(n&7))&1;}
+const CB=dec(D.colsBase,Float32Array), CH=dec(D.colsHead,Float32Array);
+const BZ=VX.lo[2]+VX.n[2];
+function sweep(C,ax,z0,th,collect,battOut){
+  const c=Math.cos(th),s=Math.sin(th);let hit=0,maxX=-1e9;const out=collect?[]:null;
+  for(let n=0;n<C.length;n+=4){const x=C[n],y=C[n+1];const X=ax+x*c-y*s,Y=AY+x*s+y*c;if(X>maxX)maxX=X;
+    const za=C[n+2]+z0,zb=C[n+3]+z0,zs=Math.ceil(za-.5)+.5;
+    if(battOut){for(const b of D.batt){if(X>=b[0][0]&&X<=b[1][0]&&Y>=b[0][1]&&Y<=b[1][1]){const gap=za-.05-b[1][2];if(gap<battOut.gap)battOut.gap=gap;}}}
+    if(zb<Z0v||za>BZ)continue;
+    for(let z=zs;z<=zb;z+=1){if(inBody(X,Y,z)){hit++;if(out&&out.length<240000)out.push(X,Y,z);}}}
+  return {hit,maxX,pts:out};}
+function setPts(p,a){p.geometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(a||[]),3));p.geometry.computeBoundingSphere();}
+const $=id=>document.getElementById(id);
+function tag(id,ok,txt){const e=$(id);e.className='tag '+(ok?'ok':'warn');e.textContent=txt;}
+const cm3=n=>n<1000?n+' mm³':(n/1000).toFixed(1)+' cm³';
+let sweepTimer=0;
+function update(){
+  const ax=+$('s-x').value, drop=+$('s-drop').value, turn=+$('s-turn').value, pan=+$('s-pan').value;
+  const z0=DECK-D.baseZmin-drop, tb=turn*Math.PI/180, tp=pan*Math.PI/180;
+  $('o-x').textContent='X '+ax.toFixed(1);$('o-drop').textContent=drop.toFixed(1)+' mm';$('o-turn').textContent=turn+'°';$('o-pan').textContent=pan+'°';
+  baseG.position.set(ax,AY,z0);baseG.rotation.z=tb;turnG.position.set(ax,AY,z0);turnG.rotation.z=tp;
+  const bo={gap:1e9};const rb=sweep(CB,ax,z0,tb,true,bo);setPts(redP,rb.pts);
+  $('r-body').textContent=rb.hit?cm3(rb.hit):'none';tag('g-body',!rb.hit,rb.hit?'cut':'clear');
+  if(bo.gap===1e9){$('r-batt').textContent='not above them';tag('g-batt',true,'clear');}
+  else{$('r-batt').textContent=bo.gap>=0?bo.gap.toFixed(1)+' mm gap':(-bo.gap).toFixed(1)+' mm into them';tag('g-batt',bo.gap>=0.5,bo.gap>=0.5?'clear':'hits');}
+  const rh=sweep(CH,ax,z0,tp,true,null);setPts(magP,rh.pts);
+  $('r-head').textContent=rh.hit?cm3(rh.hit):'none';tag('g-head',!rh.hit,rh.hit?'hits':'clear');
+  const past=rb.maxX+.5-NOSE;$('r-nose').textContent=past>0?past.toFixed(1)+' mm out':(-past).toFixed(1)+' mm inside';
+  $('r-z').textContent=(z0+D.baseZmin).toFixed(1)+' · '+(z0+D.tiltZ).toFixed(1)+' · '+(z0+D.ballTop).toFixed(1);
+  clearTimeout(sweepTimer);$('r-sweep').textContent='…';
+  sweepTimer=setTimeout(()=>{let worst=0,at=0;for(let a=-180;a<180;a+=10){const r=sweep(CH,ax,z0,a*Math.PI/180,false,null);if(r.hit>worst){worst=r.hit;at=a;}}
+    $('r-sweep').textContent=worst?cm3(worst)+' at '+at+'°':'none';tag('g-sweep',!worst,worst?'hits':'clear');},120);
+}
+['s-x','s-drop','s-turn','s-pan'].forEach(id=>$(id).addEventListener('input',update));
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{const [x,d,t]=b.dataset.p.split(',');$('s-x').value=x;$('s-drop').value=d;$('s-turn').value=t;$('s-pan').value=0;update();});
+$('o-nose').textContent='X '+NOSE.toFixed(1);
+function tog(id,f){const b=$(id);b.onclick=()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);f(on);};}
+tog('t-cut',on=>{cutOn=on;clip.constant=on?-AY:1e6;});
+clip.constant=1e6;
+tog('t-body',on=>{const m=meshes.body.material;m.opacity=on?1:.42;m.transparent=!on;m.depthWrite=on;m.needsUpdate=true;});
+tog('t-old',on=>{meshes.old.visible=on;});
+const tgt=new THREE.Vector3(40,AY,60);
+function view(dir,dist,t){const d=dir.clone().normalize();const c=t||tgt;ctl.target.copy(c);cam.position.copy(c).addScaledVector(d,dist||560);ctl.update();}
+$('v-side').onclick=()=>view(new THREE.Vector3(0,-1,.04),560);
+$('v-top').onclick=()=>view(new THREE.Vector3(0.001,-0.02,1),560);
+$('v-front').onclick=()=>view(new THREE.Vector3(1,0,.08),460,new THREE.Vector3(100,AY,70));
+$('v-iso').onclick=()=>view(new THREE.Vector3(.9,-1.1,.75),560);
+function size(){const w=st.clientWidth,h=st.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(st);size();
+update();view(new THREE.Vector3(.9,-1.1,.75),560);
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam);})();
+</script>

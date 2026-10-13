@@ -19,9 +19,11 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 | `head-v2/generator/` | the SDF generator: the cradle, the 360° pan coil and the older forks |
 | `head-v2/out/` | *(untracked)* everything the fixes write: print STLs, 3MF, STEP, pictures |
 | `sim/mujoco/` | the head as a MuJoCo physics model: servo sliders, shove it by hand, a camera at the lens |
-| `chassis-v1/` | the chassis parts as used on the robot |
+| `chassis-v1/` | the chassis parts as used on the robot; `from_fusion/` holds Zach's newest body exports |
+| `chassis-v2/` | the Scorpion body: the hull redesign round the v1 legs (`hull.py`) and its fit checks. `README.md` is its live state |
 | `reference/fpv-rover-v2/` | the original FPV-Rover V2.0 download, by Markus_p |
 | `reference/raspberry-pi-5/` | Pi 5 fit-check models |
+| `reference/pca9685/` | PCA9685 servo driver models (Adafruit and generic) |
 | `reference/solids/` | fit-check dummies: servo, camera, bearing, screw heads |
 | `reference/downloads/` | *(untracked)* big third-party files that can be downloaded again |
 | `archive/` | superseded work worth keeping: the 2024 code, the August 2026 pan/tilt, head-v2 rev 1 |
@@ -51,6 +53,9 @@ python head-v2/checks/regression.py    # about 6 min: the checks, and the table 
 python head-v2/checks/reeval.py        # a revision as drawn, before any fix
 python head-v2/checks/plug_passage.py  # about 1 min: can the servo plug and the ribbon get from the bowl into the coil
 python head-v2/checks/wire_route.py    # ~3 min: tilt servo wires' own route (stub + cradle hole): passage, walls, stub fit
+python head-v2/checks/plus_sleeve_fit.py # ~10 s: the +Y hub as a sleeve: ball drops in, sleeve fits and slides in
+python tools/orca.py PART.stl [--set key=value]   # ~5 s: slice headless in OrcaSlicer, Zach's K2 settings, into head-v2/out/gcode/
+python tools/k2.py status | upload F | start F --bed-clear | pause | resume | cancel | watch   # the K2 Pro, over its Moonraker API
 ```
 
 The generator lives in `head-v2/generator/` (since phase B, 2026-09-27). FPVTank_Control holds no CAD.

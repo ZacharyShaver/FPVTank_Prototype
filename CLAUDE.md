@@ -32,7 +32,9 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
   measured.
 - His tested horn-pocket rule is **zero offset**: subtract his real horn model as-is, and leave 1–2 mm
   of roof for the screw. Grip the arms, not the shaft. It applies to horn pockets only; a 21 mm slide
-  needs 0.15 per side.
+  needs 0.15 per side. **Exception (pan set 9, 2026-10-11):** a pocket of the horn's whole outline, carried
+  straight through the part so the horn drops in, needs **0.10 per side**: zero threw the horn out, 0.15 was
+  loose. If the horn's own screw has to reach it, open the floor under the horn's centre instead of a roof.
 - He does booleans in Fusion himself. Give him the position, depth and orientation, or named tool
   bodies (Deliverables).
 - He edits between sessions. Check file dates before trusting anything derived, and re-run the checks
@@ -74,7 +76,8 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
 Every hand-off has:
 - print-oriented STLs in `out/print/` (halves seam face down, post flange down, pins flat);
 - a 3MF plate;
-- a Fusion STEP of named `ADD_*` / `CUT_*` tool bodies, in his coordinates;
+- a Fusion STEP of named `ADD_*` / `CUT_*` tool bodies, in his coordinates, for HIS Fusion parts only (ball,
+  post). Generator parts (cradle, pan coil) can't be imported into his Fusion as solids, so skip their tool bodies;
 - a picture sheet;
 - a README.
 
@@ -93,4 +96,5 @@ Mark superseded files; don't silently replace them.
 - Run with `python` (3.10; it has cadquery). `python head-v2/fixes/build_all.py` regenerates the
   hand-off; `python head-v2/checks/regression.py` must reproduce its table.
 - Reviewing a new Fusion revision: the `review-revision` skill.
+- Slicing and printing on his K2 Pro: the `print-on-k2` skill (`tools/orca.py`, `tools/k2.py`).
 - The head's MuJoCo model is in `sim/mujoco/` (`build_head.py`; rebuild it after a CAD change).

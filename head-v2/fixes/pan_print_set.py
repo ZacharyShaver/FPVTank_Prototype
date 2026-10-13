@@ -27,15 +27,45 @@ SRC = {'cradle': os.path.join(GEN, 'tree-parts-b', 'print', 'fork.stl'),
        'floor': os.path.join(GEN, 'pan-coil-b', 'print', 'floor.stl'),
        'small_gear': os.path.join(GEN, 'pan-coil-b', 'print', 'gear_out.stl'),
        'input_gear': os.path.join(GEN, 'pan-coil-b', 'print', 'gear_in.stl'),
-       'tab_block': os.path.join(GEN, 'pan-coil-b', 'print', 'tab_block.stl')}
+       'tab_block': os.path.join(GEN, 'pan-coil-b', 'print', 'tab_block.stl'),
+       'shelf_ring': os.path.join(GEN, 'pan-coil-b', 'print', 'shelf_ring.stl'),
+       'input_gear_loose': os.path.join(GEN, 'pan-coil-b', 'print', 'gear_in_loose.stl')}   # set 9, gear_horn_set9.py
+import pan_coil_b as _P
+if not _P.RING_PART:   # set 11: no shelf ring to print
+    del SRC['shelf_ring']
+# Set 9, as reprinted (2026-10-10): the small gear is 0.10 a side (pan_coil_b.SQ_FIT; the 0.05 tore the stub off), so
+# set 8's second, looser small gear (gear_out_loose.stl, drum_set8.py) is gone from the set. Superseded: 'small_gear_loose'.
 # The plate: only what changed since the last set. Set 3 (2026-09-28): Zach's MG90S model
 # dropped the gear plane 5.7 mm, so base and drum change; the floor and both gears keep their shape.
 # Set 4 (2026-10-02): the tilt servo's wires get their own lane under the ribbon: base and drum again.
+# Set 5 (2026-10-02, later): a notch in the drum's bore wall and a funnel on its wire hole. Only the drum
+# changed, but set 4 was never printed, so the plate keeps the base too.
+# Set 6 (2026-10-03): the drum's bore floor is a 30 deg cone with the wire hole at its point (no supports),
+# and the input gear takes the spline straight in. Set 5's base is printed and unchanged, so only these two.
 # Layout in mm from the plate centre (a 220 x 220 bed).
-PLATE = ['base', 'drum']
-SPOT = {'base': (-48, 45), 'drum': (58, 50), 'tab_block': (0, -20), 'floor': (-40, -55), 'small_gear': (50, -45)}
+# Set 7 (2026-10-04): the shelf and the ribbon cup's wall leave the base as a drop-in ring, so nothing in the
+# base overhangs the wire lane; the deck ring stands on a skirt and a 30 deg cone. Base + ring.
+# Set 8 (2026-10-09): the small gear's screw threads into the barrel above the step (the seat kept snapping), the
+# seat and the gear's bore are a square, and the wires go down a straight hole and out through a groove in the
+# drum's underside. Drum + the small gear at two fits.
+# Set 9 (2026-10-10): the pan servo couldn't turn the drum. The input gear carries the servo's horn (an exact solid,
+# fixes/gear_horn_set9.py) and sits 1.0 under the servo's block; the barrel runs in a 688 seated in the base, and the
+# stub shrank to 6.0 square to pass it. Base + drum + input gear + the small gear at two fits.
+# Reprinted the same day: the input gear's pocket grows 0.10 / 0.15 a side and its floor opens for the horn's own screw.
+# Set 10 (2026-10-11): the wires straight down the pan axis. A 6704 seat in the base, a hollow 19.9 barrel on the drum, the
+# small gear with a solid hub on three M3 x 16, and a wider middle hole in the floor plate for their heads. Two plates, as
+# set 9 had to go: with supports on, Orca fills the drum's bore, so the drum, gear and floor print with them off and the
+# base on its own with them on. Superseded: set 9's single plate (plate_pan_coil_set9.3mf).
+# Set 11 (2026-10-12): the shelf ring merged back into the base (it could fall out upside down), the lane filled, the wires'
+# old exit hole closed. Only the base changes; set 10's plate A (drum, small gear, floor) is printed and stays.
+# Superseded: plate_pan_coil_set10_b_base.3mf, shelf_ring.stl.
+PLATES = {'plate_pan_coil_set11_base.3mf': ['base']}                         # supports on
+PLATE = [n for v in PLATES.values() for n in v]
+SPOT = {'base': (0, 0), 'drum': (-45, 40), 'tab_block': (0, -20), 'floor': (20, -50), 'small_gear': (45, 40),
+        'input_gear': (55, -15), 'shelf_ring': (52, -42), 'input_gear_loose': (5, -55)}
 COL = {'cradle': (216, 195, 154), 'drum': (62, 156, 143), 'base': (163, 168, 162), 'floor': (180, 184, 178),
-       'input_gear': (79, 174, 158), 'small_gear': (79, 174, 158), 'tab_block': (163, 168, 162)}
+       'input_gear': (79, 174, 158), 'small_gear': (79, 174, 158), 'tab_block': (163, 168, 162),
+       'shelf_ring': (214, 160, 72), 'input_gear_loose': (79, 174, 158)}
 OUT = os.path.dirname(config.out('print-pan', 'x'))
 
 
@@ -76,40 +106,43 @@ if __name__ == '__main__':
         size = V.max(0) - V.min(0)
         print('%-11s %5.1f x %5.1f x %5.1f mm  %s%s' % (name, *size, msg, '' if ok else '  <-- CHECK'))
         meshes[name] = (V, F)
-    # footprints must fit the bed and not touch each other
-    boxes = [(n, V[:, 0].min() + SPOT[n][0], V[:, 0].max() + SPOT[n][0], V[:, 1].min() + SPOT[n][1], V[:, 1].max() + SPOT[n][1])
-             for n, (V, F) in meshes.items() if n in PLATE]
-    clash = [(a[0], b[0]) for i, a in enumerate(boxes) for b in boxes[i + 1:]
-             if a[1] < b[2] + 3 and b[1] < a[2] + 3 and a[3] < b[4] + 3 and b[3] < a[4] + 3]
-    xs = [v for bb in boxes for v in bb[1:3]]; ys = [v for bb in boxes for v in bb[3:5]]
-    print('plate: x %.0f..%.0f  y %.0f..%.0f (bed +-110)  gaps under 3 mm: %s' % (min(xs), max(xs), min(ys), max(ys), clash or 'none'))
-    bad += bool(clash) or max(abs(v) for v in xs + ys) > 110
-    res, build = [], []
-    for i, n in enumerate(PLATE, 1):
-        V, F = meshes[n]
-        vs = ''.join('<vertex x="%.5f" y="%.5f" z="%.5f"/>' % tuple(v) for v in V)
-        ts = ''.join('<triangle v1="%d" v2="%d" v3="%d"/>' % tuple(f) for f in F)
-        res.append('<object id="%d" type="model" name="%s"><mesh><vertices>%s</vertices><triangles>%s</triangles></mesh></object>' % (i, n, vs, ts))
-        build.append('<item objectid="%d" transform="1 0 0 0 1 0 0 0 1 %.3f %.3f 0"/>' % (i, *SPOT[n]))
-    model = ('<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" '
-             'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources>%s</resources><build>%s</build></model>'
-             % (''.join(res), ''.join(build)))
-    ct = ('<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
-          '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
-          '<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')
-    rels = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-            '<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
-    plate = os.path.join(OUT, 'plate_pan_coil_set4.3mf')
-    with zipfile.ZipFile(plate, 'w', zipfile.ZIP_DEFLATED) as z:
-        z.writestr('[Content_Types].xml', ct); z.writestr('_rels/.rels', rels); z.writestr('3D/3dmodel.model', model)
-    print('wrote %s (%.1f MB)' % (os.path.basename(plate), os.path.getsize(plate) / 1e6))
-    # picture: the plate as it sits on the bed, from the front-left. Picture-only copies, simplified the
+    for PLATE_NAME, ON in PLATES.items():
+        # footprints must fit the bed and not touch each other
+        boxes = [(n, V[:, 0].min() + SPOT[n][0], V[:, 0].max() + SPOT[n][0], V[:, 1].min() + SPOT[n][1], V[:, 1].max() + SPOT[n][1])
+                 for n, (V, F) in meshes.items() if n in ON]
+        clash = [(a[0], b[0]) for i, a in enumerate(boxes) for b in boxes[i + 1:]
+                 if a[1] < b[2] + 3 and b[1] < a[2] + 3 and a[3] < b[4] + 3 and b[3] < a[4] + 3]
+        xs = [v for bb in boxes for v in bb[1:3]]; ys = [v for bb in boxes for v in bb[3:5]]
+        print('%s: x %.0f..%.0f  y %.0f..%.0f (bed +-110)  gaps under 3 mm: %s'
+              % (PLATE_NAME, min(xs), max(xs), min(ys), max(ys), clash or 'none'))
+        bad += bool(clash) or max(abs(v) for v in xs + ys) > 110
+        res, build = [], []
+        for i, n in enumerate(ON, 1):
+            V, F = meshes[n]
+            vs = ''.join('<vertex x="%.5f" y="%.5f" z="%.5f"/>' % tuple(v) for v in V)
+            ts = ''.join('<triangle v1="%d" v2="%d" v3="%d"/>' % tuple(f) for f in F)
+            res.append('<object id="%d" type="model" name="%s"><mesh><vertices>%s</vertices><triangles>%s</triangles></mesh></object>' % (i, n, vs, ts))
+            build.append('<item objectid="%d" transform="1 0 0 0 1 0 0 0 1 %.3f %.3f 0"/>' % (i, *SPOT[n]))
+        model = ('<?xml version="1.0" encoding="UTF-8"?>\n<model unit="millimeter" xml:lang="en-US" '
+                 'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"><resources>%s</resources><build>%s</build></model>'
+                 % (''.join(res), ''.join(build)))
+        ct = ('<?xml version="1.0" encoding="UTF-8"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+              '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+              '<Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/></Types>')
+        rels = ('<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                '<Relationship Target="/3D/3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/></Relationships>')
+        plate = os.path.join(OUT, PLATE_NAME)
+        with zipfile.ZipFile(plate, 'w', zipfile.ZIP_DEFLATED) as z:
+            z.writestr('[Content_Types].xml', ct); z.writestr('_rels/.rels', rels); z.writestr('3D/3dmodel.model', model)
+        print('wrote %s (%.1f MB)' % (os.path.basename(plate), os.path.getsize(plate) / 1e6))
+    # picture: both plates' parts as they sit on the bed, from the front-left (the base's plate drawn beside the other). Picture-only copies, simplified the
     # generator's way (quality threshold, planar quadric): a plain 9000-face collapse threw 78 mm spikes.
     tris = []
     for n in PLATE:
         V, F = meshes[n]
         with TP_.quiet():
-            m = ml.MeshSet(); m.add_mesh(ml.Mesh(V + np.array([*SPOT[n], 0.0]), F))
+            dx = -120.0 if n == 'base' and len(PLATE) > 1 else 0.0
+            m = ml.MeshSet(); m.add_mesh(ml.Mesh(V + np.array([SPOT[n][0] + dx, SPOT[n][1], 0.0]), F))
             m.meshing_decimation_quadric_edge_collapse(targetfacenum=30000, qualitythr=0.6, preserveboundary=True,
                                                        preservenormal=True, preservetopology=True,
                                                        planarquadric=True, planarweight=0.002, autoclean=True)
@@ -120,8 +153,12 @@ if __name__ == '__main__':
     # picture 2: how it goes together, pulled apart along the way each part goes in. From the
     # generator's viewer meshes (pan_coil_b.py), which sit in the assembled frame.
     FUS = os.path.join(GEN, 'pan-coil-b', 'fusion')
+    import pan_coil_b as PC
     EXPLODE = [('well', (0, 0, 0), (163, 168, 162)), ('bay', (0, 0, 0), (163, 168, 162)), ('servo', (0, 45, 0), (40, 70, 140)),
-               ('bearing', (0, 0, 30), (150, 150, 160)), ('drum', (0, 0, 45), (62, 156, 143)),
+               *([('shelf_ring', (0, 0, 24), (214, 160, 72))] if PC.RING_PART else []),
+               ('bearing6704' if PC.HOLLOW_AXIS else 'bearing688', (0, 0, 36), (201, 162, 39)),
+               ('bearing', (0, 0, 48), (150, 150, 160)), ('drum', (0, 0, 66), (62, 156, 143)),
+               ('horn', (0, 0, -12), (43, 43, 43)),
                ('gear_in', (0, 0, -22), (79, 174, 158)), ('gear_out', (0, 0, -22), (79, 174, 158)),
                ('screw_out', (0, 0, -36), (60, 60, 60)), ('floor', (0, 0, -48), (180, 184, 178))]
     tris = []

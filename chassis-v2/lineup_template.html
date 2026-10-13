@@ -1,0 +1,237 @@
+<title>Scorpion Chassis Line-up</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same tokens as the other chassis pages. Layout: the design strip on top, the 3D stage left, the selected design and the table right. */
+:root{--bg:#EEF0EC;--panel:#FFFFFF;--ink:#1C211E;--muted:#5E6862;--line:#D4D9D3;--accent:#D9622B;--accent-ink:#FFFFFF;--warn:#9A5B12;--warn-bg:#F6ECDC;--ok:#2F7A5A;--ok-bg:#E3F1EA;--canvas:#E4E7E2;--grid1:#A4ADA6;--grid2:#C7CDC8;--ghost:#D9622B;--mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"Barlow",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--accent-ink:#151917;--warn:#E3B06A;--warn-bg:#352A1B;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--grid1:#47514B;--grid2:#2E3531;--ghost:#E8804A}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151917;--panel:#1D2320;--ink:#E4E9E5;--muted:#9AA59E;--line:#313934;--accent:#E8804A;--accent-ink:#151917;--warn:#E3B06A;--warn-bg:#352A1B;--ok:#6CC49B;--ok-bg:#1F3129;--canvas:#1A1F1C;--grid1:#47514B;--grid2:#2E3531;--ghost:#E8804A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);padding-inline:16px;padding-block:18px 28px}
+.wrap{max-width:1400px;margin:0 auto;display:grid;gap:12px}
+h1{font-size:23px;font-weight:600;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:3px 0 0;max-width:92ch}
+.strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.chip{flex:none;display:grid;gap:1px;text-align:left;min-width:104px;padding:6px 10px 7px}
+.chip .n{font-weight:600;font-size:14px;white-space:nowrap}
+.chip .d{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.chip[aria-pressed="true"] .d{color:inherit;opacity:.75}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:14px;align-items:start}
+@media (max-width:1020px){.main{grid-template-columns:1fr}}
+.stage{position:sticky;top:12px;background:var(--canvas);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:min(82vh,800px);min-height:440px}
+@media (max-width:1020px){.stage{position:relative;top:0;height:min(72vh,600px)}}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.bar{position:absolute;left:10px;top:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;pointer-events:none}
+.bar>*{pointer-events:auto}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;border-radius:0}
+.seg button+button{border-left:1px solid var(--line)}
+button,select{font:500 13px var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+button:hover,select:hover{border-color:var(--muted)}
+button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+button:disabled{opacity:.4;cursor:default}
+button[aria-pressed="false"].grp{opacity:.55}
+.lab{font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
+.poses{flex-basis:100%;display:grid;gap:6px;pointer-events:none}
+.poses[hidden]{display:none}
+.poses .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.poses .row>*{pointer-events:auto}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:1px}
+.cap{font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:3px 9px;pointer-events:auto}
+.legend{position:absolute;left:10px;bottom:10px;right:10px;display:flex;flex-wrap:wrap;gap:6px}
+.legend button{display:inline-flex;align-items:center;gap:6px;padding:4px 9px}
+.sw{width:11px;height:11px;border-radius:3px;flex:none;display:inline-block}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tag3{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;font:600 12.5px var(--sans);padding:3px 8px;border-radius:5px;white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.tag3 i{font:500 10.5px var(--mono);font-style:normal;color:var(--muted);margin-left:5px}
+.tag3.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tag3.sel i{color:inherit;opacity:.8}
+.pick{position:absolute;right:10px;top:96px;max-width:300px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13.5px;line-height:1.4;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.pick b{display:block;font-size:14px;margin-bottom:2px}
+.pick .g{font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.hint{position:absolute;right:12px;bottom:52px;font:12px var(--mono);color:var(--muted);pointer-events:none}
+@media (max-width:760px){.hint{display:none}.pick{left:10px;right:10px;max-width:none;top:auto;bottom:96px}}
+.side{display:grid;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;min-width:0}
+.card h2{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 9px}
+.card p{margin:0 0 8px}.card p:last-child{margin:0}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-bottom:6px}
+.head h3{font-size:20px;font-weight:600;margin:0}
+.head .dt{font:500 12px var(--mono);color:var(--muted)}
+ul{margin:0;padding-left:19px;display:grid;gap:5px;font-size:14px}
+.nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:11px 0}
+.nums div{border-top:1px solid var(--line);padding-top:6px;min-width:0}
+.nums span{display:block;font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.nums b{font:500 15px var(--mono);font-variant-numeric:tabular-nums}
+.st{display:inline-block;font:500 11px var(--mono);padding:1px 7px;border-radius:4px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.st.latest{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.st.option{border-color:var(--accent);color:var(--accent)}
+.st.on-hold{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.st.superseded{text-decoration:line-through}
+.st.start{background:var(--ok-bg);border-color:transparent;color:var(--ok)}
+a{color:var(--accent);text-underline-offset:2px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td,th{padding:5px 4px;border-top:1px solid var(--line);vertical-align:middle;text-align:left}
+th{font-weight:600;font-size:12px;color:var(--muted)}
+td.v,th.v{text-align:right;font:500 12.5px var(--mono);white-space:nowrap;padding-left:8px;font-variant-numeric:tabular-nums}
+th.v{font-family:var(--sans);font-weight:600;font-size:12px}
+tr.sel td{background:var(--bg)}
+td button{border:0;background:none;padding:0;font:600 13.5px var(--sans);color:var(--ink);text-align:left}
+td button:hover{color:var(--accent)}
+.foot{font-size:12.5px;color:var(--muted);margin-top:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<div class="wrap">
+  <header>
+    <h1>Scorpion chassis line-up</h1>
+    <p class="sub">Every chassis variation so far, oldest first, from your TEST-PRINT-2 body on. Pick one to see it alone, turn it, cut it in half, try its arm poses, or lay another design over it.</p>
+  </header>
+  <nav class="strip" id="strip" aria-label="Designs"></nav>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="labels" id="labels"></div>
+      <div class="bar">
+        <span class="seg" role="group" aria-label="Show"><button id="m-all" aria-pressed="true">Line-up</button><button id="m-one" aria-pressed="false">One at a time</button></span>
+        <span class="seg" role="group" aria-label="View" id="views"><button id="v-iso">3/4</button><button id="v-side">Side</button><button id="v-front">Front</button><button id="v-top">Top</button><button id="v-under">Under</button></span>
+        <button id="t-cut" aria-pressed="false" title="Cut along the centre line">Cut in half</button>
+        <select id="cmp" aria-label="Lay another design over this one"><option value="">Overlay: none</option></select>
+        <div class="poses" id="poses" hidden></div>
+      </div>
+      <div class="pick" id="pick" hidden></div>
+      <div class="hint" id="hint">drag to turn · scroll to zoom · click a robot</div>
+      <div class="legend" id="legend" aria-label="Show or hide part groups"></div>
+    </div>
+    <aside class="side">
+      <section class="card" aria-labelledby="h-this">
+        <h2 id="h-this">This design</h2>
+        <div id="this"></div>
+      </section>
+      <section class="card" aria-labelledby="h-all">
+        <h2 id="h-all">All of them</h2>
+        <div class="scroll"><table id="tab"></table></div>
+        <p class="foot">Size is measured here, the same way for every design: length and width over everything, height from the ground, the arm in its first pose. * Mass is each page's estimate from guessed densities. Tips back is each page's own check; for the four pictures (~) a static estimate from the centre of mass.</p>
+      </section>
+    </aside>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+function dec(s,T){const b=atob(s);const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return new T(u.buffer);}
+const $=id=>document.getElementById(id), st=$('stage'), css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.localClippingEnabled=true;
+st.prepend(renderer.domElement);
+const scene=new THREE.Scene(), cam=new THREE.PerspectiveCamera(26,1,5,30000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x5d625e,0.78));
+const d1=new THREE.DirectionalLight(0xffffff,0.62);d1.position.set(260,-320,420);scene.add(d1);
+const d2=new THREE.DirectionalLight(0xffffff,0.34);d2.position.set(-300,260,-260);scene.add(d2);
+const clip=new THREE.Plane(new THREE.Vector3(0,1,0),1e6);
+// shapes are stored once and shared between designs
+const geos=[];
+function geo(i){if(geos[i])return geos[i];const p=D.geo[i],g=new THREE.BufferGeometry();
+  const q=dec(p.v,Int16Array),v=new Float32Array(q.length);for(let j=0;j<q.length;j++)v[j]=q[j]*0.02;
+  g.setAttribute('position',new THREE.BufferAttribute(v,3));g.setIndex(new THREE.BufferAttribute(p.i32?dec(p.f,Uint32Array):dec(p.f,Uint16Array),1));g.computeVertexNormals();g.computeBoundingSphere();
+  return geos[i]=g;}
+const mats={};
+const mat=c=>mats[c]||(mats[c]=new THREE.MeshStandardMaterial({color:c,roughness:.6,metalness:.06,side:THREE.DoubleSide,clippingPlanes:[clip]}));
+const ghostMat=new THREE.MeshStandardMaterial({roughness:.8,metalness:0,side:THREE.DoubleSide,transparent:true,opacity:.16,depthWrite:false,clippingPlanes:[clip]});
+const ALL=[];
+function inst(p,ghost){const m=new THREE.Mesh(geo(p.g),ghost?ghostMat:mat(p.c));m.position.set(p.o[0],p.o[1],p.o[2]);m.userData={grp:p.grp,l:p.l,n:p.n};ALL.push(m);return m;}
+function robot(e,ghost){const root=new THREE.Group();root.position.z=-e.ground;
+  e.parts.forEach(p=>root.add(inst(p,ghost)));
+  const sets={};if(e.pose)for(const k in e.pose.sets){const g=new THREE.Group();e.pose.sets[k].forEach(p=>g.add(inst(p,ghost)));g.visible=k===e.pose.dflt;root.add(g);sets[k]=g;}
+  root.userData={e,sets,key:e.pose?e.pose.dflt:null,ghost};scene.add(root);return root;}
+function setKey(r,k){r.userData.key=k;for(const s in r.userData.sets)r.userData.sets[s].visible=s===k;}
+const E=D.designs, R=E.map(e=>robot(e,false)), byId={};E.forEach((e,i)=>byId[e.id]=i);
+// line-up: oldest at the back left, four to a row
+const PX=Math.max(...E.map(e=>e.L))+110, PY=Math.max(...E.map(e=>e.W))+150, COLS=4, ROWS=Math.ceil(E.length/COLS);
+const slot=i=>[(Math.floor(i/COLS)-(ROWS-1)/2)*PX,((i%COLS)-(COLS-1)/2)*PY];
+const ctr=e=>[(e.box[0][0]+e.box[1][0])/2,(e.box[0][1]+e.box[1][1])/2];
+const grid=new THREE.Group();scene.add(grid);
+function mkGrid(){grid.clear();const one=mode==='one';const s=one?1000:Math.ceil(Math.max(ROWS*PX,COLS*PY)/100)*100+400;
+  const g=new THREE.GridHelper(s,s/50,new THREE.Color(css('--grid1')),new THREE.Color(css('--grid2')));g.rotation.x=Math.PI/2;g.position.z=-0.5;grid.add(g);}
+// groups
+const GROUPS=[['legs','Legs, wheels',0x2B2F33],['hull','Body',0x6B7A69],['cage','Cage',0x3E4440],['tpu','Bumpers, seals',0xDB8F29],['head','Head v2',0x4F7FBF],['arm','Arm',0xC05A2B],['elec','Electronics',0x3C9A4C]];
+const on={legs:true,hull:true,cage:true,tpu:true,head:true,arm:true,elec:false}, btn={};
+function vis(){ALL.forEach(m=>m.visible=!!on[m.userData.grp]);for(const g in btn)btn[g].setAttribute('aria-pressed',!!on[g]);}
+GROUPS.forEach(([g,lab,c])=>{const b=document.createElement('button');b.className='grp';btn[g]=b;
+  b.innerHTML='<span class="sw" style="background:#'+c.toString(16).padStart(6,'0')+'"></span>'+lab;b.onclick=()=>{on[g]=!on[g];vis();};$('legend').appendChild(b);});
+// labels over the line-up
+const tags=E.map((e,i)=>{const b=document.createElement('button');b.className='tag3';b.innerHTML=e.short+'<i>'+e.date.slice(5)+'</i>';b.onclick=()=>select(i);b.ondblclick=()=>{select(i);setMode('one');};$('labels').appendChild(b);return b;});
+// state
+let mode='all', cur=E.length-1, ghost=null;
+const f0=x=>x==null?'—':Math.round(x).toLocaleString('en-US');
+const ST={'start':'start','superseded':'superseded','brainstorm':'brainstorm','picture':'picture','on hold':'on hold','option':'option','latest':'latest'};
+const stTag=s=>'<span class="st '+s.replace(' ','-')+'">'+ST[s]+'</span>';
+E.forEach((e,i)=>{const b=document.createElement('button');b.className='chip';b.id='c-'+e.id;
+  b.innerHTML='<span class="n">'+e.name+'</span><span class="d">'+e.date.slice(5)+' · '+e.status+'</span>';b.onclick=()=>pickDesign(i);$('strip').appendChild(b);
+  const o=document.createElement('option');o.value=i;o.textContent='Overlay: '+e.name;$('cmp').appendChild(o);});
+$('tab').innerHTML='<tr><th>Design</th><th class="v">L × W × H</th><th class="v">Mass*</th><th class="v">Tips back</th></tr>'+E.map((e,i)=>
+  '<tr id="r-'+e.id+'"><td><button data-i="'+i+'">'+e.name+'</button> '+stTag(e.status)+'</td><td class="v">'+f0(e.L)+' × '+f0(e.W)+' × '+f0(e.H)+'</td><td class="v">'+(e.mass?f0(e.mass)+' g':'—')+'</td><td class="v">'+(e.tip==null?'—':(e.tip_how==='static'?'~':'')+f0(e.tip)+'°')+'</td></tr>').join('');
+$('tab').querySelectorAll('button').forEach(b=>b.onclick=()=>pickDesign(+b.dataset.i));
+function pickDesign(i){select(i);if(mode!=='one')return;const d=cam.position.clone().sub(ctl.target);show();view([d.x,d.y,d.z]);}
+function card(){const e=E[cur];
+  $('this').innerHTML='<div class="head"><h3>'+e.name+'</h3>'+stTag(e.status)+'<span class="dt">'+e.date+'</span></div><p>'+e.story+'</p>'+
+  '<div class="nums"><div><span>Length</span><b>'+f0(e.L)+'</b></div><div><span>Width</span><b>'+f0(e.W)+'</b></div><div><span>Height</span><b>'+f0(e.H)+'</b></div>'+
+  '<div><span>Mass*</span><b>'+(e.mass?f0(e.mass)+' g':'—')+'</b></div><div><span>Tips back</span><b>'+(e.tip==null?'—':(e.tip_how==='static'?'~':'')+f0(e.tip)+'°')+'</b></div><div><span>Parts</span><b>'+(e.parts.length)+'</b></div></div>'+
+  '<ul>'+e.facts.map(f=>'<li>'+f+'</li>').join('')+'</ul>'+
+  '<p style="margin-top:10px">Its own page: <a href="'+e.link.url+'" target="_blank" rel="noopener">'+e.link.title+'</a></p>';}
+function select(i){cur=i;E.forEach((e,j)=>{$('c-'+e.id).setAttribute('aria-pressed',j===i);$('r-'+e.id).classList.toggle('sel',j===i);tags[j].classList.toggle('sel',j===i);});
+  card();$('c-'+E[i].id).scrollIntoView({block:'nearest',inline:'nearest'});$('pick').hidden=true;}
+// poses (one at a time)
+function poses(){const e=E[cur],P=$('poses'),r=R[cur];P.innerHTML='';P.hidden=mode!=='one'||!e.pose;if(P.hidden)return;
+  const parts=r.userData.key?r.userData.key.split('/'):[];
+  e.pose.dims.forEach((d,di)=>{const row=document.createElement('div');row.className='row';row.innerHTML='<span class="lab">'+d.name+'</span>';
+    d.opts.forEach(([k,lab,c])=>{const b=document.createElement('button');b.innerHTML=(c?'<span class="dot" style="background:'+c+'"></span>':'')+lab;
+      b.setAttribute('aria-pressed',parts[di]===k);b.onclick=()=>{parts[di]=k;setKey(r,parts.join('/'));poses();};row.appendChild(b);});P.appendChild(row);});
+  if(!e.pose.sets[parts.join('/')]){const c=document.createElement('div');c.className='row';
+    c.innerHTML='<span class="cap">Can\'t: '+(e.pose.why[parts.join('/')]||'out of reach')+'</span>';P.appendChild(c);}}
+// camera
+function frame(c,rad,dir){const d=new THREE.Vector3(...dir).normalize();ctl.target.set(...c);cam.position.set(...c).addScaledVector(d,rad/Math.sin(THREE.MathUtils.degToRad(13))*1.08);ctl.update();}
+function view(dir){const e=E[cur];frame([ctr(e)[0],ctr(e)[1],e.H/2],0.5*Math.hypot(e.L,e.W,e.H),dir);}
+const VIEWS={'v-iso':[1,-1.1,.65],'v-side':[0,-1,.03],'v-front':[1,.001,.04],'v-top':[.001,-.02,1],'v-under':[.25,-.35,-1]};
+for(const k in VIEWS)$(k).onclick=()=>view(VIEWS[k]);
+function show(){                                                                     // place the robots for the mode
+  R.forEach((r,i)=>{const e=E[i];if(mode==='all'){const s=slot(i),c=ctr(e);r.position.set(s[0]-c[0],s[1]-c[1],-e.ground);r.visible=true;}
+    else{r.position.set(0,0,-e.ground);r.visible=i===cur;}
+    if(mode==='all'&&e.pose)setKey(r,e.pose.dflt);});
+  if(ghost){scene.remove(ghost);ghost=null;ALL.splice(0,ALL.length,...ALL.filter(m=>m.material!==ghostMat));}
+  const k=$('cmp').value;if(mode==='one'&&k!==''&&+k!==cur){ghost=robot(E[+k],true);ghost.position.set(0,0,-E[+k].ground);vis();}
+  $('labels').hidden=mode!=='all';$('hint').textContent=mode==='all'?'drag to turn · click a robot or its name':'drag to turn · scroll to zoom · click a part';
+  ['views','t-cut','cmp'].forEach(id=>{const el=$(id);el.querySelectorAll?el.querySelectorAll('button').forEach(b=>b.disabled=mode!=='one'):0;el.disabled=mode!=='one';});
+  if(mode!=='one'){clip.constant=1e6;$('t-cut').setAttribute('aria-pressed',false);}
+  poses();mkGrid();}
+function setMode(m){const was=mode;mode=m;$('m-all').setAttribute('aria-pressed',m==='all');$('m-one').setAttribute('aria-pressed',m==='one');show();
+  if(m==='all')frame([0,0,40],0.5*Math.hypot((ROWS-.9)*PX,(COLS-.7)*PY),[1,-.16,.82]);else if(was!=='one')view(VIEWS['v-iso']);}
+$('m-all').onclick=()=>setMode('all');$('m-one').onclick=()=>setMode('one');
+$('cmp').onchange=show;
+$('t-cut').onclick=()=>{const b=$('t-cut'),v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);clip.constant=v?-D.yc:1e6;};
+// picking
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+const seen=o=>{while(o){if(!o.visible)return false;o=o.parent;}return true;};
+function hit(e){const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ptr,cam);
+  const h=ray.intersectObjects(ALL.filter(m=>m.material!==ghostMat&&seen(m)),false).filter(x=>clip.distanceToPoint(x.point)>=0);return h[0];}
+const owner=o=>{while(o.parent!==scene)o=o.parent;return R.indexOf(o);};
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;const h=hit(e),pk=$('pick');
+  if(mode==='all'){if(h)select(owner(h.object));return;}
+  if(!h){pk.hidden=true;return;}const u=h.object.userData,gl=(GROUPS.find(g=>g[0]===u.grp)||[0,u.grp])[1];
+  pk.innerHTML='<span class="g">'+gl+'</span><b>'+(D.txt[u.l]||gl)+'</b>'+(D.txt[u.n]||'');pk.hidden=false;});
+renderer.domElement.addEventListener('dblclick',e=>{if(mode!=='all')return;const h=hit(e);if(h){select(owner(h.object));setMode('one');}});
+// theme
+function retheme(){ghostMat.color.set(css('--ghost'));mkGrid();}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',retheme);
+new MutationObserver(retheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+// labels follow the robots
+const pv=new THREE.Vector3();
+function place(){if(mode!=='all')return;const w=st.clientWidth,h=st.clientHeight;
+  E.forEach((e,i)=>{const s=slot(i);pv.set(s[0],s[1],e.H+14).project(cam);const t=tags[i];
+    t.style.left=((pv.x+1)/2*w)+'px';t.style.top=((1-pv.y)/2*h)+'px';t.hidden=pv.z>1;});}
+function size(){const w=st.clientWidth,h=st.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(st);size();vis();select(cur);retheme();setMode('all');
+(function loop(){requestAnimationFrame(loop);ctl.update();renderer.render(scene,cam);place();})();
+</script>
