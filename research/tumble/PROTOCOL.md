@@ -46,3 +46,22 @@ the top is, how wide the shell is relative to the wheels) and on its centre-of-m
   that keep the tub's 339.5 mm length at any width. The exploratory width-170 numbers above used the old shape. With
   the new one, top 200 / round 0.3 / width 170 gave 0.72 (40 drops). The sweep and everything after use the fixed
   shape.
+
+## Results (2026-10-13, after the protocol above)
+Ground truth: 400 designs x 200 drops, 74 s on 20 cores. P(upright) ranged 0.26 to 0.76 (median 0.37). Top height
+mattered most (r +0.67), then CoM height (-0.33), peak (-0.21) and width (+0.17). The best designs were tall
+(190-220), peaked (round 0.1-0.4), wide, with a low CoM.
+
+| H2 as recorded | Result | |
+|---|---|---|
+| RMSE < 0.05 at 120 training designs | 0.039 (280 held out) | met |
+| 90% intervals cover 85-95% | 86.8% | met |
+| Uncertainty choice beats random | 0.041 vs 0.045 RMSE at 45 designs; equal by 85 | small advantage |
+| Gate at 0.6: decides >= half, <= 2% wrong | 266/280 decided, 2 wrong (0.8%), 14 sent to simulation | met |
+| Out-of-range design gets a wider interval | 0.16 vs the widest in range, 0.06 | met |
+| Hidden friction (0.4x) caught by 8 sentinels | 0/8 flagged (control 0/8): friction moved P by <= 0.04 | not met |
+
+Post hoc (`posthoc_sentinels.py`, labelled as such): a 3x harder spin flagged 0/8 (mean shift 0.029) and 150 mm
+wheels flagged 1/8 (0.039). In this regime P(upright) is set by geometry and mass. Eight sentinels at 200 drops
+can't see a physics change smaller than about 0.05 in P. As a control, the sentinel check is weak. The same lesson
+as `check_failures.csv` C10: a control has to be shown able to fail.

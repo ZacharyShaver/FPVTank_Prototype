@@ -1,0 +1,144 @@
+{
+ "control": {
+  "outside": 0,
+  "of": 8,
+  "mean_abs_shift": 0.022,
+  "rows": [
+   {
+    "pred": 0.423,
+    "sim": 0.4,
+    "outside": false
+   },
+   {
+    "pred": 0.406,
+    "sim": 0.385,
+    "outside": false
+   },
+   {
+    "pred": 0.564,
+    "sim": 0.575,
+    "outside": false
+   },
+   {
+    "pred": 0.499,
+    "sim": 0.525,
+    "outside": false
+   },
+   {
+    "pred": 0.401,
+    "sim": 0.37,
+    "outside": false
+   },
+   {
+    "pred": 0.449,
+    "sim": 0.48,
+    "outside": false
+   },
+   {
+    "pred": 0.357,
+    "sim": 0.385,
+    "outside": false
+   },
+   {
+    "pred": 0.384,
+    "sim": 0.39,
+    "outside": false
+   }
+  ]
+ },
+ "spin x3": {
+  "outside": 0,
+  "of": 8,
+  "mean_abs_shift": 0.029,
+  "rows": [
+   {
+    "pred": 0.423,
+    "sim": 0.41,
+    "outside": false
+   },
+   {
+    "pred": 0.406,
+    "sim": 0.365,
+    "outside": false
+   },
+   {
+    "pred": 0.564,
+    "sim": 0.575,
+    "outside": false
+   },
+   {
+    "pred": 0.499,
+    "sim": 0.565,
+    "outside": false
+   },
+   {
+    "pred": 0.401,
+    "sim": 0.415,
+    "outside": false
+   },
+   {
+    "pred": 0.449,
+    "sim": 0.465,
+    "outside": false
+   },
+   {
+    "pred": 0.357,
+    "sim": 0.415,
+    "outside": false
+   },
+   {
+    "pred": 0.384,
+    "sim": 0.4,
+    "outside": false
+   }
+  ]
+ },
+ "rw 75": {
+  "outside": 1,
+  "of": 8,
+  "mean_abs_shift": 0.039,
+  "rows": [
+   {
+    "pred": 0.423,
+    "sim": 0.325,
+    "outside": true
+   },
+   {
+    "pred": 0.406,
+    "sim": 0.37,
+    "outside": false
+   },
+   {
+    "pred": 0.564,
+    "sim": 0.535,
+    "outside": false
+   },
+   {
+    "pred": 0.499,
+    "sim": 0.48,
+    "outside": false
+   },
+   {
+    "pred": 0.401,
+    "sim": 0.35,
+    "outside": false
+   },
+   {
+    "pred": 0.449,
+    "sim": 0.41,
+    "outside": false
+   },
+   {
+    "pred": 0.357,
+    "sim": 0.37,
+    "outside": false
+   },
+   {
+    "pred": 0.384,
+    "sim": 0.36,
+    "outside": false
+   }
+  ]
+ },
+ "note": "post hoc; the pre-registered friction mutant result is in surrogate_summary.json"
+}

@@ -61,7 +61,7 @@ def task(mid, check):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument('--workers', type=int, default=28); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument('--workers', type=int, default=6); a = ap.parse_args()   # memory-bound: 4+ workers barely add throughput here
     sys.path.insert(0, os.path.dirname(__file__))
     import mutants as MU
     ids = ['none'] + list(MU.MUTANTS)
@@ -72,7 +72,7 @@ def main():
         futs = [ex.submit(task, *j) for j in jobs]
         for i, f in enumerate(as_completed(futs), 1):
             res.append(f.result())
-            if i % 25 == 0:
+            if i % 10 == 0:
                 print(f'{i}/{len(jobs)}  {time.time() - t0:.0f} s', flush=True)
     K = {(m, c): (k, s, d) for m, c, k, s, d in res}
     base_fail = [c for c in CHECKS if K[('none', c)][0]]
