@@ -39,3 +39,10 @@ the top is, how wide the shell is relative to the wheels) and on its centre-of-m
   - and the share of trials where the most likely predicted state is the one observed.
 - The physical control: move the quarters to raise the centre of mass and repeat. The prediction has to shift the
   way the simulation says, and the observed outcomes have to follow.
+
+## Change log
+- 2026-10-13, before the sweep: fixed the shell's ends. They were half-circles of radius equal to the half-width, so
+  widening the shell to cover the wheels also lengthened it, to 548 mm at width 170. Now the ends are half-ellipses
+  that keep the tub's 339.5 mm length at any width. The exploratory width-170 numbers above used the old shape. With
+  the new one, top 200 / round 0.3 / width 170 gave 0.72 (40 drops). The sweep and everything after use the fixed
+  shape.

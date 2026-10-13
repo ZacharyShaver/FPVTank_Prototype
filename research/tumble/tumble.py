@@ -46,9 +46,13 @@ def shell_points(top, rnd, n=48, k=9, width=R0):
     takes `rnd` of the half-width and rises from the walls (or from 5 under the top, if the top is lower) to `top`"""
     R = width; hw = min(WALL, top - 5.0); b = top - hw; a = max(rnd, 0.02) * R
     def ring(r, z):
-        th = np.linspace(-np.pi / 2, np.pi / 2, n)                      # front half-circle about XN
-        f = np.c_[XN + r * np.cos(th), r * np.sin(th)]
-        rear = np.c_[XT - r * np.cos(th), -r * np.sin(th)]
+        """the outline inset to half-width r: its ends are half-ellipses reaching R0 * r / R past XN and XT, so the
+        body stays the tub's length (339.5) whatever its width (first version: half-circles of radius r, which made a
+        wide shell long too)"""
+        c = R0 * r / R
+        th = np.linspace(-np.pi / 2, np.pi / 2, n)
+        f = np.c_[XN + c * np.cos(th), r * np.sin(th)]
+        rear = np.c_[XT - c * np.cos(th), -r * np.sin(th)]
         P = np.vstack([f, rear]); return np.c_[P, np.full(len(P), z)]
     pts = [ring(R, Z0), ring(R, hw)]
     for phi in np.linspace(0, np.pi / 2, k)[1:]:
