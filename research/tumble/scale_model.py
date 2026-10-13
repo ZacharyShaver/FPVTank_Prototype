@@ -113,13 +113,17 @@ def mass_layout(info, print_grams, high):
         a, b, cc = P[f] - c; v = abs(np.dot(a, np.cross(b, cc))) / 6
         Q = np.array([a, b, cc]); S = (Q.T @ Q + np.outer(Q.sum(0), Q.sum(0))) / 20   # second moment of the tetrahedron
         I += v * (np.trace(S) * np.eye(3) - S)
-    k = info['pockets'][0]; m_pla = float(print_grams); rho = m_pla / vol
-    n = k['coins']; m_c = n * COIN_G
-    zc = (k['depth'] - n * COIN_T / 2) if high else n * COIN_T / 2
-    cc = np.array([k['x'], k['y'], zc])
-    M = m_pla + m_c; com = (m_pla * c + m_c * cc) / M
+    k = info['pockets'][0]
+    # the spacer: a printed plug, mostly walls at this size (a guess: 60% solid); it sits on the other side of the coins
+    sp_vol = np.pi * (POCKET_R - 0.25) ** 2 * k['spacer'] / 1000; m_sp = sp_vol * 1.24 * 0.6
+    m_pla = float(print_grams) - m_sp; rho = m_pla / vol                # the body; the slice's grams include the spacer
+    n = k['coins']; m_c = n * COIN_G; stack = n * COIN_T
+    zc = (k['depth'] - stack / 2) if high else stack / 2
+    zs = (k['spacer'] / 2) if high else (stack + k['spacer'] / 2)
+    cc, cs = np.array([k['x'], k['y'], zc]), np.array([k['x'], k['y'], zs])
+    M = m_pla + m_c + m_sp; com = (m_pla * c + m_c * cc + m_sp * cs) / M
     It = rho * I
-    for m, r in ((m_pla, c), (m_c, cc)):
+    for m, r in ((m_pla, c), (m_c, cc), (m_sp, cs)):
         d = r - com; It += m * (d @ d * np.eye(3) - np.outer(d, d))
     return M, com, It, P
 

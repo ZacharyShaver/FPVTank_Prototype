@@ -1,0 +1,40 @@
+{
+ "name": "E3_tall",
+ "params": {
+  "top": 210,
+  "round": 0.15,
+  "dz": -10,
+  "m_head": 360.0,
+  "rw": 55.0,
+  "track": 131.0,
+  "width": 165,
+  "mu": 1.0
+ },
+ "scale": 0.25,
+ "size": [
+  84.9,
+  82.5,
+  58.8
+ ],
+ "hull_volume_cm3": 361.4,
+ "body_volume_cm3": 339.0,
+ "valid": true,
+ "pockets": [
+  {
+   "name": "pocket",
+   "x": 2.75,
+   "y": 0.0,
+   "z0": 0.0,
+   "depth": 45.8,
+   "coins": 12,
+   "spacer": 24.4
+  }
+ ],
+ "coin": {
+  "r": 12.13,
+  "t": 1.75,
+  "g": 5.67
+ },
+ "coins_g": 68.04,
+ "hull_facets": 1496
+}

@@ -1,0 +1,40 @@
+{
+ "name": "E2_dome",
+ "params": {
+  "top": 150,
+  "round": 0.3,
+  "dz": 0,
+  "m_head": 360.0,
+  "rw": 55.0,
+  "track": 131.0,
+  "width": 130,
+  "mu": 1.0
+ },
+ "scale": 0.25,
+ "size": [
+  84.9,
+  77.0,
+  43.8
+ ],
+ "hull_volume_cm3": 237.9,
+ "body_volume_cm3": 221.2,
+ "valid": true,
+ "pockets": [
+  {
+   "name": "pocket",
+   "x": 2.75,
+   "y": 0.0,
+   "z0": 0.0,
+   "depth": 34.1,
+   "coins": 12,
+   "spacer": 12.7
+  }
+ ],
+ "coin": {
+  "r": 12.13,
+  "t": 1.75,
+  "g": 5.67
+ },
+ "coins_g": 68.04,
+ "hull_facets": 1224
+}
