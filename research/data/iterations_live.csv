@@ -1,0 +1,2 @@
+id,found_at,found_by,subsystem,category,check_had_passed,finding,fix,fix_ready_at,printed_at,verified_at,notes
+L01,2026-10-13 09:12,print,nose section,print process,n/a,"Nose + ring print failed on bed adhesion: dirty plate, small footprint (the pocket's base) under tall supports.",Clean the plate; 6 mm brim,2026-10-13 10:05,,,"Reported 09:12; re-sliced as nose_A_ring_brim and uploaded"
