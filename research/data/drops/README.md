@@ -50,3 +50,13 @@ the predictions were committed first (research/results/drop_predictions.json, co
   seen, so they can't be a blind test.
 - Qualitatively they agree with the bounce reading: after impact the body keeps moving, rocking onto its side and
   back, rather than stopping where it lands.
+
+## Run 3: the 30 cm redo (2026-10-14), H4's primary data
+- `run3_30cm_raw.txt` is Zach's message verbatim; `run3_30cm.csv` is the transcription, one row per drop.
+- Heights were marked: a US letter sheet on edge plus a finger-width. No video.
+- **Readings fixed before scoring** (Zach is asked to confirm, and the run is rescored if any is wrong):
+  1. x = upside down, o = upright, as in runs 1 and 2. (A literal "x = on its bottom" would have the flat-topped
+     E1 righting itself from most upside-down starts.)
+  2. The second block, "weight in first then coins then tape", is mass low: the spacer first, coins by the base.
+     The first block is mass high.
+  3. "c" (E3, mass low, left side down, drop 5) is an unknown mark and is left out.
