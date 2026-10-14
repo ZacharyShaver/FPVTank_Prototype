@@ -1,0 +1,251 @@
+{
+ "drop_mm": 80.0,
+ "E1_tub mass low": {
+  "mass_g": 108.5,
+  "com_mm": [
+   2.8,
+   0.0,
+   13.0
+  ],
+  "by_attitude": {
+   "nose down": {
+    "p": {
+     "upright": 0.305,
+     "inverted": 0.145,
+     "left side": 0.225,
+     "right side": 0.185,
+     "nose up": 0.085,
+     "nose down": 0.055
+    },
+    "p_lowmu": {
+     "upright": 0.31,
+     "inverted": 0.155,
+     "left side": 0.22,
+     "right side": 0.185,
+     "nose up": 0.07,
+     "nose down": 0.06
+    },
+    "p_highmu": {
+     "upright": 0.31,
+     "inverted": 0.145,
+     "left side": 0.215,
+     "right side": 0.185,
+     "nose up": 0.09,
+     "nose down": 0.055
+    }
+   },
+   "tail down": {
+    "p": {
+     "upright": 0.3,
+     "inverted": 0.115,
+     "left side": 0.21,
+     "right side": 0.175,
+     "nose up": 0.115,
+     "nose down": 0.085
+    },
+    "p_lowmu": {
+     "upright": 0.325,
+     "inverted": 0.125,
+     "left side": 0.2,
+     "right side": 0.17,
+     "nose up": 0.11,
+     "nose down": 0.07
+    },
+    "p_highmu": {
+     "upright": 0.315,
+     "inverted": 0.12,
+     "left side": 0.215,
+     "right side": 0.175,
+     "nose up": 0.12,
+     "nose down": 0.055
+    }
+   },
+   "left side down": {
+    "p": {
+     "upright": 0.34,
+     "inverted": 0.18,
+     "left side": 0.175,
+     "right side": 0.165,
+     "nose up": 0.075,
+     "nose down": 0.065
+    },
+    "p_lowmu": {
+     "upright": 0.36,
+     "inverted": 0.185,
+     "left side": 0.165,
+     "right side": 0.165,
+     "nose up": 0.065,
+     "nose down": 0.06
+    },
+    "p_highmu": {
+     "upright": 0.335,
+     "inverted": 0.19,
+     "left side": 0.165,
+     "right side": 0.16,
+     "nose up": 0.085,
+     "nose down": 0.065
+    }
+   },
+   "right side down": {
+    "p": {
+     "upright": 0.335,
+     "inverted": 0.145,
+     "left side": 0.18,
+     "right side": 0.205,
+     "nose up": 0.08,
+     "nose down": 0.055
+    },
+    "p_lowmu": {
+     "upright": 0.34,
+     "inverted": 0.145,
+     "left side": 0.175,
+     "right side": 0.205,
+     "nose up": 0.07,
+     "nose down": 0.065
+    },
+    "p_highmu": {
+     "upright": 0.33,
+     "inverted": 0.13,
+     "left side": 0.18,
+     "right side": 0.2,
+     "nose up": 0.085,
+     "nose down": 0.075
+    }
+   },
+   "upside down": {
+    "p": {
+     "inverted": 1.0
+    },
+    "p_lowmu": {
+     "inverted": 1.0
+    },
+    "p_highmu": {
+     "inverted": 1.0
+    }
+   },
+   "upside down, 45 to the left": {
+    "p": {
+     "inverted": 1.0
+    },
+    "p_lowmu": {
+     "inverted": 1.0
+    },
+    "p_highmu": {
+     "inverted": 1.0
+    }
+   }
+  }
+ },
+ "E1_tub mass high": {
+  "mass_g": 108.5,
+  "com_mm": [
+   2.8,
+   0.0,
+   19.5
+  ],
+  "by_attitude": {
+   "nose down": {
+    "p": {
+     "upright": 0.015,
+     "inverted": 0.775,
+     "left side": 0.09,
+     "right side": 0.12
+    },
+    "p_lowmu": {
+     "upright": 0.015,
+     "inverted": 0.82,
+     "left side": 0.07,
+     "right side": 0.095
+    },
+    "p_highmu": {
+     "upright": 0.015,
+     "inverted": 0.795,
+     "left side": 0.095,
+     "right side": 0.095
+    }
+   },
+   "tail down": {
+    "p": {
+     "upright": 0.025,
+     "inverted": 0.77,
+     "left side": 0.095,
+     "right side": 0.11
+    },
+    "p_lowmu": {
+     "upright": 0.025,
+     "inverted": 0.82,
+     "left side": 0.07,
+     "right side": 0.085
+    },
+    "p_highmu": {
+     "upright": 0.025,
+     "inverted": 0.805,
+     "left side": 0.09,
+     "right side": 0.08
+    }
+   },
+   "left side down": {
+    "p": {
+     "upright": 0.03,
+     "inverted": 0.82,
+     "left side": 0.08,
+     "right side": 0.07
+    },
+    "p_lowmu": {
+     "upright": 0.03,
+     "inverted": 0.835,
+     "left side": 0.065,
+     "right side": 0.07
+    },
+    "p_highmu": {
+     "upright": 0.03,
+     "inverted": 0.83,
+     "left side": 0.07,
+     "right side": 0.07
+    }
+   },
+   "right side down": {
+    "p": {
+     "upright": 0.035,
+     "inverted": 0.785,
+     "left side": 0.08,
+     "right side": 0.1
+    },
+    "p_lowmu": {
+     "upright": 0.04,
+     "inverted": 0.795,
+     "left side": 0.08,
+     "right side": 0.085
+    },
+    "p_highmu": {
+     "upright": 0.03,
+     "inverted": 0.835,
+     "left side": 0.055,
+     "right side": 0.08
+    }
+   },
+   "upside down": {
+    "p": {
+     "inverted": 1.0
+    },
+    "p_lowmu": {
+     "inverted": 1.0
+    },
+    "p_highmu": {
+     "inverted": 1.0
+    }
+   },
+   "upside down, 45 to the left": {
+    "p": {
+     "inverted": 1.0
+    },
+    "p_lowmu": {
+     "inverted": 1.0
+    },
+    "p_highmu": {
+     "inverted": 1.0
+    }
+   }
+  }
+ }
+}
