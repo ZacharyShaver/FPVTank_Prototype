@@ -320,3 +320,32 @@ No direction is predicted between models 1 and 3.
 **Scoring:** `score_30cm.py`'s rules, with these files. If the PLA ball measures a different restitution before the
 15 cm drops, a hard-floor set with that value is committed too, before the drops, and the slow-motion set stays the
 main test.
+
+### Post hoc 7, correction (2026-10-14): the hard floor wasn't converged at 0.5 ms (C14)
+A time-step check (`audit/hard_floor_convergence.py`) showed the stiff contact injecting energy at 0.5 ms. Flips from
+upside-down starts fall from 34% to 6% (E3) and from 28% to 7% (E1 at 45 degrees) at 0.1 ms. Rerun at 0.1 ms with
+the same bounce (restitution 0.31, damping 0.45 at that step):
+
+| Model | Brier, 6 cm | Brier, 30 cm |
+|---|---|---|
+| hard floor, 0.5 ms (as reported above) | 0.472 | 0.638 |
+| **hard floor, 0.1 ms (converged)** | **0.483** | **0.693** |
+| soft floor, bounce fitted | 0.443 | 0.634 |
+| soft floor, dead | 0.861 | 1.156 |
+
+The unconverged step flattered the 30 cm score by 0.055. The converged hard floor still closes most of the gap,
+without fitting, but less well than the fitted bounce at 30 cm. The soft-floor bounce model (H3b's winner) is
+converged at 0.5 ms (`audit/soft_bounce_convergence.py`: E3 within sampling noise, E1 within 0.13).
+
+## H3c amendment (2026-10-14, before any 15 cm drop)
+The main model committed for H3c (`drop_predictions_15cm_hard_floor`, a hard floor at 0.5 ms) is not converged
+(C14). It stays recorded and will be scored, but it is no longer the primary test. Added before any 15 cm drop:
+- `drop_predictions_15cm_hard_floor_converged`: hard floor at 0.1 ms, bounce 0.31 (E3 slow motion). **Now primary.**
+- `drop_predictions_15cm_hard_floor_ball`: hard floor at 0.1 ms, bounce ~0.55. This is the PLA ball's slow-motion
+  value, which is rough (0.45-0.65), because the camera was too close for a reliable drop height.
+
+**Primary hypothesis:** the converged hard floor (0.31) beats the dead soft floor and naive, with paired bootstrap 95%
+CIs excluding 0.
+
+**Secondary, no direction predicted:** the 0.31 hard floor vs the 0.55 one (which bounce fits), and vs the fitted
+soft bounce.
