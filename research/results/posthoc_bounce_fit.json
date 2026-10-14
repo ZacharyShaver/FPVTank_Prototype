@@ -1,0 +1,233 @@
+{
+ "note": "post hoc, exploratory: fitted to the 6 cm drops",
+ "results": {
+  "default": {
+   "restitution": 0.127,
+   "brier": 0.861,
+   "naive": 1.293,
+   "diff_95": [
+    -0.521,
+    -0.346
+   ],
+   "top_hit": 0.431,
+   "groups": {
+    "E1_tub mass low": 0.835,
+    "E1_tub mass high": 0.566,
+    "E2_dome mass low": 0.898,
+    "E2_dome mass high": 0.813,
+    "E3_tall mass low": 0.876,
+    "E3_tall mass high": 1.177
+   },
+   "by_start": {
+    "nose down": {
+     "stays_predicted": 0.6,
+     "stays_seen": 0.07,
+     "upright_predicted": 0.19,
+     "upright_seen": 0.3
+    },
+    "tail down": {
+     "stays_predicted": 0.63,
+     "stays_seen": 0.1,
+     "upright_predicted": 0.19,
+     "upright_seen": 0.57
+    },
+    "side": {
+     "stays_predicted": 0.84,
+     "stays_seen": 0.16,
+     "upright_predicted": 0.03,
+     "upright_seen": 0.25
+    }
+   }
+  },
+  "0.6": {
+   "restitution": 0.236,
+   "brier": 0.704,
+   "naive": 1.293,
+   "diff_95": [
+    -0.686,
+    -0.493
+   ],
+   "top_hit": 0.486,
+   "groups": {
+    "E1_tub mass low": 0.759,
+    "E1_tub mass high": 0.423,
+    "E2_dome mass low": 0.771,
+    "E2_dome mass high": 0.551,
+    "E3_tall mass low": 0.795,
+    "E3_tall mass high": 0.921
+   },
+   "by_start": {
+    "nose down": {
+     "stays_predicted": 0.52,
+     "stays_seen": 0.07,
+     "upright_predicted": 0.22,
+     "upright_seen": 0.3
+    },
+    "tail down": {
+     "stays_predicted": 0.49,
+     "stays_seen": 0.1,
+     "upright_predicted": 0.24,
+     "upright_seen": 0.57
+    },
+    "side": {
+     "stays_predicted": 0.7,
+     "stays_seen": 0.16,
+     "upright_predicted": 0.06,
+     "upright_seen": 0.25
+    }
+   }
+  },
+  "0.4": {
+   "restitution": 0.348,
+   "brier": 0.529,
+   "naive": 1.293,
+   "diff_95": [
+    -0.879,
+    -0.648
+   ],
+   "top_hit": 0.575,
+   "groups": {
+    "E1_tub mass low": 0.491,
+    "E1_tub mass high": 0.362,
+    "E2_dome mass low": 0.481,
+    "E2_dome mass high": 0.391,
+    "E3_tall mass low": 0.682,
+    "E3_tall mass high": 0.77
+   },
+   "by_start": {
+    "nose down": {
+     "stays_predicted": 0.37,
+     "stays_seen": 0.07,
+     "upright_predicted": 0.31,
+     "upright_seen": 0.3
+    },
+    "tail down": {
+     "stays_predicted": 0.35,
+     "stays_seen": 0.1,
+     "upright_predicted": 0.3,
+     "upright_seen": 0.57
+    },
+    "side": {
+     "stays_predicted": 0.47,
+     "stays_seen": 0.16,
+     "upright_predicted": 0.15,
+     "upright_seen": 0.25
+    }
+   }
+  },
+  "0.3": {
+   "restitution": 0.435,
+   "brier": 0.465,
+   "naive": 1.293,
+   "diff_95": [
+    -0.961,
+    -0.695
+   ],
+   "top_hit": 0.691,
+   "groups": {
+    "E1_tub mass low": 0.447,
+    "E1_tub mass high": 0.327,
+    "E2_dome mass low": 0.424,
+    "E2_dome mass high": 0.324,
+    "E3_tall mass low": 0.565,
+    "E3_tall mass high": 0.701
+   },
+   "by_start": {
+    "nose down": {
+     "stays_predicted": 0.25,
+     "stays_seen": 0.07,
+     "upright_predicted": 0.36,
+     "upright_seen": 0.3
+    },
+    "tail down": {
+     "stays_predicted": 0.24,
+     "stays_seen": 0.1,
+     "upright_predicted": 0.38,
+     "upright_seen": 0.57
+    },
+    "side": {
+     "stays_predicted": 0.3,
+     "stays_seen": 0.16,
+     "upright_predicted": 0.23,
+     "upright_seen": 0.25
+    }
+   }
+  },
+  "0.2": {
+   "restitution": 0.555,
+   "brier": 0.443,
+   "naive": 1.293,
+   "diff_95": [
+    -0.993,
+    -0.708
+   ],
+   "top_hit": 0.696,
+   "groups": {
+    "E1_tub mass low": 0.427,
+    "E1_tub mass high": 0.328,
+    "E2_dome mass low": 0.429,
+    "E2_dome mass high": 0.31,
+    "E3_tall mass low": 0.526,
+    "E3_tall mass high": 0.636
+   },
+   "by_start": {
+    "nose down": {
+     "stays_predicted": 0.09,
+     "stays_seen": 0.07,
+     "upright_predicted": 0.38,
+     "upright_seen": 0.3
+    },
+    "tail down": {
+     "stays_predicted": 0.11,
+     "stays_seen": 0.1,
+     "upright_predicted": 0.43,
+     "upright_seen": 0.57
+    },
+    "side": {
+     "stays_predicted": 0.14,
+     "stays_seen": 0.16,
+     "upright_predicted": 0.31,
+     "upright_seen": 0.25
+    }
+   }
+  },
+  "0.1": {
+   "restitution": 0.724,
+   "brier": 0.575,
+   "naive": 1.293,
+   "diff_95": [
+    -0.873,
+    -0.561
+   ],
+   "top_hit": 0.586,
+   "groups": {
+    "E1_tub mass low": 0.545,
+    "E1_tub mass high": 0.353,
+    "E2_dome mass low": 0.672,
+    "E2_dome mass high": 0.411,
+    "E3_tall mass low": 0.763,
+    "E3_tall mass high": 0.705
+   },
+   "by_start": {
+    "nose down": {
+     "stays_predicted": 0.02,
+     "stays_seen": 0.07,
+     "upright_predicted": 0.39,
+     "upright_seen": 0.3
+    },
+    "tail down": {
+     "stays_predicted": 0.03,
+     "stays_seen": 0.1,
+     "upright_predicted": 0.43,
+     "upright_seen": 0.57
+    },
+    "side": {
+     "stays_predicted": 0.05,
+     "stays_seen": 0.16,
+     "upright_predicted": 0.46,
+     "upright_seen": 0.25
+    }
+   }
+  }
+ }
+}

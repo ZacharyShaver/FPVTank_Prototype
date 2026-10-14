@@ -149,3 +149,31 @@ a cover of a given thickness. The best tall designs then give P(upright):
 
 So the design rule stands with a condition: a light cover. All of this is the dead-contact simulator and stays
 provisional until the bounce is measured.
+
+### Post hoc 5 (2026-10-14): bounce explains the miss, and a prediction for the slow-motion measurement
+`posthoc_bounce_fit.py` reran the start-fixed model at six contact damping ratios and scored each against the 181
+drops. This is exploratory, because it fits this data.
+
+| Restitution | Brier score |
+|---|---|
+| 0.13 (the default, dead contact) | 0.861 |
+| 0.35 | 0.529 |
+| 0.44 | 0.465 |
+| **0.56 (best)** | **0.443** |
+| 0.72 | 0.575 |
+
+At 0.56 the model matches all three signatures of the miss (predicted / seen):
+- stays on its end: 0.10 / 0.09;
+- stays on its side: 0.14 / 0.16;
+- end drops upright: 0.41 / 0.43.
+
+**Prediction, recorded before the slow-motion video is taken or seen.** E3, mass low, dropped flat on its base from
+6 cm onto the same floor:
+- the measured restitution (upward speed after the first impact over the speed before) will be **0.4-0.7**,
+  most likely about 0.55;
+- if it falls outside 0.4-0.7, bounce alone does not explain the miss, and the fitted value is standing in for
+  something else, such as coin rattle or release spin.
+
+**Next, also before any 30 cm data are seen:** predictions at 30 cm are committed for the start-fixed model with the
+fitted bounce (damping ratio 0.2). After the video, a second set with the measured bounce follows, still before the
+30 cm data.

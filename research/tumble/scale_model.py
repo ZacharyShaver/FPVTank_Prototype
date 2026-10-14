@@ -129,7 +129,7 @@ def mass_layout(info, print_grams, high):
 
 
 def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_mm=60.0, mu=1.0, seed=0, layout=None,
-            world_yaw=True):
+            world_yaw=True, dampratio=None):
     """P(each rest state) for each starting attitude, by simulating the printed body with hand jitter. `layout`
     (total g, CoM mm, inertia g mm^2) replaces mass_layout's uniform-solid estimate when given.
 
@@ -137,7 +137,11 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
     (drop_predictions.json, 2026-10-13) were made with world_yaw=False: the heading was the third intrinsic Euler
     angle, a turn about the body's own z axis after the tilt, which for the end-down and side-down starts is
     horizontal. So each of those four starts was really an even mix of both ends and both sides (found 2026-10-14
-    after the drops were scored). Upside down was unaffected; the 45-degree start was partly mixed."""
+    after the drops were scored). Upside down was unaffected; the 45-degree start was partly mixed.
+
+    `dampratio` sets the contact's damping ratio (solref "0.02 dampratio" on both surfaces); None keeps MuJoCo's
+    default contact (as committed), which is critically damped: a flat 6 cm drop rebounds at restitution 0.08.
+    bounce_curve() maps a damping ratio to the restitution it gives."""
     import mujoco
     info = json.load(open(os.path.join(ROOT, 'models', name + '.json')))
     if layout is None:
@@ -148,11 +152,12 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
     verts = ' '.join('%.5f' % v for v in (P * s).ravel())
     Isi = I * 1e-9
     full = ' '.join('%.8g' % v for v in (Isi[0, 0], Isi[1, 1], Isi[2, 2], Isi[0, 1], Isi[0, 2], Isi[1, 2]))
+    sr = '' if dampratio is None else f' solref="0.02 {dampratio:.4f}"'
     xml = f"""<mujoco><option timestep="0.0005"/><asset><mesh name="h" vertex="{verts}"/></asset><worldbody>
-      <geom type="plane" size="2 2 .1" friction="{0.45 * mu:.3f} 0.005 0.0005"/>
+      <geom type="plane" size="2 2 .1" friction="{0.45 * mu:.3f} 0.005 0.0005"{sr}/>
       <body name="b" pos="0 0 .3"><freejoint/>
         <inertial pos="{com[0] * s:.5f} {com[1] * s:.5f} {com[2] * s:.5f}" mass="{M * 1e-3:.5f}" fullinertia="{full}"/>
-        <geom type="mesh" mesh="h" friction="{0.45 * mu:.3f} 0.005 0.0005"/></body></worldbody></mujoco>"""
+        <geom type="mesh" mesh="h" friction="{0.45 * mu:.3f} 0.005 0.0005"{sr}/></body></worldbody></mujoco>"""
     m = mujoco.MjModel.from_xml_string(xml); d = mujoco.MjData(m)
     rng = np.random.default_rng(seed); out = {}
     Ps = P * s
@@ -181,6 +186,31 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
             cnt[T.classify(d.xmat[1].reshape(3, 3))] += 1
         out[att] = {k: v / n_per for k, v in cnt.items() if v}
     return dict(name=name, high=high, mass_g=round(M, 1), com_mm=com.round(1).tolist(), by_attitude=out)
+
+
+def bounce_curve(name='E3_tall', high=False, ratios=(None, 1.0, 0.6, 0.4, 0.3, 0.2, 0.1, 0.05), drop_mm=60.0):
+    """restitution for each contact damping ratio: the body dropped flat on its base from drop_mm, upward speed just
+    after the first impact over the speed just before (MuJoCo's soft contact, solref timeconst 0.02)"""
+    import mujoco, predict_drops as PD
+    info = json.load(open(os.path.join(ROOT, 'models', name + '.json')))
+    M, com, I, P = mass_layout(info, PD.GRAMS[name], high); s = 1e-3; Isi = I * 1e-9
+    verts = ' '.join('%.5f' % v for v in (P * s).ravel())
+    full = ' '.join('%.8g' % v for v in (Isi[0, 0], Isi[1, 1], Isi[2, 2], Isi[0, 1], Isi[0, 2], Isi[1, 2]))
+    out = {}
+    for dr in ratios:
+        sr = '' if dr is None else f' solref="0.02 {dr:.4f}"'
+        xml = f"""<mujoco><option timestep="0.0005"/><asset><mesh name="h" vertex="{verts}"/></asset><worldbody>
+          <geom type="plane" size="2 2 .1" friction="0.45 0.005 0.0005"{sr}/><body name="b" pos="0 0 .3"><freejoint/>
+          <inertial pos="{com[0] * s:.5f} {com[1] * s:.5f} {com[2] * s:.5f}" mass="{M * 1e-3:.5f}" fullinertia="{full}"/>
+          <geom type="mesh" mesh="h" friction="0.45 0.005 0.0005"{sr}/></body></worldbody></mujoco>"""
+        m = mujoco.MjModel.from_xml_string(xml); d = mujoco.MjData(m)
+        d.qpos[:3] = (0, 0, drop_mm * s - (P * s)[:, 2].min()); d.qpos[3:7] = (1, 0, 0, 0)
+        vz = []
+        for _ in range(1200):
+            mujoco.mj_step(m, d); vz.append(d.qvel[2])
+        vz = np.array(vz); i = int(np.argmax(vz > 0)); v_in = -vz[:i].min(); v_out = vz[i:i + 200].max()
+        out['default' if dr is None else dr] = round(float(v_out / v_in), 3)
+    return out
 
 
 def start_check(world_yaw=True, n=400, seed=0):
