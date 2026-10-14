@@ -18,6 +18,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8767", "--directory", "chassis-v2/out"],
       "port": 8767
+    },
+    {
+      "name": "research-tumble-out",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8768", "--directory", "research/tumble/out"],
+      "port": 8768
     }
   ]
 }
