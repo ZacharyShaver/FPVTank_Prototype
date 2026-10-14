@@ -107,3 +107,23 @@ extrusion line and arc, split into pieces of at most 1 mm, with supports and bri
   0.007, and the overall Brier score goes from 0.578 to 0.570. The shell-versus-solid hypothesis is ruled out.
 - Still untested: bounce (MuJoCo's default contact is critically damped, so nothing rebounds; a PLA print on a
   wood floor does), release jitter and spin, and the real edges.
+
+### Post hoc 2 (2026-10-14): the committed predictions dropped the wrong faces
+Looking at where the misses were, by start (`posthoc_attitude_fix.py`), led to a bug in `scale_model.predict`. The
+random heading was applied as a turn about the body's own z axis *after* the tilt. For the nose-down, tail-down and
+both side starts, that axis is horizontal. Each of those four starts was really an even mix of both ends and both
+sides (25% each); only upside down was right, and the 45-degree start was partly mixed. The main sweep (D) uses
+uniformly random orientations and is unaffected.
+- Fix: the heading turns about the world's vertical (`world_yaw=True`). `world_yaw=False` reproduces the committed
+  predictions exactly. `start_check()` now asserts that the intended face is down at release. Its control, the
+  committed code, fails it on 5 of 6 starts.
+- **With the fix, the model gets worse: Brier 0.578 to 0.861** (naive 1.293; still better, CI -0.52 to -0.35). The
+  pre-registered score was better than the model deserved, because the bug happened to mimic how much a real fall
+  randomizes.
+- The fixed model says a body dropped on an end or side mostly stays there: on its end 60% of the time (seen 7-13%),
+  on its side 76-92% (seen 16-17%). Real drops from 6 cm knock it off its narrow ends and sides; simulated ones don't.
+- Reading: the contact model is too dead. MuJoCo's default contact is critically damped and nothing rebounds, while
+  the coins rattle and PLA bounces on a wood floor. The printed-mass layout still makes no difference (0.845).
+- What follows has to be honest about tuning. Any bounce setting fitted to these 181 drops is exploratory. The test
+  is a prediction made before new data are seen. Two such data sets are available: Zach's 30 cm drops, which aren't
+  shared yet, and a slow-motion bounce measurement that sets the parameter without fitting.

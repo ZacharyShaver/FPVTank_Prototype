@@ -128,9 +128,16 @@ def mass_layout(info, print_grams, high):
     return M, com, It, P
 
 
-def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_mm=60.0, mu=1.0, seed=0, layout=None):
+def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_mm=60.0, mu=1.0, seed=0, layout=None,
+            world_yaw=True):
     """P(each rest state) for each starting attitude, by simulating the printed body with hand jitter. `layout`
-    (total g, CoM mm, inertia g mm^2) replaces mass_layout's uniform-solid estimate when given."""
+    (total g, CoM mm, inertia g mm^2) replaces mass_layout's uniform-solid estimate when given.
+
+    The random heading turns the body about the world's vertical (world_yaw=True). The committed 6 cm predictions
+    (drop_predictions.json, 2026-10-13) were made with world_yaw=False: the heading was the third intrinsic Euler
+    angle, a turn about the body's own z axis after the tilt, which for the end-down and side-down starts is
+    horizontal. So each of those four starts was really an even mix of both ends and both sides (found 2026-10-14
+    after the drops were scored). Upside down was unaffected; the 45-degree start was partly mixed."""
     import mujoco
     info = json.load(open(os.path.join(ROOT, 'models', name + '.json')))
     if layout is None:
@@ -154,7 +161,12 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
         for _ in range(n_per):
             r = np.radians(roll + rng.normal(0, jitter_deg / 2)); pt = np.radians(pitch + rng.normal(0, jitter_deg / 2))
             yw = rng.uniform(0, 2 * np.pi)
-            q = np.zeros(4); mujoco.mju_euler2Quat(q, np.array([r, pt, yw]), 'xyz')
+            q = np.zeros(4)
+            if world_yaw:                                    # tilt, then turn about the world's vertical
+                q0 = np.zeros(4); mujoco.mju_euler2Quat(q0, np.array([r, pt, 0.0]), 'xyz')
+                mujoco.mju_mulQuat(q, np.array([np.cos(yw / 2), 0.0, 0.0, np.sin(yw / 2)]), q0)
+            else:                                            # as committed 2026-10-13 (see the docstring)
+                mujoco.mju_euler2Quat(q, np.array([r, pt, yw]), 'xyz')
             R9 = np.zeros(9); mujoco.mju_quat2Mat(R9, q); R = R9.reshape(3, 3)
             mujoco.mj_resetData(m, d)
             d.qpos[:3] = (0, 0, drop_mm * s - (Ps @ R.T)[:, 2].min()); d.qpos[3:7] = q
@@ -169,6 +181,32 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
             cnt[T.classify(d.xmat[1].reshape(3, 3))] += 1
         out[att] = {k: v / n_per for k, v in cnt.items() if v}
     return dict(name=name, high=high, mass_g=round(M, 1), com_mm=com.round(1).tolist(), by_attitude=out)
+
+
+def start_check(world_yaw=True, n=400, seed=0):
+    """the start each attitude means, checked: at release the intended body axis must point down in at least 95%
+    of jittered drops (the 45-degree start: its two faces split it). Returns the failures. Control: world_yaw=False,
+    the committed code, must fail it."""
+    import mujoco
+    want = {'nose down': '+X', 'tail down': '-X', 'left side down': '-Y', 'right side down': '+Y', 'upside down': '+Z'}
+    rng = np.random.default_rng(seed); bad = {}
+    for att, (roll, pitch) in ATTITUDES.items():
+        hits = {}
+        for _ in range(n):
+            r = np.radians(roll + rng.normal(0, 7.5)); pt = np.radians(pitch + rng.normal(0, 7.5)); yw = rng.uniform(0, 2 * np.pi)
+            q = np.zeros(4)
+            if world_yaw:
+                q0 = np.zeros(4); mujoco.mju_euler2Quat(q0, np.array([r, pt, 0.0]), 'xyz')
+                mujoco.mju_mulQuat(q, np.array([np.cos(yw / 2), 0.0, 0.0, np.sin(yw / 2)]), q0)
+            else:
+                mujoco.mju_euler2Quat(q, np.array([r, pt, yw]), 'xyz')
+            R9 = np.zeros(9); mujoco.mju_quat2Mat(R9, q); v = R9.reshape(3, 3).T @ np.array([0, 0, -1.0])
+            i = int(np.argmax(np.abs(v))); k = ('+' if v[i] > 0 else '-') + 'XYZ'[i]; hits[k] = hits.get(k, 0) + 1
+        if att in want and hits.get(want[att], 0) < 0.95 * n:
+            bad[att] = hits
+        if att not in want and (hits.get('+Z', 0) + hits.get('-Y', 0) < 0.95 * n):
+            bad[att] = hits
+    return bad
 
 
 ATTITUDES = {'nose down': (0, 90), 'tail down': (0, -90), 'left side down': (90, 0), 'right side down': (-90, 0),
