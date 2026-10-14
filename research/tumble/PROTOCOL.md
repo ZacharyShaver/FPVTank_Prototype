@@ -235,3 +235,7 @@ and 4 tail-down drops of E3 (weight low) from 6 cm, filmed side-on and close.
   contact setting was standing in for that. This is the outcome recorded in advance as "something else is involved".
 - **Next:** a cleaner measurement needs either a release with no tilt (a jig) or a shape that can't rock, such as a
   printed PLA sphere of the same walls and infill, dropped onto the same floor.
+
+H4, model 4: `drop_predictions_30cm_bounce_measured` uses the start fix and the preliminary slow-motion bounce
+(restitution about 0.3, damping ratio 0.48). It was committed before any 30 cm data were seen, which completes H4's
+set of four models.
