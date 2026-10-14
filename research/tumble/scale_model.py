@@ -129,7 +129,7 @@ def mass_layout(info, print_grams, high):
 
 
 def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_mm=60.0, mu=1.0, seed=0, layout=None,
-            world_yaw=True, dampratio=None, timeconst=None):
+            world_yaw=True, dampratio=None, timeconst=None, timestep=0.0005):
     """P(each rest state) for each starting attitude, by simulating the printed body with hand jitter. `layout`
     (total g, CoM mm, inertia g mm^2) replaces mass_layout's uniform-solid estimate when given.
 
@@ -154,7 +154,7 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
     Isi = I * 1e-9
     full = ' '.join('%.8g' % v for v in (Isi[0, 0], Isi[1, 1], Isi[2, 2], Isi[0, 1], Isi[0, 2], Isi[1, 2]))
     sr = '' if dampratio is None and timeconst is None else f' solref="{timeconst or 0.02} {1.0 if dampratio is None else dampratio:.4f}"'
-    xml = f"""<mujoco><option timestep="0.0005"/><asset><mesh name="h" vertex="{verts}"/></asset><worldbody>
+    xml = f"""<mujoco><option timestep="{timestep}"/><asset><mesh name="h" vertex="{verts}"/></asset><worldbody>
       <geom type="plane" size="2 2 .1" friction="{0.45 * mu:.3f} 0.005 0.0005"{sr}/>
       <body name="b" pos="0 0 .3"><freejoint/>
         <inertial pos="{com[0] * s:.5f} {com[1] * s:.5f} {com[2] * s:.5f}" mass="{M * 1e-3:.5f}" fullinertia="{full}"/>
@@ -178,7 +178,7 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
             d.qpos[:3] = (0, 0, drop_mm * s - (Ps @ R.T)[:, 2].min()); d.qpos[3:7] = q
             still = 0
             for _ in range(240):
-                mujoco.mj_step(m, d, nstep=40)
+                mujoco.mj_step(m, d, nstep=int(round(0.02 / timestep)))
                 if np.abs(d.qvel).max() < 0.01:
                     still += 1
                     if still >= 6: break
