@@ -1,0 +1,238 @@
+{
+ "note": "post hoc",
+ "bodies": {
+  "E1_tub": {
+   "body_g": 37.86,
+   "spacer_g": 2.2,
+   "body_com_mm": [
+    2.59,
+    -0.02,
+    16.83
+   ],
+   "body_x_range": [
+    -39.5,
+    45.0
+   ],
+   "body_top_z": 41.5,
+   "sliced_grams_used_before": 40.48,
+   "mass low": {
+    "print_layout": {
+     "g": 108.1,
+     "com_z": 13.05,
+     "I_diag": [
+      26553.0,
+      25966.0,
+      41080.0
+     ]
+    },
+    "uniform_solid": {
+     "g": 108.5,
+     "com_z": 13.01,
+     "I_diag": [
+      21086.0,
+      21055.0,
+      32861.0
+     ]
+    }
+   },
+   "mass high": {
+    "print_layout": {
+     "g": 108.1,
+     "com_z": 19.86,
+     "I_diag": [
+      26276.0,
+      25689.0,
+      41080.0
+     ]
+    },
+    "uniform_solid": {
+     "g": 108.5,
+     "com_z": 19.47,
+     "I_diag": [
+      21133.0,
+      21102.0,
+      32861.0
+     ]
+    }
+   }
+  },
+  "E2_dome": {
+   "body_g": 48.06,
+   "spacer_g": 2.41,
+   "body_com_mm": [
+    1.72,
+    0.0,
+    21.67
+   ],
+   "body_x_range": [
+    -39.5,
+    45.0
+   ],
+   "body_top_z": 43.7,
+   "sliced_grams_used_before": 50.89,
+   "mass low": {
+    "print_layout": {
+     "g": 118.5,
+     "com_z": 15.37,
+     "I_diag": [
+      37948.0,
+      40621.0,
+      53300.0
+     ]
+    },
+    "uniform_solid": {
+     "g": 118.9,
+     "com_z": 15.22,
+     "I_diag": [
+      29978.0,
+      33156.0,
+      42659.0
+     ]
+    }
+   },
+   "mass high": {
+    "print_layout": {
+     "g": 118.5,
+     "com_z": 22.46,
+     "I_diag": [
+      34828.0,
+      37501.0,
+      53300.0
+     ]
+    },
+    "uniform_solid": {
+     "g": 118.9,
+     "com_z": 21.93,
+     "I_diag": [
+      27587.0,
+      30764.0,
+      42659.0
+     ]
+    }
+   }
+  },
+  "E3_tall": {
+   "body_g": 67.73,
+   "spacer_g": 3.92,
+   "body_com_mm": [
+    2.18,
+    -0.01,
+    30.31
+   ],
+   "body_x_range": [
+    -39.5,
+    45.0
+   ],
+   "body_top_z": 58.7,
+   "sliced_grams_used_before": 72.08,
+   "mass low": {
+    "print_layout": {
+     "g": 139.7,
+     "com_z": 20.74,
+     "I_diag": [
+      77388.0,
+      77906.0,
+      82035.0
+     ]
+    },
+    "uniform_solid": {
+     "g": 140.1,
+     "com_z": 20.42,
+     "I_diag": [
+      62353.0,
+      62390.0,
+      64212.0
+     ]
+    }
+   },
+   "mass high": {
+    "print_layout": {
+     "g": 139.7,
+     "com_z": 32.23,
+     "I_diag": [
+      65911.0,
+      66429.0,
+      82035.0
+     ]
+    },
+    "uniform_solid": {
+     "g": 140.1,
+     "com_z": 31.18,
+     "I_diag": [
+      53684.0,
+      53721.0,
+      64212.0
+     ]
+    }
+   }
+  }
+ },
+ "scores": {
+  "uniform solid (pre-registered)": {
+   "E1_tub mass low": {
+    "brier": 0.522,
+    "p_upright": 0.211,
+    "seen_upright": 0.333
+   },
+   "E1_tub mass high": {
+    "brier": 0.343,
+    "p_upright": 0.018,
+    "seen_upright": 0.133
+   },
+   "E2_dome mass low": {
+    "brier": 0.628,
+    "p_upright": 0.214,
+    "seen_upright": 0.29
+   },
+   "E2_dome mass high": {
+    "brier": 0.382,
+    "p_upright": 0.005,
+    "seen_upright": 0.033
+   },
+   "E3_tall mass low": {
+    "brier": 0.727,
+    "p_upright": 0.175,
+    "seen_upright": 0.5
+   },
+   "E3_tall mass high": {
+    "brier": 0.864,
+    "p_upright": 0.003,
+    "seen_upright": 0.2
+   },
+   "all": 0.578
+  },
+  "printed layout (post hoc)": {
+   "E1_tub mass low": {
+    "brier": 0.526,
+    "p_upright": 0.204,
+    "seen_upright": 0.333
+   },
+   "E1_tub mass high": {
+    "brier": 0.342,
+    "p_upright": 0.016,
+    "seen_upright": 0.133
+   },
+   "E2_dome mass low": {
+    "brier": 0.621,
+    "p_upright": 0.217,
+    "seen_upright": 0.29
+   },
+   "E2_dome mass high": {
+    "brier": 0.371,
+    "p_upright": 0.005,
+    "seen_upright": 0.033
+   },
+   "E3_tall mass low": {
+    "brier": 0.725,
+    "p_upright": 0.182,
+    "seen_upright": 0.5
+   },
+   "E3_tall mass high": {
+    "brier": 0.831,
+    "p_upright": 0.0,
+    "seen_upright": 0.2
+   },
+   "all": 0.57
+  }
+ }
+}

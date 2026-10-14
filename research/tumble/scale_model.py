@@ -128,11 +128,15 @@ def mass_layout(info, print_grams, high):
     return M, com, It, P
 
 
-def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_mm=60.0, mu=1.0, seed=0):
-    """P(each rest state) for each starting attitude, by simulating the printed body with hand jitter"""
+def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_mm=60.0, mu=1.0, seed=0, layout=None):
+    """P(each rest state) for each starting attitude, by simulating the printed body with hand jitter. `layout`
+    (total g, CoM mm, inertia g mm^2) replaces mass_layout's uniform-solid estimate when given."""
     import mujoco
     info = json.load(open(os.path.join(ROOT, 'models', name + '.json')))
-    M, com, I, P = mass_layout(info, print_grams, high)
+    if layout is None:
+        M, com, I, P = mass_layout(info, print_grams, high)
+    else:
+        (M, com, I), P = layout, hull_points(info['params'], info['scale'])
     s = 1e-3
     verts = ' '.join('%.5f' % v for v in (P * s).ravel())
     Isi = I * 1e-9

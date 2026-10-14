@@ -96,3 +96,14 @@ The candidates for what it misses are untested, and post hoc from here:
 - contact softness and bounce;
 - release jitter and spin;
 - the real edges of the print.
+
+### Post hoc 1 (2026-10-14): the printed mass layout does not explain the miss
+`posthoc_print_mass.py` rebuilds each body's mass, centre of mass and inertia from the sliced G-code: every
+extrusion line and arc, split into pieces of at most 1 mm, with supports and brim excluded.
+- Registration checks: no plastic falls outside the hull, the tops agree within 0.5 mm, and the weights agree with
+  the slicer's within 1%.
+- Control: given the old uniform layout, the new code path reproduces the committed predictions exactly.
+- Result: with the walls-and-infill layout, the centre of mass moves less than 1 mm, P(upright) moves by at most
+  0.007, and the overall Brier score goes from 0.578 to 0.570. The shell-versus-solid hypothesis is ruled out.
+- Still untested: bounce (MuJoCo's default contact is critically damped, so nothing rebounds; a PLA print on a
+  wood floor does), release jitter and spin, and the real edges.
