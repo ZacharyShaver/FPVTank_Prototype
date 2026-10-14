@@ -62,3 +62,13 @@ the predictions were committed first (research/results/drop_predictions.json, co
      The first block is mass high.
   3. "c" (E3, mass low, left side down, drop 5) is an unknown mark and is left out. Zach, after the first scoring:
      a typo for x. Corrected, and the run rescored on all 180 drops; the first scoring (179) is in git history.
+
+## Slow-motion videos of the PLA ball (2026-10-14, 240 fps, not in git)
+The ball is `models/ball_pla_40.stl`, printed like the bodies: 2 walls, 10% infill. It is dropped by hand onto the
+same floor.
+- `IMG_1640.MOV`: rough. The camera was too close to read the drop height reliably. Restitution 0.45-0.65.
+  Superseded.
+- `IMG_1642.MOV` (iPhone 15, 642 MB, 58 s, 13,869 frames, 239.5 fps average): side-on from floor level, against a
+  black board. It has 12 drops from 7-12 cm, by the ball's own scale (Zach aimed for 6 cm without a ruler). Measured
+  by `tumble/measure_ball.py`, with results in `results/ball_restitution.md`. **First-impact restitution: 0.39 mean,
+  range 0.24-0.61.** Later, slower bounces have a median of 0.78.

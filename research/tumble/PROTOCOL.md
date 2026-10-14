@@ -349,3 +349,23 @@ CIs excluding 0.
 
 **Secondary, no direction predicted:** the 0.31 hard floor vs the 0.55 one (which bounce fits), and vs the fitted
 soft bounce.
+
+## H3c second amendment (2026-10-14, before any 15 cm drop): the PLA ball, measured
+A second slow-motion video of the ball (`IMG_1642.MOV`) was filmed side-on from floor level, against a black board,
+far enough back to see the whole drop. `measure_ball.py` fits each drop as one ballistic path, and the ball's own
+40 mm width checks the scale: gravity comes out at 9.8-11.0 m/s^2. Results are in `results/ball_restitution.md`.
+- **First impact: restitution 0.39 mean (95% CI 0.33-0.46), range 0.24-0.61, over 12 drops.** The drops were from
+  7-12 cm, with impacts at 1.15-1.54 m/s. The spread is real: every fit is clean, and two centroid methods agree to
+  0.005. Its cause is not known. Candidates are which part of the 2-wall, 10%-infill shell strikes, and where on the
+  floor it lands.
+- The rough 0.55 from the first ball video was too high. 0.39 is close to E3's 0.31.
+- **Slower bounces are much livelier: median 0.78 at 0.2-0.9 m/s** (23 later bounces). MuJoCo's contact gives one
+  restitution at every speed (0.31-0.32 from 6 to 30 cm at damping 0.45). So every model here under-bounces the slow
+  rocking impacts after a landing. H3c does not test this; it stays an open question.
+
+Added before any 15 cm drop:
+- `drop_predictions_15cm_hard_floor_ball2`: hard floor at 0.1 ms, damping 0.35, which gives restitution 0.38-0.40
+  from 6 to 30 cm (`scale_model.bounce_curve`). This is the ball's measured 0.39.
+
+The primary test is unchanged: the 0.31 hard floor. The 0.55 set stays recorded and is scored. **Secondary, no
+direction predicted:** the 0.39 hard floor against the 0.31 one, the 0.55 one and the fitted soft bounce.

@@ -189,9 +189,10 @@ def predict(name, print_grams, high, attitudes, jitter_deg=15.0, n_per=60, drop_
     return dict(name=name, high=high, mass_g=round(M, 1), com_mm=com.round(1).tolist(), by_attitude=out)
 
 
-def bounce_curve(name='E3_tall', high=False, ratios=(None, 1.0, 0.6, 0.4, 0.3, 0.2, 0.1, 0.05), drop_mm=60.0):
+def bounce_curve(name='E3_tall', high=False, ratios=(None, 1.0, 0.6, 0.4, 0.3, 0.2, 0.1, 0.05), drop_mm=60.0, timeconst=0.02, timestep=0.0005):
     """restitution for each contact damping ratio: the body dropped flat on its base from drop_mm, upward speed just
-    after the first impact over the speed just before (MuJoCo's soft contact, solref timeconst 0.02)"""
+    after the first impact over the speed just before (MuJoCo's soft contact, solref timeconst 0.02; a hard floor is
+    timeconst 0.002, which needs timestep 0.0001, audit C14)"""
     import mujoco, predict_drops as PD
     info = json.load(open(os.path.join(ROOT, 'models', name + '.json')))
     M, com, I, P = mass_layout(info, PD.GRAMS[name], high); s = 1e-3; Isi = I * 1e-9
@@ -199,17 +200,17 @@ def bounce_curve(name='E3_tall', high=False, ratios=(None, 1.0, 0.6, 0.4, 0.3, 0
     full = ' '.join('%.8g' % v for v in (Isi[0, 0], Isi[1, 1], Isi[2, 2], Isi[0, 1], Isi[0, 2], Isi[1, 2]))
     out = {}
     for dr in ratios:
-        sr = '' if dr is None else f' solref="0.02 {dr:.4f}"'
-        xml = f"""<mujoco><option timestep="0.0005"/><asset><mesh name="h" vertex="{verts}"/></asset><worldbody>
+        sr = '' if dr is None else f' solref="{timeconst} {dr:.4f}"'
+        xml = f"""<mujoco><option timestep="{timestep}"/><asset><mesh name="h" vertex="{verts}"/></asset><worldbody>
           <geom type="plane" size="2 2 .1" friction="0.45 0.005 0.0005"{sr}/><body name="b" pos="0 0 .3"><freejoint/>
           <inertial pos="{com[0] * s:.5f} {com[1] * s:.5f} {com[2] * s:.5f}" mass="{M * 1e-3:.5f}" fullinertia="{full}"/>
           <geom type="mesh" mesh="h" friction="0.45 0.005 0.0005"{sr}/></body></worldbody></mujoco>"""
         m = mujoco.MjModel.from_xml_string(xml); d = mujoco.MjData(m)
         d.qpos[:3] = (0, 0, drop_mm * s - (P * s)[:, 2].min()); d.qpos[3:7] = (1, 0, 0, 0)
         vz = []
-        for _ in range(1200):
+        for _ in range(int(round(0.6 / timestep))):
             mujoco.mj_step(m, d); vz.append(d.qvel[2])
-        vz = np.array(vz); i = int(np.argmax(vz > 0)); v_in = -vz[:i].min(); v_out = vz[i:i + 200].max()
+        vz = np.array(vz); i = int(np.argmax(vz > 0)); v_in = -vz[:i].min(); v_out = vz[i:i + int(round(0.1 / timestep))].max()
         out['default' if dr is None else dr] = round(float(v_out / v_in), 3)
     return out
 
