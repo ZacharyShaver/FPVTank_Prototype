@@ -38,3 +38,15 @@ the predictions were committed first (research/results/drop_predictions.json, co
   predicted "nose up"/"nose down" rest labels are swapped back. Probabilities are unchanged.
 - `results/drop_predictions_30cm.*` are the same model at 300 mm, for the 30 cm drops (recorded elsewhere, no
   video). They were run after those drops, so they count as post hoc.
+
+## Slow-motion video 1 (`IMG_1628.MOV`, 2026-10-14, 240 fps, 434 MB, not in git)
+- 5 drops of E3, weight low, filmed looking along the floor from about a metre away.
+- Released from well above 6 cm: the body is in view and falling for about 0.18 s before it lands, already more than
+  a 6 cm fall takes (0.11 s), so it fell at least 15 cm.
+- The bodies land tilted and tumble; none landed flat.
+- The 5th drop split the tape: the coins and the spacer spilled out.
+- **Not usable for restitution**, which needs flat drops from 6 cm filmed from the side, close up.
+- **Not part of H4.** H4's 30 cm data are the 2026-10-13 session's, which I still haven't seen. These drops I have
+  seen, so they can't be a blind test.
+- Qualitatively they agree with the bounce reading: after impact the body keeps moving, rocking onto its side and
+  back, rather than stopping where it lands.
