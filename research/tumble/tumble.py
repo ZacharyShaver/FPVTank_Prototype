@@ -60,6 +60,26 @@ def shell_points(top, rnd, n=48, k=9, width=R0):
     return np.vstack(pts)
 
 
+SHELL_MASS = 'fixed'     # 'fixed': 600 g at Z 50 for every shape (as the sweep ran, 2026-10-13); 'area': the shell's
+                         # mass scales with its surface area (600 g at the tub's) and sits at its area centroid
+
+
+def shell_mass(p):
+    """(g, (x, y, z)) of the shell: SHELL_MASS 'fixed', or 'area' (added 2026-10-14: the fixed shell left a 210 mm dome
+    as light and as low as the 66 mm tub, which understates a tall shell's CoM by ~40 mm)"""
+    if SHELL_MASS == 'fixed':
+        return 600.0, (-20.0, 0.0, 50.0)
+    from scipy.spatial import ConvexHull
+    def area(top, rnd, width):
+        pts = shell_points(top, rnd, width=width); h = ConvexHull(pts); tri = pts[h.simplices]
+        ar = 0.5 * np.linalg.norm(np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]), axis=1)
+        keep = ~np.all(tri[:, :, 2] < Z0 + 0.5, axis=1)                  # no floor: the shell is open underneath
+        c = (tri[keep].mean(1) * ar[keep, None]).sum(0) / ar[keep].sum()
+        return ar[keep].sum(), c
+    a0, _ = area(66.0, 0.08, R0); a, c = area(p['top'], p['round'], p['width'])
+    return 600.0 * a / a0, (float(c[0]), 0.0, float(c[2]))
+
+
 def mass_model(p):
     """(name, mass g, position mm, half-size mm or None) for the inertia; a box when half-size is given"""
     dz = p['dz']
@@ -70,7 +90,7 @@ def mass_model(p):
     items += [('head', p['m_head'], (115.0, 0.0, 95.0), (30, 30, 30)),
               ('pack L', 300.0, (44.5, 53.0, 33.0 + dz), (70, 13, 23)), ('pack R', 300.0, (44.5, -53.0, 33.0 + dz), (70, 13, 23)),
               ('electronics', 300.0, (-40.0, 0.0, 45.0 + dz), (40, 30, 15)),
-              ('shell', 600.0, (-20.0, 0.0, 50.0), (170, 65, 30))]
+              ('shell', *shell_mass(p), (170, 65, 30))]
     return items
 
 

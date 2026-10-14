@@ -127,3 +127,14 @@ uniformly random orientations and is unaffected.
 - What follows has to be honest about tuning. Any bounce setting fitted to these 181 drops is exploratory. The test
   is a prediction made before new data are seen. Two such data sets are available: Zach's 30 cm drops, which aren't
   shared yet, and a slow-motion bounce measurement that sets the parameter without fitting.
+
+### Post hoc 3 (2026-10-14): simulator audit (`audit/AUDIT.md`)
+- **The sweep's shell weighed the same and sat at the same height for every shape** (600 g at Z 50). If its mass
+  scales with its area and sits at its area centroid, the best tall, wide designs' CoM rises about 40 mm, and their
+  P(upright) falls from 0.62-0.68 to 0.33-0.37, no better than the tub (0.39).
+  - D's design conclusion ("self-righting needs a tall, peaked top wider than the wheels") came from that
+    weightless shell. It holds only if the shell is light for its size.
+  - D's surrogate results are unaffected: they measure the GP against the simulator, whatever the simulator models.
+  - E is unaffected: the printed bodies carry their real mass.
+- Two naming mix-ups were found, with no numbers changed. Contact rebounds at restitution 0.08, which is dead.
+- Penetration, face stability, time step, settle rule and registration all passed.
