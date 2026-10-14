@@ -42,7 +42,7 @@ dead-contact simulator that E showed under-predicts tumbling, so these are provi
 
 | Test | Result |
 |---|---|
-| Resting penetration into the floor (`audit_sim.py pen`) | 0.02 mm at the default contact |
+| Resting penetration into the floor (`audit_sim.py pen`) | 0.02 mm at the default contact. **Incomplete (C13):** on impact the same contact sinks 7.4 mm (6 cm drop) and 17 mm (30 cm); a stiff contact (timeconst 0.002) sinks 0.2-1.7 mm. Found by Zach in the viewer |
 | Face stability, sim vs hand calculation, 3 bodies x 2 masses x 6 faces (`static`) | agree in all 36. Where the CoM is outside the support, the sim rolls to a nearby tilted rest of the same class. Ends are narrow: E1 balances on an end with 2.7 mm to spare (mass low) |
 | Time step 1 / 0.5 / 0.25 ms (`audit_conv.py`) | identical |
 | Settle rule: 0.12 s vs 0.5 s still; a 0.3 rad/s knock after settling | identical / within 0.03 |
