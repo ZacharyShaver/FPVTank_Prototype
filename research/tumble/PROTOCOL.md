@@ -286,3 +286,20 @@ both masses toward the same outcomes.
 Naming note (2026-10-14): this file's "H4" (the 30 cm drops) is part of the sprint plan's H3 (sim-to-real), and is
 called H3b in the write-up. The sprint plan's H4 (the AI-in-the-loop cycle time) is unrelated. Commits before this
 note say "H4" for the 30 cm test.
+
+### Post hoc 7 (2026-10-14): a hard floor with the measured bounce explains both heights, unfitted
+MuJoCo's default contact (time constant 0.02 s) lets a body sink 7.4 mm into the floor on a 6 cm drop and 17 mm at
+30 cm (C13, L12, found by Zach in the viewer). `posthoc_stiff.py` makes the floor hard (time constant 0.002 s,
+0.3-0.5 mm) and sets its bounce from the slow-motion measurement (restitution ~0.3, damping ratio 0.35). No part of
+it is fitted to drop outcomes.
+
+| Model | Brier, 6 cm | Brier, 30 cm |
+|---|---|---|
+| naive | 1.293 | 1.506 |
+| soft floor, dead | 0.861 | 1.156 |
+| soft floor, bounce fitted at 6 cm | 0.443 | 0.634 |
+| **hard floor, bounce measured** | **0.472** | **0.638** |
+
+Its 30 cm mass control is closer to what was seen (E2 0.54 vs 0.48 predicted, 16/30 vs 14/30 seen). Reading: the
+fitted bounce worked mostly by making the floor harder. The physical fix is a hard floor plus the measured
+restitution. Both data sets have been seen, so this is post hoc; H3c below tests it on new drops.

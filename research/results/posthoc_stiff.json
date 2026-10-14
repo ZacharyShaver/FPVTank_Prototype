@@ -1,0 +1,51 @@
+{
+ "note": "post hoc",
+ "stiff": {
+  "timeconst": 0.002,
+  "dampratio": 0.35
+ },
+ "naive": {
+  "six": 1.293,
+  "thirty": 1.506
+ },
+ "models": [
+  {
+   "model": "dead contact (start fixed)",
+   "brier_6cm": 0.861,
+   "brier_30cm": 1.156,
+   "top_30cm": 0.283
+  },
+  {
+   "model": "soft floor, bounce fitted at 6 cm",
+   "brier_6cm": 0.443,
+   "brier_30cm": 0.634,
+   "top_30cm": 0.472
+  },
+  {
+   "model": "soft floor, bounce measured",
+   "brier_6cm": null,
+   "brier_30cm": 0.784,
+   "top_30cm": 0.417
+  },
+  {
+   "model": "hard floor, bounce measured (this run)",
+   "brier_6cm": 0.472,
+   "brier_30cm": 0.638,
+   "top_30cm": 0.45
+  }
+ ],
+ "control_30cm_pred_upright": {
+  "E1_tub": {
+   "low": 0.46,
+   "high": 0.32
+  },
+  "E2_dome": {
+   "low": 0.54,
+   "high": 0.48
+  },
+  "E3_tall": {
+   "low": 0.66,
+   "high": 0.3
+  }
+ }
+}
