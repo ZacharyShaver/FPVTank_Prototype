@@ -247,3 +247,38 @@ were guessed by eye, "about a foot" each time, with no mark. He will redo it wit
 - Redo protocol: release with the lowest point at a marked 30 cm; the same six starts x 5; Zach's nose/tail
   convention; the same floor; the pocket taped with two crossed strips, checked after each body; a drop where the
   coins come out is recorded and redone. A regular (30 fps) video if possible, for checking the readings.
+
+## H4 results (2026-10-14): the 30 cm redo, 180 drops, against four models committed before it
+Scoring: `score_30cm.py`, committed before it ran. The readings of the sheet were fixed and committed before
+scoring; one mark ("c") was later corrected by Zach to x, and the run was rescored.
+
+| Model (committed before the data) | Brier | minus naive (95% CI) | top state right |
+|---|---|---|---|
+| naive ("stays on the face it was dropped on") | 1.506 | | |
+| 1: old start, dead contact | 0.871 | -0.63 (-0.74 to -0.53) | 0.37 |
+| 2: start fixed, dead contact | 1.156 | -0.35 (-0.43 to -0.27) | 0.28 |
+| **3: start fixed, bounce fitted at 6 cm** | **0.634** | **-0.87 (-1.01 to -0.73)** | **0.47** |
+| 4: start fixed, bounce measured (~0.3) | 0.784 | -0.72 (-0.84 to -0.61) | 0.42 |
+
+**H4 supported.** On drops it had never seen, from 5x the height, the bounce model beats the dead-contact model by
+0.52 (95% CI 0.40 to 0.64) and the naive predictor by 0.87. The measured-bounce model also beats dead contact
+(0.37, CI 0.29 to 0.46), but by less than the fitted one.
+
+What is still wrong:
+- **The mass control is weaker in reality than the model says.** P(upright) for low vs high:
+
+  | Body | Predicted | Seen | Fisher p |
+  |---|---|---|---|
+  | E1 | 0.51 vs 0.32 | 10/30 vs 9/30 | 1.0 |
+  | E2 | 0.61 vs 0.39 | 16/30 vs 14/30 | 0.80 |
+  | E3 | 0.71 vs 0.34 | 16/30 vs 9/30 | 0.12 |
+
+  All three point the same way, but from 30 cm the outcome depends on the mass far less than predicted.
+- Mass low, the model over-predicts upright: from upside down it predicts 0.62, and 0.40 was seen. Mass high,
+  it under-predicts upright after end drops: 0.30-0.39 predicted, 0.53 seen.
+- Again, the old start (bug and all) scores better than the fixed start with dead contact. The randomising bug
+  stands in for missing randomness in the dead model, as it did at 6 cm.
+
+Reading: adding bounce was the right direction, and it carries to a new height. The model is now too confident
+about mass. Real 30 cm drops randomise more than the model (rocking, rattling coins, hand release), which pulls
+both masses toward the same outcomes.

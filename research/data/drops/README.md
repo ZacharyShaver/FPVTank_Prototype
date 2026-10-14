@@ -59,4 +59,5 @@ the predictions were committed first (research/results/drop_predictions.json, co
      E1 righting itself from most upside-down starts.)
   2. The second block, "weight in first then coins then tape", is mass low: the spacer first, coins by the base.
      The first block is mass high.
-  3. "c" (E3, mass low, left side down, drop 5) is an unknown mark and is left out.
+  3. "c" (E3, mass low, left side down, drop 5) is an unknown mark and is left out. Zach, after the first scoring:
+     a typo for x. Corrected, and the run rescored on all 180 drops; the first scoring (179) is in git history.

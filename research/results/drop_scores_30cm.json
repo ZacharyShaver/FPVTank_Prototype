@@ -1,0 +1,327 @@
+{
+ "n": 180,
+ "naive": 1.506,
+ "models": {
+  "1 old start, dead": {
+   "brier": 0.871,
+   "minus_naive": -0.634,
+   "minus_naive_95": [
+    -0.741,
+    -0.525
+   ],
+   "top_hit": 0.372
+  },
+  "2 start fixed, dead": {
+   "brier": 1.156,
+   "minus_naive": -0.349,
+   "minus_naive_95": [
+    -0.426,
+    -0.273
+   ],
+   "top_hit": 0.283
+  },
+  "3 start fixed, bounce fitted (main)": {
+   "brier": 0.634,
+   "minus_naive": -0.872,
+   "minus_naive_95": [
+    -1.006,
+    -0.729
+   ],
+   "top_hit": 0.472
+  },
+  "4 start fixed, bounce measured": {
+   "brier": 0.784,
+   "minus_naive": -0.722,
+   "minus_naive_95": [
+    -0.841,
+    -0.606
+   ],
+   "top_hit": 0.417
+  }
+ },
+ "H4": {
+  "main_minus_dead": -0.522,
+  "main_minus_dead_95": [
+   -0.64,
+   -0.402
+  ],
+  "main_minus_naive_95": [
+   -1.006,
+   -0.729
+  ],
+  "supported": true
+ },
+ "measured_minus_dead": {
+  "mean": -0.373,
+  "ci95": [
+   -0.458,
+   -0.292
+  ]
+ },
+ "groups": {
+  "E1_tub mass low": {
+   "n": 30,
+   "brier": {
+    "1 old start, dead": 0.786,
+    "2 start fixed, dead": 1.116,
+    "3 start fixed, bounce fitted (main)": 0.613,
+    "4 start fixed, bounce measured": 0.703
+   },
+   "p_upright_pred": 0.51,
+   "upright_seen": 10
+  },
+  "E1_tub mass high": {
+   "n": 30,
+   "brier": {
+    "1 old start, dead": 0.598,
+    "2 start fixed, dead": 1.017,
+    "3 start fixed, bounce fitted (main)": 0.501,
+    "4 start fixed, bounce measured": 0.638
+   },
+   "p_upright_pred": 0.323,
+   "upright_seen": 9
+  },
+  "E2_dome mass low": {
+   "n": 30,
+   "brier": {
+    "1 old start, dead": 0.899,
+    "2 start fixed, dead": 1.36,
+    "3 start fixed, bounce fitted (main)": 0.584,
+    "4 start fixed, bounce measured": 0.765
+   },
+   "p_upright_pred": 0.614,
+   "upright_seen": 16
+  },
+  "E2_dome mass high": {
+   "n": 30,
+   "brier": {
+    "1 old start, dead": 0.888,
+    "2 start fixed, dead": 1.14,
+    "3 start fixed, bounce fitted (main)": 0.616,
+    "4 start fixed, bounce measured": 0.833
+   },
+   "p_upright_pred": 0.391,
+   "upright_seen": 14
+  },
+  "E3_tall mass low": {
+   "n": 30,
+   "brier": {
+    "1 old start, dead": 0.94,
+    "2 start fixed, dead": 1.055,
+    "3 start fixed, bounce fitted (main)": 0.683,
+    "4 start fixed, bounce measured": 0.786
+   },
+   "p_upright_pred": 0.713,
+   "upright_seen": 16
+  },
+  "E3_tall mass high": {
+   "n": 30,
+   "brier": {
+    "1 old start, dead": 1.115,
+    "2 start fixed, dead": 1.249,
+    "3 start fixed, bounce fitted (main)": 0.807,
+    "4 start fixed, bounce measured": 0.979
+   },
+   "p_upright_pred": 0.338,
+   "upright_seen": 9
+  }
+ },
+ "control": {
+  "E1_tub": {
+   "pred_low": 0.51,
+   "pred_high": 0.323,
+   "seen_low": "10/30",
+   "seen_high": "9/30",
+   "same_direction": true,
+   "fisher_p": 1.0
+  },
+  "E2_dome": {
+   "pred_low": 0.614,
+   "pred_high": 0.391,
+   "seen_low": "16/30",
+   "seen_high": "14/30",
+   "same_direction": true,
+   "fisher_p": 0.7965
+  },
+  "E3_tall": {
+   "pred_low": 0.713,
+   "pred_high": 0.338,
+   "seen_low": "16/30",
+   "seen_high": "9/30",
+   "same_direction": true,
+   "fisher_p": 0.1154
+  }
+ },
+ "by_start": {
+  "low / nose down": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.62,
+    "inverted": 0.26,
+    "side": 0.1,
+    "head up": 0.01,
+    "head down": 0.01
+   },
+   "observed": {
+    "upright": 0.53,
+    "inverted": 0.33,
+    "side": 0.07,
+    "head up": 0.07,
+    "head down": 0.0
+   }
+  },
+  "low / tail down": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.62,
+    "inverted": 0.25,
+    "side": 0.1,
+    "head up": 0.01,
+    "head down": 0.02
+   },
+   "observed": {
+    "upright": 0.53,
+    "inverted": 0.13,
+    "side": 0.27,
+    "head up": 0.0,
+    "head down": 0.07
+   }
+  },
+  "low / side": {
+   "n": 30,
+   "predicted": {
+    "upright": 0.61,
+    "inverted": 0.29,
+    "side": 0.09,
+    "head up": 0.01,
+    "head down": 0.0
+   },
+   "observed": {
+    "upright": 0.5,
+    "inverted": 0.4,
+    "side": 0.1,
+    "head up": 0.0,
+    "head down": 0.0
+   }
+  },
+  "low / upside down": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.62,
+    "inverted": 0.29,
+    "side": 0.08,
+    "head up": 0.01,
+    "head down": 0.01
+   },
+   "observed": {
+    "upright": 0.4,
+    "inverted": 0.53,
+    "side": 0.07,
+    "head up": 0.0,
+    "head down": 0.0
+   }
+  },
+  "low / upside down, 45 to the left": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.6,
+    "inverted": 0.29,
+    "side": 0.08,
+    "head up": 0.01,
+    "head down": 0.01
+   },
+   "observed": {
+    "upright": 0.33,
+    "inverted": 0.47,
+    "side": 0.13,
+    "head up": 0.07,
+    "head down": 0.0
+   }
+  },
+  "high / nose down": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.3,
+    "inverted": 0.55,
+    "side": 0.09,
+    "head up": 0.03,
+    "head down": 0.02
+   },
+   "observed": {
+    "upright": 0.53,
+    "inverted": 0.27,
+    "side": 0.13,
+    "head up": 0.0,
+    "head down": 0.07
+   }
+  },
+  "high / tail down": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.39,
+    "inverted": 0.48,
+    "side": 0.08,
+    "head up": 0.02,
+    "head down": 0.02
+   },
+   "observed": {
+    "upright": 0.53,
+    "inverted": 0.2,
+    "side": 0.07,
+    "head up": 0.13,
+    "head down": 0.07
+   }
+  },
+  "high / side": {
+   "n": 30,
+   "predicted": {
+    "upright": 0.36,
+    "inverted": 0.52,
+    "side": 0.1,
+    "head up": 0.01,
+    "head down": 0.01
+   },
+   "observed": {
+    "upright": 0.33,
+    "inverted": 0.47,
+    "side": 0.17,
+    "head up": 0.03,
+    "head down": 0.0
+   }
+  },
+  "high / upside down": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.32,
+    "inverted": 0.54,
+    "side": 0.07,
+    "head up": 0.03,
+    "head down": 0.05
+   },
+   "observed": {
+    "upright": 0.33,
+    "inverted": 0.53,
+    "side": 0.07,
+    "head up": 0.07,
+    "head down": 0.0
+   }
+  },
+  "high / upside down, 45 to the left": {
+   "n": 15,
+   "predicted": {
+    "upright": 0.36,
+    "inverted": 0.51,
+    "side": 0.08,
+    "head up": 0.02,
+    "head down": 0.02
+   },
+   "observed": {
+    "upright": 0.07,
+    "inverted": 0.67,
+    "side": 0.07,
+    "head up": 0.13,
+    "head down": 0.07
+   }
+  }
+ }
+}

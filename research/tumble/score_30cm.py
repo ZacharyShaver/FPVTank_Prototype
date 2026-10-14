@@ -24,7 +24,8 @@ def per_drop(rows, P):
 
 
 if __name__ == '__main__':
-    R = [r for r in csv.DictReader(open(os.path.join(ROOT, 'data', 'drops', 'run3_30cm.csv'), encoding='utf-8')) if r['mark'] in SD.MARK2CLS]
+    ALL = list(csv.DictReader(open(os.path.join(ROOT, 'data', 'drops', 'run3_30cm.csv'), encoding='utf-8')))
+    R = [r for r in ALL if r['mark'] in SD.MARK2CLS]
     Ps = {k: json.load(open(os.path.join(ROOT, 'results', f))) for k, f in MODELS.items()}
     rng = np.random.default_rng(0); B = [rng.integers(0, len(R), len(R)) for _ in range(4000)]
     naive = np.array([((SD.naive(r['start']) - SD.onehot(SD.MARK2CLS[r['mark']])) ** 2).sum() for r in R])
@@ -72,7 +73,7 @@ if __name__ == '__main__':
             out['by_start'][f'{m} / {s}'] = dict(n=len(rows), predicted=dict(zip(SD.CLS, pm.round(2).tolist())), observed=dict(zip(SD.CLS, ob.round(2).tolist())))
     json.dump(out, open(os.path.join(ROOT, 'results', 'drop_scores_30cm.json'), 'w'), indent=1)
     L = ['# H4: the 30 cm redo against the four models committed before it', '',
-         f"{out['n']} drops (one unknown mark left out). Naive predictor Brier {out['naive']}.", '',
+         f"{out['n']} drops ({len(ALL) - len(R)} with an unknown mark left out). Naive predictor Brier {out['naive']}.", '',
          '| model | Brier | minus naive (95% CI) | top state right |', '|---|---|---|---|']
     for k, v in out['models'].items():
         L.append(f"| {k} | {v['brier']} | {v['minus_naive']} ({v['minus_naive_95'][0]} to {v['minus_naive_95'][1]}) | {v['top_hit']} |")
