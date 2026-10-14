@@ -18,23 +18,29 @@ GRAMS = {'E1_tub': 40.48, 'E2_dome': 50.89, 'E3_tall': 72.08}      # Orca, suppo
 
 
 def one(args):
-    name, high, mu, drop_mm = args
+    name, high, mu, drop_mm, dampratio, old_start = args
     sys.path.insert(0, HERE)
     import scale_model as S
-    return (name, high, mu), S.predict(name, GRAMS[name], high, S.ATTITUDES, n_per=200, mu=mu, seed=7, drop_mm=drop_mm)
+    return (name, high, mu), S.predict(name, GRAMS[name], high, S.ATTITUDES, n_per=200, mu=mu, seed=7, drop_mm=drop_mm,
+                                       dampratio=dampratio, world_yaw=not old_start)
 
 
 if __name__ == '__main__':
     import argparse
     ap = argparse.ArgumentParser(); ap.add_argument('--drop-mm', type=float, default=60.0); ap.add_argument('--tag', default='')
     ap.add_argument('--title', default='Drop predictions (committed before any drop)'); ap.add_argument('--bodies', nargs='*')
+    ap.add_argument('--dampratio', type=float, default=None, help='contact damping ratio (bounce); default: the MuJoCo default, a dead contact')
+    ap.add_argument('--old-start', action='store_true', help='the committed 2026-10-13 start (heading about the body axis; see scale_model.predict)')
     A = ap.parse_args()
+    if not A.tag and not (A.old_start and A.drop_mm == 60.0 and A.dampratio is None and not A.bodies):
+        sys.exit('only an exact rerun of the committed predictions (--old-start, nothing else) may write without --tag')
     bodies = A.bodies or list(GRAMS)
-    jobs = [(n, h, mu, A.drop_mm) for n in bodies for h in (False, True) for mu in (1.0, 0.65, 1.5)]
+    jobs = [(n, h, mu, A.drop_mm, A.dampratio, A.old_start) for n in bodies for h in (False, True) for mu in (1.0, 0.65, 1.5)]
     with Pool(min(18, len(jobs))) as pool:
         R = dict(pool.map(one, jobs))
-    out = {'drop_mm': A.drop_mm}
-    lines = [f'# {A.title}', '', f'Release height {A.drop_mm:.0f} mm (lowest point of the body above the table).', '',
+    out = {'drop_mm': A.drop_mm, 'dampratio': A.dampratio, 'old_start': A.old_start}
+    lines = [f'# {A.title}', '', f'Release height {A.drop_mm:.0f} mm (lowest point of the body above the table). Contact damping ratio: '
+             f"{A.dampratio if A.dampratio is not None else 'default (dead)'}. Start: {'old (body-axis heading)' if A.old_start else 'fixed (world heading)'}.", '',
              'Each cell: the most likely rest state and its probability at the nominal friction, then the range of that',
              "probability across 0.65x to 1.5x friction. 200 simulated drops per cell.", '']
     for n in bodies:
@@ -53,8 +59,6 @@ if __name__ == '__main__':
                 lines.append(f'| {a} | {top} | {p[top]:.2f} | {min(rng + [p[top]]):.2f}-{max(rng + [p[top]]):.2f} | {others} |')
             lines.append('')
     tag = f'_{A.tag}' if A.tag else ''
-    if not tag and (A.drop_mm != 60.0 or A.bodies):
-        sys.exit('a non-default run needs --tag, so it cannot overwrite the committed predictions')
     json.dump(out, open(os.path.join(ROOT, 'results', f'drop_predictions{tag}.json'), 'w'), indent=1)
     open(os.path.join(ROOT, 'results', f'drop_predictions{tag}.md'), 'w', encoding='utf-8').write('\n'.join(lines))
     print('\n'.join(lines[:40]))

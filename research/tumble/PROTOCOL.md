@@ -177,3 +177,20 @@ At 0.56 the model matches all three signatures of the miss (predicted / seen):
 **Next, also before any 30 cm data are seen:** predictions at 30 cm are committed for the start-fixed model with the
 fitted bounce (damping ratio 0.2). After the video, a second set with the measured bounce follows, still before the
 30 cm data.
+
+## H4: the 30 cm drops (pre-registered 2026-10-14, before any 30 cm data are seen)
+Zach dropped the bodies from 30 cm as well (no video). I haven't seen those results. Several models' predictions for
+them are committed before they are shared:
+1. `drop_predictions_30cm` (2026-10-13): the old start and dead contact;
+2. `drop_predictions_30cm_dead`: the start fixed, dead contact (the control for the bounce);
+3. **`drop_predictions_30cm_bounce_fit`: the start fixed, with the bounce fitted to the 6 cm drops (damping ratio 0.2,
+   restitution 0.56). This is the main test;**
+4. `drop_predictions_30cm_bounce_measured`: the start fixed, with the bounce from the slow-motion video, if the video
+   comes before the 30 cm data.
+
+Scoring follows `score_drops.py`'s rules: Brier against the naive predictor, the most likely state, and the mass
+control if both masses were run.
+
+**Hypothesis:** model 3 scores a lower Brier than both model 2 and the naive predictor, with bootstrap 95% CIs of
+the differences excluding 0. If model 3 is no better than model 2, the 6 cm fit was fitting noise or something
+height-specific, not bounce.
