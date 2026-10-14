@@ -25,4 +25,4 @@ cycle-time statistics. The transcripts themselves stay out of the repo; findings
 Everything except `bench` and `print` counts as caught before printing. `check_had_passed` is `yes` when an existing
 automated check had passed the defect.
 
-Prospective data, logged as findings happen from 2026-10-13, goes in `data/iterations_live.csv` and is kept separate.
+Prospective data, logged as findings happen from 2026-10-13, goes in `data/iterations_live.csv` and is kept separate. Its times are the times of the commits that recorded each finding (the hash is in `notes`); IDs follow the order things were logged, and are never renumbered, because commits and PROTOCOL.md cite them.
