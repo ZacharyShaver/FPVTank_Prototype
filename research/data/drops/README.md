@@ -13,14 +13,26 @@ the predictions were committed first (research/results/drop_predictions.json, co
 - Loading: coins first, then the spacer (Zach), which is **mass high** in DROP_TEST.md. The card asked for mass low
   first; the order of the two runs does not change either prediction.
 
-## Open (2026-10-13, late): the sheet and the E1 video don't agree
+## The E1 video (`IMG_1617.MOV`, Zach's Downloads, 174 MB, not in git)
 
-- Zach: the sheet is a 6 cm session, and so is the video `IMG_1617.MOV` (in his Downloads, 174 MB, not in git).
-- The video is E1 (the slot where the pocket breaks through the top is unique to E1), about 28 drops released from
-  roughly 4-8 cm by eye. In it E1 comes to rest standing on end twice (0:49 and 1:17); the sheet's E1 row has no N or
-  T. So the two are not the same drops. To settle with Zach before anything is scored: how many sessions there were,
-  at what heights, and where each was recorded. He also has 30 cm drops recorded somewhere, without video.
-- Release height doesn't need redos: the simulation at 40, 60 and 80 mm moves no E1 probability by more than 0.03
-  (`results/drop_predictions_E1_40mm.md`, `_E1_80mm.md`). A rerun at 60 mm reproduced the committed predictions exactly.
-- `results/drop_predictions_30cm.*` are the same model at 300 mm, for the 30 cm drops. They were run after those drops
-  were made (not before), so they count as post hoc for any data already recorded.
+- The same 6 cm session as the sheet. The video starts partway through: it holds the last 2 nose-down drops and
+  all 25 after them, 27 in total. One more pick-up at 1:24 lifts the body out of frame and isn't a drop.
+- `video_E1.csv` is my reading of each drop's landing from the frames, matched to the card's order of starting
+  attitudes. It agrees with the sheet's E1 row on 24 of 27. The 3 that differ are drops 2-4 of the left-side block
+  (video X O X, sheet O X O). Zach's call (2026-10-13): **go with the video** for E1.
+- Correction to my first pass: I read drops 12 and 16 as "standing on end". They are lying on their side (base to
+  one side), which is what Zach wrote (R). With that fixed, the right-side, tail-down, upside-down and 45 blocks
+  match the sheet exactly.
+- Release height: about 4-8 cm by eye. The simulation moves no E1 probability by more than 0.03 across 40-80 mm
+  (`results/drop_predictions_E1_40mm.md`, `_E1_80mm.md`), so no drop is redone for height. A rerun at 60 mm reproduced
+  the committed predictions exactly.
+- **Nose and tail, to confirm with Zach:** in the "tail down" drops (video 4-7) the head end (the bump; the pointed end
+  seen from the base) points down. The card defines nose down as the head end down, so Zach's nose and tail are
+  likely swapped against the card and the model. Score by the physical end, once he confirms.
+- Left and right: all three bodies are mirror-symmetric, so "left side" and "right side" (starts and rest states)
+  are the same physics and get merged into "side" when scoring.
+- Found while checking this: `tumble.classify` names the on-end rest states opposite to `scale_model.ATTITUDES`
+  (+X up is called "nose down"). It doesn't touch P(upright) or anything already reported; when scoring, the
+  predicted "nose up"/"nose down" rest labels are swapped back. Probabilities are unchanged.
+- `results/drop_predictions_30cm.*` are the same model at 300 mm, for the 30 cm drops (recorded elsewhere, no
+  video). They were run after those drops, so they count as post hoc.
