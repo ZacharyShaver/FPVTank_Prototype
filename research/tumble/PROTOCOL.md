@@ -138,3 +138,14 @@ uniformly random orientations and is unaffected.
   - E is unaffected: the printed bodies carry their real mass.
 - Two naming mix-ups were found, with no numbers changed. Contact rebounds at restitution 0.08, which is dead.
 - Penetration, face stability, time step, settle rule and registration all passed.
+
+### Post hoc 4 (2026-10-14): correction to post hoc 3
+Post hoc 3 overstated the shell bug. Scaling the tub's 600 g by area means 5.6 mm of solid PLA over the whole shell,
+far heavier than a printed cover. In `posthoc_cover_weight.py` the tub stays the chassis and the extra shell area is
+a cover of a given thickness. The best tall designs then give P(upright):
+- 0.53-0.62 at 1-1.5 mm, a realistic print, against the tub's 0.39;
+- 0.44-0.49 at 3 mm;
+- about the tub's value at 4-5 mm.
+
+So the design rule stands with a condition: a light cover. All of this is the dead-contact simulator and stays
+provisional until the bounce is measured.

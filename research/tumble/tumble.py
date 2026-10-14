@@ -62,6 +62,9 @@ def shell_points(top, rnd, n=48, k=9, width=R0):
 
 SHELL_MASS = 'fixed'     # 'fixed': 600 g at Z 50 for every shape (as the sweep ran, 2026-10-13); 'area': the shell's
                          # mass scales with its surface area (600 g at the tub's) and sits at its area centroid
+SHELL_FACTOR = 1.0       # 'area' only: the shell's mass per area as a fraction of the tub's (1.0 = 5.6 mm of solid PLA)
+COVER_T = 1.0            # 'cover': the tub's 600 g stays where it was, and the shell area beyond the tub's is a cover of
+                         # this many mm of solid PLA (1.24 g/cm3) at that extra area's centroid
 
 
 def shell_mass(p):
@@ -76,8 +79,15 @@ def shell_mass(p):
         keep = ~np.all(tri[:, :, 2] < Z0 + 0.5, axis=1)                  # no floor: the shell is open underneath
         c = (tri[keep].mean(1) * ar[keep, None]).sum(0) / ar[keep].sum()
         return ar[keep].sum(), c
-    a0, _ = area(66.0, 0.08, R0); a, c = area(p['top'], p['round'], p['width'])
-    return 600.0 * a / a0, (float(c[0]), 0.0, float(c[2]))
+    a0, c0 = area(66.0, 0.08, R0); a, c = area(p['top'], p['round'], p['width'])
+    if SHELL_MASS == 'cover':
+        extra = max(a - a0, 0.0); m_cov = 1.24e-3 * COVER_T * extra                 # mm2 x mm x g/mm3
+        if extra < 1.0:
+            return 600.0, (-20.0, 0.0, 50.0)
+        ce = (a * c - a0 * c0) / extra
+        M = 600.0 + m_cov; z = (600.0 * np.array([-20.0, 0.0, 50.0]) + m_cov * ce) / M
+        return M, (float(z[0]), 0.0, float(z[2]))
+    return SHELL_FACTOR * 600.0 * a / a0, (float(c[0]), 0.0, float(c[2]))
 
 
 def mass_model(p):

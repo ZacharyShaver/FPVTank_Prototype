@@ -1,0 +1,512 @@
+{
+ "note": "post hoc, exploratory",
+ "drops": 400,
+ "thickness_mm": [
+  0.0,
+  0.5,
+  1.0,
+  1.5,
+  2.0,
+  3.0,
+  5.6
+ ],
+ "designs": {
+  "tub": {
+   "top": 66,
+   "round": 0.08,
+   "width": 65.75,
+   "dz": 0
+  },
+  "E2-like dome": {
+   "top": 150,
+   "round": 0.3,
+   "width": 130,
+   "dz": 0
+  },
+  "E3-like tall": {
+   "top": 210,
+   "round": 0.15,
+   "width": 165,
+   "dz": -10
+  },
+  "tall wide 200/0.3/170": {
+   "top": 200,
+   "round": 0.3,
+   "width": 170,
+   "dz": 0
+  },
+  "tall low CoM 180/0.2/150/-20": {
+   "top": 180,
+   "round": 0.2,
+   "width": 150,
+   "dz": -20
+  }
+ },
+ "results": {
+  "tub": {
+   "0.0": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "0.5": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "1.0": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "1.5": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "2.0": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "3.0": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "5.6": {
+    "p_upright": 0.3875,
+    "counts": {
+     "upright": 155,
+     "inverted": 222,
+     "left side": 9,
+     "right side": 12,
+     "nose up": 0,
+     "nose down": 2
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   }
+  },
+  "E2-like dome": {
+   "0.0": {
+    "p_upright": 0.455,
+    "counts": {
+     "upright": 182,
+     "inverted": 168,
+     "left side": 10,
+     "right side": 14,
+     "nose up": 12,
+     "nose down": 14
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "0.5": {
+    "p_upright": 0.4375,
+    "counts": {
+     "upright": 175,
+     "inverted": 178,
+     "left side": 6,
+     "right side": 12,
+     "nose up": 13,
+     "nose down": 16
+    },
+    "mass_g": 3378,
+    "com_z": 44.6
+   },
+   "1.0": {
+    "p_upright": 0.425,
+    "counts": {
+     "upright": 170,
+     "inverted": 186,
+     "left side": 4,
+     "right side": 11,
+     "nose up": 15,
+     "nose down": 14
+    },
+    "mass_g": 3452,
+    "com_z": 46.5
+   },
+   "1.5": {
+    "p_upright": 0.41,
+    "counts": {
+     "upright": 164,
+     "inverted": 195,
+     "left side": 2,
+     "right side": 8,
+     "nose up": 16,
+     "nose down": 15
+    },
+    "mass_g": 3526,
+    "com_z": 48.3
+   },
+   "2.0": {
+    "p_upright": 0.405,
+    "counts": {
+     "upright": 162,
+     "inverted": 198,
+     "left side": 2,
+     "right side": 8,
+     "nose up": 15,
+     "nose down": 15
+    },
+    "mass_g": 3600,
+    "com_z": 50.1
+   },
+   "3.0": {
+    "p_upright": 0.385,
+    "counts": {
+     "upright": 154,
+     "inverted": 203,
+     "left side": 1,
+     "right side": 9,
+     "nose up": 17,
+     "nose down": 16
+    },
+    "mass_g": 3747,
+    "com_z": 53.4
+   },
+   "5.6": {
+    "p_upright": 0.3475,
+    "counts": {
+     "upright": 139,
+     "inverted": 220,
+     "left side": 0,
+     "right side": 5,
+     "nose up": 20,
+     "nose down": 16
+    },
+    "mass_g": 4132,
+    "com_z": 60.8
+   }
+  },
+  "E3-like tall": {
+   "0.0": {
+    "p_upright": 0.6825,
+    "counts": {
+     "upright": 273,
+     "inverted": 63,
+     "left side": 18,
+     "right side": 19,
+     "nose up": 20,
+     "nose down": 7
+    },
+    "mass_g": 3304,
+    "com_z": 39.9
+   },
+   "0.5": {
+    "p_upright": 0.655,
+    "counts": {
+     "upright": 262,
+     "inverted": 64,
+     "left side": 18,
+     "right side": 25,
+     "nose up": 21,
+     "nose down": 10
+    },
+    "mass_g": 3449,
+    "com_z": 45.2
+   },
+   "1.0": {
+    "p_upright": 0.625,
+    "counts": {
+     "upright": 250,
+     "inverted": 65,
+     "left side": 24,
+     "right side": 29,
+     "nose up": 22,
+     "nose down": 10
+    },
+    "mass_g": 3594,
+    "com_z": 50.1
+   },
+   "1.5": {
+    "p_upright": 0.585,
+    "counts": {
+     "upright": 234,
+     "inverted": 67,
+     "left side": 29,
+     "right side": 35,
+     "nose up": 22,
+     "nose down": 13
+    },
+    "mass_g": 3739,
+    "com_z": 54.6
+   },
+   "2.0": {
+    "p_upright": 0.5425,
+    "counts": {
+     "upright": 217,
+     "inverted": 71,
+     "left side": 32,
+     "right side": 37,
+     "nose up": 27,
+     "nose down": 16
+    },
+    "mass_g": 3884,
+    "com_z": 58.8
+   },
+   "3.0": {
+    "p_upright": 0.4925,
+    "counts": {
+     "upright": 197,
+     "inverted": 75,
+     "left side": 40,
+     "right side": 40,
+     "nose up": 27,
+     "nose down": 21
+    },
+    "mass_g": 4174,
+    "com_z": 66.3
+   },
+   "5.6": {
+    "p_upright": 0.3325,
+    "counts": {
+     "upright": 133,
+     "inverted": 83,
+     "left side": 59,
+     "right side": 47,
+     "nose up": 36,
+     "nose down": 42
+    },
+    "mass_g": 4927,
+    "com_z": 81.6
+   }
+  },
+  "tall wide 200/0.3/170": {
+   "0.0": {
+    "p_upright": 0.6725,
+    "counts": {
+     "upright": 269,
+     "inverted": 62,
+     "left side": 17,
+     "right side": 22,
+     "nose up": 20,
+     "nose down": 10
+    },
+    "mass_g": 3304,
+    "com_z": 42.6
+   },
+   "0.5": {
+    "p_upright": 0.65,
+    "counts": {
+     "upright": 260,
+     "inverted": 66,
+     "left side": 19,
+     "right side": 24,
+     "nose up": 21,
+     "nose down": 10
+    },
+    "mass_g": 3436,
+    "com_z": 47.0
+   },
+   "1.0": {
+    "p_upright": 0.6075,
+    "counts": {
+     "upright": 243,
+     "inverted": 72,
+     "left side": 23,
+     "right side": 25,
+     "nose up": 24,
+     "nose down": 13
+    },
+    "mass_g": 3568,
+    "com_z": 51.2
+   },
+   "1.5": {
+    "p_upright": 0.59,
+    "counts": {
+     "upright": 236,
+     "inverted": 74,
+     "left side": 26,
+     "right side": 26,
+     "nose up": 25,
+     "nose down": 13
+    },
+    "mass_g": 3701,
+    "com_z": 55.0
+   },
+   "2.0": {
+    "p_upright": 0.55,
+    "counts": {
+     "upright": 220,
+     "inverted": 77,
+     "left side": 32,
+     "right side": 26,
+     "nose up": 28,
+     "nose down": 17
+    },
+    "mass_g": 3833,
+    "com_z": 58.5
+   },
+   "3.0": {
+    "p_upright": 0.4675,
+    "counts": {
+     "upright": 187,
+     "inverted": 83,
+     "left side": 43,
+     "right side": 32,
+     "nose up": 29,
+     "nose down": 26
+    },
+    "mass_g": 4097,
+    "com_z": 64.9
+   },
+   "5.6": {
+    "p_upright": 0.3375,
+    "counts": {
+     "upright": 135,
+     "inverted": 123,
+     "left side": 37,
+     "right side": 33,
+     "nose up": 36,
+     "nose down": 36
+    },
+    "mass_g": 4785,
+    "com_z": 78.2
+   }
+  },
+  "tall low CoM 180/0.2/150/-20": {
+   "0.0": {
+    "p_upright": 0.6175,
+    "counts": {
+     "upright": 247,
+     "inverted": 73,
+     "left side": 35,
+     "right side": 30,
+     "nose up": 8,
+     "nose down": 7
+    },
+    "mass_g": 3304,
+    "com_z": 37.2
+   },
+   "0.5": {
+    "p_upright": 0.58,
+    "counts": {
+     "upright": 232,
+     "inverted": 73,
+     "left side": 40,
+     "right side": 34,
+     "nose up": 12,
+     "nose down": 9
+    },
+    "mass_g": 3414,
+    "com_z": 40.8
+   },
+   "1.0": {
+    "p_upright": 0.55,
+    "counts": {
+     "upright": 220,
+     "inverted": 74,
+     "left side": 44,
+     "right side": 35,
+     "nose up": 15,
+     "nose down": 12
+    },
+    "mass_g": 3524,
+    "com_z": 44.2
+   },
+   "1.5": {
+    "p_upright": 0.5275,
+    "counts": {
+     "upright": 211,
+     "inverted": 74,
+     "left side": 51,
+     "right side": 34,
+     "nose up": 20,
+     "nose down": 10
+    },
+    "mass_g": 3635,
+    "com_z": 47.4
+   },
+   "2.0": {
+    "p_upright": 0.4725,
+    "counts": {
+     "upright": 189,
+     "inverted": 78,
+     "left side": 52,
+     "right side": 43,
+     "nose up": 24,
+     "nose down": 14
+    },
+    "mass_g": 3745,
+    "com_z": 50.5
+   },
+   "3.0": {
+    "p_upright": 0.4425,
+    "counts": {
+     "upright": 177,
+     "inverted": 84,
+     "left side": 53,
+     "right side": 47,
+     "nose up": 25,
+     "nose down": 14
+    },
+    "mass_g": 3965,
+    "com_z": 56.0
+   },
+   "5.6": {
+    "p_upright": 0.375,
+    "counts": {
+     "upright": 150,
+     "inverted": 121,
+     "left side": 38,
+     "right side": 35,
+     "nose up": 29,
+     "nose down": 27
+    },
+    "mass_g": 4539,
+    "com_z": 67.8
+   }
+  }
+ }
+}

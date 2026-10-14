@@ -10,11 +10,13 @@ was committed.
 | # | Where | What | Effect | Status |
 |---|---|---|---|---|
 | B1 | `scale_model.predict` | the random heading turned the body about its own z axis after the tilt | E's end-down and side-down starts were 25/25/25/25 mixes of ends and sides; Brier 0.578 -> 0.861 when fixed | fixed (`world_yaw`), `start_check()` with a failing control |
-| B2 | `tumble.mass_model` (the sweep, D) | the shell is 600 g at Z 50 for every shape: a 210 mm dome as light and as low as the 66 mm tub | with the shell's mass scaled by its area at its area centroid, the best designs' CoM rises ~40 mm and their P(upright) falls from 0.62-0.68 to 0.33-0.37, no better than the tub (0.39). **D's design rule ("a tall, peaked top wider than the wheels") is an artifact of the weightless shell.** | option `SHELL_MASS = 'area'`; default `'fixed'` reproduces the sweep; `shell_mass_check.py` |
+| B2 | `tumble.mass_model` (the sweep, D) | the shell is 600 g at Z 50 for every shape: a 210 mm dome as light and as low as the 66 mm tub | **the tall-shape advantage is real but depends on a light shell.** With the tub kept as the chassis and the extra shell area a cover (`posthoc_cover_weight.py`), the best tall designs give P(upright) 0.62-0.68 weightless, 0.53-0.62 at 1-1.5 mm of solid PLA (a realistic print), 0.44-0.49 at 3 mm, and the tub's 0.39 at about 4-5 mm. The wide dome helps little at any weight (0.41-0.46). (First pass, corrected: spreading the tub's 600 g over the whole shell is 5.6 mm of solid wall, which erased the advantage; that overstated it.) | option `SHELL_MASS` ('fixed', 'area', 'cover'); default 'fixed' reproduces the sweep |
 
 B2 does not touch E: the printed bodies are real solids, and their simulation uses their own mass. It also leaves
 D's surrogate statistics standing. Those measure how well the GP stands in for the simulator, and they hold
-whatever the simulator gets wrong. What it undoes is the physical claim about which shapes self-right.
+whatever the simulator gets wrong. What changes is the design claim. It needs a condition: a tall, peaked top
+helps if the cover stays light, roughly under 3 mm of solid wall. Every P(upright) here is still from the
+dead-contact simulator that E showed under-predicts tumbling, so these are provisional until the bounce is measured.
 
 ## Wrong names (no number changes)
 
