@@ -303,3 +303,20 @@ it is fitted to drop outcomes.
 Its 30 cm mass control is closer to what was seen (E2 0.54 vs 0.48 predicted, 16/30 vs 14/30 seen). Reading: the
 fitted bounce worked mostly by making the floor harder. The physical fix is a hard floor plus the measured
 restitution. Both data sets have been seen, so this is post hoc; H3c below tests it on new drops.
+
+## H3c: the hard floor on new drops at 15 cm (pre-registered 2026-10-14, before any 15 cm drop)
+Three models' predictions are committed for drops from a marked 15 cm, a height not yet tested:
+1. `drop_predictions_15cm_hard_floor`: start fixed, hard floor (time constant 0.002 s), bounce measured (~0.3).
+   **The main test.**
+2. `drop_predictions_15cm_dead`: start fixed, MuJoCo's default soft, dead contact. The control.
+3. `drop_predictions_15cm_bounce_fit`: start fixed, soft floor with the bounce fitted at 6 cm. For comparison.
+
+**Protocol:** as the 30 cm redo, with the lowest point at a marked 15 cm (5.9 in); the six starts x 5; Zach's
+nose/tail; the pocket taped crossed; mass low for all three bodies, then mass high if time allows; video.
+
+**Hypothesis:** model 1 scores a lower Brier than model 2 and than naive, with paired bootstrap 95% CIs excluding 0.
+No direction is predicted between models 1 and 3.
+
+**Scoring:** `score_30cm.py`'s rules, with these files. If the PLA ball measures a different restitution before the
+15 cm drops, a hard-floor set with that value is committed too, before the drops, and the slow-motion set stays the
+main test.
