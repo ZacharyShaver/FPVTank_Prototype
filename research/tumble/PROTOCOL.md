@@ -239,3 +239,11 @@ and 4 tail-down drops of E3 (weight low) from 6 cm, filmed side-on and close.
 H4, model 4: `drop_predictions_30cm_bounce_measured` uses the start fix and the preliminary slow-motion bounce
 (restitution about 0.3, damping ratio 0.48). It was committed before any 30 cm data were seen, which completes H4's
 set of four models.
+
+H4, amendment (2026-10-14, before any 30 cm data are seen or retaken): Zach says the first 30 cm session's heights
+were guessed by eye, "about a foot" each time, with no mark. He will redo it with a marked 30 cm.
+- **The redo is H4's primary data**, scored against the four committed models by the same rules.
+- The first session, if shared, is scored as secondary data (height by eye) and reported as such.
+- Redo protocol: release with the lowest point at a marked 30 cm; the same six starts x 5; Zach's nose/tail
+  convention; the same floor; the pocket taped with two crossed strips, checked after each body; a drop where the
+  coins come out is recorded and redone. A regular (30 fps) video if possible, for checking the readings.
