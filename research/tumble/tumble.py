@@ -63,6 +63,7 @@ def shell_points(top, rnd, n=48, k=9, width=R0):
 SHELL_MASS = 'fixed'     # 'fixed': 600 g at Z 50 for every shape (as the sweep ran, 2026-10-13); 'area': the shell's
                          # mass scales with its surface area (600 g at the tub's) and sits at its area centroid
 SHELL_FACTOR = 1.0       # 'area' only: the shell's mass per area as a fraction of the tub's (1.0 = 5.6 mm of solid PLA)
+DAMPRATIO = None         # contact damping ratio on every geom (bounce); None = MuJoCo's default, dead (as the sweep ran)
 COVER_T = 1.0            # 'cover': the tub's 600 g stays where it was, and the shell area beyond the tub's is a cover of
                          # this many mm of solid PLA (1.24 g/cm3) at that extra area's centroid
 
@@ -118,7 +119,8 @@ def inertia(items):
 
 def xml(p):
     M, c, I = inertia(mass_model(p))
-    s = 1e-3                                                            # mm -> m, g -> kg below
+    dflt = '' if DAMPRATIO is None else f'<default><geom solref="0.02 {DAMPRATIO:.4f}"/></default>'   # every geom
+    s = 1e-3                                                           # mm -> m, g -> kg below
     pts = shell_points(p['top'], p['round'], width=p['width']) * s
     verts = ' '.join('%.5f' % v for v in pts.ravel())
     rw, mu = p['rw'] * s, p['mu']
@@ -129,7 +131,7 @@ def xml(p):
     I_si = I * 1e-3 * 1e-6                                              # g mm^2 -> kg m^2
     full = ' '.join('%.8g' % v for v in (I_si[0, 0], I_si[1, 1], I_si[2, 2], I_si[0, 1], I_si[0, 2], I_si[1, 2]))
     return f"""<mujoco model="tumble">
-  <option timestep="0.001" gravity="0 0 -9.81"/>
+  <option timestep="0.001" gravity="0 0 -9.81"/>{dflt}
   <asset><mesh name="shell" vertex="{verts}"/></asset>
   <worldbody>
     <geom type="plane" size="5 5 0.1" friction="{0.6 * p['mu']:.3f} 0.005 0.0005"/>

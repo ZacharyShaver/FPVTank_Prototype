@@ -194,3 +194,27 @@ control if both masses were run.
 **Hypothesis:** model 3 scores a lower Brier than both model 2 and the naive predictor, with bootstrap 95% CIs of
 the differences excluding 0. If model 3 is no better than model 2, the 6 cm fit was fitting noise or something
 height-specific, not bounce.
+
+### Post hoc 6 (2026-10-14): which shape wins, with a realistic shell (`posthoc_sweep_v2.py`)
+Setup: the same 400 designs and seeds, the tub as the chassis plus a 1.5 mm printed cover, with dead contact and
+with bounce (damping 0.2, a sensitivity check for the full-size robot, not a measurement). The top 6 of each were
+rerun at 1000 drops.
+
+**The same design wins all three variants:** top 211 mm, round 0.13, half-width 169, dz -6.
+
+| Variant | P(upright) | Tub (1000 drops) |
+|---|---|---|
+| Weightless shell (as the sweep ran) | 0.75 | 0.40 |
+| Realistic cover, dead contact | 0.65 | 0.40 |
+| Realistic cover, bounce | 0.67 | 0.40 |
+
+The runner-up in all three is 196 / 0.19 / 162 / -19 (0.62-0.74). Wide domes don't place.
+
+**Wording correction.** Earlier text here called the best tops "peaked (round 0.1-0.4)". In `shell_points`, a low
+`round` is a *small edge round*: the top is a flat plateau with a steep, rounded shoulder. So the winner is a tall,
+boxy shell with rounded top edges, wider than the wheels, and with the weight low. It is not a peak. A dome
+(round 1.0) is the rounded one, and it does worse.
+
+The printed E3 is this design (210 / 0.15 / 165 / -10). In the real 6 cm drops it came to rest upright more often
+than the tub: weight low 15/30 vs 10/30, weight high 6/30 vs 4/30. That is consistent with the simulation, though
+not significant on its own (Fisher p about 0.3).
