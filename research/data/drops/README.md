@@ -54,7 +54,8 @@ the predictions were committed first (research/results/drop_predictions.json, co
 ## Run 3: the 30 cm redo (2026-10-14), H4's primary data
 - `run3_30cm_raw.txt` is Zach's message verbatim; `run3_30cm.csv` is the transcription, one row per drop.
 - Heights were marked: a US letter sheet on edge plus a finger-width. No video.
-- **Readings fixed before scoring** (Zach is asked to confirm, and the run is rescored if any is wrong):
+- **Readings fixed before scoring.** Zach confirmed 1 and 2 after scoring ("second set was weight low"; x upside down,
+  o right side up), so no rescoring was needed. He corrected 3:
   1. x = upside down, o = upright, as in runs 1 and 2. (A literal "x = on its bottom" would have the flat-topped
      E1 righting itself from most upside-down starts.)
   2. The second block, "weight in first then coins then tape", is mass low: the spacer first, coins by the base.
