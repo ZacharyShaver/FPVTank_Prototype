@@ -369,3 +369,11 @@ Added before any 15 cm drop:
 
 The primary test is unchanged: the 0.31 hard floor. The 0.55 set stays recorded and is scored. **Secondary, no
 direction predicted:** the 0.39 hard floor against the 0.31 one, the 0.55 one and the fitted soft bounce.
+
+### Post hoc 8 (2026-10-14): the ball's bounce on the hard floor, against the seen drops
+The 0.39 hard floor (damping 0.35, 0.1 ms) run at 6 and 30 cm (`drop_predictions_6cm_hard_floor_ball2`,
+`drop_predictions_30cm_hard_floor_ball2`). Both data sets have been seen, so this is not a test; nothing was fitted.
+Brier: **0.456 at 6 cm, 0.672 at 30 cm**. That is between the 0.31 hard floor (0.483, 0.693) and the soft floor
+fitted at 6 cm (0.443, 0.634), and the best of the unfitted models. All models side by side, by body, weight and
+start: `results/sim_vs_reality.md` (`sim_vs_reality.py`). The 6 cm fitted set is now saved per drop
+(`drop_predictions_6cm_bounce_fit`), and it reproduces post hoc 3's 0.443.
