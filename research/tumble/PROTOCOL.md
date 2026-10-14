@@ -282,3 +282,7 @@ What is still wrong:
 Reading: adding bounce was the right direction, and it carries to a new height. The model is now too confident
 about mass. Real 30 cm drops randomise more than the model (rocking, rattling coins, hand release), which pulls
 both masses toward the same outcomes.
+
+Naming note (2026-10-14): this file's "H4" (the 30 cm drops) is part of the sprint plan's H3 (sim-to-real), and is
+called H3b in the write-up. The sprint plan's H4 (the AI-in-the-loop cycle time) is unrelated. Commits before this
+note say "H4" for the 30 cm test.
