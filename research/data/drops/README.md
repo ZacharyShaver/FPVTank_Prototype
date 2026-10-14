@@ -26,9 +26,11 @@ the predictions were committed first (research/results/drop_predictions.json, co
 - Release height: about 4-8 cm by eye. The simulation moves no E1 probability by more than 0.03 across 40-80 mm
   (`results/drop_predictions_E1_40mm.md`, `_E1_80mm.md`), so no drop is redone for height. A rerun at 60 mm reproduced
   the committed predictions exactly.
-- **Nose and tail, to confirm with Zach:** in the "tail down" drops (video 4-7) the head end (the bump; the pointed end
-  seen from the base) points down. The card defines nose down as the head end down, so Zach's nose and tail are
-  likely swapped against the card and the model. Score by the physical end, once he confirms.
+- **Nose and tail are swapped against the card.** Zach did the nose-down block first (2026-10-13), and the video
+  cut off its first 3 drops. In its last 2 (video 1-2), the side profile is widest at the top, where the head's bump
+  is. So "nose down" was flown with the head end **up**. In the tail-down block (video 4-7), the head end (the pointed
+  end seen from the base) is plainly down. So Zach's "nose down" is the model's tail down, and vice versa. The
+  scoring maps by the physical end, and assumes the same convention for E2 and E3 (same session, no video).
 - Left and right: all three bodies are mirror-symmetric, so "left side" and "right side" (starts and rest states)
   are the same physics and get merged into "side" when scoring.
 - Found while checking this: `tumble.classify` names the on-end rest states opposite to `scale_model.ATTITUDES`
