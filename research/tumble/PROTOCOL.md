@@ -218,3 +218,20 @@ boxy shell with rounded top edges, wider than the wheels, and with the weight lo
 The printed E3 is this design (210 / 0.15 / 165 / -10). In the real 6 cm drops it came to rest upright more often
 than the tub: weight low 15/30 vs 10/30, weight high 6/30 vs 4/30. That is consistent with the simulation, though
 not significant on its own (Fisher p about 0.3).
+
+### Post hoc 5, result (2026-10-14): the slow-motion measurement, preliminary
+Video `IMG_E1630.MOV`: Apple's edited export, every 240 fps frame kept and played at 30 fps. It shows 4 flat drops
+and 4 tail-down drops of E3 (weight low) from 6 cm, filmed side-on and close.
+- **The bodies rock rather than hop.** Even a level release lands a few degrees tilted: one edge strikes first, the
+  body pivots onto its base and rocks.
+- Tracking: the body's upper face, matched by template (`measure_bounce.bottom_by_template`). Drops 3 and 4 have
+  template dropouts and are not used.
+- The two clean drops rise about 13 px after impact out of a 75-83 px drop, which is restitution about 0.4 if it
+  were all hop. But the larger rise comes 60 ms after impact and looks like rocking. The hop at impact is about 3 px,
+  restitution about 0.2.
+- **Measured flat-drop restitution: roughly 0.2-0.4.** That is at or below the bottom of the predicted 0.4-0.7.
+- **Reading:** the prediction is not confirmed. The fitted 0.55 is likely higher than the real normal bounce. So
+  bounce alone does not explain the miss: edge-first landings that turn into rocking do part of it, and the fitted
+  contact setting was standing in for that. This is the outcome recorded in advance as "something else is involved".
+- **Next:** a cleaner measurement needs either a release with no tilt (a jig) or a shape that can't rock, such as a
+  printed PLA sphere of the same walls and infill, dropped onto the same floor.
