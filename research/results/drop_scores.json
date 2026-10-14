@@ -1,0 +1,250 @@
+{
+ "n_drops": 181,
+ "classes": [
+  "upright",
+  "inverted",
+  "side",
+  "head up",
+  "head down"
+ ],
+ "groups": {
+  "E1_tub mass low": {
+   "n": 30,
+   "brier_model": 0.522,
+   "brier_naive": 1.217,
+   "diff": -0.695,
+   "diff_95": [
+    -0.949,
+    -0.413
+   ],
+   "top_hit_model": 0.4,
+   "top_hit_naive": 0.433
+  },
+  "E1_tub mass high": {
+   "n": 30,
+   "brier_model": 0.343,
+   "brier_naive": 1.283,
+   "diff": -0.941,
+   "diff_95": [
+    -1.275,
+    -0.579
+   ],
+   "top_hit_model": 0.8,
+   "top_hit_naive": 0.4
+  },
+  "E2_dome mass low": {
+   "n": 31,
+   "brier_model": 0.628,
+   "brier_naive": 1.306,
+   "diff": -0.679,
+   "diff_95": [
+    -0.894,
+    -0.453
+   ],
+   "top_hit_model": 0.387,
+   "top_hit_naive": 0.355
+  },
+  "E2_dome mass high": {
+   "n": 30,
+   "brier_model": 0.382,
+   "brier_naive": 1.217,
+   "diff": -0.835,
+   "diff_95": [
+    -1.218,
+    -0.43
+   ],
+   "top_hit_model": 0.8,
+   "top_hit_naive": 0.4
+  },
+  "E3_tall mass low": {
+   "n": 30,
+   "brier_model": 0.727,
+   "brier_naive": 1.35,
+   "diff": -0.623,
+   "diff_95": [
+    -0.859,
+    -0.379
+   ],
+   "top_hit_model": 0.3,
+   "top_hit_naive": 0.267
+  },
+  "E3_tall mass high": {
+   "n": 30,
+   "brier_model": 0.864,
+   "brier_naive": 1.383,
+   "diff": -0.519,
+   "diff_95": [
+    -0.718,
+    -0.31
+   ],
+   "top_hit_model": 0.367,
+   "top_hit_naive": 0.3
+  }
+ },
+ "friction": {
+  "p_lowmu": {
+   "n": 181,
+   "brier_model": 0.585,
+   "brier_naive": 1.293,
+   "diff": -0.708,
+   "diff_95": [
+    -0.83,
+    -0.586
+   ],
+   "top_hit_model": 0.53,
+   "top_hit_naive": 0.359
+  },
+  "p_highmu": {
+   "n": 181,
+   "brier_model": 0.558,
+   "brier_naive": 1.293,
+   "diff": -0.735,
+   "diff_95": [
+    -0.856,
+    -0.612
+   ],
+   "top_hit_model": 0.508,
+   "top_hit_naive": 0.359
+  }
+ },
+ "control": {
+  "E1_tub": {
+   "low": {
+    "n": 30,
+    "predicted": {
+     "upright": 0.211,
+     "inverted": 0.431,
+     "side": 0.253,
+     "head up": 0.044,
+     "head down": 0.061
+    },
+    "observed": {
+     "upright": 0.333,
+     "inverted": 0.533,
+     "side": 0.067,
+     "head up": 0.033,
+     "head down": 0.033
+    },
+    "upright": 10
+   },
+   "high": {
+    "n": 30,
+    "predicted": {
+     "upright": 0.017,
+     "inverted": 0.86,
+     "side": 0.123,
+     "head up": 0.0,
+     "head down": 0.0
+    },
+    "observed": {
+     "upright": 0.133,
+     "inverted": 0.8,
+     "side": 0.067,
+     "head up": 0.0,
+     "head down": 0.0
+    },
+    "upright": 4
+   },
+   "predicted_shift_upright": 0.194,
+   "observed_shift_upright": 0.2,
+   "same_direction": true,
+   "fisher_p_upright": 0.1253
+  },
+  "E2_dome": {
+   "low": {
+    "n": 31,
+    "predicted": {
+     "upright": 0.214,
+     "inverted": 0.335,
+     "side": 0.284,
+     "head up": 0.085,
+     "head down": 0.082
+    },
+    "observed": {
+     "upright": 0.29,
+     "inverted": 0.548,
+     "side": 0.129,
+     "head up": 0.032,
+     "head down": 0.0
+    },
+    "upright": 9
+   },
+   "high": {
+    "n": 30,
+    "predicted": {
+     "upright": 0.005,
+     "inverted": 0.755,
+     "side": 0.047,
+     "head up": 0.077,
+     "head down": 0.116
+    },
+    "observed": {
+     "upright": 0.033,
+     "inverted": 0.8,
+     "side": 0.067,
+     "head up": 0.067,
+     "head down": 0.033
+    },
+    "upright": 1
+   },
+   "predicted_shift_upright": 0.209,
+   "observed_shift_upright": 0.257,
+   "same_direction": true,
+   "fisher_p_upright": 0.0125
+  },
+  "E3_tall": {
+   "low": {
+    "n": 30,
+    "predicted": {
+     "upright": 0.175,
+     "inverted": 0.259,
+     "side": 0.281,
+     "head up": 0.159,
+     "head down": 0.126
+    },
+    "observed": {
+     "upright": 0.5,
+     "inverted": 0.233,
+     "side": 0.167,
+     "head up": 0.067,
+     "head down": 0.033
+    },
+    "upright": 15
+   },
+   "high": {
+    "n": 30,
+    "predicted": {
+     "upright": 0.003,
+     "inverted": 0.372,
+     "side": 0.297,
+     "head up": 0.169,
+     "head down": 0.158
+    },
+    "observed": {
+     "upright": 0.2,
+     "inverted": 0.467,
+     "side": 0.133,
+     "head up": 0.1,
+     "head down": 0.1
+    },
+    "upright": 6
+   },
+   "predicted_shift_upright": 0.172,
+   "observed_shift_upright": 0.3,
+   "same_direction": true,
+   "fisher_p_upright": 0.0292
+  }
+ },
+ "all": {
+  "n": 181,
+  "brier_model": 0.578,
+  "brier_naive": 1.293,
+  "diff": -0.715,
+  "diff_95": [
+   -0.833,
+   -0.591
+  ],
+  "top_hit_model": 0.508,
+  "top_hit_naive": 0.359
+ }
+}

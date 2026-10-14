@@ -65,3 +65,34 @@ Post hoc (`posthoc_sentinels.py`, labelled as such): a 3x harder spin flagged 0/
 wheels flagged 1/8 (0.039). In this regime P(upright) is set by geometry and mass. Eight sentinels at 200 drops
 can't see a physics change smaller than about 0.05 in P. As a control, the sentinel check is weak. The same lesson
 as `check_failures.csv` C10: a control has to be shown able to fail.
+
+## H3 results (2026-10-14; `score_drops.py`, scoring choices committed before it ran)
+181 drops from 6 cm: 3 bodies x mass low and high, 6 starts x 5 drops (one group has 6). Mass high was run first
+(Zach loaded coins first), against the card's order; the predictions for both were committed before either run.
+Deviations, all recorded in `data/drops/README.md` before scoring:
+- E1's mass-high landings were read from the video (agreeing with the sheet on 24 of 27);
+- Zach's nose and tail are the reverse of the model's, so they're scored by which end physically pointed down;
+- left and right are merged, because the bodies are mirror-symmetric.
+
+| Pre-registered test | Result | |
+|---|---|---|
+| Brier score, model vs naive (all 181) | 0.578 vs 1.293; difference -0.715 (95% CI -0.833 to -0.591) | met |
+| ... in each of the 6 body x mass groups | the model is better in all 6; no CI crosses 0 | met |
+| Most likely state was the one seen | 0.51 vs naive 0.36; mass high 0.37-0.80; mass low 0.30-0.40, about naive's level | partly |
+| Control: P(upright) shifts low vs high the predicted way | same direction for all 3 bodies; E2 p = 0.013, E3 p = 0.029, E1 p = 0.13 (Fisher) | met, 2 of 3 significant |
+| The prediction's uncertainty (friction 0.65x-1.5x) covers the misses | it moves the Brier score only 0.558-0.585; the misses below are far larger | not met |
+
+**Where the model is wrong, in the same direction in all 6 groups:**
+- **The real bodies right themselves more often than predicted.** P(upright) predicted vs observed:
+  - E1: 0.21 vs 0.33 (low), 0.02 vs 0.13 (high);
+  - E2: 0.21 vs 0.29 (low), 0.01 vs 0.03 (high);
+  - E3: 0.17 vs 0.50 (low), 0.00 vs 0.20 (high).
+- **They come to rest on a side less often:** for example E1 low, 0.25 predicted vs 0.07 observed.
+
+**Reading:** the simulation is useful, much better than the naive guess, and it tracks a change in mass. But its
+error is systematic, and its own uncertainty band (friction) doesn't contain that error, so it is overconfident.
+The candidates for what it misses are untested, and post hoc from here:
+- how the PLA mass sits in a print (walls and infill, not a uniform solid);
+- contact softness and bounce;
+- release jitter and spin;
+- the real edges of the print.
