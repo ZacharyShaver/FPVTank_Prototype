@@ -1,0 +1,230 @@
+[
+ {
+  "variant": "weightless shell, dead (as the sweep ran)",
+  "surrogate": "surrogate.py (H2)",
+  "inside": 1,
+  "n": 6,
+  "mean_miss_pts": 4.9,
+  "rows": [
+   {
+    "design": "211/0.13/169/-6",
+    "sim_1000": 0.75,
+    "surrogate": 0.712,
+    "miss_pts": 3.8,
+    "band90_pts": 3.6,
+    "inside": false
+   },
+   {
+    "design": "196/0.19/162/-19",
+    "sim_1000": 0.739,
+    "surrogate": 0.698,
+    "miss_pts": 4.1,
+    "band90_pts": 3.3,
+    "inside": false
+   },
+   {
+    "design": "191/0.39/163/-8",
+    "sim_1000": 0.698,
+    "surrogate": 0.609,
+    "miss_pts": 8.9,
+    "band90_pts": 2.8,
+    "inside": false
+   },
+   {
+    "design": "204/0.23/144/-6",
+    "sim_1000": 0.674,
+    "surrogate": 0.643,
+    "miss_pts": 3.1,
+    "band90_pts": 2.8,
+    "inside": false
+   },
+   {
+    "design": "219/0.10/97/-14",
+    "sim_1000": 0.66,
+    "surrogate": 0.594,
+    "miss_pts": 6.6,
+    "band90_pts": 4.3,
+    "inside": false
+   },
+   {
+    "design": "209/0.12/138/16",
+    "sim_1000": 0.625,
+    "surrogate": 0.598,
+    "miss_pts": 2.7,
+    "band90_pts": 3.1,
+    "inside": true
+   }
+  ]
+ },
+ {
+  "variant": "weightless shell, dead (as the sweep ran)",
+  "surrogate": "surrogate_gp.py",
+  "inside": 1,
+  "n": 6,
+  "mean_miss_pts": 5.1,
+  "rows": [
+   {
+    "design": "211/0.13/169/-6",
+    "sim_1000": 0.75,
+    "surrogate": 0.709,
+    "miss_pts": 4.1,
+    "band90_pts": 3.9,
+    "inside": false
+   },
+   {
+    "design": "196/0.19/162/-19",
+    "sim_1000": 0.739,
+    "surrogate": 0.689,
+    "miss_pts": 5.0,
+    "band90_pts": 3.6,
+    "inside": false
+   },
+   {
+    "design": "191/0.39/163/-8",
+    "sim_1000": 0.698,
+    "surrogate": 0.607,
+    "miss_pts": 9.1,
+    "band90_pts": 2.9,
+    "inside": false
+   },
+   {
+    "design": "204/0.23/144/-6",
+    "sim_1000": 0.674,
+    "surrogate": 0.639,
+    "miss_pts": 3.5,
+    "band90_pts": 2.9,
+    "inside": false
+   },
+   {
+    "design": "219/0.10/97/-14",
+    "sim_1000": 0.66,
+    "surrogate": 0.597,
+    "miss_pts": 6.3,
+    "band90_pts": 4.5,
+    "inside": false
+   },
+   {
+    "design": "209/0.12/138/16",
+    "sim_1000": 0.625,
+    "surrogate": 0.597,
+    "miss_pts": 2.8,
+    "band90_pts": 3.2,
+    "inside": true
+   }
+  ]
+ },
+ {
+  "variant": "cover, dead",
+  "surrogate": "surrogate_gp.py",
+  "inside": 2,
+  "n": 6,
+  "mean_miss_pts": 5.1,
+  "rows": [
+   {
+    "design": "211/0.13/169/-6",
+    "sim_1000": 0.649,
+    "surrogate": 0.533,
+    "miss_pts": 11.6,
+    "band90_pts": 3.8,
+    "inside": false
+   },
+   {
+    "design": "196/0.19/162/-19",
+    "sim_1000": 0.617,
+    "surrogate": 0.564,
+    "miss_pts": 5.3,
+    "band90_pts": 3.7,
+    "inside": false
+   },
+   {
+    "design": "191/0.39/163/-8",
+    "sim_1000": 0.556,
+    "surrogate": 0.506,
+    "miss_pts": 5.0,
+    "band90_pts": 3.0,
+    "inside": false
+   },
+   {
+    "design": "219/0.43/156/1",
+    "sim_1000": 0.554,
+    "surrogate": 0.525,
+    "miss_pts": 2.9,
+    "band90_pts": 3.3,
+    "inside": true
+   },
+   {
+    "design": "219/0.10/97/-14",
+    "sim_1000": 0.527,
+    "surrogate": 0.504,
+    "miss_pts": 2.3,
+    "band90_pts": 4.3,
+    "inside": true
+   },
+   {
+    "design": "211/0.75/133/11",
+    "sim_1000": 0.469,
+    "surrogate": 0.435,
+    "miss_pts": 3.4,
+    "band90_pts": 3.0,
+    "inside": false
+   }
+  ]
+ },
+ {
+  "variant": "cover, bounce",
+  "surrogate": "surrogate_gp.py",
+  "inside": 1,
+  "n": 6,
+  "mean_miss_pts": 5.8,
+  "rows": [
+   {
+    "design": "211/0.13/169/-6",
+    "sim_1000": 0.671,
+    "surrogate": 0.568,
+    "miss_pts": 10.3,
+    "band90_pts": 4.0,
+    "inside": false
+   },
+   {
+    "design": "196/0.19/162/-19",
+    "sim_1000": 0.652,
+    "surrogate": 0.596,
+    "miss_pts": 5.6,
+    "band90_pts": 3.8,
+    "inside": false
+   },
+   {
+    "design": "191/0.39/163/-8",
+    "sim_1000": 0.605,
+    "surrogate": 0.533,
+    "miss_pts": 7.2,
+    "band90_pts": 3.1,
+    "inside": false
+   },
+   {
+    "design": "219/0.43/156/1",
+    "sim_1000": 0.589,
+    "surrogate": 0.553,
+    "miss_pts": 3.6,
+    "band90_pts": 3.4,
+    "inside": false
+   },
+   {
+    "design": "193/0.31/175/19",
+    "sim_1000": 0.575,
+    "surrogate": 0.507,
+    "miss_pts": 6.8,
+    "band90_pts": 3.3,
+    "inside": false
+   },
+   {
+    "design": "204/0.23/144/-6",
+    "sim_1000": 0.564,
+    "surrogate": 0.549,
+    "miss_pts": 1.5,
+    "band90_pts": 3.1,
+    "inside": true
+   }
+  ]
+ }
+]

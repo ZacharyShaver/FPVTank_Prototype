@@ -377,3 +377,16 @@ Brier: **0.456 at 6 cm, 0.672 at 30 cm**. That is between the 0.31 hard floor (0
 fitted at 6 cm (0.443, 0.634), and the best of the unfitted models. All models side by side, by body, weight and
 start: `results/sim_vs_reality.md` (`sim_vs_reality.py`). The 6 cm fitted set is now saved per drop
 (`drop_predictions_6cm_bounce_fit`), and it reproduces post hoc 3's 0.443.
+
+### Post hoc 9 (2026-10-15): past the sweep's edge, and the surrogate at the best designs (C15)
+- **The sweep's range held the best design.** The best design pushed past each limit (`explore_edge.py`, cover +
+  bounce, 1000 drops each): P(upright) peaks at half-width 175-200 (0.68) and falls past it (0.63 at 300-350).
+  It plateaus at top 200-220 (0.67) and falls steeply past it (0.56 at 300 mm, 0.41 at 400). Width removes side rests
+  up to about the body's length (339.5 mm), then makes upside down more stable. Height removes upside-down rests,
+  then adds side and end rests. The dead-contact runs show the same shape.
+- **H2's surrogate is overconfident at the best designs** (C15, `audit/surrogate_peak_check.py`). Its 90% intervals
+  cover 86.8% of held-out designs overall, as recorded, but only 1 of the 6 best, and it puts all 6 about 5 points
+  too low. A second, independent GP (`surrogate_gp.py`, Matern kernel) does the same on all three sweep variants.
+  H2's recorded result stands; the overall check was the wrong place to look. The design conclusions rest on the
+  1000-drop reruns, not on surrogate values. The surrogate ranks candidates well (its top two were the simulator's
+  top two in every variant) but undervalues the winner.

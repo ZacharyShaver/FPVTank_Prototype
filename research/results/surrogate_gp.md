@@ -1,5 +1,7 @@
 # Surrogate vs simulator: a Gaussian process trained on the shape sweep (exploratory)
 
+A second, independent GP; the sprint's surrogate is `surrogate.py` (H2). Both undervalue the best designs (C15).
+
 Errors in percentage points of P(upright). Every number is for designs the surrogate did not see.
 
 ## weightless shell, dead (as the sweep ran)
@@ -71,4 +73,4 @@ Against 1000-drop reruns (each predicted without its own design):
 | 204/0.23/144/-6 | 0.564 | 0.549 | -1.5 | +-1.6 | 5 |
 | tub | 0.401 | 0.358 | -4.3 | +-1.5 | - |
 
-Speed, one core: the simulator takes 0.01 s per drop, so 3 s for one design at 200 drops. The surrogate answers one design in about 19 microseconds: about 139,535 times faster.
+Speed, one core: the simulator takes 0.01 s per drop, so 3 s for one design at 200 drops. The surrogate answers one design in about 19 microseconds: about 141,594 times faster.

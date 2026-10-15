@@ -1,0 +1,239 @@
+{
+ "best": {
+  "top": 211.36555648222566,
+  "round": 0.13475734433159234,
+  "width": 169.14089045184664,
+  "dz": -6.211591809988022
+ },
+ "key": "top",
+ "runs": {
+  "cover, bounce": [
+   {
+    "value": 180.0,
+    "p_upright": 0.655,
+    "mass_g": 3688,
+    "com_z": 52.2,
+    "counts": {
+     "upright": 655,
+     "inverted": 184,
+     "left side": 45,
+     "right side": 45,
+     "nose up": 54,
+     "nose down": 17
+    },
+    "surrogate": 0.557,
+    "surrogate_95": 0.029
+   },
+   {
+    "value": 200.0,
+    "p_upright": 0.67,
+    "mass_g": 3731,
+    "com_z": 54.6,
+    "counts": {
+     "upright": 670,
+     "inverted": 155,
+     "left side": 53,
+     "right side": 42,
+     "nose up": 56,
+     "nose down": 24
+    },
+    "surrogate": 0.594,
+    "surrogate_95": 0.029
+   },
+   {
+    "value": 220.0,
+    "p_upright": 0.669,
+    "mass_g": 3773,
+    "com_z": 57.3,
+    "counts": {
+     "upright": 669,
+     "inverted": 135,
+     "left side": 54,
+     "right side": 47,
+     "nose up": 61,
+     "nose down": 34
+    },
+    "surrogate": 0.611,
+    "surrogate_95": 0.039
+   },
+   {
+    "value": 250.0,
+    "p_upright": 0.642,
+    "mass_g": 3838,
+    "com_z": 61.5,
+    "counts": {
+     "upright": 642,
+     "inverted": 106,
+     "left side": 65,
+     "right side": 54,
+     "nose up": 71,
+     "nose down": 62
+    },
+    "surrogate": 0.598,
+    "surrogate_95": 0.077
+   },
+   {
+    "value": 300.0,
+    "p_upright": 0.562,
+    "mass_g": 3946,
+    "com_z": 69.4,
+    "counts": {
+     "upright": 562,
+     "inverted": 78,
+     "left side": 89,
+     "right side": 77,
+     "nose up": 95,
+     "nose down": 99
+    },
+    "surrogate": 0.53,
+    "surrogate_95": 0.141
+   },
+   {
+    "value": 350.0,
+    "p_upright": 0.495,
+    "mass_g": 4054,
+    "com_z": 78.2,
+    "counts": {
+     "upright": 495,
+     "inverted": 58,
+     "left side": 115,
+     "right side": 98,
+     "nose up": 113,
+     "nose down": 121
+    },
+    "surrogate": 0.467,
+    "surrogate_95": 0.173
+   },
+   {
+    "value": 400.0,
+    "p_upright": 0.41,
+    "mass_g": 4162,
+    "com_z": 87.8,
+    "counts": {
+     "upright": 410,
+     "inverted": 40,
+     "left side": 132,
+     "right side": 128,
+     "nose up": 141,
+     "nose down": 149
+    },
+    "surrogate": 0.428,
+    "surrogate_95": 0.184
+   }
+  ],
+  "cover, dead": [
+   {
+    "value": 180.0,
+    "p_upright": 0.625,
+    "mass_g": 3688,
+    "com_z": 52.2,
+    "counts": {
+     "upright": 625,
+     "inverted": 185,
+     "left side": 52,
+     "right side": 50,
+     "nose up": 66,
+     "nose down": 22
+    },
+    "surrogate": 0.524,
+    "surrogate_95": 0.026
+   },
+   {
+    "value": 200.0,
+    "p_upright": 0.635,
+    "mass_g": 3731,
+    "com_z": 54.6,
+    "counts": {
+     "upright": 635,
+     "inverted": 158,
+     "left side": 60,
+     "right side": 51,
+     "nose up": 65,
+     "nose down": 31
+    },
+    "surrogate": 0.558,
+    "surrogate_95": 0.026
+   },
+   {
+    "value": 220.0,
+    "p_upright": 0.635,
+    "mass_g": 3773,
+    "com_z": 57.3,
+    "counts": {
+     "upright": 635,
+     "inverted": 135,
+     "left side": 65,
+     "right side": 52,
+     "nose up": 67,
+     "nose down": 46
+    },
+    "surrogate": 0.579,
+    "surrogate_95": 0.036
+   },
+   {
+    "value": 250.0,
+    "p_upright": 0.624,
+    "mass_g": 3838,
+    "com_z": 61.5,
+    "counts": {
+     "upright": 624,
+     "inverted": 105,
+     "left side": 71,
+     "right side": 57,
+     "nose up": 81,
+     "nose down": 62
+    },
+    "surrogate": 0.581,
+    "surrogate_95": 0.071
+   },
+   {
+    "value": 300.0,
+    "p_upright": 0.539,
+    "mass_g": 3946,
+    "com_z": 69.4,
+    "counts": {
+     "upright": 539,
+     "inverted": 78,
+     "left side": 97,
+     "right side": 79,
+     "nose up": 106,
+     "nose down": 101
+    },
+    "surrogate": 0.533,
+    "surrogate_95": 0.134
+   },
+   {
+    "value": 350.0,
+    "p_upright": 0.462,
+    "mass_g": 4054,
+    "com_z": 78.2,
+    "counts": {
+     "upright": 462,
+     "inverted": 63,
+     "left side": 110,
+     "right side": 108,
+     "nose up": 131,
+     "nose down": 126
+    },
+    "surrogate": 0.475,
+    "surrogate_95": 0.169
+   },
+   {
+    "value": 400.0,
+    "p_upright": 0.378,
+    "mass_g": 4162,
+    "com_z": 87.8,
+    "counts": {
+     "upright": 378,
+     "inverted": 48,
+     "left side": 134,
+     "right side": 127,
+     "nose up": 160,
+     "nose down": 153
+    },
+    "surrogate": 0.434,
+    "surrogate_95": 0.183
+   }
+  ]
+ }
+}

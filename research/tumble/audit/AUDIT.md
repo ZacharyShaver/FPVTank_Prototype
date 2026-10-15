@@ -38,6 +38,12 @@ dead-contact simulator that E showed under-predicts tumbling, so these are provi
 - The surrogate's intervals leave out its fitted extra-noise term. Coverage still came out at 86.8%, inside the
   85-95% target.
 
+- **The surrogate is overconfident at the best designs (C15, found 2026-10-15).** Its 90% intervals cover 86.8% of
+  held-out designs overall, but only 1 of the 6 best (1000-drop reruns, rerun noise allowed for), and it puts all 6
+  about 5 points too low. A stationary GP shaves peaks. The same holds for a second GP (`surrogate_gp.py`) on all
+  three sweep variants (`audit/surrogate_peak_check.py`). Design claims rest on the 1000-drop reruns, not on the
+  surrogate's values, so none changes; the surrogate can rank candidates but not value the winner.
+
 ## Tests that passed
 
 | Test | Result |

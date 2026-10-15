@@ -5,11 +5,11 @@
   "width": 169.14089045184664,
   "dz": -6.211591809988022
  },
+ "key": "width",
  "runs": {
   "cover, bounce": [
    {
-    "half_width": 150.0,
-    "across_mm": 300.0,
+    "value": 150.0,
     "p_upright": 0.588,
     "mass_g": 3710,
     "com_z": 54.9,
@@ -25,8 +25,7 @@
     "surrogate_95": 0.027
    },
    {
-    "half_width": 175.0,
-    "across_mm": 350.0,
+    "value": 175.0,
     "p_upright": 0.675,
     "mass_g": 3769,
     "com_z": 56.5,
@@ -42,8 +41,7 @@
     "surrogate_95": 0.036
    },
    {
-    "half_width": 200.0,
-    "across_mm": 400.0,
+    "value": 200.0,
     "p_upright": 0.68,
     "mass_g": 3829,
     "com_z": 57.9,
@@ -59,8 +57,7 @@
     "surrogate_95": 0.054
    },
    {
-    "half_width": 225.0,
-    "across_mm": 450.0,
+    "value": 225.0,
     "p_upright": 0.655,
     "mass_g": 3889,
     "com_z": 59.4,
@@ -76,8 +73,7 @@
     "surrogate_95": 0.076
    },
    {
-    "half_width": 250.0,
-    "across_mm": 500.0,
+    "value": 250.0,
     "p_upright": 0.637,
     "mass_g": 3949,
     "com_z": 60.8,
@@ -93,8 +89,7 @@
     "surrogate_95": 0.099
    },
    {
-    "half_width": 300.0,
-    "across_mm": 600.0,
+    "value": 300.0,
     "p_upright": 0.63,
     "mass_g": 4071,
     "com_z": 63.5,
@@ -110,8 +105,7 @@
     "surrogate_95": 0.137
    },
    {
-    "half_width": 350.0,
-    "across_mm": 700.0,
+    "value": 350.0,
     "p_upright": 0.633,
     "mass_g": 4194,
     "com_z": 66.0,
@@ -129,8 +123,7 @@
   ],
   "cover, dead": [
    {
-    "half_width": 150.0,
-    "across_mm": 300.0,
+    "value": 150.0,
     "p_upright": 0.565,
     "mass_g": 3710,
     "com_z": 54.9,
@@ -146,8 +139,7 @@
     "surrogate_95": 0.025
    },
    {
-    "half_width": 175.0,
-    "across_mm": 350.0,
+    "value": 175.0,
     "p_upright": 0.646,
     "mass_g": 3769,
     "com_z": 56.5,
@@ -163,8 +155,7 @@
     "surrogate_95": 0.033
    },
    {
-    "half_width": 200.0,
-    "across_mm": 400.0,
+    "value": 200.0,
     "p_upright": 0.644,
     "mass_g": 3829,
     "com_z": 57.9,
@@ -180,8 +171,7 @@
     "surrogate_95": 0.048
    },
    {
-    "half_width": 225.0,
-    "across_mm": 450.0,
+    "value": 225.0,
     "p_upright": 0.609,
     "mass_g": 3889,
     "com_z": 59.4,
@@ -197,8 +187,7 @@
     "surrogate_95": 0.068
    },
    {
-    "half_width": 250.0,
-    "across_mm": 500.0,
+    "value": 250.0,
     "p_upright": 0.586,
     "mass_g": 3949,
     "com_z": 60.8,
@@ -214,8 +203,7 @@
     "surrogate_95": 0.088
    },
    {
-    "half_width": 300.0,
-    "across_mm": 600.0,
+    "value": 300.0,
     "p_upright": 0.575,
     "mass_g": 4071,
     "com_z": 63.5,
@@ -231,8 +219,7 @@
     "surrogate_95": 0.125
    },
    {
-    "half_width": 350.0,
-    "across_mm": 700.0,
+    "value": 350.0,
     "p_upright": 0.582,
     "mass_g": 4194,
     "com_z": 66.0,

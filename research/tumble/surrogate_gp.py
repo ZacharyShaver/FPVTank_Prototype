@@ -1,5 +1,9 @@
 """EXPLORATORY (2026-10-15): a data-driven surrogate of the shape sweep. How far is it from the simulator?
 
+A second, independent GP. The sprint's surrogate is surrogate.py (H2: an RBF GP on the first sweep, with active
+learning, gating and controls); on the same data the two agree on held-out error (3.7 vs 3.8 pts) and share the
+peak bias found here (C15, audit/surrogate_peak_check.py).
+
     python research/tumble/surrogate_gp.py -> research/results/surrogate_gp.json and .md
 
 The surrogate is a Gaussian process: 4 shape settings (top, round, width, dz; scaled to 0-1 over the sweep's range)
@@ -68,6 +72,7 @@ def linear(Xtr, ytr, Xte):
 if __name__ == '__main__':
     D = json.load(open(os.path.join(ROOT, 'results', 'posthoc_sweep_v2.json')))['results']
     out = {}; L = ['# Surrogate vs simulator: a Gaussian process trained on the shape sweep (exploratory)', '',
+                   "A second, independent GP; the sprint's surrogate is `surrogate.py` (H2). Both undervalue the best designs (C15).", '',
                    'Errors in percentage points of P(upright). Every number is for designs the surrogate did not see.', '']
     for lab, v in D.items():
         X = scale([r['params'] for r in v['all']]); y = np.array([r['p_upright'] for r in v['all']])

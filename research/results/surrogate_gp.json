@@ -72,7 +72,7 @@
     "sim_noise_pts": 1.5
    }
   ],
-  "surrogate_s_per_design": 1.8663959999685175e-05
+  "surrogate_s_per_design": 1.866147499968065e-05
  },
  "cover, dead": {
   "n": 400,
@@ -147,7 +147,7 @@
     "sim_noise_pts": 1.5
    }
   ],
-  "surrogate_s_per_design": 2.0846375000837725e-05
+  "surrogate_s_per_design": 1.8602145000477322e-05
  },
  "cover, bounce": {
   "n": 400,
@@ -222,11 +222,11 @@
     "sim_noise_pts": 1.5
    }
   ],
-  "surrogate_s_per_design": 1.8760190000466535e-05
+  "surrogate_s_per_design": 1.8926255000405945e-05
  },
  "speed": {
   "simulator_s_per_drop": 0.013,
-  "simulator_s_per_design_200": 2.6,
-  "surrogate_s_per_design": 1.8760190000466535e-05
+  "simulator_s_per_design_200": 2.7,
+  "surrogate_s_per_design": 1.8926255000405945e-05
  }
 }
