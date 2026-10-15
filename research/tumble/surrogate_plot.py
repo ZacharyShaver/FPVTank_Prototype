@@ -17,7 +17,7 @@ VARIANT = 'cover, bounce'
 BLUE, BAND, INK, MUTED, GRID, AXIS, SURF = '#2a78d6', '#cde2fb', '#0b0b0b', '#52514e', '#e1e0d9', '#c3c2b7', '#fcfcfb'
 BLUES = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b']
 ORANGES = ['#fde5d9', '#f8bea3', '#f2946d', '#eb6834', '#c44f1f', '#963a15', '#6b280d']
-LABEL = {'top': 'top height (mm)', 'round': 'edge rounding (0 boxy, 1 dome)', 'width': 'width (mm)', 'dz': 'weight position (mm, + is higher)'}
+LABEL = {'top': 'top height (mm)', 'round': 'edge rounding (0 boxy, 1 dome)', 'width': 'shell half-width (mm; 175 = 350 across)', 'dz': 'weight position (mm, + is higher)'}
 
 if __name__ == '__main__':
     import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
@@ -47,7 +47,7 @@ if __name__ == '__main__':
              f"{best['params']['width']:.0f}/{best['params']['dz']:.0f}, dashed): line = its prediction, band = 95% sure the simulator's answer is inside",
              ha='center', color=INK, fontsize=11)
 
-    fig.text(0.05, 0.515, 'Maps over height and width, with edge rounding and weight position held at the best design', color=INK, fontsize=11)
+    fig.text(0.05, 0.515, 'Maps over height and half-width, with edge rounding and weight position held at the best design', color=INK, fontsize=11)
     nt, nw = 120, 120; T, Wd = np.meshgrid(np.linspace(0, 1, nt), np.linspace(0, 1, nw))
     Z = np.tile(xb, (nt * nw, 1)); Z[:, 0] = T.ravel(); Z[:, 2] = Wd.ravel()
     m, s = g.predict(Z); s = np.sqrt(np.maximum(s ** 2 - g.sn2, 0))
