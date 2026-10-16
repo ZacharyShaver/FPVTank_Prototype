@@ -52,7 +52,7 @@ figcaption b{color:var(--ink)}
   <p class="sub">Assured AI agents and surrogate models for faster ground-system design and simulation</p>
   <p class="byline"><span class="ph">[Your name]</span>, M.S. Cybersecurity &middot; Research plan for the <span class="ph">[Org]</span> AI Research Fellow, UM-LANL SPARC &middot; October 2026</p>
 
-  <p class="summary"><b>Summary.</b> AI agents and surrogate models can speed up vehicle design, but only as far as the checks that accept their work can be trusted, and checks fail. In a two-week pilot on my robot, Scorpion, every check was itself tested: planted faults for the CAD checks, the simulator for the surrogate, and real drops for the simulator. Across the project, 15 checks have been caught being wrong, none by the check itself. This plan makes that testing routine.</p>
+  <p class="summary"><b>Summary.</b> AI agents and surrogate models can speed vehicle design, but only as far as the checks that accept their work can be trusted, and checks fail. In a two-week pilot on my robot, Scorpion, every check was itself tested: planted faults for CAD checks, the simulator for the surrogate, and real drops for the simulator. Fifteen checks have been caught being wrong, none by the check itself. This plan makes it routine.</p>
 
   <h2>1. The challenge</h2>
   <p>The slow step in building a vehicle is not drawing a change but building and testing it. AI agents can now revise CAD, set up simulations and write the tests that judge the result in minutes, yet each change still waits on hardware: on my robot, 16 of 26 design flaws surfaced only at the bench, after printing. In this pilot, 361 hand drops took three sessions; the simulator ran 80,000 in 74 s, and a surrogate model answers in microseconds. Simulation and surrogates can replace most builds, but only if their answers can be trusted. A check that passes when it should fail sends a defect to hardware, where each one costs days; a check nobody trusts sends every design back to the bench, and the speed is lost.</p>
@@ -64,7 +64,7 @@ figcaption b{color:var(--ink)}
     <li><b>Pace.</b> The pan drive went through <span class="num">11</span> design iterations in <span class="num">16</span> days, the last four on consecutive days.</li>
     <li><b>Checks.</b> Interference, assembly order, gear backlash, bearing contact, thread engagement and wire clearance; for the whole vehicle, stability, rest states after a tumble, and which part strikes first.</li>
     <li><b>Finding.</b> Ten recorded cases of a check that was itself wrong, seven of them passes that let a defect through, such as parts with zero overlap that could not be assembled. The fix that worked: every check ships with a <i>negative control</i>, a deliberately broken variant it must flag, which is mutation testing borrowed from software engineering [1].</li>
-    <li><b>Escapes.</b> What still reached hardware was what no check modelled: a material assumption (nylon screws taken for steel), friction, print tolerance and strength. That is where physics and test data come in.</li>
+    <li><b>Escapes.</b> When an escape became a check, its kind stopped recurring: after Oct 3 no assembly or access fault reached the bench, and the next one (Oct 11) was caught by the assembly sweep before printing. What kept escaping is what no check models yet: wire routing (5 findings, the most common), friction, print tolerance, material (nylon screws taken for steel) and strength.</li>
   </ul>
 
   <h2>3. Pilot results</h2>
@@ -93,12 +93,12 @@ figcaption b{color:var(--ink)}
 <section class="sheet" aria-label="Page 3">
   <h2>4. Approach</h2>
   <p class="aim"><b>Aim 1: Mutation-tested agent workflows.</b> Grow the pilot's harness into a library of fault operators (move a part, close a clearance, swap a material, sever a joint, duplicate a body, perturb a load) that scores each check by the faults it catches. The agent must deliver every design change with its checks and their mutants, and a change is accepted only when its checks reach a set mutation score. Designs, results and test logs are versioned and signed: a chain of custody for AI-generated engineering artifacts.</p>
-  <p class="aim"><b>Aim 2: Physics, surrogates and uncertainty.</b> Couple the checks to physics-based simulation: Project Chrono for vehicle-terrain mobility and rollover [2], MuJoCo for mechanisms [3], and <span class="ph">[Org]</span> and SPARC tools where they fit. Train surrogates on simulation sweeps run on high-performance computing, so the agent can screen a change in seconds; send any case a surrogate is unsure of to full simulation or physical test [4]; and check its intervals where decisions are made, not only on average. A surrogate is a check too, so it faces the same mutants. Bench data calibrates the physics, and each escape becomes both a regression case and new training data.</p>
+  <p class="aim"><b>Aim 2: Physics, surrogates and uncertainty.</b> Couple the checks to physics-based simulation: Project Chrono for vehicle-terrain mobility and rollover [2], MuJoCo for mechanisms [3], assembly planning for whether a design goes together [8], and <span class="ph">[Org]</span> and SPARC tools where they fit. Train surrogates on simulation sweeps run on high-performance computing, so the agent can screen a change in seconds; send any case a surrogate is unsure of to full simulation or physical test [4]; and check its intervals where decisions are made, not only on average. A surrogate is a check too, so it faces the same mutants. Bench data calibrates the physics, and each escape becomes a regression case and training data.</p>
   <p class="aim"><b>Aim 3: Demonstrate and measure.</b> With the Chief Scientist, choose a ground-system problem from <span class="ph">[Org]</span> and SPARC priorities, for example a sensor mast or turret mount, a drive module, or rollover screening. Run a controlled comparison on matched tasks: the conventional workflow, AI agents alone, and AI agents with mutation-tested, uncertainty-gated checks. Measures: time from a test finding to a verified change; defects that reach hardware; mutation score; whether the surrogate's stated uncertainty holds; and compute and engineer hours.</p>
   <h2>5. Schedule (12 months)</h2>
   <table>
     <tr><th>Months 1-2</th><td>Evaluate SPARC foundation models, frameworks and simulation codes against the three aims; select the demonstration problem; package the pilot's toolkit and fault-operator library.</td></tr>
-    <tr><th>Months 3-6</th><td>Physics coupling and surrogate training on HPC; uncertainty gating; bench calibration; provenance logging.</td></tr>
+    <tr><th>Months 3-6</th><td>Physics coupling, surrogate training on HPC; uncertainty gating; calibration; provenance logging.</td></tr>
     <tr><th>Months 7-10</th><td>Controlled study on the selected subsystem.</td></tr>
     <tr><th>Months 11-12</th><td>Analysis, transition package, technical report and publication.</td></tr>
   </table>
@@ -115,12 +115,13 @@ figcaption b{color:var(--ink)}
 
   <div class="refs">
     <h2>References</h2>
-    <p>[1] Y. Jia and M. Harman, "An analysis and survey of the development of mutation testing," <i>IEEE Trans. Software Engineering</i>, 37(5), 2011.</p>
+    <p>[1] Y. Jia and M. Harman, "An analysis and survey of the development of mutation testing," <i>IEEE Trans. Softw. Eng.</i>, 37(5), 2011.</p>
     <p>[2] A. Tasora et al., "Chrono: An open source multi-physics dynamics engine," <i>High Performance Computing in Science and Engineering</i>, LNCS 9611, Springer, 2016.</p>
     <p>[3] E. Todorov, T. Erez and Y. Tassa, "MuJoCo: A physics engine for model-based control," <i>IEEE/RSJ IROS</i>, 2012.</p>
     <p>[4] G. E. Karniadakis et al., "Physics-informed machine learning," <i>Nature Reviews Physics</i>, 3, 2021.</p>
     <p>[5] C. E. Rasmussen and C. K. I. Williams, <i>Gaussian Processes for Machine Learning</i>, MIT Press, 2006.</p>
     <p>[6] G. W. Brier, "Verification of forecasts expressed in terms of probability," <i>Monthly Weather Review</i>, 78(1), 1950.</p>
     <p>[7] B. A. Nosek, C. R. Ebersole, A. C. DeHaven and D. T. Mellor, "The preregistration revolution," <i>PNAS</i>, 115(11), 2018.</p>
+    <p>[8] Y. Tian et al., "Assemble Them All: Physics-based planning for generalizable assembly by disassembly," <i>ACM Trans. Graphics</i>, 41(6), 2022.</p>
   </div>
 </section>
