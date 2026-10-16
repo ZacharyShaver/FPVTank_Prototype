@@ -8,6 +8,7 @@ Evidence for the research plan "Checks That Can Fail" (UM-LANL SPARC AI Research
 | `data/iterations.csv` | Workstream A: one row per design finding, Sep 27 to Oct 12 (P), plus earlier drivetrain and electronics escapes (E). Retrospective. |
 | `data/check_failures.csv` | Every recorded case of an automated check itself being wrong (false pass, false fail, weak control). |
 | `analysis/iterations.py` | Statistics (`results/iterations_summary.json`) and `figures/iterations.png`. |
+| `paper/` | The research plan, draft v3 (2026-10-16): `checks-that-can-fail-v3.html` and its PDF (Edge, US Letter, 3 pages); Figure 1 from `make_fig1.py`. The Oct 13 draft stays in the session folder. |
 
 **How the data was made.** Finding times come from the session transcripts (Zach's message reporting the finding) or
 from the check or slicer run. Fix times come from G-code and superseded-folder timestamps, or from `docs/decisions.md`
