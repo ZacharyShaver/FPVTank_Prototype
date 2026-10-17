@@ -193,6 +193,12 @@ def slice_parts(stls, name=None, sets=(), outdir=GCODE):
         log = os.path.join(work, '00000.log')
         err = open(log, errors='ignore').read() if os.path.isfile(log) else r.stderr
         raise SystemExit('Orca failed (exit %s):\n%s' % (r.returncode, err[-2000:]))
+    # Orca's arrange moves what doesn't fit to a second plate, and the CLI slices only the first, silently
+    # (2026-10-17: the drop stand's post, jaws, gauge and pins never printed). Every part must be on plate 1.
+    text = open(plate, errors='ignore').read()
+    missing = [os.path.basename(x) for x in stls if 'NAME=%s_id_' % os.path.basename(x) not in text]
+    if missing:
+        raise SystemExit('Orca left %d of %d parts off the plate: %s' % (len(missing), len(stls), ', '.join(missing)))
     os.makedirs(outdir, exist_ok=True)
     s = summary(plate)
     hm = re.findall(r'(\d+)([hms])', s['time'] or '')
