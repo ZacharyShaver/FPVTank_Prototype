@@ -1,0 +1,131 @@
+{
+ "drop_mm": 150.0,
+ "settings": [
+  {
+   "body": "E1_tub",
+   "start": "left side down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 92
+  },
+  {
+   "body": "E1_tub",
+   "start": "nose down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 88
+  },
+  {
+   "body": "E1_tub",
+   "start": "right side down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 92
+  },
+  {
+   "body": "E1_tub",
+   "start": "tail down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 88
+  },
+  {
+   "body": "E1_tub",
+   "start": "upside down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "upper",
+   "grip_centre_below_pivot": 94
+  },
+  {
+   "body": "E1_tub",
+   "start": "upside down, 45 to the left",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 93
+  },
+  {
+   "body": "E2_dome",
+   "start": "left side down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 92
+  },
+  {
+   "body": "E2_dome",
+   "start": "nose down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 88
+  },
+  {
+   "body": "E2_dome",
+   "start": "right side down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 92
+  },
+  {
+   "body": "E2_dome",
+   "start": "tail down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 88
+  },
+  {
+   "body": "E2_dome",
+   "start": "upside down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "upper",
+   "grip_centre_below_pivot": 93
+  },
+  {
+   "body": "E2_dome",
+   "start": "upside down, 45 to the left",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 92
+  },
+  {
+   "body": "E3_tall",
+   "start": "left side down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 89
+  },
+  {
+   "body": "E3_tall",
+   "start": "nose down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 88
+  },
+  {
+   "body": "E3_tall",
+   "start": "right side down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 89
+  },
+  {
+   "body": "E3_tall",
+   "start": "tail down",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 88
+  },
+  {
+   "body": "E3_tall",
+   "start": "upside down",
+   "post_hole_mm": 270.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 91
+  },
+  {
+   "body": "E3_tall",
+   "start": "upside down, 45 to the left",
+   "post_hole_mm": 280.0,
+   "sleeve_hole": "lower",
+   "grip_centre_below_pivot": 83
+  }
+ ]
+}

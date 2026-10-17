@@ -390,3 +390,12 @@ start: `results/sim_vs_reality.md` (`sim_vs_reality.py`). The 6 cm fitted set is
   H2's recorded result stands; the overall check was the wrong place to look. The design conclusions rest on the
   1000-drop reruns, not on surrogate values. The surrogate ranks candidates well (its top two were the simulator's
   top two in every variant) but undervalues the winner.
+
+## H3c third amendment (2026-10-17, before any 15 cm drop): released from a drop stand
+The 15 cm drops will be released from a printed drop stand (`drop_stand.py`) instead of by hand. A pinch clamp holds
+the body still in its start, a gauge sets its lowest point at 150 mm, and pinching the clamp's handles snaps both
+jaws open together. The starts are still set by hand in the clamp. This changes the release, not the models: every
+committed 15 cm prediction stays as it is, with its +-15 degree hand jitter, and the scoring is unchanged. Expected
+effect: less height error and less release randomness than a hand drop. If the real release is now steadier than
+the models assume, that costs every model in the same direction. It is recorded here so that any such effect is
+read as a known change, not found after the fact.
