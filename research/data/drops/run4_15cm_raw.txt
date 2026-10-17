@@ -1,0 +1,15 @@
+Zach, 2026-10-17, chat message, verbatim. H3c's data: drops from the printed drop stand (drop_stand.py), lowest point
+set at 150 mm with its gauge, the six starts x 5 in the card's order. Same legend as run 3 (x upside down, o upright,
+n nose, t tail, r/l right/left side).
+
+quarters against tape
+E3 otoct oronn onooo orool xorox notoo
+E2 oxrox oxlox ooooo otoxo roxxx noxox
+E1 xoxxx oxoox xxxox oloox xxxxx xxoxx
+spacer on tape
+E3 oxxon xlxlo xotxo ortox xxonn nloxo
+E2 ooxro ooxox looxx ooxxo xolxx ooxox
+E1 xxxxo ooxxx oxxxl xoxlx xxxxx xxxxx
+
+Open before scoring (asked 2026-10-17):
+- the "c" in E3's first block, first group (nose down, drop 4): run 3's "c" was a typo for x.
