@@ -72,3 +72,15 @@ same floor.
   black board. It has 12 drops from 7-12 cm, by the ball's own scale (Zach aimed for 6 cm without a ruler). Measured
   by `tumble/measure_ball.py`, with results in `results/ball_restitution.md`. **First-impact restitution: 0.39 mean,
   range 0.24-0.61.** Later, slower bounces have a median of 0.78.
+
+## Run 4: the 15 cm drops from the drop stand (2026-10-17), H3c's data
+- `run4_15cm_raw.txt` is Zach's message verbatim; `run4_15cm.csv` is the transcription, one row per drop.
+- Released from the printed drop stand (`tumble/drop_stand.py`, PROTOCOL.md H3c third amendment), with the lowest
+  point set at 150 mm by its gauge.
+- **Readings fixed before scoring:**
+  1. The legend is run 3's: x upside down, o upright, n and t Zach's nose and tail, r and l the sides.
+  2. "Quarters against tape" is mass low: the pocket opens in the base (DROP_TEST.md), so coins against the tape sit
+     by the base. "Spacer on tape" is mass high. Low came first, as the protocol asks.
+  3. Each line names its body (listed E3, E2, E1 this time).
+  4. The "c" (E3, mass low, nose down, drop 4) is an unknown mark and is left out until Zach reads it. Run 3's "c"
+     was a typo for x.
