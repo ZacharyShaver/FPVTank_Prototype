@@ -399,3 +399,35 @@ committed 15 cm prediction stays as it is, with its +-15 degree hand jitter, and
 effect: less height error and less release randomness than a hand drop. If the real release is now steadier than
 the models assume, that costs every model in the same direction. It is recorded here so that any such effect is
 read as a known change, not found after the fact.
+
+## H3c results (2026-10-17): 15 cm from the drop stand, 179 drops, against six models committed before them
+`score_15cm.py`; full tables in `results/drop_scores_15cm.md`. One unknown mark (a "c") is left out; reading it as any
+state moves the primary difference by at most 0.01.
+
+| Model | Brier, 15 cm |
+|---|---|
+| naive (stays on the face it was dropped on) | 1.520 |
+| dead soft floor (the control) | 1.118 |
+| **hard floor 0.31, 0.1 ms (primary)** | **0.675** |
+| soft floor, bounce fitted at 6 cm | 0.648 |
+| hard floor 0.39 (the ball, measured) | 0.640 |
+| hard floor 0.31, 0.5 ms (unconverged, C14) | 0.626 |
+| hard floor 0.55 (the ball, rough) | 0.592 |
+| best possible (each cell's true odds, from the drops) | 0.601 |
+
+**Primary: supported.** The converged 0.31 hard floor beats the dead soft floor by 0.443 (paired bootstrap 95% CI
+0.347-0.538) and naive by 0.845 (0.722-0.957).
+
+**Secondary, no direction predicted: the bouncier floors scored better.** 0.39 beat 0.31 by 0.035 (CI 0.016-0.055)
+and 0.55 beat 0.31 by 0.083 (0.016-0.149). 0.39 against 0.55 (CI -0.005 to 0.098) and against the fitted soft bounce
+(-0.068 to 0.052) are within noise. The 0.55 set's 0.592 is under the estimated best possible, 0.601; that estimate
+rests on 5 drops per cell and is noisy, so read the two as level. The unconverged 0.5 ms set also beats the converged
+one: its numerical energy gain (C14) acts as extra bounce, so this is not evidence for the coarse step.
+
+**Where the models miss, as at 30 cm.** They over-predict how much the weight matters: E2 is predicted upright 0.45
+with the weight low and 0.13 with it high, and landed upright 15/30 both ways. They also over-predict how often a
+body stays where it lands: upside-down starts are predicted to stay upside down 95-100% of the time, and stayed 67%.
+With the weight high, real bodies ended upright 33-40% of the time from most starts, against 9-24% predicted. All of
+this points the same way as the ball's livelier slow bounces (median 0.78; second amendment): real bodies rock and
+flip after landing more than one restitution at every speed allows. That reading is post hoc, from seen data. The
+stand's steadier release (third amendment) can't be separated from it here.

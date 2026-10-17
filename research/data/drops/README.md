@@ -84,3 +84,4 @@ same floor.
   3. Each line names its body (listed E3, E2, E1 this time).
   4. The "c" (E3, mass low, nose down, drop 4) is an unknown mark and is left out until Zach reads it. Run 3's "c"
      was a typo for x.
+- Scored by `tumble/score_15cm.py` (`results/drop_scores_15cm.md`); the result is in PROTOCOL.md, H3c results.
