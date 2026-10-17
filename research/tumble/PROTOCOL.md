@@ -400,27 +400,28 @@ effect: less height error and less release randomness than a hand drop. If the r
 the models assume, that costs every model in the same direction. It is recorded here so that any such effect is
 read as a known change, not found after the fact.
 
-## H3c results (2026-10-17): 15 cm from the drop stand, 179 drops, against six models committed before them
-`score_15cm.py`; full tables in `results/drop_scores_15cm.md`. One unknown mark (a "c") is left out; reading it as any
-state moves the primary difference by at most 0.01.
+## H3c results (2026-10-17): 15 cm from the drop stand, 180 drops, against six models committed before them
+`score_15cm.py`; full tables in `results/drop_scores_15cm.md`. The first scoring left out one unknown mark (a "c",
+179 drops). Zach, after it: a typo for x, as in run 3. Corrected and rescored on all 180; the first scoring is in
+git history. No number moved by more than 0.005.
 
 | Model | Brier, 15 cm |
 |---|---|
-| naive (stays on the face it was dropped on) | 1.520 |
-| dead soft floor (the control) | 1.118 |
-| **hard floor 0.31, 0.1 ms (primary)** | **0.675** |
-| soft floor, bounce fitted at 6 cm | 0.648 |
-| hard floor 0.39 (the ball, measured) | 0.640 |
-| hard floor 0.31, 0.5 ms (unconverged, C14) | 0.626 |
-| hard floor 0.55 (the ball, rough) | 0.592 |
-| best possible (each cell's true odds, from the drops) | 0.601 |
+| naive (stays on the face it was dropped on) | 1.522 |
+| dead soft floor (the control) | 1.120 |
+| **hard floor 0.31, 0.1 ms (primary)** | **0.677** |
+| soft floor, bounce fitted at 6 cm | 0.650 |
+| hard floor 0.39 (the ball, measured) | 0.641 |
+| hard floor 0.31, 0.5 ms (unconverged, C14) | 0.628 |
+| hard floor 0.55 (the ball, rough) | 0.594 |
+| best possible (each cell's true odds, from the drops) | 0.606 |
 
-**Primary: supported.** The converged 0.31 hard floor beats the dead soft floor by 0.443 (paired bootstrap 95% CI
-0.347-0.538) and naive by 0.845 (0.722-0.957).
+**Primary: supported.** The converged 0.31 hard floor beats the dead soft floor by 0.444 (paired bootstrap 95% CI
+0.348-0.537) and naive by 0.846 (0.724-0.964).
 
-**Secondary, no direction predicted: the bouncier floors scored better.** 0.39 beat 0.31 by 0.035 (CI 0.016-0.055)
-and 0.55 beat 0.31 by 0.083 (0.016-0.149). 0.39 against 0.55 (CI -0.005 to 0.098) and against the fitted soft bounce
-(-0.068 to 0.052) are within noise. The 0.55 set's 0.592 is under the estimated best possible, 0.601; that estimate
+**Secondary, no direction predicted: the bouncier floors scored better.** 0.39 beat 0.31 by 0.035 (CI 0.016-0.056)
+and 0.55 beat 0.31 by 0.083 (0.016-0.151). 0.39 against 0.55 (CI -0.005 to 0.099) and against the fitted soft bounce
+(-0.068 to 0.051) are within noise. The 0.55 set's 0.594 is under the estimated best possible, 0.606; that estimate
 rests on 5 drops per cell and is noisy, so read the two as level. The unconverged 0.5 ms set also beats the converged
 one: its numerical energy gain (C14) acts as extra bounce, so this is not evidence for the coarse step.
 

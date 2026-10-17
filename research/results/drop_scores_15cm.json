@@ -1,73 +1,73 @@
 {
- "n": 179,
- "left_out": 1,
- "naive": 1.52,
- "best_possible": 0.601,
+ "n": 180,
+ "left_out": 0,
+ "naive": 1.522,
+ "best_possible": 0.606,
  "models": {
   "hard floor 0.31, converged (primary)": {
-   "brier": 0.675,
-   "minus_naive": -0.845,
+   "brier": 0.677,
+   "minus_naive": -0.846,
    "minus_naive_95": [
-    -0.957,
-    -0.722
+    -0.964,
+    -0.724
    ],
-   "top_hit": 0.531
+   "top_hit": 0.528
   },
   "dead soft floor (control)": {
-   "brier": 1.118,
+   "brier": 1.12,
    "minus_naive": -0.402,
    "minus_naive_95": [
-    -0.481,
-    -0.324
+    -0.482,
+    -0.322
    ],
-   "top_hit": 0.313
+   "top_hit": 0.311
   },
   "soft floor, bounce fitted at 6 cm": {
-   "brier": 0.648,
+   "brier": 0.65,
    "minus_naive": -0.872,
    "minus_naive_95": [
     -0.998,
-    -0.739
+    -0.736
    ],
-   "top_hit": 0.464
+   "top_hit": 0.461
   },
   "hard floor 0.39, the ball measured": {
-   "brier": 0.64,
-   "minus_naive": -0.88,
+   "brier": 0.641,
+   "minus_naive": -0.881,
    "minus_naive_95": [
-    -0.989,
-    -0.759
+    -0.998,
+    -0.761
    ],
-   "top_hit": 0.531
+   "top_hit": 0.528
   },
   "hard floor 0.55, the ball rough": {
-   "brier": 0.592,
+   "brier": 0.594,
    "minus_naive": -0.928,
    "minus_naive_95": [
     -1.047,
-    -0.8
+    -0.796
    ],
-   "top_hit": 0.559
+   "top_hit": 0.556
   },
   "hard floor 0.31, 0.5 ms (unconverged, C14)": {
-   "brier": 0.626,
-   "minus_naive": -0.893,
+   "brier": 0.628,
+   "minus_naive": -0.895,
    "minus_naive_95": [
-    -1.005,
-    -0.771
+    -1.012,
+    -0.772
    ],
-   "top_hit": 0.536
+   "top_hit": 0.533
   }
  },
  "primary": {
-  "primary_minus_dead": -0.443,
+  "primary_minus_dead": -0.444,
   "primary_minus_dead_95": [
-   -0.538,
-   -0.347
+   -0.537,
+   -0.348
   ],
   "primary_minus_naive_95": [
-   -0.957,
-   -0.722
+   -0.964,
+   -0.724
   ],
   "supported": true
  },
@@ -77,7 +77,7 @@
    "b": "hard floor 0.31, converged (primary)",
    "a_minus_b": -0.035,
    "ci95": [
-    -0.055,
+    -0.056,
     -0.016
    ]
   },
@@ -87,7 +87,7 @@
    "a_minus_b": 0.048,
    "ci95": [
     -0.005,
-    0.098
+    0.099
    ]
   },
   {
@@ -96,7 +96,7 @@
    "a_minus_b": -0.008,
    "ci95": [
     -0.068,
-    0.052
+    0.051
    ]
   },
   {
@@ -105,7 +105,7 @@
    "a_minus_b": 0.083,
    "ci95": [
     0.016,
-    0.149
+    0.151
    ]
   },
   {
@@ -113,8 +113,8 @@
    "b": "soft floor, bounce fitted at 6 cm",
    "a_minus_b": 0.027,
    "ci95": [
-    -0.046,
-    0.099
+    -0.045,
+    0.101
    ]
   }
  ],
@@ -172,14 +172,14 @@
    "upright_seen": 15
   },
   "E3_tall mass low": {
-   "n": 29,
+   "n": 30,
    "brier": {
-    "hard floor 0.31, converged (primary)": 0.781,
-    "dead soft floor (control)": 1.13,
-    "soft floor, bounce fitted at 6 cm": 0.822,
-    "hard floor 0.39, the ball measured": 0.759,
-    "hard floor 0.55, the ball rough": 0.697,
-    "hard floor 0.31, 0.5 ms (unconverged, C14)": 0.715
+    "hard floor 0.31, converged (primary)": 0.789,
+    "dead soft floor (control)": 1.146,
+    "soft floor, bounce fitted at 6 cm": 0.826,
+    "hard floor 0.39, the ball measured": 0.764,
+    "hard floor 0.55, the ball rough": 0.705,
+    "hard floor 0.31, 0.5 ms (unconverged, C14)": 0.721
    },
    "p_upright_pred": 0.524,
    "upright_seen": 16
@@ -218,28 +218,28 @@
   "E3_tall": {
    "pred_low": 0.524,
    "pred_high": 0.213,
-   "seen_low": "16/29",
+   "seen_low": "16/30",
    "seen_high": "10/30",
    "same_direction": true,
-   "fisher_p": 0.1188
+   "fisher_p": 0.1923
   }
  },
  "by_start": {
   "low / nose down": {
-   "n": 14,
+   "n": 15,
    "predicted": {
     "upright": 0.56,
-    "inverted": 0.27,
-    "side": 0.11,
+    "inverted": 0.26,
+    "side": 0.12,
     "head up": 0.05,
     "head down": 0.0
    },
    "observed": {
-    "upright": 0.36,
-    "inverted": 0.43,
+    "upright": 0.33,
+    "inverted": 0.47,
     "side": 0.07,
     "head up": 0.0,
-    "head down": 0.14
+    "head down": 0.13
    }
   },
   "low / tail down": {

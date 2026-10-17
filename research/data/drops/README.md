@@ -82,6 +82,7 @@ same floor.
   2. "Quarters against tape" is mass low: the pocket opens in the base (DROP_TEST.md), so coins against the tape sit
      by the base. "Spacer on tape" is mass high. Low came first, as the protocol asks.
   3. Each line names its body (listed E3, E2, E1 this time).
-  4. The "c" (E3, mass low, nose down, drop 4) is an unknown mark and is left out until Zach reads it. Run 3's "c"
-     was a typo for x.
+  4. The "c" (E3, mass low, nose down, drop 4) is an unknown mark and was left out of the first scoring. Zach, after
+     it: a typo for x, as in run 3. Corrected, and the run rescored on all 180 drops; the first scoring (179) is in
+     git history.
 - Scored by `tumble/score_15cm.py` (`results/drop_scores_15cm.md`); the result is in PROTOCOL.md, H3c results.

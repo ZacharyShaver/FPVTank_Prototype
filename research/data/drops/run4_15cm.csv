@@ -152,7 +152,7 @@ run,body,mass,start,drop,mark,rest_state,note
 4,E3_tall,low,nose down,1,O,upright,
 4,E3_tall,low,nose down,2,T,nose up,
 4,E3_tall,low,nose down,3,O,upright,
-4,E3_tall,low,nose down,4,C,unknown,"written ""c"": unknown, left out until Zach reads it"
+4,E3_tall,low,nose down,4,X,inverted,"written ""c""; Zach: a typo for x (2026-10-17, after the first scoring)"
 4,E3_tall,low,nose down,5,T,nose up,
 4,E3_tall,low,tail down,1,O,upright,
 4,E3_tall,low,tail down,2,R,right side,
