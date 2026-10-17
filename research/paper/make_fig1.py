@@ -5,7 +5,9 @@
 A (H1): seeded faults caught, results/mutation_summary.json.
 B (H2): the surrogate against the simulator on the 280 held-out designs of H2's main fit (surrogate.py, seed 7),
    and the 6 best designs, each predicted without its own data, against their 1000-drop reruns (C15).
-C (H3): Brier scores against the real drops, results/sim_vs_reality.md and drop_scores*.json; the dashed line is
+C (H3): Brier scores against the real drops, results/sim_vs_reality.md and drop_scores*.json (15 cm: drop_scores_15cm,
+   where every model was committed before the drops; its hard-floor row is the 0.39 bounce, as at 6 and 30 cm, and the
+   primary 0.31 is in the text); the dashed line is
    the expected score of a model that knew each case's true odds (estimated from the drops; sim_vs_reality notes).
 """
 import os, sys, json
@@ -25,8 +27,8 @@ def title(ax, letter, text):
 
 
 if __name__ == '__main__':
-    fig = plt.figure(figsize=(7.1, 2.5))
-    gs = fig.add_gridspec(1, 4, width_ratios=[1.0, 0.95, 0.66, 0.66], left=0.012, right=0.968, top=0.865, bottom=0.235, wspace=0.36)
+    fig = plt.figure(figsize=(7.1, 2.4))
+    gs = fig.add_gridspec(1, 5, width_ratios=[1.12, 0.92, 0.55, 0.55, 0.55], left=0.012, right=0.968, top=0.86, bottom=0.245, wspace=0.42)
 
     # A: H1
     M = json.load(open(os.path.join(ROOT, 'results', 'mutation_summary.json')))
@@ -39,9 +41,9 @@ if __name__ == '__main__':
         a.barh(yy, r['killed'], height=0.36, color=ACC if i else ACC2, lw=0)
         a.text(0, yy + 0.3, lab, fontsize=7.2, color=INK, va='bottom')
         a.text(r['killed'] - 0.5, yy, f"{r['killed']}", fontsize=7.4, color='white', va='center', ha='right', fontweight='semibold')
-        a.text(22.7, yy, f"real: {r['historical_killed']} of {M['historical_mutants']}", fontsize=6.6, color=MUTED, va='center')
+        a.text(22.7, yy, f"real {r['historical_killed']}/{M['historical_mutants']}", fontsize=6.6, color=MUTED, va='center')
     a.set_xlim(0, 29.5); a.set_ylim(-0.4, 2.85); a.set_xticks([0, 11, 22]); a.set_xlabel(f"seeded faults caught, of {M['mutants']}")
-    title(a, 'A', 'H1  Checks against seeded faults')
+    title(a, 'A', 'H1  Checks vs seeded faults')
 
     # B: H2
     import surrogate as SU, sweep as SW
@@ -62,23 +64,26 @@ if __name__ == '__main__':
 
     # C: H3
     models = ['naive guess', 'as registered', 'start fixed, dead floor', 'floor bounce, fitted at 6 cm', 'hard floor, bounce measured']
-    brier = {'6 cm': [1.293, 0.578, 0.861, 0.443, 0.456], '30 cm': [1.506, 0.871, 1.156, 0.634, 0.672]}
-    before = {'6 cm': [None, True, False, False, False], '30 cm': [None, True, True, True, False]}
-    floor = {'6 cm': 0.44, '30 cm': 0.60}
+    brier = {'6 cm': [1.293, 0.578, 0.861, 0.443, 0.456], '15 cm': [1.522, None, 1.120, 0.650, 0.641], '30 cm': [1.506, 0.871, 1.156, 0.634, 0.672]}
+    before = {'6 cm': [None, True, False, False, False], '15 cm': [None, None, True, True, True], '30 cm': [None, True, True, True, False]}
+    floor = {'6 cm': 0.44, '15 cm': 0.61, '30 cm': 0.60}
+    drops = {'6 cm': 181, '15 cm': 180, '30 cm': 180}
     for j, h in enumerate(brier):
-        c = fig.add_subplot(gs[2 + j]); c.spines['left'].set_visible(False); c.set_yticks([])
+        c = fig.add_subplot(gs[2 + j]); c.spines['left'].set_visible(False); c.set_yticks([]); c.patch.set_alpha(0)   # row labels may run into the next panel
         for i, (v, bf) in enumerate(zip(brier[h], before[h])):
             yy = 4 - i
+            if v is None:                                  # the original model was never run at 15 cm
+                c.text(0.04, yy, 'not run', va='center', fontsize=6.2, color=MUTED, zorder=4, bbox=dict(facecolor='white', edgecolor='none', pad=0.4)); continue
             if bf is None: c.barh(yy, v, height=0.34, color=GRAY, lw=0)
             elif bf: c.barh(yy, v, height=0.34, color=ACC, lw=0)
             else: c.barh(yy, v, height=0.34, color='white', edgecolor=ACC, lw=0.8, hatch='//////')
             c.text(v + 0.04, yy, f'{v:.2f}', va='center', fontsize=6.6, color=INK)
-            if j == 0: c.text(0, yy + 0.24, models[i], fontsize=6.9, color=INK, va='bottom', zorder=4,
+            if j == 0: c.text(0, yy + 0.24, models[i], fontsize=6.7, color=INK, va='bottom', zorder=4,
                               bbox=dict(facecolor='white', edgecolor='none', pad=0.6))
         c.axvline(floor[h], color=INK, lw=0.7, ls=(0, (2, 2)), ymax=0.93, zorder=3)
         c.set_xlim(0, 1.75); c.set_xticks([0, 0.5, 1.0, 1.5]); c.set_xticklabels(['0', '.5', '1', '1.5']); c.set_ylim(-0.45, 4.75)
-        c.set_xlabel(f"Brier score, {h} ({'180' if j else '181'} drops)")
-        if j == 0: title(c, 'C', 'H3  Simulation vs real drops (lower is better)')
+        c.set_xlabel(f"{h} ({drops[h]} drops)")
+        if j == 0: title(c, 'C', 'H3  Brier score vs real drops (lower is better)')
     from matplotlib.patches import Patch
     from matplotlib.lines import Line2D
     fig.legend(handles=[Patch(facecolor=ACC, label='predicted before those drops'), Patch(facecolor='white', edgecolor=ACC, hatch='//////', label='after (post hoc)'),
