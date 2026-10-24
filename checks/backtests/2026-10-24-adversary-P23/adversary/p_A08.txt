@@ -1,0 +1,2 @@
+A08: shelf 0.30 mm thick at r 16
+A08: rest  drop 0.00 mm before it meets the base; contact area 188 mm2

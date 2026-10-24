@@ -1,0 +1,1 @@
+A03: slide least play to the base 0.05 mm, least travel to the drum 0.65 mm; drum met first at: none

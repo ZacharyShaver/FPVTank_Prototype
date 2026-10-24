@@ -27,6 +27,8 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 | `reference/solids/` | fit-check dummies: servo, camera, bearing, screw heads |
 | `reference/downloads/` | *(untracked)* big third-party files that can be downloaded again |
 | `archive/` | superseded work worth keeping: the 2024 code, the August 2026 pan/tilt, head-v2 rev 1 |
+| `checks/` | the check library (draft): every check's registry row, its rot audit (`audit.py`), and the agent loop that runs it (`README.md`) |
+| `.claude/agents/` | the library's agents: adversary, gatekeeper, bench intake, auditor |
 | `docs/decisions.md` | why each design went the way it did |
 | `docs/lessons/` | lessons |
 | `tools/` | shared Python: STL to exact solid, booleans, ray and slice probes, renders, mesh report, export |

@@ -1,0 +1,6 @@
+pairs          FAIL    servo vs well 1260 mm3
+insertion      pass  <== expected FAIL  
+assembly       FAIL    shelf ring down into the base from above          171.46   <== BLOCKED 11.2 mm out; drum + 6809 down into the base from above        1320.12   <== BLOCKED 6.8 mm out; input gear up onto the servo from
+gear_play      FAIL    gear pair                                        overlap 0.039 mm2 through a pitch, drum free play 0.00 deg <== JAMS
+bearing_races  FAIL    6809 races on the fixed ledge                    inner (turns) 96%, outer (fixed) 100% <== WRONG
+853 s

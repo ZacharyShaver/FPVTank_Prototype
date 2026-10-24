@@ -1,0 +1,1 @@
+A06: rest  drop 0.00 mm before it meets the base; contact area 10 mm2

@@ -1,0 +1,6 @@
+pairs          pass    
+insertion      pass    
+assembly       pass    
+gear_play      pass    
+bearing_races  pass    
+187 s

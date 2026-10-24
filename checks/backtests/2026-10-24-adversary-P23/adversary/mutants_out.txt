@@ -1,0 +1,23 @@
+mutant      pairs insertion  assembly gear_play bearing_r  killed  description
+A01             .         .         .         .         .      NO  shelf ring moulded back onto the base (set 6 lane roof, needs supports)
+A02             .         .         .         .         .      NO  30 deg read from horizontal: deck cone, slit and teardrop roofs 60 deg off vertical
+A03             .         .         .         .         .      NO  ring edge +0.15 (bed-face elephant foot): zero slide in the skirt
+A04             .         .         .         .         .      NO  key notch prints 0.25 narrow a side: 0.1 interference on the rib
+A05             .         .         .         .         .      NO  rib flush with the ledge (as if the room cut ate it): nothing keys the ring
+A06             .         .         .         .         .      NO  lane widened 1.6 mm for the wires: ledge gone, ring sits on nothing
+A07             .         .         .         .         .      NO  ring 0.7 smaller in radius: 0.85 play a side, more than its 0.6 drum clearance
+A08             .         .         .         .         .      NO  ledge and shelf bottom raised 0.5: the ring shelf is 0.3 mm thick
+A09             x         .         .         .         .     yes  ring loses its ribbon window and wire mouth
+          pairs: shelf_ring vs ribbon 10 mm3
+A10             x         .         x         .         .     yes  ring modelled 0.3 low, into its ledge
+          pairs: shelf_ring vs well 67 mm3
+          assembly: shelf ring down into the base from above           66.88   <== BLOCKED 0.0 mm out
+A11             .         .         .         .         x     yes  ring rides 0.4 high: cup top meets the drum hub
+          bearing_races: fixed material under the drum hub                28.7% (0 wanted); set 5 control 23% <== TOUCHES
+A12             x         .         .         .         .     yes  ribbon resting on the shelf, as the pair note says (1 mm below the drawn band)
+          pairs: error: TypeError: move.<locals>.apply.<locals>.<lambda>() got an unexpected keyword argument 'pan_deg'
+A13             .         .         .         .         .      NO  ring ribbon window cut to the 2 mm slit width (model ribbon turns a sharp corner)
+A14             .         .         .         .         .      NO  ring 0.2 off centre: a 0.05 crescent into the skirt
+A15             .         .         .         .         x     yes  dead set 5 constant (no effect on the set 7 design)
+          bearing_races: fixed material under the drum hub                0.0% (0 wanted); set 5 control 0% <== CONTROL READS NOTHING
+5 of 15 killed; 2736 s
