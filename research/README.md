@@ -8,7 +8,7 @@ Evidence for the research plan "Checks That Can Fail" (UM-LANL SPARC AI Research
 | `data/iterations.csv` | Workstream A: one row per design finding, Sep 27 to Oct 12 (P), plus earlier drivetrain and electronics escapes (E). Retrospective. |
 | `data/check_failures.csv` | Every recorded case of an automated check itself being wrong (false pass, false fail, weak control). |
 | `analysis/iterations.py` | Statistics (`results/iterations_summary.json`) and `figures/iterations.png`. |
-| `paper/` | The research plan, draft v4 (2026-10-25): `checks-that-can-fail-v4.html`, Figure 1 `fig1_v4.png` from `make_fig1.py`; its PDF comes from Edge's print dialog (US Letter, 3 pages; `pagefit.py` checks the fit first). `review-v3.md` holds the review that made v4. **Superseded:** draft v3 (`checks-that-can-fail-v3.html`, its PDF, `fig1.png`), kept as it was. The Oct 13 draft stays in the session folder. |
+| `paper/` | The research plan, draft v5 (2026-10-25): `checks-that-can-fail-v5.html` and its PDF, Figure 1 `fig1_v4.png` from `make_fig1.py` (unchanged since v4); the PDF comes from Edge's print dialog, Save as PDF, or `pagefit.py --pdf` (US Letter, 3 pages; `pagefit.py --print` checks the fit first). `review-v3.md` and `review-v4.md` hold the reviews that made v4 and v5. **Superseded:** draft v4 (`checks-that-can-fail-v4.html`, its PDF) and draft v3 (`checks-that-can-fail-v3.html`, its PDF, `fig1.png`), kept as they were. The Oct 13 draft stays in the session folder. |
 
 **How the data was made.** Finding times come from the session transcripts (Zach's message reporting the finding) or
 from the check or slicer run. Fix times come from G-code and superseded-folder timestamps, or from `docs/decisions.md`
