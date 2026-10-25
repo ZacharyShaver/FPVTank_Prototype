@@ -31,7 +31,7 @@ end-to-end pilot that found real defects; a clear, transferable framing and a co
 | I4 | Why n = 20 of 26 in H4? | 20 have exact times; the rest were reconstructed. |
 | I5 | Can sponsor CAD go to a commercial cloud model? | Prepare an answer: on-prem or SPARC models, which is also what "evaluate SPARC foundation models" is for. |
 | I6 | What needs HPC? The pilot ran on 20 cores in 74 s. | Full-size vehicle sweeps with Chrono, and many designs per change. |
-| I7 | How were the CIs computed? The drops are clustered. | A paired bootstrap over single drops (`score_*.py`, 4,000 resamples), not by group or session, so the CIs may be too narrow. A by-group bootstrap would answer it before the interview. |
+| I7 | How were the CIs computed? The drops are clustered. | Checked (2026-10-25, `posthoc_cluster_ci.py`, PROTOCOL post hoc 10): resampling whole cells of 5 drops widens the CIs to 0.38–0.68 (30 cm) and 0.31–0.59 (15 cm), from 0.40–0.64 and 0.35–0.54. Both stay far from 0; by body-and-weight group they barely move. The paper keeps the registered CIs. |
 | I8 | 19 out of how many? "Never by the check itself" holds by definition. | No denominator is given. Not quite by definition: a working control can catch its own check (C08). |
 | I9 | Which parts are yours and which the agent's? | Be ready to say. |
 

@@ -1,0 +1,116 @@
+{
+ "30 cm: bounce fitted at 6 cm (main) minus default floor": {
+  "n": 180,
+  "brier": {
+   "3 start fixed, bounce fitted (main)": 0.634,
+   "2 start fixed, dead": 1.156
+  },
+  "tests": {
+   "3 start fixed, bounce fitted (main) minus 2 start fixed, dead": {
+    "mean": -0.522,
+    "drop": {
+     "ci95": [
+      -0.64,
+      -0.402
+     ],
+     "clusters": 180
+    },
+    "cell": {
+     "ci95": [
+      -0.676,
+      -0.375
+     ],
+     "clusters": 36
+    },
+    "group": {
+     "ci95": [
+      -0.634,
+      -0.433
+     ],
+     "clusters": 6
+    }
+   },
+   "3 start fixed, bounce fitted (main) minus naive": {
+    "mean": -0.872,
+    "drop": {
+     "ci95": [
+      -1.006,
+      -0.729
+     ],
+     "clusters": 180
+    },
+    "cell": {
+     "ci95": [
+      -1.052,
+      -0.685
+     ],
+     "clusters": 36
+    },
+    "group": {
+     "ci95": [
+      -0.957,
+      -0.78
+     ],
+     "clusters": 6
+    }
+   }
+  }
+ },
+ "15 cm: hard floor 0.31 (primary) minus default floor": {
+  "n": 180,
+  "brier": {
+   "hard floor 0.31, converged (primary)": 0.677,
+   "dead soft floor (control)": 1.12
+  },
+  "tests": {
+   "hard floor 0.31, converged (primary) minus dead soft floor (control)": {
+    "mean": -0.444,
+    "drop": {
+     "ci95": [
+      -0.537,
+      -0.348
+     ],
+     "clusters": 180
+    },
+    "cell": {
+     "ci95": [
+      -0.587,
+      -0.31
+     ],
+     "clusters": 36
+    },
+    "group": {
+     "ci95": [
+      -0.553,
+      -0.343
+     ],
+     "clusters": 6
+    }
+   },
+   "hard floor 0.31, converged (primary) minus naive": {
+    "mean": -0.846,
+    "drop": {
+     "ci95": [
+      -0.964,
+      -0.724
+     ],
+     "clusters": 180
+    },
+    "cell": {
+     "ci95": [
+      -1.009,
+      -0.668
+     ],
+     "clusters": 36
+    },
+    "group": {
+     "ci95": [
+      -0.923,
+      -0.762
+     ],
+     "clusters": 6
+    }
+   }
+  }
+ }
+}

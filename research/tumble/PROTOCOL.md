@@ -432,3 +432,15 @@ With the weight high, real bodies ended upright 33-40% of the time from most sta
 this points the same way as the ball's livelier slow bounces (median 0.78; second amendment): real bodies rock and
 flip after landing more than one restitution at every speed allows. That reading is post hoc, from seen data. The
 stand's steadier release (third amendment) can't be separated from it here.
+
+### Post hoc 10 (2026-10-25): the blind tests' CIs, resampling clusters (`posthoc_cluster_ci.py`)
+A cold read of the research plan asked whether the CIs are too narrow, since drops come in clusters: 5 in a row from
+one start, 30 per body and weight. Resampling whole clusters instead of single drops (95% CI of the difference):
+
+| Test | Drops (registered) | Cells, 36 | Body-and-weight groups, 6 |
+|---|---|---|---|
+| 30 cm: fitted bounce minus dead floor, -0.52 | -0.64 to -0.40 | -0.68 to -0.38 | -0.63 to -0.43 |
+| 15 cm: 0.31 hard floor minus dead floor, -0.44 | -0.54 to -0.35 | -0.59 to -0.31 | -0.55 to -0.34 |
+
+By cell the CIs are about a quarter to a half wider, and both still sit far from 0. Both registered results hold. The
+registered CIs stay as the reported ones; these are the conservative check.
