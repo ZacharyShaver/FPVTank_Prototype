@@ -40,7 +40,7 @@ figcaption b{color:var(--ink)}
 @page{size:letter;margin:0.55in 0.66in}
 @media print{
   :root{--paper:#fff;--ink:#111;--muted:#4b5560;--rule:#c9cfd4;--accent:#1f4a64;--tint:#fff;color-scheme:light}
-  body{background:#fff;padding:0}
+  body{background:#fff;padding:0;margin:0}   /* v4: the default 8px body margin cost print 16px of width */
   .sheet{box-shadow:none;margin:0;padding:0;max-width:none}
   .sheet+.sheet{break-before:page}
   .ph{background:none;padding:0}

@@ -162,10 +162,13 @@ the trims below, and the caption names the split as the out-of-sample test. `fig
 - Page 3, Schedule, months 1–2: "Evaluate SPARC foundation models and codes; pick the problem; package the toolkit."
 - Page 3, ref [8]: "ACM TOG 41(6), 2022".
 
-**Fit.** Spare room per page is 0.36, 0.32 and 0.25 in (v3: 0.36, 0.32, 0.35), by `pagefit.py`'s measuring page.
-Control: on v3 it reads its recorded margins, and v3's dialog-printed PDF shows the same line breaks. Headless Edge is
-not a fit test for this paper: it printed v4 at 5 pages, because it skips the serif's optical sizing.
-**Printed:** Edge's print dialog gives 3 pages (Zach, 2026-10-25). The PDF isn't saved in `paper/` yet.
+**Fit, corrected 2026-10-25.** The screen measurement (0.36 / 0.32 / 0.25 in) was wrong about print. Zach's
+first PDFs came out at 5 pages. Those went through the *Microsoft Print to PDF* printer, which made it worse, but the
+root cause was in the paper's print CSS: it reset the body's padding, not its default 8px margin, so print had 16px
+less width than designed. The PDF's own page geometry shows it: the content box starts 8px in. v3 had the same bug
+and fit by 0.04 in. v4's print CSS now sets `margin:0`. `pagefit.py --print` prints each page alone and measures what
+it has left: **0.30 / 0.22 / 0.15 in**. The whole document is **3 pages**. `checks-that-can-fail-v4.pdf` was made with
+the same engine as Save as PDF (Producer `Skia/PDF m156`).
 
 **The space check.** Nothing held fits without cutting more of the text. Each held item costs about a line, and page
 3 has a little over one (0.25 in). Not added: 1.4, 3.4, 4.2, 4.5, 6.1, 7.2. 3.6 needs no paper space, so it went into
