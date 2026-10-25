@@ -1,0 +1,29 @@
+margin, any      print 0.996-1.000 (high 0.02) robot 0.998 margin 11.2/73.0 size 513x560x432
+margin, any      print 1.000-1.000 (high 0.03) robot 0.992 margin 10.9/73.8 size 520x564x431
+margin, any      print 1.000-1.000 (high 0.02) robot 0.992 margin 11.0/73.9 size 515x554x432
+margin, any      print 1.000-1.000 (high 0.06) robot 0.995 margin 10.7/65.0 size 522x556x427
+margin, plan 500 print 1.000-1.000 (high 0.05) robot 0.993 margin 10.0/52.0 size 451x488x376
+margin, plan 500 print 0.996-1.000 (high 0.05) robot 0.997 margin 9.9/53.4 size 451x487x374
+margin, plan 500 print 0.992-1.000 (high 0.10) robot 0.997 margin 9.8/45.1 size 442x490x370
+margin, plan 500 print 1.000-1.000 (high 0.10) robot 0.990 margin 9.8/59.5 size 455x488x379
+margin, plan 450 print 1.000-1.000 (high 0.07) robot 0.990 margin 8.1/25.1 size 399x435x324
+margin, plan 450 print 1.000-1.000 (high 0.08) robot 0.993 margin 8.1/33.7 size 402x434x327
+margin, plan 450 print 1.000-1.000 (high 0.06) robot 0.992 margin 8.2/33.1 size 400x436x329
+margin, plan 450 print 1.000-1.000 (high 0.08) robot 0.998 margin 7.9/29.9 size 403x431x327
+margin, plan 400 print 0.996-1.000 (high 0.11) robot 0.997 margin 5.6/28.1 size 383x397x300
+margin, plan 400 print 1.000-1.000 (high 0.12) robot 0.988 margin 5.5/26.3 size 377x394x295
+margin, plan 400 print 1.000-1.000 (high 0.12) robot 0.983 margin 5.4/20.3 size 386x392x298
+margin, plan 400 print 1.000-1.000 (high 0.07) robot 0.967 margin 5.2/10.4 size 385x393x295
+stage 2          print 1.000-1.000 (high 0.17) robot 0.993 margin 8.5/66.2 size 528x511x463
+stage 2          print 1.000-1.000 (high 0.08) robot 1.000 margin 8.2/60.5 size 501x514x430
+stage 2          print 1.000-1.000 (high 0.19) robot 1.000 margin 7.0/52.5 size 536x578x457
+stage 2          print 1.000-1.000 (high 0.32) robot 0.975 margin 6.5/57.9 size 584x538x494
+stage 2          print 1.000-1.000 (high 0.16) robot 0.998 margin 6.5/43.9 size 429x483x367
+stage 2          print 1.000-1.000 (high 0.13) robot 1.000 margin 6.3/49.5 size 529x456x423
+stage 2          print 1.000-1.000 (high 0.09) robot 1.000 margin 6.3/40.6 size 538x428x354
+stage 2          print 1.000-1.000 (high 0.29) robot 1.000 margin 6.0/37.3 size 492x480x346
+stage 2          print 1.000-1.000 (high 0.09) robot 1.000 margin 6.0/40.9 size 451x501x387
+stage 2          print 1.000-1.000 (high 0.23) robot 0.998 margin 5.9/53.1 size 482x505x444
+stage 2          print 1.000-1.000 (high 0.19) robot 1.000 margin 5.9/48.0 size 440x596x418
+stage 2          print 1.000-1.000 (high 0.28) robot 0.993 margin 5.8/32.5 size 510x593x447
+257 s

@@ -1,0 +1,127 @@
+{
+ "x": [
+  18.211415083800397,
+  193.92087145945183,
+  206.0015052512118,
+  218.1332091928632,
+  97.89767800771249,
+  205.88545028188804,
+  160.685486883506,
+  1.8813188980431843,
+  2.163136279273285,
+  2.032670995521578
+ ],
+ "tag": "margin, plan 450",
+ "params": {
+  "xc": 18.211415083800397,
+  "af": 193.92087145945183,
+  "ar": 206.0015052512118,
+  "b": 218.1332091928632,
+  "zc": 97.89767800771249,
+  "cu": 205.88545028188804,
+  "cd": 160.685486883506,
+  "p": 1.8813188980431843,
+  "qu": 2.163136279273285,
+  "qd": 2.032670995521578
+ },
+ "size": {
+  "length": 399.9223767106636,
+  "width": 436.2664183857264,
+  "height": 328.78312828960054
+ },
+ "margin_print_mm": 8.189059634231434,
+ "margin_robot_mm": 33.1351746479363,
+ "print_h": 69.87997554544157,
+ "print": {
+  "hard39": {
+   "p_upright": 1.0,
+   "counts": {
+    "upright": 240,
+    "inverted": 0,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  },
+  "hard31": {
+   "p_upright": 1.0,
+   "counts": {
+    "upright": 240,
+    "inverted": 0,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  },
+  "hard55": {
+   "p_upright": 1.0,
+   "counts": {
+    "upright": 240,
+    "inverted": 0,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  },
+  "softfit": {
+   "p_upright": 1.0,
+   "counts": {
+    "upright": 240,
+    "inverted": 0,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  },
+  "hard39_high": {
+   "p_upright": 0.058333333333333334,
+   "counts": {
+    "upright": 14,
+    "inverted": 226,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  },
+  "hard39_mu0.65": {
+   "p_upright": 1.0,
+   "counts": {
+    "upright": 240,
+    "inverted": 0,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  },
+  "hard39_mu1.5": {
+   "p_upright": 1.0,
+   "counts": {
+    "upright": 240,
+    "inverted": 0,
+    "left side": 0,
+    "right side": 0,
+    "nose up": 0,
+    "nose down": 0
+   }
+  }
+ },
+ "robot": {
+  "p_upright": 0.9916666666666667,
+  "counts": {
+   "upright": 595,
+   "inverted": 5,
+   "left side": 0,
+   "right side": 0,
+   "nose up": 0,
+   "nose down": 0
+  },
+  "mass_g": 3880,
+  "cover_g": 576
+ }
+}

@@ -444,3 +444,52 @@ one start, 30 per body and weight. Resampling whole clusters instead of single d
 
 By cell the CIs are about a quarter to a half wider, and both still sit far from 0. Both registered results hold. The
 registered CIs stay as the reported ones; these are the conservative check.
+
+## H5: a shape designed in simulation, printed once (pre-registered 2026-10-25, before it is printed or dropped)
+Exploratory search, not part of the plan's registered tests. The sweep's family (top, round, width at the tub's
+length) peaked at P(upright) 0.65-0.68 for the robot and 0.54 for its best print (E3). `shell3.py` is a wider
+family: a superellipsoid shell (10 knobs) that can round over in every direction, still holding the same robot
+(wheels, head, tub) and printed the same way (scale body, 12 quarters in the centre pocket, 2 walls, 10% infill).
+`search3.py` ran it in stages, about 28 minutes of compute on 30 cores:
+1. statics of 131,072 Sobol designs (print and robot): the share of orientations that drain to each rest state,
+   and the CoM margin, how far the CoM can rise with upright still the only rest state;
+2. 800 designs, 96,000 simulated drops (print from the stand, robot from random orientations);
+3. a cross-entropy search on the print's margin under four footprint caps (14,240 margin evaluations);
+4. 28 finalists under every contact model, both frictions and the coins high (63,840 drops).
+
+The margin is what buys P(upright): stage-2 prints with 5-10 mm of margin landed upright 0.999, under 1 mm 0.965.
+Inside the sweep's own box (footprint 350, height 245) no design has a single rest state; the best print there
+simulates 0.87 and its robot 0.59. One rest state starts at about 377 x 362 x 274 mm.
+
+**The body, E4_weeble** (`models/E4_weeble.*`): the best margin under a 450 mm footprint cap, 400 x 436 x 329 mm full
+scale, printed at 0.2125 (85 x 92.7 x 69.9 mm, Orca draft settings, 1h36m, `E4_weeble_orca_PLA_1h36m.gcode`). The
+mass layout is the slice's own G-code (body 60.2 g, spacer 5.1 g; CoM 0.7 mm above the walls-plus-infill estimate,
+the same direction as E1-E3). With it the print's CoM can rise 7.5 mm before a second rest state appears.
+
+**Predictions, committed before printing** (`results/drop_predictions_15cm_E4_weeble_*.json`, 200 drops per start,
+the stand's six starts at 150 mm, +-15 degrees):
+
+| model | mass low | mass high |
+|---|---|---|
+| hard floor 0.39 (primary; friction 0.65x and 1.5x: 1.000 / 0.12 and 0.11) | 1.000 | 0.122 |
+| hard floor 0.31 | 1.000 | 0.147 |
+| hard floor 0.55 | 1.000 | 0.180 |
+| soft floor, bounce fitted at 6 cm | 1.000 | 0.181 |
+
+The mass-high split by start differs between models (e.g. the nose-down start 0.70 vs 0.01 upright); only its mean
+is a prediction. The robot under this shell (cover 1.5 mm, 576 g): 0.992 over 600 random drops.
+
+**Protocol:** `DROP_TEST_E4.md`. The stand at 150 mm, post hole 280, sleeve lower, for every start; 6 starts x 5,
+mass low, then mass high; starts and rest states named by the nose dimple (the head end), so no nose/tail mapping.
+A spoiled drop is marked `?` and redone.
+
+**Hypotheses:**
+1. **Primary:** mass low lands upright more often than E3 did from the stand (16/30); one-sided Fisher exact,
+   p < 0.05 (that is 24/30 or more).
+2. The simulation's claim itself: at least 27 of 30 mass-low drops upright (P >= 0.9). Fewer means something the
+   model leaves out (rolling resistance, the print's surface, the tape) holds the body off its base.
+3. **Control:** mass high lands upright less often than mass low (one-sided Fisher, p < 0.05).
+4. Secondary, from the models' known miss (H3c: real bodies flip more, and the weight matters less than predicted):
+   mass high will land upright more often than the 0.12-0.18 predicted. Direction only.
+
+Scoring by `score_15cm.py`'s rules (Brier against naive, the most likely state), with E4's files in its place.

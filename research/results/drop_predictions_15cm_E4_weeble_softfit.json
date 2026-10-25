@@ -1,0 +1,111 @@
+{
+ "drop_mm": 150.0,
+ "dampratio": 0.2,
+ "timeconst": 0.02,
+ "timestep": 0.0005,
+ "old_start": false,
+ "model": "soft floor, bounce fitted at 6 cm",
+ "layout_source": {
+  "gcode": "E4_weeble_orca_PLA_1h36m.gcode",
+  "body_g": 60.17,
+  "spacer_g": 5.07,
+  "body_com": [
+   2.45,
+   0.01,
+   31.84
+  ],
+  "registration_mm": [
+   -0.68,
+   -0.44
+  ]
+ },
+ "n_per_start": 200,
+ "E4_weeble mass low": {
+  "mass_g": 133.3,
+  "com_mm": [
+   1.0,
+   0.0,
+   21.2
+  ],
+  "p_upright_mean": 1.0,
+  "by_attitude": {
+   "nose down": {
+    "p": {
+     "upright": 1.0
+    }
+   },
+   "tail down": {
+    "p": {
+     "upright": 1.0
+    }
+   },
+   "left side down": {
+    "p": {
+     "upright": 1.0
+    }
+   },
+   "right side down": {
+    "p": {
+     "upright": 1.0
+    }
+   },
+   "upside down": {
+    "p": {
+     "upright": 1.0
+    }
+   },
+   "upside down, 45 to the left": {
+    "p": {
+     "upright": 1.0
+    }
+   }
+  }
+ },
+ "E4_weeble mass high": {
+  "mass_g": 133.3,
+  "com_mm": [
+   1.0,
+   0.0,
+   37.5
+  ],
+  "p_upright_mean": 0.181,
+  "by_attitude": {
+   "nose down": {
+    "p": {
+     "upright": 0.01,
+     "inverted": 0.99
+    }
+   },
+   "tail down": {
+    "p": {
+     "upright": 0.115,
+     "inverted": 0.885
+    }
+   },
+   "left side down": {
+    "p": {
+     "upright": 0.005,
+     "inverted": 0.995
+    }
+   },
+   "right side down": {
+    "p": {
+     "upright": 0.005,
+     "inverted": 0.995
+    }
+   },
+   "upside down": {
+    "p": {
+     "upright": 0.01,
+     "inverted": 0.99
+    }
+   },
+   "upside down, 45 to the left": {
+    "p": {
+     "upright": 0.94,
+     "inverted": 0.06
+    }
+   }
+  }
+ }
+}
