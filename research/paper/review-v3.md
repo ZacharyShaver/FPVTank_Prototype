@@ -7,13 +7,21 @@ follows it. The changes go into v4.
 
 | # | Flag | Checked | Zach |
 |---|---|---|---|
-| 1.1 | "Fifteen checks have been caught being wrong" counts *cases*, not checks: C02 is two checks and C11 a whole suite. "A check has been caught being wrong 15 times" is exact. | `check_failures.csv`: 15 rows | |
-| 1.2 | Backtest 1 (2026-10-24) turned up four more checks being wrong. The precedent is C11, a mutant survivor that was logged. Logging them makes the counts 19 cases, 13 of them false passes, 9 of them during the sprint, in the Summary and in "What the pilot shows". (1) `insertion` has a dead control (weak control). (2) `hub_face`'s control fails on an unchanged design once its set 5 code is edited (false fail). (3) `pairs` crashes on any ribbon mutant, and the crash scores as a kill (false fail). (4) `pairs` passes 0.1 mm slide interference (false pass). | `checks/backtests/2026-10-24-adversary-P23/RESULT.md` | |
+| 1.1 | "Fifteen checks have been caught being wrong" counts *cases*, not checks: C02 is two checks and C11 a whole suite. "A check has been caught being wrong 15 times" is exact. | `check_failures.csv`: 15 rows | **leave as is** (2026-10-25): v4 keeps "19 times" |
+| 1.2 | **Count backtest 1's four check failures in the paper?** Logged as C16–C19 (a dead control, two false fails, one false pass), they move the counts from 15 / 12 / 5 to 19 / 13 / 9 (cases / false passes / during the pilot). Before and after below. | `check_failures.csv` C16–C19; backtest 1 `RESULT.md` | **counted** (2026-10-25); in v4 |
 | 1.3 | "16 of 26 design flaws surfaced only at the bench" | `iterations_summary.json`: 26 findings, 16 at the bench. Holds. | |
-| 1.4 | "361 hand drops took three sessions" is still true (the 15 cm drops came from the stand). All physical drops come to 541 in four sessions, which makes the cost point stronger. | `drop_scores*.json`: 181 + 180 + 180 | |
-| 1.5 | "each one costs days" sits against "a same-day loop" in the next paragraph. Either measure what an escape costs, or say what it costs ("a reprint and a bench session"). | no data on print-to-bench time | |
+| 1.4 | "361 hand drops took three sessions" is still true (the 15 cm drops came from the stand). All physical drops come to 541 in four sessions, which makes the cost point stronger. | `drop_scores*.json`: 181 + 180 + 180 | held for the space check |
+| 1.5 | "each one costs days" sits against "a same-day loop" in the next paragraph. Either measure what an escape costs, or say what it costs ("a reprint and a bench session"). | no data on print-to-bench time | **reworded** (2026-10-25): "a reprint and a bench session" |
 | 1.6 | The simulator's 80,000 tumbles were full-size sweep bodies; the 361 drops were scale models. That's fine as an order of magnitude, but a sharp reader may notice. Low priority. | `sweep.py`, `PROTOCOL.md` | |
 | 1.7 | Placeholders to fill before sending: [Your name], [Org] (×6). | | |
+
+Flag 1.2, before (v3) and after (v4):
+- **Summary.** "Fifteen checks have been caught being wrong, none by the check itself." → "A check has been caught
+  being wrong 19 times, never by the check itself."
+- **What the pilot shows.** "15 cases of a check that was itself wrong, 12 of them passes that should have failed, and
+  5 of them during the pilot: in a CAD check suite, … a cross-check or a control" → "19 cases …, 13 of them passes
+  that should have failed, and 9 of them during the pilot: in a CAD check suite and its controls, … a cross-check, a
+  control or a second agent".
 
 ## §2, Preliminary work
 
@@ -46,7 +54,7 @@ significant; 0.86; 7–17 mm; 0.63 vs 1.16 (CI 0.40–0.64); 0.46 and 0.67 (the 
 | 3.4 | H2's gate, in the decision region: of the 10 held-out designs that truly clear 60%, it accepted 3, sent 6 to simulation and wrongly rejected 1. "2 of 266 wrong" reads as under 1%; where decisions are made it is 1 of 4 decided. This fits C15 and Aim 2's "check its intervals where decisions are made". Optional, if there's room. | recomputed from `surrogate.py` (seed 7) | held for the space check |
 | 3.5 | H3 at 15 cm: the text's headline, "the primary hard floor scored 0.68", isn't in Fig. 1C. The figure's "hard floor, bounce measured" bar is the 0.39 bounce (0.64) at every height. "The one above 0.64" doesn't say which model. A reader sees a hard floor at 0.68 in the text and at 0.64 in the figure. | `drop_scores_15cm.md`; `make_fig1.py` docstring | **accepted** (2026-10-25) |
 | 3.6 | Naming: `PROTOCOL.md` calls the 30 cm test "H4"; the paper's H4 is cycle time. Anyone tracing a number to a file meets two H4s. A one-line map in `research/README.md` fixes it. Low priority. | commit 63fb8a0 | held for the space check |
-| 3.7 | "What the pilot shows" (15 cases, 12 passes, 5 in the pilot) moves with flag 1.2. | | |
+| 3.7 | "What the pilot shows" (15 cases, 12 passes, 5 in the pilot) moves with flag 1.2. | | done with 1.2 (19 / 13 / 9) |
 
 Proposed wording:
 - **3.1 and 3.2** (replaces "Each hypothesis and prediction was committed … every number here traces to a file in the
