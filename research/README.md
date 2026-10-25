@@ -8,7 +8,7 @@ Evidence for the research plan "Checks That Can Fail" (UM-LANL SPARC AI Research
 | `data/iterations.csv` | Workstream A: one row per design finding, Sep 27 to Oct 12 (P), plus earlier drivetrain and electronics escapes (E). Retrospective. |
 | `data/check_failures.csv` | Every recorded case of an automated check itself being wrong (false pass, false fail, weak control). |
 | `analysis/iterations.py` | Statistics (`results/iterations_summary.json`) and `figures/iterations.png`. |
-| `paper/` | The research plan, draft v3 (2026-10-16): `checks-that-can-fail-v3.html` and its PDF (Edge, US Letter, 3 pages); Figure 1 from `make_fig1.py`. The Oct 13 draft stays in the session folder. |
+| `paper/` | The research plan, draft v4 (2026-10-25): `checks-that-can-fail-v4.html`, Figure 1 `fig1_v4.png` from `make_fig1.py`; its PDF comes from Edge's print dialog (US Letter, 3 pages; `pagefit.py` checks the fit first). `review-v3.md` holds the review that made v4. **Superseded:** draft v3 (`checks-that-can-fail-v3.html`, its PDF, `fig1.png`), kept as it was. The Oct 13 draft stays in the session folder. |
 
 **How the data was made.** Finding times come from the session transcripts (Zach's message reporting the finding) or
 from the check or slicer run. Fix times come from G-code and superseded-folder timestamps, or from `docs/decisions.md`
@@ -27,3 +27,5 @@ Everything except `bench` and `print` counts as caught before printing. `check_h
 automated check had passed the defect.
 
 Prospective data, logged as findings happen from 2026-10-13, goes in `data/iterations_live.csv` and is kept separate. Its times are the times of the commits that recorded each finding (the hash is in `notes`); IDs follow the order things were logged, and are never renumbered, because commits and PROTOCOL.md cite them.
+
+**Hypothesis names.** `tumble/PROTOCOL.md` registered the 30 cm drops as its "H4"; in the paper they are H3b, and the paper's H4 is cycle time. The paper's H3c (15 cm) is PROTOCOL's H3c.

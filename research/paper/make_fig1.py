@@ -1,8 +1,9 @@
-"""Figure 1 of the research plan (v3): the pilot's three measured results, one panel each.
+"""Figure 1 of the research plan (v4): the pilot's three measured results, one panel each.
 
-    python research/paper/make_fig1.py -> research/paper/fig1.png
+    python research/paper/make_fig1.py -> research/paper/fig1_v4.png   (fig1.png is v3's, kept as it was)
 
-A (H1): seeded faults caught, results/mutation_summary.json.
+A (H1): seeded faults caught, results/mutation_summary.json; v4 splits each bar into the 14 re-created real faults and
+   the 8 invented for mutation testing (the out-of-sample test; Zach, 2026-10-25).
 B (H2): the surrogate against the simulator on the 280 held-out designs of H2's main fit (surrogate.py, seed 7),
    and the 6 best designs, each predicted without its own data, against their 1000-drop reruns (C15).
 C (H3): Brier scores against the real drops, results/sim_vs_reality.md and drop_scores*.json (15 cm: drop_scores_15cm,
@@ -35,14 +36,19 @@ if __name__ == '__main__':
     rows = [('the first check alone (interference)', M['S0_pairs_only']), ('the suite grown from escapes', M['S1_full_suite']),
             ('+ a check for the survivor', M['S2_plus_screw_alignment'])]
     a = fig.add_subplot(gs[0]); a.spines['left'].set_visible(False); a.set_yticks([])
+    nr, ni, gap = M['historical_mutants'], M['mutants'] - M['historical_mutants'], 0.5   # v4: a slot each for real and invented
     for i, (lab, r) in enumerate(rows):
-        yy = 2 - i
-        a.barh(yy, M['mutants'], height=0.36, color='#eef2f5', lw=0)
-        a.barh(yy, r['killed'], height=0.36, color=ACC if i else ACC2, lw=0)
+        yy, kr = 2 - i, r['historical_killed']
+        ki = r['killed'] - kr
+        a.barh(yy, nr, height=0.36, color='#eef2f5', lw=0); a.barh(yy, ni, left=nr + gap, height=0.36, color='#eef2f5', lw=0)
+        a.barh(yy, kr, height=0.36, color=ACC, lw=0); a.barh(yy, ki, left=nr + gap, height=0.36, color=ACC2, lw=0)
         a.text(0, yy + 0.3, lab, fontsize=7.2, color=INK, va='bottom')
-        a.text(r['killed'] - 0.5, yy, f"{r['killed']}", fontsize=7.4, color='white', va='center', ha='right', fontweight='semibold')
-        a.text(22.7, yy, f"real {r['historical_killed']}/{M['historical_mutants']}", fontsize=6.6, color=MUTED, va='center')
-    a.set_xlim(0, 29.5); a.set_ylim(-0.4, 2.85); a.set_xticks([0, 11, 22]); a.set_xlabel(f"seeded faults caught, of {M['mutants']}")
+        a.text(kr - 0.4, yy, f'{kr}', fontsize=7.4, color='white', va='center', ha='right', fontweight='semibold')
+        a.text(nr + gap + ki - 0.4, yy, f'{ki}', fontsize=7.4, color=INK, va='center', ha='right', fontweight='semibold')
+        a.text(nr + gap + ni + 0.6, yy, f"{r['killed']}/{M['mutants']}", fontsize=6.8, color=MUTED, va='center')
+    a.set_xlim(0, nr + gap + ni + 4.2); a.set_ylim(-0.4, 2.85)
+    a.set_xticks([nr / 2, nr + gap + ni / 2]); a.tick_params(axis='x', length=0)
+    a.set_xticklabels([f're-created\nreal faults ({nr})', f'mutation\ntesting ({ni})'], fontsize=7.0, linespacing=1.15)
     title(a, 'A', 'H1  Checks vs seeded faults')
 
     # B: H2
@@ -89,5 +95,5 @@ if __name__ == '__main__':
     fig.legend(handles=[Patch(facecolor=ACC, label='predicted before those drops'), Patch(facecolor='white', edgecolor=ACC, hatch='//////', label='after (post hoc)'),
                         Line2D([0], [0], color=INK, lw=0.7, ls=(0, (2, 2)), label='best possible (chance)')],
                loc='lower right', bbox_to_anchor=(0.99, -0.01), ncol=3, fontsize=6.6, frameon=False, handlelength=1.6, columnspacing=1.2)
-    fig.savefig(os.path.join(HERE, 'fig1.png'), dpi=300)
-    print('wrote paper/fig1.png')
+    fig.savefig(os.path.join(HERE, 'fig1_v4.png'), dpi=300)
+    print('wrote paper/fig1_v4.png')

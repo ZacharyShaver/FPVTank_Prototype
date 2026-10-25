@@ -55,7 +55,7 @@ def audit(L):
     for k in L['registry']:
         i, st = k['id'], k['status']
         born = [b.strip() for b in k['born_from'].split(';') if b.strip()]
-        cited |= set(born)
+        cited |= set(born) | set(re.findall(r'\bC\d+\b', k['notes']))   # a check failure is cited by its origin or its notes
         if st not in STATUSES:
             out.append(('FLAG', i, f'unknown status {st!r}'))
         if st in ('superseded', 'retired'):

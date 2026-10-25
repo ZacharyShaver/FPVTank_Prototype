@@ -25,7 +25,13 @@ catch.
 8. **Scope is explicit.** Every check says what it applies to. Used outside its scope, its result is advisory.
 9. **Numbers carry their source.** Every threshold says where it came from: *measured* (caliper), *his model*,
    *datasheet* or *guess*. A gate on a guessed number names the guess.
-10. **Stay light.** Add a check only where a real escape or a surviving mutant shows the need. Retire one only on
+10. **The library is a memory as well as a gate.** Before a change, the designer reads the escapes and lessons for
+    the kinds of part it touches, so fewer faults get designed at all (prevention). The gate catches the faults that
+    still get designed (detection). Measure them apart: prevention is faults of a recorded kind designed per change,
+    wherever they're caught; detection is planted faults caught. Neither is enough alone: a screwdriver-access lesson
+    (Sep 18) didn't stop P10 (Oct 3), but lesson plus check caught P21. (Zach, 2026-10-25.) The memory cuts both
+    ways: what helps the designer is what leaks answers into a backtest.
+11. **Stay light.** Add a check only where a real escape or a surviving mutant shows the need. Retire one only on
     evidence.
 
 ## The loop
