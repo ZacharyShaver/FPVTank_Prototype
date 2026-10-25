@@ -1,14 +1,16 @@
-"""Figure 1 of the research plan (v4): the pilot's three measured results, one panel each.
+"""Figure 1 of the research plan (v6): the pilot's three measured results, one panel each.
 
-    python research/paper/make_fig1.py -> research/paper/fig1_v4.png   (fig1.png is v3's, kept as it was)
+    python research/paper/make_fig1.py -> research/paper/fig1_v6.png   (fig1.png is v3's, fig1_v4.png v4's and v5's; kept as they were)
 
 A (H1): seeded faults caught, results/mutation_summary.json; v4 splits each bar into the 14 re-created real faults and
    the 8 invented for mutation testing (the out-of-sample test; Zach, 2026-10-25).
 B (H2): the surrogate against the simulator on the 280 held-out designs of H2's main fit (surrogate.py, seed 7),
    and the 6 best designs, each predicted without its own data, against their 1000-drop reruns (C15).
 C (H3): Brier scores against the real drops, results/sim_vs_reality.md and drop_scores*.json (15 cm: drop_scores_15cm,
-   where every model was committed before the drops; its hard-floor row is the 0.39 bounce, as at 6 and 30 cm, and the
-   primary 0.31 is in the text); the dashed line is
+   where every model was committed before the drops). v6: the hard-floor row is the 0.31 bounce at every height, the
+   model registered as the 15 cm primary (it was the 0.39 ball bounce, which left the primary out of the figure); the
+   first model is labelled by its start bug, not "as registered", and "dead floor" is "default floor" as in the text.
+   The dashed line is
    the expected score of a model that knew each case's true odds (estimated from the drops; sim_vs_reality notes).
 """
 import os, sys, json
@@ -69,8 +71,8 @@ if __name__ == '__main__':
     title(b, 'B', 'H2  Surrogate vs simulator')
 
     # C: H3
-    models = ['naive guess', 'as registered', 'start fixed, dead floor', 'floor bounce, fitted at 6 cm', 'hard floor, bounce measured']
-    brier = {'6 cm': [1.293, 0.578, 0.861, 0.443, 0.456], '15 cm': [1.522, None, 1.120, 0.650, 0.641], '30 cm': [1.506, 0.871, 1.156, 0.634, 0.672]}
+    models = ['naive guess', 'first model (start bug)', 'start fixed, default floor', 'floor bounce, fitted at 6 cm', 'hard floor, bounce measured']
+    brier = {'6 cm': [1.293, 0.578, 0.861, 0.443, 0.483], '15 cm': [1.522, None, 1.120, 0.650, 0.677], '30 cm': [1.506, 0.871, 1.156, 0.634, 0.693]}
     before = {'6 cm': [None, True, False, False, False], '15 cm': [None, None, True, True, True], '30 cm': [None, True, True, True, False]}
     floor = {'6 cm': 0.44, '15 cm': 0.61, '30 cm': 0.60}
     drops = {'6 cm': 181, '15 cm': 180, '30 cm': 180}
@@ -95,5 +97,5 @@ if __name__ == '__main__':
     fig.legend(handles=[Patch(facecolor=ACC, label='predicted before those drops'), Patch(facecolor='white', edgecolor=ACC, hatch='//////', label='after (post hoc)'),
                         Line2D([0], [0], color=INK, lw=0.7, ls=(0, (2, 2)), label='best possible (chance)')],
                loc='lower right', bbox_to_anchor=(0.99, -0.01), ncol=3, fontsize=6.6, frameon=False, handlelength=1.6, columnspacing=1.2)
-    fig.savefig(os.path.join(HERE, 'fig1_v4.png'), dpi=300)
-    print('wrote paper/fig1_v4.png')
+    fig.savefig(os.path.join(HERE, 'fig1_v6.png'), dpi=300)
+    print('wrote paper/fig1_v6.png')
