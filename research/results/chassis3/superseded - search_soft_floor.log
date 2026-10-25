@@ -1,0 +1,16 @@
+screen: 256 designs x 64 runs, 222 valid, best 0.750, 33 s
+gen 0: best 0.727, elite 0.723, mu [  78.  179. -183.   62.    0.    5.]
+gen 1: best 0.766, elite 0.744, mu [  79.  179. -187.   64.    9.    6.]
+gen 2: best 0.758, elite 0.753, mu [  81.  183. -187.   66.   13.    7.]
+gen 3: best 0.758, elite 0.756, mu [  82.  186. -189.   69.   15.    8.]
+gen 4: best 0.781, elite 0.761, mu [  85.  186. -191.   66.   15.    7.]
+gen 5: best 0.766, elite 0.762, mu [  86.  186. -191.   65.   14.    7.]
+gen 6: best 0.773, elite 0.766, mu [  89.  185. -192.   64.   13.    6.]
+gen 7: best 0.766, elite 0.768, mu [  90.  186. -191.   62.   15.    6.]
+finalists: 6 x 640 runs + climbs, 27 s
+F1                   steps down 0.748  climbs {40: 0.0, 60: 0.0, 80: 0.05, 100: 0.0, 120: 0.0}  [  95.  190. -200.   56.   -3.    1.]  {'ok': True, 'notes': ['axle past the wall: bracket'], 'length': 580.4369869215236, 'height': 190.98440489495823, 'mass': 4074.513413010704}
+F2                   steps down 0.747  climbs {40: 0.0, 60: 0.0, 80: 0.0, 100: 0.0, 120: 0.0}  [  95.  190. -200.   55.   51.    8.]  {'ok': True, 'notes': ['axle past the wall: bracket'], 'length': 579.9347064666605, 'height': 189.91207495623036, 'mass': 4073.3901819535677}
+F3                   steps down 0.738  climbs {40: 0.1, 60: 0.0, 80: 0.0, 100: 0.0, 120: 0.0}  [  92.  186. -187.   59.   -7.    6.]  {'ok': True, 'notes': ['axle past the wall: bracket'], 'length': 557.3639830408845, 'height': 193.61811521751667, 'mass': 4002.0653382149776}
+F4                   steps down 0.734  climbs {40: 0.05, 60: 0.0, 80: 0.0, 100: 0.0, 120: 0.0}  [  70.  188. -193.   75.   73.    6.]  {'ok': True, 'notes': ['axle past the wall: bracket'], 'length': 521.8948256790718, 'height': 210.08217576789008, 'mass': 3511.6019100461185}
+F5                   steps down 0.747  climbs {40: 0.1, 60: 0.0, 80: 0.0, 100: 0.0, 120: 0.0}  [  95.  188. -184.   54.    6.    6.]  {'ok': True, 'notes': ['axle past the wall: bracket'], 'length': 562.1526914053103, 'height': 190.0, 'mass': 4074.513413010704}
+baseline (Trainer)   steps down 0.509  climbs {40: 0.05, 60: 0.25, 80: 0.05, 100: 0.0, 120: 0.0}  [ 55.  91. -93.  32.   0.   0.]  {'ok': True, 'notes': [], 'length': 341.87, 'height': 167.1, 'mass': 3221.1712642503735}

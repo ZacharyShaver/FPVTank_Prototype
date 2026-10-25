@@ -1,0 +1,22 @@
+cap 380: gen 0 best 0.398 elite 0.365 mu [ 53.  76. -80.  53.  22.   4.]
+cap 380: gen 1 best 0.420 elite 0.390 mu [ 52.  68. -81.  51.  19.   2.]
+cap 380: gen 2 best 0.419 elite 0.403 mu [ 52.  66. -74.  52.  16.   2.]
+cap 380: gen 3 best 0.412 elite 0.408 mu [ 51.  64. -71.  50.  17.   2.]
+cap 380: gen 4 best 0.449 elite 0.417 mu [ 51.  62. -71.  50.  16.   2.]
+cap 380: gen 5 best 0.443 elite 0.431 mu [ 49.  63. -66.  52.  16.   1.]
+cap 380: [ 48.  62. -57.  48.  14.   2.] down 0.672 up 0.090 {'notes': [], 'length': 327.87, 'height': 182.9651706744694, 'mass': 3109.162905473323}  71 s
+cap 450: gen 0 best 0.369 elite 0.366 mu [  56.   69. -105.   51.   24.    2.]
+cap 450: gen 1 best 0.389 elite 0.370 mu [  53.   66. -100.   54.   17.    2.]
+cap 450: gen 2 best 0.367 elite 0.371 mu [  53.   66. -102.   55.   22.    2.]
+cap 450: gen 3 best 0.433 elite 0.397 mu [ 54.  60. -92.  60.  19.   0.]
+cap 450: gen 4 best 0.403 elite 0.403 mu [ 54.  55. -90.  57.  12.   0.]
+cap 450: gen 5 best 0.409 elite 0.411 mu [ 53.  52. -87.  58.  16.  -1.]
+cap 450: [ 55.  45. -81.  60.  37.  -4.] down 0.695 up 0.060 {'notes': [], 'length': 330.5013547702179, 'height': 194.68767327177144, 'mass': 3223.7019415928403}  137 s
+cap 600: gen 0 best 0.389 elite 0.374 mu [  59.  103. -126.   55.   19.    1.]
+cap 600: gen 1 best 0.465 elite 0.386 mu [  58.   99. -120.   53.   16.    1.]
+cap 600: gen 2 best 0.339 elite 0.386 mu [  57.   98. -118.   52.   15.    1.]
+cap 600: gen 3 best 0.403 elite 0.395 mu [  57.   93. -109.   50.   16.    0.]
+cap 600: gen 4 best 0.356 elite 0.395 mu [  58.   91. -105.   49.   17.    0.]
+cap 600: gen 5 best 0.361 elite 0.395 mu [  58.   90. -103.   48.   17.   -0.]
+cap 600: [ 45.  53. -64.  51. -21.   9.] down 0.683 up 0.120 {'notes': ['axle outside the wall band: drop bracket'], 'length': 327.87, 'height': 185.27062936711997, 'mass': 3060.5960576388034}  208 s
+baseline: down 0.502 up 0.060

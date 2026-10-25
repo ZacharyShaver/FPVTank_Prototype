@@ -1,0 +1,34 @@
+cap 380: gen 0 best 0.356 elite 0.361 mu [ 58.  86. -77.  49.  -7.   4.]
+cap 380: gen 1 best 0.377 elite 0.365 mu [ 56.  83. -78.  53.  -5.   5.]
+cap 380: gen 2 best 0.388 elite 0.374 mu [ 55.  77. -78.  53. -10.   5.]
+cap 380: gen 3 best 0.394 elite 0.381 mu [ 54.  73. -77.  53.  -9.   4.]
+cap 380: gen 4 best 0.403 elite 0.389 mu [ 54.  70. -74.  53. -11.   3.]
+cap 380: [ 46.  53. -77.  54.  28.   6.] down 0.658 up 0.080 {'notes': ['axle outside the wall band: drop bracket'], 'length': 327.87, 'height': 188.75302039080154, 'mass': 3076.8990690164555}  179 s
+cap 450: gen 0 best 0.378 elite 0.384 mu [  65.  118. -119.   39.    3.    4.]
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.0644.
+cap 450: gen 1 best 0.345 elite 0.384 mu [  66.  122. -117.   39.    2.    4.]
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.8080.
+cap 450: gen 2 best 0.400 elite 0.387 mu [  66.  122. -122.   39.    1.    4.]
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 4.0878.
+cap 450: gen 3 best 0.419 elite 0.397 mu [  65.  125. -125.   36.   -2.    5.]
+cap 450: gen 4 best 0.383 elite 0.398 mu [  67.  124. -125.   32.   -1.    5.]
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 3.9322.
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 2.8498.
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 3.8622.
+cap 450: [  46.  170. -160.   45.  -30.    3.] down 0.697 up 0.130 {'notes': ['axle past the wall: bracket'], 'length': 422.1217427838791, 'height': 179.97597995741333, 'mass': 3076.5704692847476}  389 s
+WARNING: Nan, Inf or huge value in QACC at DOF 2. The simulation is unstable. Time = 4.9878.
+cap 600: gen 0 best 0.433 elite 0.424 mu [  76.  157. -165.   53.   18.    2.]
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 3.7546.
+cap 600: gen 1 best 0.464 elite 0.436 mu [  76.  163. -175.   55.   22.    2.]
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.1066.
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 4.0554.
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 3.4234.
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 2.1820.
+cap 600: gen 2 best 0.452 elite 0.443 mu [  77.  161. -182.   56.   23.    2.]
+WARNING: Nan, Inf or huge value in QACC at DOF 3. The simulation is unstable. Time = 4.9286.
+WARNING: Nan, Inf or huge value in QACC at DOF 1. The simulation is unstable. Time = 3.5826.
+cap 600: gen 3 best 0.450 elite 0.446 mu [  77.  159. -184.   56.   25.    1.]
+WARNING: Nan, Inf or huge value in QACC at DOF 0. The simulation is unstable. Time = 4.0120.
+cap 600: gen 4 best 0.461 elite 0.452 mu [  75.  161. -188.   57.   23.    1.]
+cap 600: [  71.  195. -182.   51.   25.   -4.] down 0.727 up 0.180 {'notes': ['axle past the wall: bracket'], 'length': 518.4634855008178, 'height': 186.15341367381708, 'mass': 3523.051768915446}  613 s
+baseline: down 0.528 up 0.040

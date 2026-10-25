@@ -1,0 +1,22 @@
+statics: 6144 poses, 4466 clear of the body and floor, 49 s
+drops: 4466 poses x 60, 299 s
+top 100 x 400, finalists 12 + baselines 5 x 2000, 118 s
+baselines:
+  no arm (base only)       robot upright 0.452  {'upright': 904, 'inverted': 954, 'left side': 63, 'right side': 55, 'nose up': 0, 'nose down': 24}
+  guard (stowed arch)      robot upright 0.410  {'upright': 821, 'inverted': 111, 'left side': 517, 'right side': 477, 'nose up': 0, 'nose down': 74}
+  straight up              robot upright 0.416  {'upright': 832, 'inverted': 0, 'left side': 355, 'right side': 350, 'nose up': 258, 'nose down': 205}
+  up and forward           robot upright 0.453  {'upright': 905, 'inverted': 0, 'left side': 386, 'right side': 437, 'nose up': 59, 'nose down': 213}
+  folded back, flat        robot upright 0.400  {'upright': 800, 'inverted': 1145, 'left side': 31, 'right side': 23, 'nose up': 1, 'nose down': 0}
+finalists:
+  q [-68. 169. 140. 111.]  robot upright 0.565  (400: 0.593)  rests 9  set free  {'upright': 1130, 'inverted': 838, 'left side': 20, 'right side': 10, 'nose up': 0, 'nose down': 2}
+  q [ 103.   54.    8. -107.]  robot upright 0.553  (400: 0.593)  rests 12  set free  {'upright': 1106, 'inverted': 834, 'left side': 18, 'right side': 12, 'nose up': 0, 'nose down': 30}
+  q [-70. 162. 146.  46.]  robot upright 0.558  (400: 0.588)  rests 11  set free  {'upright': 1117, 'inverted': 854, 'left side': 14, 'right side': 9, 'nose up': 1, 'nose down': 5}
+  q [-71. 169. 123. 187.]  robot upright 0.562  (400: 0.588)  rests 10  set free  {'upright': 1124, 'inverted': 848, 'left side': 9, 'right side': 10, 'nose up': 1, 'nose down': 8}
+  q [109.  72.  16. -24.]  robot upright 0.557  (400: 0.588)  rests 10  set free  {'upright': 1114, 'inverted': 494, 'left side': 33, 'right side': 341, 'nose up': 0, 'nose down': 18}
+  q [112.  75. -29.  13.]  robot upright 0.558  (400: 0.588)  rests 12  set free  {'upright': 1116, 'inverted': 540, 'left side': 8, 'right side': 334, 'nose up': 0, 'nose down': 2}
+  q [-73. 158. 138. 160.]  robot upright 0.563  (400: 0.585)  rests 9  set free  {'upright': 1126, 'inverted': 842, 'left side': 5, 'right side': 9, 'nose up': 0, 'nose down': 18}
+  q [108.  67.   3. -86.]  robot upright 0.563  (400: 0.585)  rests 13  set free  {'upright': 1126, 'inverted': 439, 'left side': 33, 'right side': 392, 'nose up': 0, 'nose down': 10}
+  q [102.  61. -18.  68.]  robot upright 0.559  (400: 0.585)  rests 12  set free  {'upright': 1119, 'inverted': 376, 'left side': 16, 'right side': 454, 'nose up': 1, 'nose down': 34}
+  q [112.  59.  19. -15.]  robot upright 0.552  (400: 0.580)  rests 8  set free  {'upright': 1105, 'inverted': 874, 'left side': 6, 'right side': 10, 'nose up': 1, 'nose down': 4}
+  q [ 111.   52.  -46. -116.]  robot upright 0.543  (400: 0.580)  rests 10  set free  {'upright': 1087, 'inverted': 888, 'left side': 11, 'right side': 14, 'nose up': 0, 'nose down': 0}
+  q [-74. 174. 117. 199.]  robot upright 0.555  (400: 0.578)  rests 10  set free  {'upright': 1110, 'inverted': 848, 'left side': 17, 'right side': 10, 'nose up': 0, 'nose down': 15}
