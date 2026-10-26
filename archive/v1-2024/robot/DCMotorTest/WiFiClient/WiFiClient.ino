@@ -17,8 +17,9 @@
 #include <WiFi.h>
 #include <WebSocketClient.h>
 
-const char *ssid = "your-ssid";          // Change this to your WiFi SSID
-const char *password = "your-password";  // Change this to your WiFi password
+#include "wifi_secrets.h"  // untracked: copy wifi_secrets.example.h to wifi_secrets.h and fill it in
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 const char *host = "192.0.2.11";        // This should not be changed
 const int httpPort = 80;                        // This should not be changed

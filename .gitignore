@@ -7,3 +7,7 @@ _incoming/
 .claude/settings.local.json
 head-v2/generator/*/print/
 research/models/_fig_*.stl
+tools/config_local.py
+# Wi-Fi for the archive sketches: local only (templates: wifi_secrets.example.*)
+wifi_secrets.h
+wifi_secrets.py

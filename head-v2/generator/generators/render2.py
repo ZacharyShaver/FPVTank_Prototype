@@ -5,8 +5,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from render_stl import load_stl, rot  # noqa (re-runs stats; fine)
 
 OUT = sys.argv[1]
-B = load_stl(r'C:\Users\<usr>\Downloads\TEST-PRINT-2_Configuration 1_z_mount_bottom.stl')
-T = load_stl(r'C:\Users\<usr>\Downloads\TEST-PRINT-2_Configuration 1_z_mount_top.stl')
+B = load_stl(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test-print-2', 'z_mount_bottom.stl'))
+T = load_stl(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test-print-2', 'z_mount_top.stl'))
 
 def zrender(meshes, yaw, pitch, size=700, label='', center=None, ext=None):
     allv = np.concatenate([m.reshape(-1, 3) for m, _ in meshes])

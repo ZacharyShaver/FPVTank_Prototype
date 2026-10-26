@@ -16,4 +16,4 @@ ledge reverse gen 5: passive 0.48, best 0.40, mean 0.40, mu [ 7.27 -0.11 13.2 ]
 ledge reverse gen 6: passive 0.40, best 0.48, mean 0.40, mu [ 7.38 -0.15 13.48]
 ledge reverse gen 7: passive 0.45, best 0.50, mean 0.47, mu [ 7.42 -0.16 13.59]
 ledge reverse passive 0.4066666666666667 | finalists [([10.99, -0.13, -10.11], 0.4266666666666667), ([8.52, 0.09, 20.66], 0.43166666666666664), ([5.43, 0.22, 3.83], 0.43)]
-C:\Users\<usr>\Documents\GitHub\FPVTank_Prototype-github\research\figures\wheels3_ledges.png
+research\figures\wheels3_ledges.png

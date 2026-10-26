@@ -1,0 +1,4 @@
+#!/bin/sh
+# .githooks/pre-commit: refuse a commit that adds a credential, token or located photo
+# Enable once in a clone:  git config core.hooksPath .githooks
+exec python tools/leakscan.py --staged

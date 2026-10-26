@@ -15,8 +15,8 @@ As of 2026-09-27.
     and the pictures are byte-identical to that set. The STEP files differ only in metadata (timestamp,
     assembly ids, colour order); their solids match. Re-verified 2026-09-26 after the camera posts.
   - `python head-v2/checks/regression.py` reproduces its checks: all 22 rows.
-  - Both verified 2026-09-26, and again on 2026-09-27 after the repos moved off OneDrive to
-    `C:\Users\<usr>\Documents\GitHub`.
+  - Both verified 2026-09-26, and again on 2026-09-27 after the repos moved off the cloud-synced folder to
+    `Documents\GitHub`.
 - The hand-off also has `step/`: the finished parts as STEP solids (`fixes/step_models.py`).
 - Superseded, don't print: `Downloads/head-v2-fixes/` (rev 1, screws), the pins in
   `head-v2-snap/superseded - first pins, no stop/`, and the pre-camera-post ball_plus and plate in

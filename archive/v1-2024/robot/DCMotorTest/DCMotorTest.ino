@@ -42,8 +42,9 @@ bool outputTesting = true;
 
 // You can also make another motor on port M2
 // Adafruit_DCMotor *myOtherMotor = AFMS.getMotor(2);
-const char *ssid = "your-ssid";          // Change this to your WiFi SSID
-const char *password = "your-password";  // Change this to your WiFi password
+#include "wifi_secrets.h"  // untracked: copy wifi_secrets.example.h to wifi_secrets.h and fill it in
+const char *ssid = WIFI_SSID;
+const char *password = WIFI_PASSWORD;
 
 void setup() {
   Serial.begin(115200); // set up Serial library at 9600 bps

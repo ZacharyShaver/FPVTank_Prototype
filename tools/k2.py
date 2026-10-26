@@ -68,6 +68,8 @@ def main():
     ap.add_argument('arg', nargs='?')
     ap.add_argument('--bed-clear', action='store_true', help='Zach has said the plate is empty')
     a = ap.parse_args()
+    if not config.PRINTER:
+        sys.exit('set PRINTER in tools/config_local.py or FPVTANK_PRINTER')
 
     if a.cmd == 'status':
         print(status()[1])

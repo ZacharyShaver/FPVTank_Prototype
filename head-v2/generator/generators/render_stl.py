@@ -93,8 +93,8 @@ def render(V, yaw, pitch, size, color, label):
 out = sys.argv[1]
 parts = []
 for path, name, color in [
-    (r'C:\Users\<usr>\Downloads\TEST-PRINT-2_Configuration 1_z_mount_bottom.stl', 'bottom', (120, 170, 230)),
-    (r'C:\Users\<usr>\Downloads\TEST-PRINT-2_Configuration 1_z_mount_top.stl', 'top', (235, 150, 90)),
+    (os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test-print-2', 'z_mount_bottom.stl'), 'bottom', (120, 170, 230)),
+    (os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'test-print-2', 'z_mount_top.stl'), 'top', (235, 150, 90)),
 ]:
     V = load_stl(path)
     stats(name, V)

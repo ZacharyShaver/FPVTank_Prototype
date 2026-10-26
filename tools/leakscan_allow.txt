@@ -1,0 +1,24 @@
+# tools/leakscan_allow.txt: accepted findings, one 'rule path-glob' per line ('*' = every rule). Say why on each.
+credential tools/leakscan.py                       # the scanner's own examples in comments and docstrings: a Wi-Fi call with positional arguments
+email tools/leakscan.py                            # the scanner's comment on its one safe address, a GitHub host, not a personal one
+user_path tools/leakscan.py                        # the scanner's own user-folder patterns (Windows users, a Linux home, a synced profile) in comments and regexes
+* tools/tests/test_leakscan.py                     # planted test values (a fake password, key, path), not real
+artifact_link tools/tests/test_site.py             # made-up private links the gallery's leak-gate tests plant
+email tools/tests/test_site.py                     # made-up addresses the same tests plant
+user_path tools/tests/test_site.py                 # planted test paths for the gallery's leak gate
+unreadable tools/tests/test_site.py!data-uri-*     # sample image data URIs in those tests, a few padding characters long: not real images
+credential docs/superpowers/plans/2026-10-25-leak-audit.md    # the same test code, quoted in the plan: made-up Wi-Fi names and passwords
+token docs/superpowers/plans/2026-10-25-leak-audit.md         # a made-up key in that test code
+email docs/superpowers/plans/2026-10-25-leak-audit.md         # made-up addresses in that test code
+private_ip docs/superpowers/plans/2026-10-25-leak-audit.md    # a made-up home-network address in that test code
+user_path docs/superpowers/plans/2026-10-25-leak-audit.md     # made-up user folders in that test code
+artifact_link docs/superpowers/plans/2026-10-25-leak-audit.md # a made-up private link in that test code
+artifact_link docs/superpowers/plans/2026-10-25-pages-showcase.md  # the gallery plan's made-up private-link examples
+user_path docs/superpowers/plans/2026-10-25-pages-showcase.md      # a made-up user folder in the plan's test code
+unreadable docs/superpowers/plans/2026-10-25-pages-showcase.md!data-uri-*   # a sample image data URI a few padding characters long, not a real image
+unreadable *.f3d                                   # Zach, 2026-10-25: Fusion archives carry nothing personal; their zstd members can't be read on Python 3.10
+user_path docs/reorg-2026-09/*                     # the reorganisation's record of where things lived; private repo only
+user_path chassis-v1/stl-parts.md                  # prose mention of the old synced-folder name, no path
+user_path docs/lessons/2026-09-27-zero-overlap-is-not-a-fit.md  # prose mention of the old synced-folder name, no path
+unreadable tools/tests/test_leakscan.py!data-uri-*   # sample data URIs in the scanner's own tests
+artifact_link tools/gallery/build.py                 # the gallery's private-link pattern and its examples

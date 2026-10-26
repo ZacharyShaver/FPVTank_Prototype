@@ -5,7 +5,7 @@ description: Slice a part with OrcaSlicer headless and print it on Zach's Creali
 
 # Print on the K2
 
-Two tools, both through `tools/config.py` (`PRINTER` is the address):
+Two tools, both through `tools/config.py` (the printer's address is `PRINTER`, read from the untracked `tools/config_local.py`, template `tools/config_local.example.py`, or from `FPVTANK_PRINTER`):
 - `tools/orca.py` slices with OrcaSlicer's CLI in about 5 s;
 - `tools/k2.py` drives the printer over its stock Moonraker API (Klipper's HTTP API, port 7125, no login).
 

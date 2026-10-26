@@ -74,8 +74,7 @@ while rgb > 0:
 
 
 # edit host and port to match server
-SSID = "your-ssid"
-PASS = "your-password"
+from wifi_secrets import SSID, PASS  # untracked: copy wifi_secrets.example.py to wifi_secrets.py and fill it in
 HOST = "192.0.2.11"
 PORT = 3333
 TIMEOUT = 0.25

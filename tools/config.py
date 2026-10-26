@@ -35,8 +35,22 @@ FIXES = os.path.join(REPO, 'head-v2', 'fixes')
 
 
 # Zach's Creality K2 Pro: its stock Moonraker (Klipper's HTTP API), on his LAN, no login. tools/k2.py
-# drives it. The address is what Creality Print found (deviceInfo.json); a DHCP change moves it.
-PRINTER = 'http://192.0.2.12:7125'
+# drives it. The address is what Creality Print found (deviceInfo.json); a DHCP change moves it. It is not
+# committed: write PRINTER = 'http://<printer-ip>:7125' in tools/config_local.py (untracked; copy
+# config_local.example.py), or set FPVTANK_PRINTER. Loaded by path from this folder, since scripts import
+# config in different ways. None when neither is set; tools/k2.py then says so.
+def _local_printer():
+    path = os.path.join(TOOLS, 'config_local.py')
+    if os.path.isfile(path):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('config_local', path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return getattr(mod, 'PRINTER', None)
+    return None
+
+
+PRINTER = _local_printer() or os.environ.get('FPVTANK_PRINTER')
 
 
 def zach(name):
