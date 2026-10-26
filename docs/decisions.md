@@ -3,12 +3,26 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
-## 2026-10-26: The gallery is public; this repo stays private
+## 2026-10-26: This repo is public, its history rewritten first
+
+Zach chose to make the repo public, the leak audit's option B. Before it went public the history was rewritten:
+- every commit's author and committer email became his GitHub noreply address;
+- the old Wi-Fi name and password, four private IPs and his Windows user name were scrubbed from 25 files and one
+  commit message;
+- the third-party files not cleared for sharing were removed from every commit. They stay on disk, gitignored, and
+  `THIRD_PARTY.md` records them.
+
+The old history is archived, still private, as `ZacharyShaver/FPVTank_Prototype-private-old`, and backed up locally in
+`FPVTank_Prototype-backup-2026-10-26`. The new public repo took the old name, so no old commit is reachable from it.
+Every commit hash changed: an old hash, such as the one in the gallery's first commit message, points only into the
+archive. Any other clone must be cloned again rather than pulled.
+
+## 2026-10-26: The gallery is public; this repo stays private (**superseded** the same day: see above)
 
 Zach asked for the visuals to be published on GitHub Pages. The gallery goes out from a separate public repo,
 `ZacharyShaver/scorpion-gallery` (https://zacharyshaver.github.io/scorpion-gallery/). `tools/gallery/build.py` builds it from
-this repo, and `tools/gallery/publish.py --yes` pushes it. This repo stays private, and its history stays as it is: the
-leak audit's option A (`docs/audit/2026-10-25-leak-report.md`).
+this repo, and `tools/gallery/publish.py --yes` pushes it. ~~This repo stays private, and its history stays as it is: the
+leak audit's option A (`docs/audit/2026-10-25-leak-report.md`).~~ Superseded: the repo went public after a history rewrite.
 
 - The build is gated: every link resolves, sizes are under GitHub's limits, external loads come only from the allowed CDNs,
   no file goes out unlinked, and `leakscan` finds nothing in the built site.
