@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+/* layout: a lab notebook's contents page: sections in build order, cards to open */
+:root{--bg:#f4f6f4;--card:#fff;--ink:#1c2124;--mute:#59646a;--line:#dbe1de;--accent:#13824f}
+@media (prefers-color-scheme:dark){:root{--bg:#141819;--card:#1c2224;--ink:#e5eae8;--mute:#9aa6aa;--line:#2d3538;--accent:#3cc488;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,"Segoe UI",sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 16px 56px;display:grid;gap:34px}
+h1{font-size:clamp(28px,4vw,40px);margin:0}h2{font-size:20px;margin:0 0 12px}
+p.intro{margin:6px 0 0;max-width:70ch;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+a.card{display:grid;grid-template-rows:auto 1fr;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}
+a.card:focus-visible{border-color:var(--accent);outline:3px solid var(--accent);outline-offset:2px}
+.thumb{aspect-ratio:3/2;background:var(--line) center/cover no-repeat;display:grid;place-items:center;color:var(--mute);font:600 14px ui-monospace,monospace}
+.meta{padding:10px 12px;display:grid;gap:4px}.meta b{font-size:15px}.meta span{font-size:13.5px;color:var(--mute)}
+.meta .kind{font:600 11px ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+footer{color:var(--mute);font-size:13px}footer p{margin:0 0 6px}
+</style></head><body><div class="wrap">
+<header><h1>{{TITLE}}</h1><p class="intro">{{INTRO}}</p></header>
+{{SECTIONS}}
+<footer><p>Built {{BUILT}} from the Scorpion project's design repository. 3D pages load three.js and fonts from public CDNs.</p>
+<p>Some renders show parts from FPV-Rover V2.0 by Markus_p (CC BY-NC-SA 4.0) and the Raspberry Pi 5 model from Printables 727155 (CC0).</p></footer>
+</div></body></html>

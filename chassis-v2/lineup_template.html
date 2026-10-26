@@ -179,7 +179,7 @@ function card(){const e=E[cur];
   '<div class="nums"><div><span>Length</span><b>'+f0(e.L)+'</b></div><div><span>Width</span><b>'+f0(e.W)+'</b></div><div><span>Height</span><b>'+f0(e.H)+'</b></div>'+
   '<div><span>Mass*</span><b>'+(e.mass?f0(e.mass)+' g':'—')+'</b></div><div><span>Tips back</span><b>'+(e.tip==null?'—':(e.tip_how==='static'?'~':'')+f0(e.tip)+'°')+'</b></div><div><span>Parts</span><b>'+(e.parts.length)+'</b></div></div>'+
   '<ul>'+e.facts.map(f=>'<li>'+f+'</li>').join('')+'</ul>'+
-  '<p style="margin-top:10px">Its own page: <a href="'+e.link.url+'" target="_blank" rel="noopener">'+e.link.title+'</a></p>';}
+  (e.link&&e.link.url?'<p style="margin-top:10px">Its own page: <a href="'+e.link.url+'" target="_blank" rel="noopener">'+e.link.title+'</a></p>':'');}
 function select(i){cur=i;E.forEach((e,j)=>{$('c-'+e.id).setAttribute('aria-pressed',j===i);$('r-'+e.id).classList.toggle('sel',j===i);tags[j].classList.toggle('sel',j===i);});
   card();$('c-'+E[i].id).scrollIntoView({block:'nearest',inline:'nearest'});$('pick').hidden=true;}
 // poses (one at a time)

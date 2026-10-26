@@ -3,6 +3,21 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-10-26: The gallery is public; this repo stays private
+
+Zach asked for the visuals to be published on GitHub Pages. The gallery goes out from a separate public repo,
+`ZacharyShaver/scorpion-gallery` (https://zacharyshaver.github.io/scorpion-gallery/). `tools/gallery/build.py` builds it from
+this repo, and `tools/gallery/publish.py --yes` pushes it. This repo stays private, and its history stays as it is: the
+leak audit's option A (`docs/audit/2026-10-25-leak-report.md`).
+
+- The build is gated: every link resolves, sizes are under GitHub's limits, external loads come only from the allowed CDNs,
+  no file goes out unlinked, and `leakscan` finds nothing in the built site.
+- The public commits carry Zach's GitHub noreply address, never the personal one.
+- The 14 chassis and head 3D pages are held. They embed third-party part meshes: FPV-Rover V2.0 (CC BY-NC-SA 4.0), a
+  PCA9685 board whose licence isn't recorded, and an MG90S whose origin isn't recorded. Publishing them is Zach's
+  licensing call. Releasing one means removing its `"hold"` in `tools/gallery/manifest.json`, adding a `"licence"`, and
+  rerunning `publish.py --yes`.
+
 ## 2026-10-12: Bench stand v2, and the head's pocket in the body (nose section)
 
 Zach: "more room for the gears on height and a spot to pin the black wires to the base so they dont fly in the gears"
