@@ -113,7 +113,8 @@ def wheel_pad(x, y):
     """wheels: a corner pod's pad on the wall at y, centred on body X x. Where the wall curves away (the six-wheel's
     front pods, on the nose) a cheek fills back to it; its inboard top stops 1 under the claws' roots (Z 43), the outer
     3.5 mm stays full height round the inserts"""
-    sg = 1 if y > YC else -1; z0 = FLOOR0 if W.PAD_Z0 is None else W.PAD_Z0; hz = W.Z_A + W.HALF - z0
+    sg = 1 if y > YC else -1; z0 = FLOOR0 if W.PAD_Z0 is None else W.PAD_Z0
+    hz = (W.Z_A + W.HALF if W.PAD_Z1 is None else W.PAD_Z1) - z0      # step: the wall's full height, the drop plate on it
     p = wp().box(2 * W.HALF, W.PAD, hz, centered=False).translate((x - W.HALF, y if sg > 0 else y - W.PAD, z0))
     if W.CHEEK:
         ck = wp().box(2 * W.HALF, W.CHEEK, hz, centered=False).translate((x - W.HALF, y - W.CHEEK if sg > 0 else y, z0))
@@ -141,8 +142,8 @@ def tub():
                 x = xa - BODY_DX
                 o = o.union(wheel_pad(x, y))
                 for dx in (-17, 17):
-                    for dz in (-17, 17):
-                        o = o.cut(wp().workplane().transformed(rotate=(90, 0, 0)).circle(2.0).extrude(6, both=True).translate((x + dx, y + sg * W.PAD, W.Z_A + dz)))
+                    for hz in W.HOLE_Z:
+                        o = o.cut(wp().workplane().transformed(rotate=(90, 0, 0)).circle(2.0).extrude(6, both=True).translate((x + dx, y + sg * W.PAD, hz)))
                 o = o.cut(wp().box(9, 14, 8).translate((W.LEAD_X[c] - BODY_DX, y, TUB_TOP - 3)))   # leads in over the pack, under the side lid
         else:                                                           # v2: the gearbox's hole, and 10 M3 inserts for the leg frame
             o = o.cut(wp().workplane().transformed(rotate=(90, 0, 0)).circle(L2.MOTOR['gb_d'] / 2 + 0.75).extrude(20, both=True)

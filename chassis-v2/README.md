@@ -8,6 +8,25 @@ All the variations side by side: `python chassis-v2/lineup.py` -> `out/lineup.ht
 page's script first if its design changed) and builds the four body options' meshes once (`out/_lineup_variants.pkl`).
 Its sizes are measured one way for all thirteen and match each page's own.
 
+## The Trainer, step layout (2026-10-25, from a simulated search)
+
+`SCORPION_WHEELS=step python chassis-v2/trainer.py` (~1.5 min, plus ~1.5 if the four-wheel run is stale) ->
+`out/trainerstep.html`, the "Scorpion Step Trainer" page (https://claude.ai/artifact/8KVjUJZpHXWszfcMZ3DKmw),
+`trainerstep.json`, `trainerstep_*.png`. Zach: "turn the best-under-380 mm layout into a chassis-v2 change". The layout
+is `research/tumble/chassis3.py`'s best at the Trainer's length for driving down steps: Ø92 wheels, axles X 53 / -77
+(wheelbase 130), the belly 54 off the ground (was 32). Each pod's flange is a 5 mm drop plate up the wall to the tub's
+top, on a full-height pad with inserts at Z 22 and 47; the axle hangs 8 under the floor. The packs stay (the search's
++28 runs them into the nose wall). `SCORPION_STEP_R=55` builds it on the Trainer's own Ø110 wheels, which scored the
+same (`research/results/chassis3/sensitivity.json`).
+
+Down a step and onto its wheels (`research/tumble/built3.py`, these meshes, hard floor, 640 runs): 0.514 -> 0.627
+(the search's stand-in: 0.641). Crests 21 -> 40+ deg, 95 g lighter, 14 shorter. Costs: tips forward on a downhill at
+34 deg (was 52), back at 50 (59); the pods 23 off the ground (32); gaps 70 -> 60 mm; 7 rests besides upright (4); the
+head first to land in 8.4 % of falls (5.3); 0.96 m/s at 200 rpm (1.15). 27 checks: 13 clear, 14 controls read, four
+rows new (front tyre against rear, 38 mm apart; the drop plates' 16 screws in the pads' inserts; each with a control). The four-wheel
+Trainer's JSON reproduces exactly after the edits to `wheels.py` and `rugged.py`. Open: the drop plate isn't
+load-checked; screws assumed from the Trainer's list.
+
 ## The Trainer on six wheels (2026-10-09, a brainstorm)
 
 `SCORPION_WHEELS=6 python chassis-v2/trainer.py` (~2 min, plus ~2.5 if the four-wheel run is stale) ->

@@ -1,0 +1,409 @@
+{
+ "wall_s": 41,
+ "runs_per_cell": 20,
+ "contact": {
+  "tc": 0.002,
+  "dr": 0.35,
+  "dt": 0.0002
+ },
+ "results": {
+  "Trainer (built)": {
+   "down": 0.5140625,
+   "stuck": 0.0,
+   "cells": {
+    "100|0.3|0": {
+     "upright": 18,
+     "right side": 1,
+     "inverted": 1
+    },
+    "100|0.3|1": {
+     "inverted": 1,
+     "upright": 19
+    },
+    "100|0.6|0": {
+     "upright": 20
+    },
+    "100|0.6|1": {
+     "inverted": 3,
+     "upright": 17
+    },
+    "100|1.0|0": {
+     "upright": 20
+    },
+    "100|1.0|1": {
+     "upright": 20
+    },
+    "100|1.4|0": {
+     "upright": 20
+    },
+    "100|1.4|1": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "200|0.3|0": {
+     "inverted": 5,
+     "upright": 5,
+     "nose up": 10
+    },
+    "200|0.3|1": {
+     "inverted": 17,
+     "upright": 3
+    },
+    "200|0.6|0": {
+     "upright": 14,
+     "inverted": 2,
+     "nose up": 3,
+     "left side": 1
+    },
+    "200|0.6|1": {
+     "inverted": 12,
+     "upright": 8
+    },
+    "200|1.0|0": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "200|1.0|1": {
+     "upright": 16,
+     "inverted": 4
+    },
+    "200|1.4|0": {
+     "upright": 20
+    },
+    "200|1.4|1": {
+     "upright": 18,
+     "inverted": 2
+    },
+    "300|0.3|0": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "300|0.3|1": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "300|0.6|0": {
+     "inverted": 15,
+     "upright": 5
+    },
+    "300|0.6|1": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "300|1.0|0": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "300|1.0|1": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "300|1.4|0": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "300|1.4|1": {
+     "upright": 20
+    },
+    "400|0.3|0": {
+     "inverted": 17,
+     "upright": 2,
+     "right side": 1
+    },
+    "400|0.3|1": {
+     "left side": 1,
+     "inverted": 17,
+     "upright": 2
+    },
+    "400|0.6|0": {
+     "inverted": 15,
+     "nose down": 1,
+     "left side": 1,
+     "right side": 1,
+     "upright": 2
+    },
+    "400|0.6|1": {
+     "inverted": 17,
+     "upright": 3
+    },
+    "400|1.0|0": {
+     "inverted": 19,
+     "left side": 1
+    },
+    "400|1.0|1": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "400|1.4|0": {
+     "inverted": 17,
+     "upright": 3
+    },
+    "400|1.4|1": {
+     "upright": 8,
+     "inverted": 12
+    }
+   },
+   "mass": 3219.442996026931,
+   "length": 327.8654440144047
+  },
+  "Step layout (built)": {
+   "down": 0.6265624999999999,
+   "stuck": 0.0,
+   "cells": {
+    "100|0.3|0": {
+     "upright": 18,
+     "inverted": 2
+    },
+    "100|0.3|1": {
+     "upright": 18,
+     "inverted": 2
+    },
+    "100|0.6|0": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "100|0.6|1": {
+     "upright": 18,
+     "inverted": 2
+    },
+    "100|1.0|0": {
+     "upright": 20
+    },
+    "100|1.0|1": {
+     "upright": 20
+    },
+    "100|1.4|0": {
+     "upright": 20
+    },
+    "100|1.4|1": {
+     "upright": 20
+    },
+    "200|0.3|0": {
+     "nose up": 3,
+     "upright": 15,
+     "inverted": 2
+    },
+    "200|0.3|1": {
+     "inverted": 14,
+     "nose down": 1,
+     "upright": 5
+    },
+    "200|0.6|0": {
+     "upright": 16,
+     "inverted": 4
+    },
+    "200|0.6|1": {
+     "inverted": 17,
+     "right side": 1,
+     "upright": 2
+    },
+    "200|1.0|0": {
+     "upright": 16,
+     "inverted": 4
+    },
+    "200|1.0|1": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "200|1.4|0": {
+     "upright": 20
+    },
+    "200|1.4|1": {
+     "upright": 20
+    },
+    "300|0.3|0": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "300|0.3|1": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "300|0.6|0": {
+     "inverted": 15,
+     "upright": 5
+    },
+    "300|0.6|1": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "300|1.0|0": {
+     "upright": 17,
+     "inverted": 3
+    },
+    "300|1.0|1": {
+     "inverted": 11,
+     "upright": 9
+    },
+    "300|1.4|0": {
+     "upright": 20
+    },
+    "300|1.4|1": {
+     "upright": 20
+    },
+    "400|0.3|0": {
+     "inverted": 17,
+     "upright": 3
+    },
+    "400|0.3|1": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "400|0.6|0": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "400|0.6|1": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "400|1.0|0": {
+     "upright": 8,
+     "inverted": 12
+    },
+    "400|1.0|1": {
+     "inverted": 15,
+     "upright": 5
+    },
+    "400|1.4|0": {
+     "upright": 20
+    },
+    "400|1.4|1": {
+     "upright": 19,
+     "inverted": 1
+    }
+   },
+   "mass": 3124.399202486209,
+   "length": 327.8654440144047
+  },
+  "Step layout (chassis3 stand-in)": {
+   "down": 0.640625,
+   "stuck": 0.0,
+   "cells": {
+    "100|0.3|0": {
+     "upright": 20
+    },
+    "100|0.3|1": {
+     "inverted": 3,
+     "upright": 17
+    },
+    "100|0.6|0": {
+     "upright": 20
+    },
+    "100|0.6|1": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "100|1.0|0": {
+     "upright": 20
+    },
+    "100|1.0|1": {
+     "upright": 20
+    },
+    "100|1.4|0": {
+     "upright": 20
+    },
+    "100|1.4|1": {
+     "upright": 20
+    },
+    "200|0.3|0": {
+     "upright": 15,
+     "inverted": 2,
+     "nose up": 3
+    },
+    "200|0.3|1": {
+     "inverted": 16,
+     "upright": 2,
+     "nose down": 2
+    },
+    "200|0.6|0": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "200|0.6|1": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "200|1.0|0": {
+     "upright": 13,
+     "inverted": 7
+    },
+    "200|1.0|1": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "200|1.4|0": {
+     "upright": 20
+    },
+    "200|1.4|1": {
+     "upright": 20
+    },
+    "300|0.3|0": {
+     "inverted": 19,
+     "upright": 1
+    },
+    "300|0.3|1": {
+     "inverted": 16,
+     "upright": 4
+    },
+    "300|0.6|0": {
+     "inverted": 16,
+     "upright": 4
+    },
+    "300|0.6|1": {
+     "inverted": 20
+    },
+    "300|1.0|0": {
+     "upright": 17,
+     "inverted": 3
+    },
+    "300|1.0|1": {
+     "upright": 13,
+     "inverted": 7
+    },
+    "300|1.4|0": {
+     "inverted": 1,
+     "upright": 19
+    },
+    "300|1.4|1": {
+     "upright": 19,
+     "inverted": 1
+    },
+    "400|0.3|0": {
+     "inverted": 18,
+     "upright": 2
+    },
+    "400|0.3|1": {
+     "upright": 9,
+     "inverted": 11
+    },
+    "400|0.6|0": {
+     "inverted": 14,
+     "upright": 6
+    },
+    "400|0.6|1": {
+     "inverted": 20
+    },
+    "400|1.0|0": {
+     "upright": 9,
+     "inverted": 10,
+     "nose down": 1
+    },
+    "400|1.0|1": {
+     "inverted": 16,
+     "upright": 4
+    },
+    "400|1.4|0": {
+     "upright": 19,
+     "nose down": 1
+    },
+    "400|1.4|1": {
+     "upright": 19,
+     "inverted": 1
+    }
+   },
+   "mass": 3075.703892349547,
+   "length": 327.87
+  }
+ }
+}

@@ -99,11 +99,14 @@ def xml(D, step=None, up=False):
         cx = 2.0 if up else -2.0
         floor += f'<geom type="box" size="2 2 {step / 2 * s:.4f}" pos="{cx} 0 {step / 2 * s:.4f}" friction="0.6 0.005 0.0005"/>'
     verts = ' '.join('%.5f' % v for v in (D['pts'] * s).ravel())
+    extra = D.get('extra', [])                                          # more convex parts, each its own geom (built variants' pods)
+    ea = ''.join(f'<mesh name="x{i}" vertex="{" ".join("%.5f" % v for v in (P * s).ravel())}"/>' for i, P in enumerate(extra))
+    eg = ''.join(f'<geom type="mesh" mesh="x{i}" friction="0.4 0.005 0.0005"/>' for i in range(len(extra)))
     return f"""<mujoco><option timestep="{CONTACT['dt']}"/><default><geom solref="{CONTACT['tc']} {CONTACT['dr']}"/></default>
-      <asset><mesh name="body" vertex="{verts}"/></asset><worldbody>{floor}
+      <asset><mesh name="body" vertex="{verts}"/>{ea}</asset><worldbody>{floor}
       <body name="robot" pos="0 0 0.5"><freejoint/>
         <inertial pos="{G[0] * s:.5f} {G[1] * s:.5f} {G[2] * s:.5f}" mass="{M * 1e-3:.4f}" fullinertia="{full}"/>
-        <geom type="mesh" mesh="body" friction="0.4 0.005 0.0005"/>{wb}</body></worldbody></mujoco>"""
+        <geom type="mesh" mesh="body" friction="0.4 0.005 0.0005"/>{eg}{wb}</body></worldbody></mujoco>"""
 
 
 class Sim:

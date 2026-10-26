@@ -27,8 +27,11 @@ IR = TA.IR
 WHEELS = R.LEGS == 'wheels'
 if WHEELS: import wheels as W
 SIX = WHEELS and W.SIX
-SFX = '6' if SIX else ''
-CONTROL = os.path.join(OUT, 'trainer.json' if SIX else 'trainer_control.json')
+STEP = WHEELS and W.STEP                     # 2026-10-25: the step layout (wheels.py), against the four-wheel Trainer
+VS4 = SIX or STEP                            # variants whose control is the four-wheel Trainer
+SFX = '6' if SIX else 'step' if STEP else ''
+NOW = 'Six wheels' if SIX else 'Step layout'
+CONTROL = os.path.join(OUT, 'trainer.json' if VS4 else 'trainer_control.json')
 
 # ---------------------------------------------------------------- rough ground in side view (quasi-static, 2D)
 def side2d(M, it):
@@ -123,7 +126,7 @@ def control():
 
 def stale():
     if not os.path.exists(CONTROL): return True
-    ins = [os.path.join(HERE, f) for f in ('rugged.py', 'hull.py') + (('wheels.py', 'trainer.py') if SIX else ('legs_v2.py',))] + [os.path.join(OUT, '_hull_meshes.npz')]
+    ins = [os.path.join(HERE, f) for f in ('rugged.py', 'hull.py') + (('wheels.py', 'trainer.py') if VS4 else ('legs_v2.py',))] + [os.path.join(OUT, '_hull_meshes.npz')]
     return os.path.getmtime(CONTROL) < max(os.path.getmtime(p) for p in ins)
 
 # ---------------------------------------------------------------- fit checks: 1 mm voxels, a control for every zero
@@ -155,6 +158,18 @@ def checks(M):
             t = lambda c, s: M['tire_' + c + s]['t'] + ([dx, 0, 0] if c == 'M' else [0, 0, 0])
             return float(sum(C.overlap_mm3(t(a, s), t(b, s)) for s in 'LR' for a, b in (('F', 'M'), ('M', 'R'))))
         ck = np.vstack([np.asarray(TA.cq_tris(cheek(y)), float).reshape(-1, 3, 3) for y in (TA.YL, TA.YR)]) + [R.BODY_DX, 0, 0]
+    if STEP:
+        def fr(dx):                                                     # front tyre against rear tyre, each side; dx moves the rear ones forward
+            return float(sum(C.overlap_mm3(M['tire_F' + s]['t'], M['tire_R' + s]['t'] + [dx, 0, 0]) for s in 'LR'))
+        gap_fr = W.AXLES['F'] - W.AXLES['R'] - 2 * W.R_T
+        def screws(dz):                                                 # the drop plates' 16 M3 x 10: through the plate into the pad's inserts
+            out = []
+            for xa in W.AXLES.values():
+                for sg in (1, -1):
+                    for dx in (-17, 17):
+                        for hz in W.HOLE_Z:
+                            out.append(TA.cyl_tris((xa + dx, YC + sg * (W.Y_FL0 + W.FLANGE), hz + dz), (xa + dx, YC + sg * (W.WALL_Y + W.PAD - 5.5), hz + dz), 1.45, 16))
+            return out
     rows = [
         ('Pods vs the tub', pods, P('tub'), 'each flange 0.2 off its pad'),
         ('Pods 2 mm inboard (control)', inb(pods, 2.0), P('tub'), 'must read > 0: into the pads'),
@@ -169,7 +184,12 @@ def checks(M):
         ('Middle tyres 10 mm forward (control)', tyres(10.0), None, 'must read > 0'),
         ('Front pads\' cheeks vs claws, claw caps, lights', [ck], P(*[k for k in M if k.startswith(('claw', 'light'))]), 'the cheek fills back to the slanted nose wall, under the claws\' roots'),
         ('Cheeks 2 mm higher (control)', [ck + [0, 0, 2.0]], P(*[k for k in M if k.startswith(('claw', 'light'))]), 'must read > 0: the claws\' roots are 1 over its trimmed top'),
-    ] if SIX else []) + [
+    ] if SIX else []) + ([
+        ('Front tyre vs rear tyre, each side', fr(0.0), None, '%.0f mm between lug tips' % gap_fr),
+        ('Rear tyres %.0f mm forward (control)' % (gap_fr + 4), fr(gap_fr + 4), None, 'must read > 0'),
+        ('Drop plates\' 16 M3 screws vs tub and plates', screws(0.0), P('tub') + pods, 'through the plates\' holes into the pads\' inserts, all above the floor'),
+        ('Screws 3 mm lower (control)', screws(-3.0), P('tub') + pods, 'must read > 0: off the holes'),
+    ] if STEP else []) + [
         ('Head, 12 pan angles, vs everything round it', sweep, around, 'carapace, deck, side lids, claws, bed, grommets, e-stop'),
         ('Head 15 mm lower (control)', sh(sweep, [0, 0, -15.0]), around, 'must read > 0: the turret deck is under it'),
         ('E-stop %.0f mm toward the head (control)' % (gap + 3), sweep, [e + toward * (gap + 3)], 'must read > 0: it sits %.0f off the cradle\'s sweep' % gap),
@@ -221,6 +241,7 @@ def renders(M):
     sh.resize((w, h), Image.LANCZOS).save(os.path.join(OUT, 'trainer%s_sheet.png' % SFX))
     ba = Image.new('RGB', (w * 2, h), 'white'); d = ImageDraw.Draw(ba)                                   # before / after
     pair = (('trainer_front.png', 'Before: four wheels'), ('trainer6_front.png', 'Now: six wheels')) if SIX else \
+           (('trainer_front.png', 'Before: the Trainer'), ('trainerstep_front.png', 'Now: the step layout')) if STEP else \
            (('trainer_before.png', 'Before: v2 tracks, fenders over them'), ('trainer_front.png', 'Now: four wheels, no fenders'))
     for i, (fn, lab) in enumerate(pair):
         ba.paste(Image.open(os.path.join(OUT, fn)), (i * w, 0)); d.text((i * w + 24, 18), lab, fill=(30, 33, 30), font=f)
@@ -228,20 +249,21 @@ def renders(M):
 
 def side_sketch(M, B=None):
     body = np.vstack([M[k]['t'] for k in M if not M[k].get('ghost') and M[k]['grp'] in ('hull', 'head', 'tpu')])
-    if SIX:                                                             # the four-wheel Trainer's wheels, dashed
+    if VS4:                                                             # the four-wheel Trainer's wheels, dashed, on the same ground
         g0 = W.G0; circ = [(x, z + g0, r) for x, z, r in B['side2d']['wheels']]
-        W.sketch(M, os.path.join(OUT, 'trainer6_side_sketch.png'), body=body, circles=circ,
-                 title='Left side from outside: three modules (wheel Ø%d on its pod), the body (green), the four-wheel Trainer\'s Ø%d wheels (dashed)' % (2 * W.R_T, 2 * circ[0][2]))
+        W.sketch(M, os.path.join(OUT, 'trainer%s_side_sketch.png' % SFX), body=body, circles=circ,
+                 title=('Left side from outside: %s modules (wheel Ø%d on its pod), the body (green), the four-wheel Trainer\'s Ø%d wheels (dashed)'
+                        % ('three' if SIX else 'two', 2 * W.R_T, 2 * circ[0][2])) + ('; same ground, so the body sits %.0f higher on them' % (W.BELLY - 32.4) if STEP else ''))
         return
     import legs_v2 as L2
     tr = L2.meshes()[0]['track_L']['t'] + [0, 0, W.G0 - L2.G0]                 # the v2 track, on this ground
     W.sketch(M, os.path.join(OUT, 'trainer_side_sketch.png'), body=body, before=tr)
 
 def terrain_fig(D, B, path):
-    """the ridge each robot's worst moment on the six-wheel's limit ridge, and the drop into gaps"""
+    """the ridge each robot's worst moment on the variant's limit ridge, and the drop into gaps"""
     import matplotlib; matplotlib.use('Agg'); import matplotlib.pyplot as plt
     a = D['terrain']['ridge']; fig = plt.figure(figsize=(13, 7.6)); gs = fig.add_gridspec(2, 2, height_ratios=[1, 0.95])
-    for j, (P, lab, col) in enumerate(((B['side2d'], 'Four wheels (its limit: %.0f°)' % B['terrain']['ridge'], '#7A8691'), (D['side2d'], 'Six wheels', '#2F7A5A'))):
+    for j, (P, lab, col) in enumerate(((B['side2d'], 'Four wheels (its limit: %.0f°)' % B['terrain']['ridge'], '#7A8691'), (D['side2d'], NOW, '#2F7A5A'))):
         ax = fig.add_subplot(gs[0, j]); h = -np.tan(np.radians(a)) * np.abs(XT)
         S = np.arange(-360.0, 361.0, 4.0); o = rest(P, h, S); i = int(np.argmin([q[1] for q in o])); ph, cl = o[i][0], o[i][1]
         cx, cz = P['cog']; r = np.radians(ph); cs, sn = np.cos(r), np.sin(r)
@@ -258,7 +280,7 @@ def terrain_fig(D, B, path):
         ax.set_title('%s on a ridge of %.0f° sides: %s' % (lab, a, 'its belly touches' if cl <= 0.5 else '%.0f mm clear at worst' % cl), loc='left', fontsize=11)
         ax.set_xlim(-260, 260); ax.set_ylim(-150, 200); ax.set_aspect('equal'); ax.axis('off')
     ax = fig.add_subplot(gs[1, :])
-    for T, lab, col in ((B['terrain'], 'Four wheels', '#7A8691'), (D['terrain'], 'Six wheels', '#2F7A5A')):
+    for T, lab, col in ((B['terrain'], 'Four wheels', '#7A8691'), (D['terrain'], NOW, '#2F7A5A')):
         w = [g['w'] for g in T['gaps']]; dr = [g['drop'] for g in T['gaps']]
         ax.plot(w, dr, '-o', color=col, ms=4, lw=2, label='%s: crosses gaps to %d mm' % (lab, T['gap_ok']))
     ax.axhline(GAP_DROP, color='#B8332A', ls='--', lw=1); ax.text(248, GAP_DROP - 4.5, ha='right',  s= 'a wheel %.0f mm down: about what it can climb back out of*' % GAP_DROP, color='#B8332A', fontsize=9)
@@ -276,7 +298,7 @@ def page(M, D):
         Tk = C.decimate(v['t'], 2600 if k.startswith('tire_') else C.faces_for(k)); V, F = C.quant(Tk)
         D['m'][k] = {'v': C.b64(V), 'f': C.b64(F), 'i32': F.dtype == np.uint32, 'c': tohex(v['rgb']), 'grp': v['grp'], 'label': v['label'], 'note': v.get('note', '')}
     A = np.vstack([v['t'].reshape(-1, 3) for v in M.values() if not v.get('ghost')]); D['centre'] = ((A.min(0) + A.max(0)) / 2).round(1).tolist(); D['yc'] = YC
-    figs = (('sketch', 'side_sketch'), ('ba', 'before_after')) + ((('terr', 'terrain'),) if SIX else ())
+    figs = (('sketch', 'side_sketch'), ('ba', 'before_after')) + ((('terr', 'terrain'),) if VS4 else ()) + ((('steps', 'steps'),) if STEP else ())
     for k, fn in figs:
         D[k] = base64.b64encode(TA._small(os.path.join(OUT, 'trainer%s_%s.png' % (SFX, fn)), 1300)).decode()
     html = open(os.path.join(HERE, 'trainer%s_template.html' % SFX), encoding='utf-8').read().replace('/*DATA*/', 'const D=' + json.dumps(D, default=float) + ';')
@@ -288,7 +310,7 @@ if __name__ == '__main__':
         assert R.LEGS == 'v2', 'the control runs with SCORPION_LEGS=v2'
         control(); sys.exit()
     if stale():
-        if SIX:
+        if VS4:
             print('control: the four-wheel Trainer ...')
             subprocess.run([sys.executable, os.path.abspath(__file__)], env=dict(os.environ, SCORPION_LEGS='wheels', SCORPION_WHEELS='4'), check=True)
         else:
@@ -297,8 +319,11 @@ if __name__ == '__main__':
     B = json.load(open(CONTROL))
     M, it, O = R.assemble()
     D = analyse(M, it); D['before'] = {k: B[k] for k in ('rests', 'contact', 'climb', 'climb_arm', 'ends', 'mass', 'belly', 'size', 'drive_g')
-                                       + (('terrain', 'wheels') if SIX else ())}
+                                       + (('terrain', 'wheels') if VS4 else ())}
     D['wheels'] = W.numbers(M); D['shop'] = W.SHOP; D['estop_gap'] = estop_gap(M)
+    bj = os.path.join(HERE, '..', 'research', 'results', 'chassis3', 'built.json')    # research/tumble/built3.py: down steps
+    if STEP and os.path.exists(bj):
+        r_ = json.load(open(bj))['results']; D['stepres'] = {k: dict(down=v['down'], stuck=v['stuck']) for k, v in r_.items()}
     if SIX:                                                             # each motor's share, six against four (same gauge)
         def share(m, ax, cx, r):
             n = 2 * len(ax); lever = np.mean([abs(x - cx) for x in ax.values()])   # skid steer: wheels scrub sideways at their distance from the centre of mass
@@ -311,7 +336,7 @@ if __name__ == '__main__':
     D['checks'] = checks(M)
     json.dump({k: v for k, v in D.items()}, open(os.path.join(OUT, 'trainer%s.json' % SFX), 'w'), indent=1, default=float)
     side_sketch(M, B)
-    if SIX: terrain_fig(D, B, os.path.join(OUT, 'trainer6_terrain.png'))
+    if VS4: terrain_fig(D, B, os.path.join(OUT, 'trainer%s_terrain.png' % SFX))
     if '--no-render' not in sys.argv: renders(M)
     if os.path.exists(os.path.join(HERE, 'trainer%s_template.html' % SFX)): page(M, D)
     print('done %.0f s' % (time.time() - t0))

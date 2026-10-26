@@ -18,6 +18,14 @@ Six wheels (2026-10-09, Zach: "a version of the trainer with 6 wheels"): `SCORPI
 three a side. Three Ø110 wheels don't fit the wall's straight run (232 long), so the wheels are Ø100 and the wheelbase
 grows 184 -> 216: the middle axle under the centre of mass (X 10), the front axle past the wall's end, its pad filled
 back to the slanted nose wall (a cheek, part of the tub). Axles at Z 25 keep the ground, so the body rides as high.
+
+Step layout (2026-10-25, Zach: "turn the best-under-380 mm layout into a chassis-v2 change"): `SCORPION_WHEELS=step`.
+research/tumble/chassis3.py's best layout for driving down steps at the Trainer's length: Ø92 wheels on axles at X 53
+and -77 (wheelbase 130), the belly 54 over the ground (was 32). The gain is the short wheelbase with the raised belly
+together (research/results/chassis3/sensitivity.json: the belly alone, 0.505; the Trainer's Ø110 wheels on these axles
+did as well as Ø92, 0.652, so `SCORPION_STEP_R=55` builds that). The axle now sits under the tub's floor, so each pod's
+flange is a drop plate: 5 thick, up the wall to the tub's top, screwed to inserts in a full-height wall pad above the
+floor. The packs stay put: the search moved them 28 forward, but they already reach the nose wall (2 mm short).
 """
 import os, sys, json
 import numpy as np
@@ -27,10 +35,17 @@ from tail_arms import C, cq, cq_tris, cyl_tris, YC, OUT
 wp = lambda: cq.Workplane('XY')
 
 SIX = os.environ.get('SCORPION_WHEELS', '4') == '6'
+STEP = os.environ.get('SCORPION_WHEELS', '4') == 'step'
+FLOOR0, TUB_TOP = 7.4, 57.4                  # hull.py's: the tub's underside and top
 if SIX:
     R_T, Z_A = 50.0, 25.0                    # Ø100; the axle 5 lower, so the ground stays at -25
     XM, PITCH = 10.0, 108.0                  # middle axle under the centre of mass (4 wheels: X 10.7); 8 between tyres
     AXLES = {'F': XM + PITCH, 'M': XM, 'R': XM - PITCH}
+elif STEP:
+    R_T = float(os.environ.get('SCORPION_STEP_R', '46'))   # Ø92 (the search's); 55: the Trainer's wheels, same score
+    BELLY = 54.0                             # the tub's underside over the ground
+    Z_A = FLOOR0 - BELLY + R_T               # -0.6 for Ø92: 8 under the tub's floor
+    AXLES = {'F': 53.0, 'R': -77.0}          # wheelbase 130, both on the wall's straight run
 else:
     R_T = 55.0                               # tyre radius over the lugs
     Z_A = 30.0                               # axle height
@@ -40,9 +55,11 @@ WALL_Y = 65.75                               # hull wall's outer face
 PAD = 4.0                                    # insert pad on the wall (part of the tub)
 CHEEK = 12.0 if SIX else 0.0                 # the pad also fills this far in behind its face, where the wall curves away
 PAD_Z0 = Z_A - 23.0 if SIX else None         # pad's bottom (None: the tub's floor); six: down to the flange, 5 under the tub
+PAD_Z1 = TUB_TOP if STEP else None           # pad's top (None: the flange's top); step: the wall's full height
+HOLE_Z = (22.0, 47.0) if STEP else (Z_A - 17.0, Z_A + 17.0)          # the pad's two rows of inserts (X +-17)
 LEAD_X = {c: min(max(x, -110.0), 105.0) for c, x in AXLES.items()}   # where each motor's leads enter: on the straight wall
 GAP = 0.2                                    # between mating faces: touching, not one solid
-FLANGE = 4.0
+FLANGE = 5.0 if STEP else 4.0              # step: the drop plate
 POD_R, POD_IR = 22.0, 19.0                   # pod tube: OD 44, ID 38 round the 37 gearbox
 LIP = 2.5
 HALF = 23.0                                  # pad and flange: 46 x 46
@@ -67,11 +84,12 @@ def ycyl(r0, r1, y0, y1):
     return s.extrude(-(y1 - y0)).translate((0, y0, 0))
 
 def pod():
-    f = wp().box(2 * HALF, FLANGE, 2 * HALF).edges('|Y').fillet(6).translate((0, Y_FL0 + FLANGE / 2, 0))
+    z0, z1 = -HALF, (PAD_Z1 - Z_A if PAD_Z1 is not None else HALF)    # the flange; step: a drop plate up to the pad's top
+    f = wp().box(2 * HALF, FLANGE, z1 - z0).edges('|Y').fillet(6).translate((0, Y_FL0 + FLANGE / 2, (z0 + z1) / 2))
     f = f.cut(ycyl(0, POD_IR + 0.5, Y_FL0 - 1, Y_FL0 + FLANGE + 1))
     for x in (-17, 17):
-        for z in (-17, 17):
-            f = f.cut(cq.Workplane('XZ').circle(1.7).extrude(-(FLANGE + 2)).translate((x, Y_FL0 - 1, z)))
+        for z in HOLE_Z:
+            f = f.cut(cq.Workplane('XZ').circle(1.7).extrude(-(FLANGE + 2)).translate((x, Y_FL0 - 1, z - Z_A)))
     t = ycyl(POD_IR, POD_R, Y_FL0, Y_FACE)
     lip = ycyl(6.5, POD_R, Y_FACE, Y_FACE + LIP)
     for i in range(6):                                                  # the gearbox face's 6 M3 holes, on a 31 circle*
@@ -115,10 +133,12 @@ def place(tris, x, side):
     return t
 
 PARTS = {  # key prefix: (builder, label, grp, rgb, note)
-    'pod_': (pod, 'Motor pod (printed)', 'legs', (0.30, 0.33, 0.36), 'A tube round the gearmotor; its flange on the hull wall\'s pad (4 M3 into inserts), its lip screwed to the gearbox face (6 M3). Identical at all four corners.'),
+    'pod_': (pod, 'Motor pod (printed)' + (': drop plate' if STEP else ''), 'legs', (0.30, 0.33, 0.36),
+             ('A tube round the gearmotor on a 5 mm drop plate that runs up the hull wall to the tub\'s top: 4 M3 into the pad\'s inserts, above the floor. The axle hangs %.0f under the floor; ' % (FLOOR0 - Z_A) if STEP else
+              'A tube round the gearmotor; its flange on the hull wall\'s pad (4 M3 into inserts), ') + 'its lip screwed to the gearbox face (6 M3). Identical at all four corners.'),
     'motor_': (motor, 'Gearmotor* (37 mm gearbox, 30:1 class, encoder)', 'legs', (0.55, 0.58, 0.62), 'One per wheel. Its leads leave by the slot at the pod\'s top and go into the hull over the pack.'),
-    'rim_': (wheel, 'Wheel (printed): dish, disc and hub', 'legs', (0.91, 0.64, 0.23), 'Wraps back over the pod: 21 mm round it, so stones fall out. D bore on the 6 mm shaft, M3 set screw.'),
-    'tire_': (tyre, 'Tyre (TPU, printed): 110 x 46, chevron lugs', 'legs', (0.11, 0.12, 0.12), 'A stretch fit over the rim. Same part at all four corners.'),
+    'rim_': (wheel, 'Wheel (printed): dish, disc and hub', 'legs', (0.91, 0.64, 0.23), 'Wraps back over the pod: %.0f mm round it, so stones fall out. D bore on the 6 mm shaft, M3 set screw.' % (RIM_R0 - POD_R)),
+    'tire_': (tyre, 'Tyre (TPU, printed): %.0f x %.0f, chevron lugs' % (2 * R_T, TW), 'legs', (0.11, 0.12, 0.12), 'A stretch fit over the rim. Same part at all four corners.'),
 }
 def meshes():
     """the four corners as rugged.py meshes: {key: dict(t, label, grp, rgb, note)}"""
