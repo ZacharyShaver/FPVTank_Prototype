@@ -11,3 +11,11 @@ tools/config_local.py
 # Wi-Fi for the archive sketches: local only (templates: wifi_secrets.example.*)
 wifi_secrets.h
 wifi_secrets.py
+# Third-party files kept locally, not redistributed (see THIRD_PARTY.md and each folder's record)
+reference/fpv-rover-v2/*.pdf
+reference/raspberry-pi-5/*.pdf
+reference/pca9685/*.step
+reference/pca9685/*.FCStd
+head-v2/generator/pan-coil-b/MG90S.3MF
+head-v2/generator/pan-coil-b/horn/MG90_Arm.step
+head-v2/generator/pan-coil-b/horn/MG90s_Arm02.stl

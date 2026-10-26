@@ -11,6 +11,7 @@ Onshape source. Saved 2026-04-26.
 - `raspberry_pi_5_with_active_cooler.stl`. The robot's Pi has the active cooler (Control's HARDWARE.md).
 
 **Not tracked:** `pi5-active-cooler.step` (31 MB), kept locally in `reference/downloads/raspberry-pi-5/`.
-To get it back, download the model's files from the page above.
+To get it back, download the model's files from the page above. The saved page,
+`727155-raspberry-pi-5-….pdf`, is kept locally and gitignored since 2026-10-26: it is a copy of Printables' page.
 
 The zip from the download was dropped because it duplicates these files.

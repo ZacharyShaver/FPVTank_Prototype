@@ -9,3 +9,7 @@ Measured on the model (head-v2 frame notes in pan_coil_b.HORN_*): from the flat 
 ~4.6 across to 1.0, a 0.4 web to 1.4, then the spline socket to 3.7.
 
 Used by head-v2/fixes/gear_horn_set9.py for the input gear's pocket (zero offset, his rule).
+
+Not tracked (2026-10-26): the download's licence wasn't recorded (the .snapshot.1 name looks like a GrabCAD
+download), so MG90_Arm.step and MG90s_Arm02.stl are kept locally and gitignored, not redistributed. A fresh clone
+needs that download saved here under the same names.

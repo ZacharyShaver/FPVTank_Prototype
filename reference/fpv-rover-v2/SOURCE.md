@@ -9,6 +9,8 @@ The license is CC BY-NC-SA 4.0, per the saved Printables page.
 - `3150-fpv-rover-v20-tank-….pdf` is the saved Printables page.
 - `FPV Rover V2.0 - Instructables guide.pdf` is the saved Instructables build guide. It was renamed on
   2026-09-26 because the original name had a colon, which Windows can't check out.
+- **Not tracked (2026-10-26):** both saved pages are copies of other people's web pages, so they are kept locally
+  and gitignored, not redistributed. To get them back, save the two pages above.
 - `alternate-wheel-mounts/` holds the two 41-tooth bevel gears, which Zach's old folder filed as
   "alternitive wheel mounts".
 - The other 26 STLs are as downloaded.
