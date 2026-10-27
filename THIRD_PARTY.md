@@ -15,4 +15,7 @@ from.
 - the PCA9685 servo-driver models in `reference/pca9685/` (licence not recorded);
 - the MG90S servo and horn models in `head-v2/generator/pan-coil-b/` (licence not recorded).
 
-These files were removed from the git history too, on 2026-10-26.
+These files were removed from the git history too, on 2026-10-26. The MG90S model's geometry still appears, exported
+from Zach's assembly, in `head-v2/generator/pan-coil-b/fusion/servo.obj` and `horn.obj` and in that folder's
+`viewer_pan_coil_b.js`. Those stay tracked by Zach's call (2026-10-26). The public gallery shows the servo as a plain
+stand-in box.
