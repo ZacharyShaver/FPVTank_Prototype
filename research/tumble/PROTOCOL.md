@@ -493,3 +493,10 @@ A spoiled drop is marked `?` and redone.
    mass high will land upright more often than the 0.12-0.18 predicted. Direction only.
 
 Scoring by `score_15cm.py`'s rules (Brier against naive, the most likely state), with E4's files in its place.
+
+### H5 outcome (2026-10-26): stopped halfway, not scored
+Zach ran about half of the drops. Every one came to rest upright. By hand he found no balance point other than
+upright: the print would not sit on its top or a side. He judged the rest of the run a waste of time and stopped.
+No marks were kept, so H5 is not formally scored. What was seen agrees with hypothesis 2 (the sim's 1.000 for mass
+low). His hand search tests the static claim behind it directly: with one rest state, a body on a flat floor has
+nowhere else to settle, and bounce only changes how long it takes. The mass-high control (hypothesis 3) was not run.
