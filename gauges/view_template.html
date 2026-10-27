@@ -1,0 +1,407 @@
+<title>Scorpion Search</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* layout: a bench report. The finding first, then the shape to turn over beside its three readings, then every
+   screened design on one chart, then what was guessed. Blueprint neutrals, cobalt for readings, amber for shells. */
+:root{
+  --bg:#f3f4f1; --panel:#fdfdfb; --ink:#1b1f23; --mute:#5b636b; --line:#d8dcd6; --grid:#e7e9e4;
+  --accent:#2356c2; --shell:#cf8419; --body:#a1aab3; --tyre:#2a2d31; --step:#2356c2; --ok:#1c7743; --bad:#b33a2c; --tail:#127a63;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif; --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#14171a; --panel:#1b1f23; --ink:#e6e9e4; --mute:#9ba3aa; --line:#30363c; --grid:#252a2f;
+  --accent:#86a8ff; --shell:#eaa64a; --body:#6e7882; --tyre:#0c0d0f; --step:#86a8ff; --ok:#5cc489; --bad:#ff806f; --tail:#4fd1aa; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171a; --panel:#1b1f23; --ink:#e6e9e4; --mute:#9ba3aa; --line:#30363c; --grid:#252a2f;
+  --accent:#86a8ff; --shell:#eaa64a; --body:#6e7882; --tyre:#0c0d0f; --step:#86a8ff; --ok:#5cc489; --bad:#ff806f; --tail:#4fd1aa; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:32px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute);margin:0}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(30px,4.2vw,42px);letter-spacing:-.01em;line-height:1.1;margin:6px 0 0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:500;font-size:22px;margin:0;text-wrap:balance}
+.thesis{font-size:18px;max-width:66ch;margin:12px 0 0}
+.thesis b{font-family:var(--f-mono);font-weight:500;font-size:16px}
+.note{font-size:13px;color:var(--mute);max-width:74ch;margin:0}
+.stage{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:880px){.stage{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+.view{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;aspect-ratio:4/3;width:100%;max-width:100%;touch-action:none;cursor:grab}
+.view:active{cursor:grabbing}
+.view canvas{display:block;width:100%;height:100%}
+.view .hint{position:absolute;left:12px;bottom:10px;font-size:12px;color:var(--mute);pointer-events:none}
+.view .zoom{position:absolute;right:10px;bottom:10px;display:flex;gap:4px}
+.view .zoom button{width:30px;height:30px;font:500 16px var(--f-mono);border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:6px;cursor:pointer}
+.view .zoom button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.view .key{position:absolute;right:12px;top:10px;display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mute);pointer-events:none;text-align:right}
+.view .key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.picker{display:flex;flex-wrap:wrap;gap:6px}
+.picker button{font:500 13px var(--f-body);padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.picker button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.picker button:focus-visible,.reset:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.picker .dot{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.picker .grp{font-family:var(--f-mono);font-size:11px;color:var(--mute);align-self:center;margin:0 4px 0 8px;text-transform:uppercase;letter-spacing:.06em}
+.reset{font:500 12px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--mute);border-radius:6px;padding:4px 8px;cursor:pointer;align-self:flex-start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.title-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:baseline}
+.title-row h2{font-size:26px}
+.pill{display:inline-block;font:500 12px var(--f-mono);padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.meets{color:var(--ok)}.misses{color:var(--bad)}.neutral{color:var(--mute)}
+.gauge{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:baseline}
+.gauge .lab{font-size:13px;color:var(--mute)}
+.gauge .num{font-family:var(--f-mono);font-size:20px;font-variant-numeric:tabular-nums}
+.bar{grid-column:1/-1;position:relative;height:8px;background:var(--grid);border-radius:4px}
+.bar .fill{position:absolute;top:0;bottom:0;left:0;border-radius:4px;background:var(--accent)}
+.bar .mk{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--mute)}
+.bar .tg{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ok)}
+.gauge .sub{grid-column:1/-1;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+dl.dims{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:0;font-size:13px}
+dl.dims dt{color:var(--mute)} dl.dims dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:520px}
+.chart text{font-family:var(--f-mono);font-size:11px;fill:var(--mute)}
+.chart .lbl{fill:var(--ink);font-size:12px;cursor:pointer}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--mute)}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-1px;background:var(--c);border:1.5px solid var(--b, var(--c))}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th{font-weight:500;color:var(--mute);text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line);font-family:var(--f-mono);white-space:nowrap}
+th:first-child,td:first-child{text-align:left;font-family:var(--f-body)}
+tr.sel td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+tbody tr{cursor:pointer}
+ol.guess{margin:0;padding-left:1.25rem;display:flex;flex-direction:column;gap:6px;max-width:76ch}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:20px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow" id="eyebrow">Scorpion · generative search with a tail, iteration 1</p>
+    <h1 id="h1">Shape, tail, or both?</h1>
+    <p class="thesis" id="thesis"></p>
+  </header>
+
+  <section class="stage" aria-label="Finalists in 3D">
+    <div class="col">
+      <div class="view" id="view">
+        <canvas id="cv" aria-label="3D view of the selected design, with the step it climbs and the circle it turns in"></canvas>
+        <div class="key"><span style="--c:var(--body)">Trainer body</span><span style="--c:var(--shell)">skin (the body)</span><span style="--c:var(--tail)">tail, stowed</span><span style="--c:var(--step)">G2 step and G3 circle</span></div>
+        <div class="hint">Drag to turn · Ctrl + scroll or the buttons to zoom</div>
+        <div class="zoom"><button type="button" id="zin" aria-label="Zoom in">+</button><button type="button" id="zout" aria-label="Zoom out">−</button></div>
+      </div>
+      <div class="picker" id="picker" role="group" aria-label="Pick a design"></div>
+      <button class="reset" id="reset" type="button">Reset view</button>
+    </div>
+    <div class="card" id="panel" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2>Every screened design</h2>
+    <p class="note" id="chart-note"></p>
+    <div class="legend" id="legend"></div>
+    <div class="chart" id="chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>The finalists on the full gauges</h2>
+    <p class="note">Every friction, 200 falls and 20 tries a step. Each reading is the worst of the three frictions. Click a row to show it above.</p>
+    <div class="tbl"><table id="ftable"><thead><tr><th>Design</th><th>G1 upright</th><th>Target</th><th>G2 step up</th><th>G3 turn</th><th>Mass</th><th>L × W × H</th><th>Wheels</th><th>Skin</th><th>Tail</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="two">
+    <div class="card">
+      <h2>What was guessed</h2>
+      <ol class="guess">
+        <li>The drive: wheels3's 37 mm 30:1 gearmotor, 1.0 N m stall at the wheel and 330 rpm, from a datasheet, scaled by the search: 0.4 to 2.5 times the gearing (torque up, speed down; G3 doesn't read the speed it costs). The drive search also scaled the motor 0.5 to 2 times (its torque, rotor and 205 g mass together) and kept it near 1; the lean search holds it there. Every wheel has one. Tracks under the Trainer's 131 mm put the motor into the hull, flagged "repack".</li>
+        <li>The insides: chassis-v2's Trainer parts and masses (3.2 kg), with the two battery packs free to move ±80 mm along and up to 15 mm up.</li>
+        <li>The skin: one closed 1.5 mm PLA shell that replaces the Trainer's walls (about 416 g out) and holds every part inside, the camera head too for now. Never printed at this size. Where it meets a tyre the sim gives it a wheel well.</li>
+        <li>The tail: two servos (a turntable and one pitch joint) of 0.3 to 4 N m stall, MG996R to 40 kg cm class, at 6 rad/s; each 45 g plus 8 g per N m. The link weighs 0.3 g a mm, the rubber foot 15 g. Only the 9 g MG90S class is on hand.</li>
+        <li>The tail's moves are scripted reflexes: after a fall, swing through the ground and push, trying the plane toward the ground, then each side; on a step, push down behind when it stalls. A learned policy should do better.</li>
+        <li>The floor: hard, with the ball's measured bounce; friction 0.6 floor, 0.9 tyre and 0.4 body, scaled ×0.65 to ×1.5. No tyre grip has been measured yet.</li>
+        <li id="bar-note">The screen's bar: 40 falls at ×1 reading at least 0.85, so that designs near 0.75 aren't let through on luck. The finals read 200 falls at every friction.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>How the search ran</h2>
+      <ol class="guess" id="stages"></ol>
+    </div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  const D = /*DATA*/null;
+  const fmt = (v) => (v == null ? 'can’t spin' : Math.round(v).toLocaleString('en') + ' mm');
+  const pct = (v) => (v * 100).toFixed(1) + '%';
+  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const byName = Object.fromEntries(D.designs.map((d) => [d.name, d]));
+  const box = D.designs.find((d) => d.role === 'baseline');
+  const fins = D.designs.filter((d) => d.role === 'finalist');
+  const ctrls = D.designs.filter((d) => d.role === 'control');
+  const meets = fins.filter((d) => d.meets);
+  const st = D.stats;
+  const n = (v) => v.toLocaleString('en');
+  const read = (d) => `${pct(d.upright)} / ${fmt(d.climb)} / ${fmt(d.turn)}`;
+  const frontOf = (list) => {                                           // meets G1, and no other beats it on climb, turn (to 10 mm) and upright
+    const m = list.filter((d) => d.meets && d.turn != null), t = (d) => Math.round(d.turn / 10);
+    return m.filter((d) => !m.some((o) => o.climb >= d.climb && t(o) <= t(d) && o.upright >= d.upright && (o.climb > d.climb || t(o) < t(d) || o.upright > d.upright)))
+      .sort((p, q) => p.climb - q.climb || q.upright - p.upright);
+  };
+
+  // thesis
+  const th = document.getElementById('thesis');
+  const ft = frontOf(fins.filter((d) => d.tail)), fn = frontOf(fins.filter((d) => !d.tail));
+  const tight = ft.length ? Math.min(...ft.map((d) => d.turn)) : null;
+  const pick = ft.filter((d) => d.turn <= 1.1 * tight).sort((p, q) => q.climb - p.climb)[0];   // the best climber within 10 % of the tightest turn
+  const top = pick;
+  const nm = (d) => `<b>${d.name}</b> (${read(d)})`;
+  const list = (a) => (a.length > 1 ? a.slice(0, -1).map(nm).join(', ') + ' and ' + nm(a[a.length - 1]) : nm(a[0]));
+  const parts = [`${n(st.n_screened)} designs simulated, ${n(st.n_tail)} of them with a tail. Read as upright / step up / turn, against the box's ${read(box)}.`];
+  if (ft.length) parts.push(` With a tail, the best trade-offs are ${list(ft)}.`);
+  if (pick) parts.push(` ${pick.name} climbs furthest while turning within 10% of the tightest.`);
+  if (fn.length) parts.push(` Without a tail the best ${fn.length > 1 ? 'are' : 'is'} ${list(fn)}.`);
+  if (ctrls.length) { const c = ctrls[0], p0 = byName[c.name.split(',')[0]]; parts.push(` The control: ${p0 ? p0.name : 'the best climber'} with its tail limp falls from ${p0 ? read(p0) : ''} to ${read(c)}.`); }
+  th.innerHTML = parts.join('');
+
+  // stages
+  const sg = document.getElementById('stages');
+  [`The family: ${st.knobs} knobs. ${st.family}.`,
+   `Screening sims: ${n(st.n_screened)} designs, ${n(st.n_random)} at random, then a cross-entropy search under four weightings of climb against turn. Each: ${st.screen}. ${n(st.n_feasible)} cleared the upright bar` + (st.n_cut ? `; ${n(st.n_cut)} were stopped short of it.` : '.'),
+   ...(st.seeded ? [st.seeded] : []),
+   ...(st.frozen ? [`Held fixed: ${st.frozen}. ${st.frozen_note} The wheels are drawn as a centre and a tyre gap, so every draw builds.`] : []),
+   `Finals: the best-turning few at each climb level of the front, plus the best with a tail and no skin and the best with no tail, on the full gauges with the box beside them, and the best tail climber again with its servos limp as the control.`,
+   `Superseded: the first shape search (${n(st.n_old)} designs, S1 to S8) laid its shell over the Trainer's whole body, counting the walls twice.`].forEach((t) => { const li = document.createElement('li'); li.textContent = t; sg.appendChild(li); });
+
+  // ---------- 3D ----------
+  const view = document.getElementById('view'), cv = document.getElementById('cv');
+  const renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(32, 4 / 3, 5, 20000); cam.up.set(0, 0, 1);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x888888, 0.75); hemi.position.set(0, 0, 1); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(600, -900, 1400); scene.add(sun);
+  const grid = new THREE.GridHelper(2400, 24); grid.rotation.x = Math.PI / 2; scene.add(grid);
+  let group = null, orbit = {az: -0.75, el: 0.42, r: 1700, tx: 0, ty: 0, tz: 90};
+  const mats = {};
+  function material() {
+    const c = (n_) => new THREE.Color(css(n_) || '#888');
+    mats.body = new THREE.MeshStandardMaterial({color: c('--body'), flatShading: true, roughness: 0.8, metalness: 0.05});
+    mats.shell = new THREE.MeshStandardMaterial({color: c('--shell'), flatShading: true, transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide, roughness: 0.6});
+    mats.skin = new THREE.MeshStandardMaterial({color: c('--shell'), flatShading: true, transparent: true, opacity: 0.8, roughness: 0.6});
+    mats.tail = new THREE.MeshStandardMaterial({color: c('--tail'), roughness: 0.5});
+    mats.tyre = new THREE.MeshStandardMaterial({color: c('--tyre'), roughness: 0.9});
+    mats.step = new THREE.MeshStandardMaterial({color: c('--step'), transparent: true, opacity: 0.35, roughness: 0.7});
+    mats.ring = new THREE.MeshBasicMaterial({color: c('--step'), transparent: true, opacity: 0.8, side: THREE.DoubleSide});
+    grid.material.color = c('--line'); grid.material.transparent = true; grid.material.opacity = 0.9;
+  }
+  function geo(m) {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(m.v, 3)); g.setIndex(m.f); g.computeVertexNormals(); return g;
+  }
+  function build(d) {
+    if (group) { scene.remove(group); group.traverse((o) => o.geometry && o.geometry.dispose()); }
+    group = new THREE.Group();
+    group.add(new THREE.Mesh(geo(d.body), d.skin ? mats.skin : mats.body));
+    if (d.tail) {                                                         // the link from its base to its tip, and the foot
+      const B = new THREE.Vector3(...d.tail.base), T = new THREE.Vector3(...d.tail.tip), dir = T.clone().sub(B), len = dir.length();
+      const link = new THREE.Mesh(new THREE.CylinderGeometry(d.tail.r, d.tail.r, len, 16), mats.tail);
+      link.position.copy(B.clone().add(T).multiplyScalar(0.5)); link.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.normalize()); group.add(link);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(d.tail.foot, 20, 14), mats.tail); foot.position.copy(T); group.add(foot);
+      const hub = new THREE.Mesh(new THREE.SphereGeometry(d.tail.r * 2.2, 16, 12), mats.tail); hub.position.copy(B); group.add(hub);
+    }
+    for (const s of d.shell) group.add(new THREE.Mesh(geo(s), mats.shell));
+    const wg = new THREE.CylinderGeometry(d.R, d.R, d.TW, 40);
+    for (const [x, y] of d.wheels) { const w = new THREE.Mesh(wg, mats.tyre); w.position.set(x, y, d.R); group.add(w); }
+    // the extent, for the step and the circle
+    let xmax = -1e9; for (let i = 0; i < d.body.v.length; i += 3) xmax = Math.max(xmax, d.body.v[i]);
+    for (const s of d.shell) for (let i = 0; i < s.v.length; i += 3) xmax = Math.max(xmax, s.v[i]);
+    for (const [x] of d.wheels) xmax = Math.max(xmax, x + d.R);
+    if (d.tail) xmax = Math.max(xmax, d.tail.tip[0] + d.tail.foot);
+    if (d.climb > 0) {
+      const sb = new THREE.Mesh(new THREE.BoxGeometry(260, 520, d.climb), mats.step); sb.position.set(xmax + 80 + 130, 0, d.climb / 2); group.add(sb);
+    }
+    if (d.turn) {
+      const cx = d.wheels.reduce((a, w) => a + w[0], 0) / d.wheels.length, cy = d.wheels.reduce((a, w) => a + w[1], 0) / d.wheels.length;
+      const r = d.turn / 2; const ring = new THREE.Mesh(new THREE.RingGeometry(r - 4, r + 4, 128), mats.ring); ring.position.set(cx, cy, 0.6); group.add(ring);
+    }
+    scene.add(group); draw();
+  }
+  function size() {
+    const w = view.clientWidth, h = view.clientHeight; renderer.setSize(w, h, false); cam.aspect = w / Math.max(h, 1); cam.updateProjectionMatrix(); draw();
+  }
+  let queued = false;
+  function draw() {
+    if (queued) return; queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      const {az, el, r, tx, ty, tz} = orbit;
+      cam.position.set(tx + r * Math.cos(el) * Math.cos(az), ty + r * Math.cos(el) * Math.sin(az), tz + r * Math.sin(el)); cam.lookAt(tx, ty, tz);
+      renderer.render(scene, cam);
+    });
+  }
+  let drag = null;
+  view.addEventListener('pointerdown', (e) => { if (e.target.closest('button')) return; drag = {x: e.clientX, y: e.clientY, az: orbit.az, el: orbit.el}; view.setPointerCapture(e.pointerId); });
+  view.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    orbit.az = drag.az - (e.clientX - drag.x) * 0.008; orbit.el = Math.max(0.03, Math.min(1.45, drag.el + (e.clientY - drag.y) * 0.006)); draw();
+  });
+  const stop = () => { drag = null; };
+  view.addEventListener('pointerup', stop); view.addEventListener('pointercancel', stop);
+  const zoom = (f) => { orbit.r = Math.max(400, Math.min(5000, orbit.r * f)); draw(); };
+  view.addEventListener('wheel', (e) => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); zoom(Math.exp(e.deltaY * 0.002)); }, {passive: false});   // plain scroll moves the page
+  document.getElementById('zin').addEventListener('click', () => zoom(0.8));
+  document.getElementById('zout').addEventListener('click', () => zoom(1.25));
+  document.getElementById('reset').addEventListener('click', () => { orbit = {az: -0.75, el: 0.42, r: 1700, tx: 0, ty: 0, tz: 90}; draw(); });
+  new ResizeObserver(size).observe(view);
+  const retheme = () => { material(); if (current) build(current); };
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+  new MutationObserver(retheme).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+  // ---------- panel ----------
+  const panel = document.getElementById('panel');
+  const maxClimb = Math.max(...D.designs.map((d) => d.climb), 10);
+  const maxTurn = Math.max(...D.designs.map((d) => d.turn || 0));
+  function gaugeRow(label, value, frac, boxFrac, sub, target) {
+    const g = document.createElement('div'); g.className = 'gauge';
+    const l = document.createElement('div'); l.className = 'lab'; l.textContent = label;
+    const v = document.createElement('div'); v.className = 'num'; v.textContent = value;
+    const bar = document.createElement('div'); bar.className = 'bar';
+    const f = document.createElement('div'); f.className = 'fill'; f.style.width = Math.max(0, Math.min(1, frac)) * 100 + '%'; bar.appendChild(f);
+    if (boxFrac != null) { const m = document.createElement('div'); m.className = 'mk'; m.style.left = `calc(${Math.min(1, boxFrac) * 100}% - 1px)`; m.title = 'the box'; bar.appendChild(m); }
+    if (target != null) { const t = document.createElement('div'); t.className = 'tg'; t.style.left = `calc(${target * 100}% - 1px)`; t.title = 'the target'; bar.appendChild(t); }
+    const s = document.createElement('div'); s.className = 'sub'; s.textContent = sub;
+    g.append(l, v, bar, s); return g;
+  }
+  function show(d) {
+    panel.replaceChildren();
+    const tr = document.createElement('div'); tr.className = 'title-row';
+    const h = document.createElement('h2'); h.textContent = d.name;
+    const p = document.createElement('span'); p.className = 'pill ' + (d.role === 'baseline' ? 'neutral' : d.meets ? 'meets' : 'misses');
+    p.textContent = d.role === 'baseline' ? 'baseline' : d.role === 'control' ? 'control' : d.meets ? 'meets the upright target' : 'misses the upright target';
+    tr.append(h, p); panel.appendChild(tr);
+    const roleNote = document.createElement('p'); roleNote.className = 'note';
+    roleNote.textContent = d.role === 'finalist' ? 'From the search: ' + (d.skin ? 'a skin is the body' : 'the Trainer’s own body') + (d.tail ? ', with a tail.' : ', no tail.') + (d.notes.length ? ' ' + d.notes.join(', ') + '.' : '')
+      : d.role === 'control' ? 'The best tail climber with its servos limp (0.05 N m): if the tail does the work, this reads worse.'
+      : d.role === 'baseline' ? 'The Trainer’s parts in a plain box: the baseline to beat.' : 'An existing design, from the first scorecard.';
+    panel.appendChild(roleNote);
+    const bm = (k) => (d.by_mu ? Object.entries(d.by_mu).map(([m, v]) => `×${m} ${k === 'upright' ? pct(v[k]) : fmt(v[k])}`).join(' · ') : '');
+    panel.appendChild(gaugeRow('G1 upright after a fall', pct(d.upright), d.upright, box.upright, bm('upright'), st.up_min));
+    panel.appendChild(gaugeRow('G2 step up', fmt(d.climb), d.climb / maxClimb, box.climb / maxClimb, bm('climb')));
+    panel.appendChild(gaugeRow('G3 turn-around space (less is better)', fmt(d.turn), (d.turn || maxTurn) / maxTurn, box.turn / maxTurn, bm('turn')));
+    const dl = document.createElement('dl'); dl.className = 'dims';
+    const add = (k, v) => { const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; dl.append(dt, dd); };
+    add('Mass', Math.round(d.mass).toLocaleString('en') + ' g');
+    add('Size', `${Math.round(d.length)} × ${Math.round(d.width)} × ${Math.round(d.height)} mm`);
+    add('Belly', Math.round(d.belly) + ' mm');
+    add('Wheels', `${d.wheels.length} × Ø${Math.round(2 * d.R)} mm`);
+    if (d.tail) {
+      add('Tail', `${Math.round(d.tail.L)} mm, ${d.tail.tq.toFixed(1)} N m servos`);
+      add('Tail mount', `${Math.round(d.tail.base[2])} mm up, ${Math.round(-d.tail.base[0])} mm back`);
+      add('Push / stow', `${Math.round(d.tail.th_push)}° / ${Math.round(d.tail.th_stow)}°`);
+    }
+    panel.appendChild(dl);
+  }
+
+  // ---------- picker and table ----------
+  const COLORS = ['--accent', '--shell', '--ok', '--bad'];
+  const picker = document.getElementById('picker');
+  let current = null; const buttons = {};
+  function select(name) {
+    current = byName[name]; build(current); show(current);
+    for (const [k, b] of Object.entries(buttons)) b.setAttribute('aria-pressed', String(k === name));
+    document.querySelectorAll('#ftable tbody tr').forEach((r) => r.classList.toggle('sel', r.dataset.name === name));
+  }
+  const groups = [['With a tail', fins.filter((d) => d.tail)], ['No tail', fins.filter((d) => !d.tail)], ['Control', ctrls],
+                  ['For scale', D.designs.filter((d) => d.role === 'baseline' || d.role === 'existing')]].filter((g) => g[1].length);
+  for (const [label, list] of groups) {
+    const g = document.createElement('span'); g.className = 'grp'; g.textContent = label; picker.appendChild(g);
+    for (const d of list) {
+      const b = document.createElement('button'); b.type = 'button';
+      const dot = document.createElement('span'); dot.className = 'dot'; dot.style.setProperty('--c', d.role === 'finalist' ? (d.meets ? 'var(--ok)' : 'var(--bad)') : 'var(--mute)');
+      b.append(dot, document.createTextNode(d.name)); b.addEventListener('click', () => select(d.name)); picker.appendChild(b); buttons[d.name] = b;
+    }
+  }
+  const tb = document.querySelector('#ftable tbody');
+  for (const d of [box, ...fins, ...ctrls]) {
+    const r = document.createElement('tr'); r.dataset.name = d.name; r.addEventListener('click', () => select(d.name));
+    const cells = [d.name, pct(d.upright), d.role === 'baseline' ? '—' : d.meets ? 'meets' : 'misses', fmt(d.climb), fmt(d.turn), Math.round(d.mass).toLocaleString('en') + ' g',
+      `${Math.round(d.length)} × ${Math.round(d.width)} × ${Math.round(d.height)}`, `${d.wheels.length} × Ø${Math.round(2 * d.R)}`, d.skin ? 'yes' : 'no',
+      d.tail ? `${Math.round(d.tail.L)} mm, ${d.tail.tq.toFixed(1)} N m` + (d.role === 'control' ? ' (limp)' : '') : '—'];
+    cells.forEach((c, i) => { const td = document.createElement('td'); td.textContent = c; if (i === 2) td.className = d.role === 'baseline' || d.role === 'control' ? 'neutral' : d.meets ? 'meets' : 'misses'; r.appendChild(td); });
+    tb.appendChild(r);
+  }
+
+  // ---------- chart ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const chart = document.getElementById('chart');
+  if (st.h1) { document.getElementById('h1').textContent = st.h1; document.getElementById('eyebrow').textContent = st.eyebrow; }
+  document.getElementById('bar-note').textContent = `The screen's bar: ${st.bar}, so that designs near 0.75 aren't let through on luck. The finals read 200 falls at every friction.`;
+  document.getElementById('chart-note').textContent = `Each dot is one screened design that got a climb (${st.screen}), spread ±3 mm up and down so the 10 mm steps don't stack. Bright: cleared the upright bar (${pct(st.up_screen).replace('.0', '')}); green with a tail, blue without. Rings: the finalists on the full gauges. Up and to the left is better.`;
+  const lg = document.getElementById('legend');
+  [['with a tail', 'var(--tail)'], ['no tail', 'var(--accent)'], ['didn’t clear the bar', 'var(--line)'], ['finalist, meets the target', 'transparent', 'var(--ok)'], ['finalist, misses', 'transparent', 'var(--bad)'], ['the box and existing designs', 'var(--mute)']]
+    .forEach(([t, c, b]) => { const s = document.createElement('span'); s.textContent = t; s.style.setProperty('--c', c); if (b) s.style.setProperty('--b', b); lg.appendChild(s); });
+  function drawChart() {
+    chart.replaceChildren();
+    const W = Math.max(520, chart.clientWidth), H = 380, m = {t: 14, r: 18, b: 40, l: 54};
+    const pts = D.screened.tail.map((p) => [...p, 1]).concat(D.screened.plain.map((p) => [...p, 0]));
+    const turns = pts.map((p) => p[1]).concat(D.designs.filter((d) => d.turn).map((d) => d.turn));
+    let x0 = Math.min(...turns), x1 = Math.max(...turns); const xcap = Math.min(x1, x0 + 900); x1 = xcap;
+    const y1 = Math.max(...pts.map((p) => p[0]), ...D.designs.map((d) => d.climb)) + 10;
+    const X = (v) => m.l + (Math.min(v, x1) - x0) / (x1 - x0) * (W - m.l - m.r), Y = (v) => H - m.b - v / y1 * (H - m.t - m.b);
+    const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Step up against turn-around space for every screened design');
+    const el = (tag, at, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); parent.appendChild(e); return e; };
+    const step = (x1 - x0) > 600 ? 200 : 100;
+    for (let v = Math.ceil(x0 / step) * step; v <= x1; v += step) { el('line', {x1: X(v), x2: X(v), y1: m.t, y2: H - m.b, stroke: css('--grid')}); el('text', {x: X(v), y: H - m.b + 16, 'text-anchor': 'middle'}).textContent = v.toLocaleString('en'); }
+    for (let v = 0; v <= y1; v += (y1 > 100 ? 20 : 10)) { el('line', {x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css('--grid')}); el('text', {x: m.l - 8, y: Y(v) + 4, 'text-anchor': 'end'}).textContent = v; }
+    el('text', {x: W - m.r, y: H - 6, 'text-anchor': 'end'}).textContent = 'turn-around space, mm' + (xcap < Math.max(...turns) ? ' (wider ones at the edge)' : '');
+    el('text', {x: m.l, y: m.t - 2}).textContent = 'step up, mm';
+    let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const gd = el('g', {});
+    for (const p of pts.filter((q) => !q[2])) el('circle', {cx: X(p[1]), cy: Y(p[0] + (rnd() - 0.5) * 6), r: 2, fill: css('--line')}, gd);
+    for (const p of pts.filter((q) => q[2])) el('circle', {cx: X(p[1]), cy: Y(p[0] + (rnd() - 0.5) * 6), r: 2.6, fill: css(p[3] ? '--tail' : '--accent'), 'fill-opacity': 0.55}, gd);
+    const lbls = [];
+    for (const d of D.designs) {
+      if (d.turn == null) continue;
+      const cx = X(d.turn), cy = Y(d.climb);
+      if (d.role === 'finalist' || d.role === 'control') el('circle', {cx, cy, r: 6, fill: 'none', stroke: css(d.role === 'control' ? '--mute' : d.meets ? '--ok' : '--bad'), 'stroke-width': 2});
+      else el('rect', {x: cx - 4, y: cy - 4, width: 8, height: 8, fill: css('--mute')});
+      const near = lbls.find((l) => Math.abs(l.cx - cx) < 9 && Math.abs(l.cy - cy) < 9);   // points on one spot share a label
+      if (near) near.names.push(d.name); else lbls.push({names: [d.name], cx, cy});
+    }
+    // labels: beside each point, moved up or down (then to the other side) until no two label boxes and no marker meet
+    const placed = [];
+    const hit = (bx) => placed.some((o) => bx.x0 < o.x1 + 4 && o.x0 < bx.x1 + 4 && bx.y0 < o.y1 + 1 && o.y0 < bx.y1 + 1)
+      || lbls.some((o) => o.cx > bx.x0 - 6 && o.cx < bx.x1 + 6 && o.cy > bx.y0 - 6 && o.cy < bx.y1 + 6);
+    chart.appendChild(svg);                                              // in the page, so text can be measured
+    lbls.sort((p, q) => p.cx - q.cx);
+    for (const l of lbls) {
+      const text = l.names.join(' · ');
+      const t = el('text', {class: 'lbl'}); t.textContent = text;
+      const w = t.getComputedTextLength ? t.getComputedTextLength() : text.length * 7;
+      let best = null;
+      for (const dy of [0, 14, -14, 28, -28, 42, -42]) for (const side of [1, -1]) {
+        if (best) break;
+        const x0 = side > 0 ? l.cx + 9 : l.cx - 9 - w, y = l.cy + dy;
+        const bx = {x0, x1: x0 + w, y0: y - 10, y1: y + 3};
+        if (bx.x0 < m.l || bx.x1 > W - m.r || bx.y0 < m.t || bx.y1 > H - m.b) continue;
+        if (!hit(bx)) best = {bx, y, x0, dy};
+      }
+      if (!best) { const x0 = l.cx + 9; best = {bx: {x0, x1: x0 + w, y0: l.cy - 10, y1: l.cy + 3}, y: l.cy, x0, dy: 0}; }
+      placed.push(best.bx);
+      t.setAttribute('x', best.x0); t.setAttribute('y', best.y + 4);
+      if (best.dy) el('line', {x1: l.cx, y1: l.cy, x2: best.x0 + (best.x0 > l.cx ? -2 : w + 2), y2: best.y, stroke: css('--mute'), 'stroke-width': 0.75});
+      t.addEventListener('click', () => select(l.names[0]));
+    }
+    chart.appendChild(svg);
+  }
+  new ResizeObserver(() => drawChart()).observe(chart);
+
+  material(); size();
+  select((pick || meets[0] || fins[0] || box).name);
+})();
+</script>

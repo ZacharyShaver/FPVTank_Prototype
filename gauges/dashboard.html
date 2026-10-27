@@ -1,0 +1,472 @@
+<style>
+.sg{font-family:var(--font-anthropic-sans);display:flex;flex-direction:column;gap:var(--cds-gap-xl)}
+.sg h1{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);margin:0;text-wrap:balance}
+.sg-take{margin:var(--cds-gap-sm) 0 0;color:var(--color-fg-muted);max-width:72ch;line-height:1.55}
+.sg .sg-take b{font-weight:600;color:var(--color-fg)}
+.sg-section{display:flex;flex-direction:column;gap:var(--cds-gap-md)}
+.sg-section>h2{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0;text-wrap:balance}
+.sg-section>.sg-note{max-width:72ch}
+.sg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));gap:var(--cds-gap-md)}
+.sg-card{background:var(--color-panel);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);min-width:0;position:relative;display:flex;flex-direction:column;gap:var(--cds-gap-sm)}
+.sg-card h3{font-size:var(--cds-font-size-heading);font-weight:var(--cds-font-weight-medium);margin:0;text-wrap:balance}
+.sg-note{font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);margin:0;line-height:1.5}
+.sg-big{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-title);font-variant-numeric:tabular-nums;line-height:1.1}
+.sg-who{font-size:var(--cds-font-size-body)}
+.sg-vs{display:flex;gap:var(--cds-gap-xs);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted);font-variant-numeric:tabular-nums}
+.sg-wrap{overflow-x:auto}
+.sg table{border-collapse:collapse;width:100%;font-size:var(--cds-font-size-body);font-variant-numeric:tabular-nums}
+.sg th{font-weight:var(--cds-font-weight-medium);text-align:right;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);padding:var(--cds-pad-xs) var(--cds-pad-sm);border-bottom:1px solid var(--color-border-line);vertical-align:bottom}
+.sg td{text-align:right;padding:var(--cds-pad-xs) var(--cds-pad-sm);border-bottom:1px solid var(--color-border-line);white-space:nowrap;vertical-align:top}
+.sg th:first-child,.sg td:first-child{text-align:left}
+.sg td.sg-txt,.sg th.sg-txt{text-align:left;white-space:normal;min-width:16rem}
+.sg tr.sg-base td{color:var(--color-fg-muted)}
+.sg-pill{display:inline-block;margin-left:var(--cds-gap-xs);padding:0 var(--cds-pad-xs);border-radius:999px;font-size:var(--cds-font-size-caption);border:1px solid var(--color-border-line);color:var(--color-fg-muted)}
+.sg-pass{color:var(--color-ok)}
+.sg-fail{color:var(--color-bad)}
+.sg-chart{min-height:300px}
+.sg-chart.sg-short{min-height:210px}
+.sg-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);white-space:nowrap;z-index:2}
+.sg-tip .sg-k{color:var(--cds-text-secondary)}
+.sg-legend{display:flex;flex-wrap:wrap;gap:var(--cds-gap-xs) var(--cds-gap-md);font-size:var(--cds-font-size-caption);color:var(--color-fg-muted)}
+.sg-legend span{display:inline-flex;align-items:center;gap:.35rem}
+.sg-legend i{display:inline-block;width:.6rem;height:.6rem;border-radius:50%}
+.sg-defs ol{margin:0;padding-left:1.25rem;display:flex;flex-direction:column;gap:var(--cds-gap-sm);max-width:72ch;line-height:1.5}
+.sg-failed{display:flex;align-items:center;justify-content:center;gap:var(--cds-gap-xs);min-height:inherit;color:var(--color-fg-muted);font-size:var(--cds-font-size-caption)}
+.sg-failed::before{content:"";width:.375rem;height:.375rem;border-radius:50%;background:var(--color-bad)}
+.sg [data-dash-source-state=empty]{color:transparent}
+.sg [data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
+</style>
+
+<div class="sg">
+  <header id="top">
+    <h1>Scorpion gauges</h1>
+    <p class="sg-take" id="takeaway"><span class="dash-skeleton">—</span></p>
+  </header>
+
+  <section class="sg-section" id="gauges">
+    <h2>Three gauges, iteration 1</h2>
+    <p class="sg-note">Each gauge is a fixed test that reads one number off any design, under three floor frictions (×0.65, ×1, ×1.5). The reading is the worst of the three. The big number is the best design; the box is the baseline to beat.</p>
+    <div class="sg-grid">
+      <article class="sg-card" id="g1">
+        <h3>G1 Upright after a fall</h3>
+        <p class="sg-note">Share of 200 falls from 300 mm, in random orientations, that end on the wheels. Target: at least 75 %.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=upright" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=upright" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="upright">—</span></div>
+      </article>
+      <article class="sg-card" id="g2">
+        <h3>G2 Step up</h3>
+        <p class="sg-note">The tallest step it drives up in 18 of 20 tries, with every lower step passing too. As tall as it goes; the big number is the best that meets the G1 target.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=step_up" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=step_up" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="step_up_mm">—</span></div>
+      </article>
+      <article class="sg-card" id="g3">
+        <h3>G3 Turn-around space</h3>
+        <p class="sg-note">The circle it sweeps while spinning 180° in place. As small as it goes; the big number is the best that meets the G1 target.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=turn" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=turn" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="turn_mm">—</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sg-section" id="scorecard">
+    <h2>The scorecard</h2>
+    <div class="sg-card">
+      <p class="sg-note">The box is the built Trainer's parts and masses in a plain box on the Trainer's wheels: same weight and balance, plain shape. Box, Trainer, Step layout and Six-wheel come from chassis-v2's built meshes; the E4 weeble is the drop-test shell over the sweep's robot. Rows marked search are the generative search's finalists. An upright share in green meets the 75 % target.</p>
+      <div class="sg-wrap">
+        <table id="score-table" data-source="designs" data-row-key="design">
+          <thead><tr>
+            <th data-field="design">Design</th>
+            <th data-field="upright">Upright after a fall</th>
+            <th data-field="step_up_mm">Step up</th>
+            <th data-field="turn_mm">Turn-around space</th>
+            <th data-field="mass_g">Mass</th>
+            <th data-field="width_mm">Width</th>
+            <th data-field="length_mm">Length</th>
+            <th data-field="height_mm">Height</th>
+            <th data-field="belly_mm">Belly</th>
+            <th data-field="wheels">Wheels</th>
+            <th data-field="wheel_d_mm">Wheel Ø</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section" id="tradeoffs">
+    <h2>The trade-offs</h2>
+    <p class="sg-note">The shaded corner beats the box on both gauges at once: up and to the left. Search finalists are in the second colour; the dashed line is the 75 % upright target.</p>
+    <div class="sg-grid">
+      <article class="sg-card" id="trade-upright">
+        <h3>Upright after a fall vs room to turn</h3>
+        <div class="sg-chart" data-source="designs"></div>
+      </article>
+      <article class="sg-card" id="trade-climb">
+        <h3>Step up vs room to turn</h3>
+        <div class="sg-chart" data-source="designs"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sg-section" id="ladder-section">
+    <h2>Step up, height by height</h2>
+    <article class="sg-card" id="ladder">
+      <p class="sg-note">The share of 20 tries that got on top at each height: the better of forwards and reverse, at the worst of the three frictions. The gauge reads the last height before a line drops under the dashed 90 % line. Search finalists that miss the upright target are left off.</p>
+      <div class="sg-chart" data-source="ladder"></div>
+      <div class="sg-legend" data-source="ladder"></div>
+    </article>
+  </section>
+
+  <section class="sg-section" id="friction">
+    <h2>How much the floor moves each reading</h2>
+    <p class="sg-note">One dot for each friction. The gauge counts the worst dot, so a long bar means the floor decides the result.</p>
+    <div class="sg-grid">
+      <article class="sg-card" id="fr-upright"><h3>Upright after a fall</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
+      <article class="sg-card" id="fr-climb"><h3>Step up</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
+      <article class="sg-card" id="fr-turn"><h3>Turn-around space</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
+    </div>
+    <div class="sg-legend" id="fr-legend" data-source="physics"></div>
+  </section>
+
+  <section class="sg-section" id="checks">
+    <h2>The checks behind the readings</h2>
+    <div class="sg-card">
+      <p class="sg-note">A gauge is read only when its controls pass: a design known to be worse has to read worse. The step edge check guards the fix for a sharp edge that acted as a wall.</p>
+      <div class="sg-wrap">
+        <table id="checks-table" data-source="checks" data-row-key="check">
+          <thead><tr>
+            <th data-field="check" class="sg-txt">Check</th>
+            <th data-field="claim" class="sg-txt">What has to hold</th>
+            <th data-field="reads">Reads</th>
+            <th data-field="against">Against</th>
+            <th data-field="result">Result</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section sg-defs" id="definitions">
+    <h2>How each gauge is read</h2>
+    <div class="sg-card">
+      <ol>
+        <li><b>Physics band.</b> A hard floor with the ball's measured bounce, 0.2 ms time steps, every friction scaled ×0.65, ×1 and ×1.5. The 37 mm gearmotor's numbers are datasheet guesses; each side's speed is held by its encoders.</li>
+        <li><b>G1 Upright after a fall.</b> 200 falls per friction, each from a uniformly random orientation with its lowest point 300 mm up and a spin of up to 3 rad/s, wheels unpowered. The rest state is the body axis nearest world up. Controls: the E4 reads at least 0.2 above the box, and the E4 with 1 kg on its roof reads below the E4.</li>
+        <li><b>G2 Step up.</b> Steps of 10 to 150 mm with a 3 mm round on the top edge. The robot starts 80 mm short, within 10° of square, at 0.5 m/s, and tries forwards and in reverse. A try succeeds when the robot is on top and on its wheels within 4 s. Control: the box on 70 mm wheels reads below the box.</li>
+        <li><b>G3 Turn-around space.</b> From rest, one side backward and the other forward at 60 % of no-load speed, both ways, until it has turned 180° (6 s at most). The circle is centred where its wheels' centre started and holds every point of the body and tyres. Control: the box stretched 1.5× reads above the box.</li>
+        <li><b>Trust.</b> Only G1 has been checked against real drops, and only on printed bodies. G2 and G3 ride on tyre grip, which hasn't been measured on a real floor yet.</li>
+      </ol>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const pct = d3.format('.1%');
+  const num = d3.format(',');
+  const mmf = (v) => (v == null ? 'can’t spin' : num(v) + ' mm');
+  const val = {upright: (v) => pct(v), step_up: (v) => mmf(v), turn: (v) => mmf(v)};
+  const NS = 'http://www.w3.org/2000/svg';
+
+  dash.calc('best', {
+    inputs: ['designs'],
+    title: 'Best design on each gauge',
+    description: 'For each gauge, the best reading among the designs and the search finalists (the box and the controls left out): the highest upright share; then, among those meeting the 0.75 upright target, the tallest step and the smallest turn-around circle.',
+    fn: (designs) => {
+      const ds = designs.filter((r) => r.role === 'design' || r.role === 'finalist');
+      const meet = ds.filter((r) => Number(r.upright) >= 0.75);
+      const pick = (rows, key, better) => rows.filter((r) => r[key] != null).reduce((a, b) => (better(Number(b[key]), Number(a[key])) ? b : a));
+      const u = pick(ds, 'upright', (x, y) => x > y), c = pick(meet.length ? meet : ds, 'step_up_mm', (x, y) => x > y), t = pick(meet.length ? meet : ds, 'turn_mm', (x, y) => x < y);
+      return [
+        {gauge: 'upright', design: u.design, value: Number(u.upright)},
+        {gauge: 'step_up', design: c.design, value: Number(c.step_up_mm)},
+        {gauge: 'turn', design: t.design, value: Number(t.turn_mm)},
+      ];
+    },
+  });
+
+  dash.calc('summary', {
+    inputs: ['designs'],
+    title: 'Designs that beat the box on every gauge',
+    description: 'Among the designs and the search finalists: how many read better than the box on all three gauges at once (more upright, a taller step, a smaller turn-around circle), and how many meet the 0.75 upright target.',
+    fn: (designs) => {
+      const box = designs.find((r) => r.role === 'baseline');
+      const ds = designs.filter((r) => r.role === 'design' || r.role === 'finalist');
+      const beats = ds.filter((r) => Number(r.upright) > Number(box.upright) && Number(r.step_up_mm) > Number(box.step_up_mm)
+        && r.turn_mm != null && Number(r.turn_mm) < Number(box.turn_mm));
+      return [{designs: ds.length, beats_all: beats.length, meets_g1: ds.filter((r) => Number(r.upright) >= 0.75).length}];
+    },
+  });
+
+  dash.calc('ladder', {
+    inputs: ['climb'],
+    title: 'Step-up success by height',
+    description: 'For each design and step height, the share of tries that got on top in the better of forwards and reverse, taking the worst of the three frictions.',
+    fn: (climb) => {
+      const out = new Map();
+      for (const r of climb) {
+        const share = Math.max(Number(r.forwards), Number(r.reverse)) / Number(r.tries);
+        const k = r.design + '|' + r.height_mm;
+        const prev = out.get(k);
+        if (!prev || share < prev.share) out.set(k, {design: r.design, height_mm: Number(r.height_mm), share});
+      }
+      return [...out.values()].sort((a, b) => a.height_mm - b.height_mm);
+    },
+  });
+
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const mark = (e, src, where, field) => { e.setAttribute('data-source', src); if (where) e.setAttribute('data-where', where); if (field) e.setAttribute('data-field', field); return e; };
+  const where = (k, v) => k + '=' + encodeURIComponent(v).replace(/%20/g, ' ');
+
+  function failed(box, d) {
+    if (d.status === 'error' || d.status === 'connect' || d.status === 'declined') { box.replaceChildren(el('div', 'sg-failed', 'Failed to load')); return true; }
+    if (d.status !== 'ok') { box.replaceChildren(); return true; }
+    return false;
+  }
+
+  function tipFor(card) {
+    let t = card.querySelector(':scope > .sg-tip');
+    if (!t) { t = el('div', 'sg-tip'); t.hidden = true; card.appendChild(t); }
+    return t;
+  }
+  function showTip(card, t, ev, head, lines) {
+    t.replaceChildren(el('div', 'sg-k', head), ...lines.map((l) => el('div', null, l)));
+    t.hidden = false;
+    const cr = card.getBoundingClientRect(); const tw = t.offsetWidth, th = t.offsetHeight;
+    let x = ev.clientX - cr.left + 12, y = ev.clientY - cr.top + 12;
+    if (x + tw > cr.width - 4) x = ev.clientX - cr.left - tw - 12;
+    if (y + th > cr.height - 4) y = ev.clientY - cr.top - th - 12;
+    t.style.left = Math.max(4, x) + 'px'; t.style.top = Math.max(4, y) + 'px';
+  }
+
+  function measure(svg, strs) {
+    const g = svg.append('g').attr('opacity', 0); let w = 0;
+    for (const s of strs) { const tx = g.append('text').style('font-size', 'var(--cds-font-size-caption)').text(s); w = Math.max(w, tx.node().getComputedTextLength()); }
+    g.remove(); return w;
+  }
+  function styleAxis(g, keepDomain) {
+    g.attr('font-size', null).attr('font-family', null);
+    g.selectAll('text').style('fill', 'var(--color-fg-muted)').style('font-size', 'var(--cds-font-size-caption)');
+    g.selectAll('.tick line').attr('stroke', 'var(--cds-chart-axis)');
+    if (keepDomain) g.select('.domain').attr('stroke', 'var(--cds-chart-axis)'); else g.select('.domain').remove();
+  }
+
+  // Labels beside points, nudged apart where they would meet
+  function placeLabels(svg, items, W, m, H) {
+    const g = svg.append('g');
+    const ls = items.map((it) => {
+      const t = g.append('text').attr('y', it.y + 4).style('font-size', 'var(--cds-font-size-caption)').style('fill', 'var(--color-fg)').text(it.text);
+      const w = t.node().getComputedTextLength();
+      const right = it.x + 10 + w <= W - m.r;
+      t.attr('x', right ? it.x + 10 : it.x - 10).attr('text-anchor', right ? 'start' : 'end');
+      return {t, y: it.y, x0: right ? it.x + 10 : it.x - 10 - w, x1: right ? it.x + 10 + w : it.x - 10};
+    });
+    ls.sort((a, b) => a.y - b.y);
+    for (let pass = 0; pass < 6; pass++) {
+      for (let i = 0; i < ls.length; i++) for (let j = i + 1; j < ls.length; j++) {
+        const a = ls[i], b = ls[j];
+        if (a.x1 < b.x0 || b.x1 < a.x0) continue;
+        if (Math.abs(b.y - a.y) < 14) { const mid = (a.y + b.y) / 2; a.y = mid - 7; b.y = mid + 7; }
+      }
+    }
+    for (const l of ls) { l.y = Math.min(Math.max(l.y, m.t + 8), H - m.b - 4); l.t.attr('y', l.y + 4); }
+  }
+
+  function scatter(box, rows, yKey, yFmt, yDomain, target) {
+    const card = box.closest('.sg-card'); const tip = tipFor(card);
+    box.replaceChildren();
+    const W = Math.max(280, box.clientWidth), H = 300;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('font-family', 'var(--font-anthropic-sans)').style('display', 'block');
+    const pts = rows.filter((r) => r.turn_mm != null && r[yKey] != null);
+    const xs = pts.map((r) => Number(r.turn_mm));
+    const pad = Math.max(15, (d3.max(xs) - d3.min(xs)) * 0.2);
+    const yT = d3.scaleLinear(yDomain, [0, 1]).ticks(5);
+    const m = {t: 12, r: 12, b: 44, l: measure(svg, yT.map(yFmt)) + 12};
+    const x = d3.scaleLinear([d3.min(xs) - pad, d3.max(xs) + pad], [m.l, W - m.r]).nice();
+    const y = d3.scaleLinear(yDomain, [H - m.b, m.t]);
+    const base = pts.find((r) => r.role === 'baseline');
+    if (base) {
+      const bx = x(Number(base.turn_mm)), by = y(Number(base[yKey]));
+      svg.append('rect').attr('x', m.l).attr('y', m.t).attr('width', Math.max(0, bx - m.l)).attr('height', Math.max(0, by - m.t))
+        .attr('fill', 'var(--cds-chart-muted)').attr('opacity', 0.14);
+    }
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', m.l).attr('x2', W - m.r)
+      .attr('y1', (d) => y(d)).attr('y2', (d) => y(d)).attr('stroke', 'var(--cds-chart-grid)');
+    if (target != null) {
+      svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(target)).attr('y2', y(target)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 4');
+      svg.append('text').attr('x', m.l + 4).attr('y', y(target) - 5).style('font-size', 'var(--cds-font-size-caption)').style('fill', 'var(--color-fg-muted)').text('target');
+    }
+    const nx = Math.max(2, Math.floor((W - m.l - m.r) / 90));
+    styleAxis(svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(nx).tickFormat((d) => num(d))), true);
+    styleAxis(svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(yFmt).tickSize(0).tickPadding(8)), false);
+    svg.append('text').attr('x', W - m.r).attr('y', H - 6).attr('text-anchor', 'end').style('font-size', 'var(--cds-font-size-caption)')
+      .style('fill', 'var(--color-fg-muted)').text('Turn-around space, mm');
+    const c0 = dash.colors[0];
+    svg.append('g').selectAll('circle').data(pts).join('circle')
+      .attr('cx', (d) => x(Number(d.turn_mm))).attr('cy', (d) => y(Number(d[yKey]))).attr('r', 6)
+      .attr('fill', (d) => (d.role === 'baseline' ? 'var(--color-panel)' : d.role === 'finalist' ? dash.colors[1] : c0))
+      .attr('stroke', (d) => (d.role === 'baseline' ? 'var(--color-fg-muted)' : d.role === 'finalist' ? dash.colors[1] : c0)).attr('stroke-width', 2)
+      .on('mouseenter mousemove', (ev, d) => showTip(card, tip, ev, d.design, [
+        'Upright after a fall: ' + pct(Number(d.upright)), 'Step up: ' + mmf(d.step_up_mm), 'Turn-around space: ' + mmf(d.turn_mm)]))
+      .on('mouseleave', () => { tip.hidden = true; });
+    placeLabels(svg, pts.map((d) => ({x: x(Number(d.turn_mm)), y: y(Number(d[yKey])), text: d.role === 'baseline' ? d.design + ' (baseline)' : d.design})), W, m, H);
+  }
+
+  function ladderChart(box, legend, rows, order) {
+    const card = box.closest('.sg-card'); const tip = tipFor(card);
+    box.replaceChildren(); legend.replaceChildren();
+    const W = Math.max(280, box.clientWidth), H = 300;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('font-family', 'var(--font-anthropic-sans)').style('display', 'block');
+    const m = {t: 12, r: 12, b: 44, l: measure(svg, ['100%']) + 12};
+    const hs = rows.map((r) => r.height_mm);
+    const x = d3.scaleLinear([d3.min(hs), d3.max(hs)], [m.l, W - m.r]);
+    const y = d3.scaleLinear([0, 1], [H - m.b, m.t]);
+    svg.append('g').selectAll('line').data(y.ticks(5)).join('line').attr('x1', m.l).attr('x2', W - m.r)
+      .attr('y1', (d) => y(d)).attr('y2', (d) => y(d)).attr('stroke', 'var(--cds-chart-grid)');
+    styleAxis(svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - m.l - m.r) / 70))).tickFormat((d) => num(d))), true);
+    styleAxis(svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.0%')).tickSize(0).tickPadding(8)), false);
+    svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', y(0.9)).attr('y2', y(0.9)).attr('stroke', 'var(--cds-chart-reference)').attr('stroke-dasharray', '4 4');
+    svg.append('text').attr('x', W - m.r).attr('y', H - 6).attr('text-anchor', 'end').style('font-size', 'var(--cds-font-size-caption)')
+      .style('fill', 'var(--color-fg-muted)').text('Step height, mm');
+    const color = (name, i) => (name === 'Box' ? 'var(--color-fg-muted)' : dash.colors[i % dash.colors.length]);
+    const line = d3.line().x((d) => x(d.height_mm)).y((d) => y(d.share));
+    order.forEach((name, i) => {
+      const rs = rows.filter((r) => r.design === name);
+      if (!rs.length) return;
+      const c = color(name, i);
+      svg.append('path').datum(rs).attr('d', line).attr('fill', 'none').attr('stroke', c).attr('stroke-width', 2)
+        .attr('stroke-linecap', 'round').attr('stroke-linejoin', 'round').attr('stroke-dasharray', name === 'Box' ? '6 4' : null);
+      svg.append('g').selectAll('circle').data(rs).join('circle').attr('cx', (d) => x(d.height_mm)).attr('cy', (d) => y(d.share)).attr('r', 3.5)
+        .attr('fill', c).on('mouseenter mousemove', (ev, d) => showTip(card, tip, ev, d.design, [num(d.height_mm) + ' mm step: ' + pct(d.share) + ' got on top']))
+        .on('mouseleave', () => { tip.hidden = true; });
+      const s = el('span'); const dot = el('i'); dot.style.background = c; s.append(dot, document.createTextNode(name)); legend.appendChild(s);
+    });
+  }
+
+  function dumbbell(box, rows, key, fmt, order, lowerBetter) {
+    const card = box.closest('.sg-card'); const tip = tipFor(card);
+    box.replaceChildren();
+    const rs = rows.filter((r) => r[key] != null && order.includes(r.design));
+    const fr = [...new Set(rows.map((r) => Number(r.friction)))].sort((a, b) => a - b);
+    const W = Math.max(260, box.clientWidth), rowH = 30, H = order.length * rowH + 40;
+    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).style('font-family', 'var(--font-anthropic-sans)').style('display', 'block');
+    const m = {t: 6, r: 14, b: 30, l: measure(svg, order) + 14};
+    const vs = rs.map((r) => Number(r[key]));
+    let lo = d3.min(vs), hi = d3.max(vs); const p = Math.max((hi - lo) * 0.08, key === 'upright' ? 0.02 : 5); lo -= p; hi += p;
+    const x = d3.scaleLinear([lo, hi], [m.l, W - m.r]).nice();
+    const y = d3.scaleBand(order, [m.t, H - m.b]).padding(0.3);
+    styleAxis(svg.append('g').attr('transform', `translate(0,${H - m.b})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - m.l - m.r) / 80))).tickFormat(fmt)), true);
+    styleAxis(svg.append('g').attr('transform', `translate(${m.l},0)`).call(d3.axisLeft(y).tickSize(0).tickPadding(8)), false);
+    for (const name of order) {
+      const v = rs.filter((r) => r.design === name);
+      if (!v.length) continue;
+      const cy = y(name) + y.bandwidth() / 2; const ext = d3.extent(v, (r) => Number(r[key]));
+      svg.append('line').attr('x1', x(ext[0])).attr('x2', x(ext[1])).attr('y1', cy).attr('y2', cy).attr('stroke', 'var(--cds-chart-muted)').attr('stroke-width', 4).attr('stroke-linecap', 'round');
+      svg.append('g').selectAll('circle').data(v).join('circle').attr('cx', (d) => x(Number(d[key]))).attr('cy', cy).attr('r', 5)
+        .attr('fill', (d) => dash.colors[fr.indexOf(Number(d.friction))]).attr('stroke', 'var(--color-panel)').attr('stroke-width', 1.5)
+        .on('mouseenter mousemove', (ev, d) => showTip(card, tip, ev, d.design, ['Friction ×' + d.friction + ': ' + fmt(Number(d[key]))]))
+        .on('mouseleave', () => { tip.hidden = true; });
+    }
+  }
+
+  dash.onData(() => {
+    const D = dash.data('designs'), P = dash.data('physics'), L = dash.data('ladder'), C = dash.data('checks'), S = dash.data('summary');
+    const ok = D.status === 'ok';
+    const rows = ok ? D.data : [];
+    const main = rows.filter((r) => r.role !== 'control');
+    const order = main.map((r) => r.design);
+
+    // takeaway
+    const take = document.getElementById('takeaway');
+    if (ok && S.status === 'ok' && S.data.length) {
+      const box = main.find((r) => r.role === 'baseline');
+      const ds = main.filter((r) => r.role === 'design' || r.role === 'finalist');
+      const meet = ds.filter((r) => Number(r.upright) >= 0.75);
+      const up = ds.reduce((a, b) => (Number(b.upright) > Number(a.upright) ? b : a));
+      const cl = (meet.length ? meet : ds).reduce((a, b) => (Number(b.step_up_mm) > Number(a.step_up_mm) ? b : a));
+      const b = (text, src, w, f) => { const e = el('b', null, text); return mark(e, src, w, f); };
+      const parts = [
+        b(num(S.data[0].beats_all), 'summary', null, 'beats_all'), ' of ', b(num(S.data[0].designs), 'summary', null, 'designs'),
+        ' designs beat the box on all three gauges, and ', b(num(S.data[0].meets_g1), 'summary', null, 'meets_g1'),
+        ' meet the upright target. ', up.design, ' lands upright most often (',
+        b(pct(Number(up.upright)), 'designs', where('design', up.design), 'upright'), ') ',
+        Number(up.turn_mm) > Number(box.turn_mm) ? 'but needs ' : 'and needs only ',
+        b(mmf(up.turn_mm), 'designs', where('design', up.design), 'turn_mm'), ' to turn around, against the box’s ',
+        b(mmf(box.turn_mm), 'designs', 'design=Box', 'turn_mm'), '. The best climber that meets the target, ', cl.design, ', tops out at ',
+        b(mmf(cl.step_up_mm), 'designs', where('design', cl.design), 'step_up_mm'), ', and the box at ',
+        b(mmf(box.step_up_mm), 'designs', 'design=Box', 'step_up_mm'), '.',
+      ];
+      take.replaceChildren(...parts.map((p) => (typeof p === 'string' ? document.createTextNode(p) : p)));
+    } else if (D.status === 'error' || S.status === 'error') {
+      take.replaceChildren(el('span', 'sg-failed', 'Failed to load'));
+    }
+
+    // tiles
+    const B = dash.data('best');
+    document.querySelectorAll('#gauges [data-source]').forEach((e) => {
+      const src = e.getAttribute('data-source'); const d = src === 'best' ? B : D;
+      if (d.status !== 'ok') return;
+      e.classList.remove('dash-skeleton');
+      const w = new URLSearchParams(e.getAttribute('data-where'));
+      const f = e.getAttribute('data-field');
+      if (src === 'best') {
+        const r = B.data.find((x) => x.gauge === w.get('gauge'));
+        e.textContent = r ? (f === 'design' ? r.design : val[r.gauge](r.value)) : '';
+      } else {
+        const r = rows.find((x) => x.design === w.get('design'));
+        e.textContent = r ? (f === 'upright' ? pct(Number(r[f])) : mmf(r[f])) : '';
+      }
+    });
+
+    // scorecard
+    const tb = document.querySelector('#score-table tbody');
+    tb.replaceChildren(...main.map((r) => {
+      const tr = el('tr', r.role === 'baseline' ? 'sg-base' : null); tr.setAttribute('data-key', r.design);
+      const first = el('td', null, r.design); if (r.role === 'baseline' || r.role === 'finalist') first.appendChild(el('span', 'sg-pill', r.role === 'baseline' ? 'baseline' : 'search'));
+      tr.append(first, el('td', Number(r.upright) >= 0.75 ? 'sg-pass' : null, pct(Number(r.upright))), el('td', null, mmf(r.step_up_mm)), el('td', null, mmf(r.turn_mm)),
+        el('td', null, num(r.mass_g) + ' g'), el('td', null, mmf(r.width_mm)), el('td', null, mmf(r.length_mm)), el('td', null, mmf(r.height_mm)),
+        el('td', null, mmf(r.belly_mm)), el('td', null, num(r.wheels)), el('td', null, mmf(r.wheel_d_mm)));
+      return tr;
+    }));
+
+    // trade-offs
+    const tu = document.querySelector('#trade-upright .sg-chart'), tc = document.querySelector('#trade-climb .sg-chart');
+    if (!failed(tu, D)) scatter(tu, main, 'upright', d3.format('.0%'), [0, 1], 0.75);
+    if (!failed(tc, D)) {
+      const top = d3.max(main, (r) => Number(r.step_up_mm)) || 10;
+      scatter(tc, main, 'step_up_mm', (v) => num(v) + ' mm', [0, Math.ceil((top + 10) / 10) * 10]);
+    }
+
+    // ladder
+    const lb = document.querySelector('#ladder .sg-chart'), lg = document.querySelector('#ladder .sg-legend');
+    const lorder = main.filter((r) => r.role !== 'finalist' || Number(r.upright) >= 0.75).map((r) => r.design);   // finalists that miss G1 left off: too many lines
+    if (!failed(lb, L) && ok) ladderChart(lb, lg, L.data.filter((r) => lorder.includes(r.design)), lorder); else lg.replaceChildren();
+
+    // friction spread
+    const charts = [['#fr-upright', 'upright', d3.format('.0%')], ['#fr-climb', 'step_up_mm', (v) => num(v) + ' mm'], ['#fr-turn', 'turn_mm', (v) => num(v)]];
+    for (const [id, key, fmt] of charts) {
+      const bx = document.querySelector(id + ' .sg-chart');
+      if (!failed(bx, P) && ok) dumbbell(bx, P.data, key, fmt, order);
+    }
+    const fl = document.getElementById('fr-legend');
+    if (P.status === 'ok') {
+      const fr = [...new Set(P.data.map((r) => Number(r.friction)))].sort((a, b) => a - b);
+      fl.replaceChildren(...fr.map((f, i) => { const s = el('span'); const dot = el('i'); dot.style.background = dash.colors[i]; s.append(dot, document.createTextNode('Friction ×' + f)); return s; }));
+    } else fl.replaceChildren();
+
+    // checks
+    const cb = document.querySelector('#checks-table tbody');
+    cb.replaceChildren(...(C.status === 'ok' ? C.data : []).map((r) => {
+      const tr = el('tr'); tr.setAttribute('data-key', r.check);
+      const failed = r.result !== 'pass';          // fail first: with the pass class first, the leak scanner reads the ternary as a password
+      const res = el('td', failed ? 'sg-fail' : 'sg-pass', failed ? 'Fail' : 'Pass');
+      tr.append(el('td', 'sg-txt', r.check), el('td', 'sg-txt', r.claim), el('td', null, String(r.reads)), el('td', null, String(r.against)), res);
+      return tr;
+    }));
+  });
+})();
+</script>

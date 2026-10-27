@@ -19,6 +19,7 @@ It began in 2024 as the first tank: an FPV-Rover V2.0 print driven over Wi-Fi. T
 | `head-v2/generator/` | the SDF generator: the cradle, the 360° pan coil and the older forks |
 | `head-v2/out/` | *(untracked)* everything the fixes write: print STLs, 3MF, STEP, pictures |
 | `sim/mujoco/` | the head as a MuJoCo physics model: servo sliders, shove it by hand, a camera at the lens |
+| `gauges/` | the Scorpion's requirements as fixed tests that read a number off any design (`README.md`: the cards and the targets) |
 | `chassis-v1/` | the chassis parts as used on the robot; `from_fusion/` holds Zach's newest body exports |
 | `chassis-v2/` | the Scorpion body: the hull redesign round the v1 legs (`hull.py`) and its fit checks. `README.md` is its live state |
 | `reference/fpv-rover-v2/` | the original FPV-Rover V2.0 download, by Markus_p |

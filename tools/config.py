@@ -33,6 +33,13 @@ OUT = os.path.join(REPO, 'head-v2', 'out')
 PRINT = os.path.join(OUT, 'print')
 FIXES = os.path.join(REPO, 'head-v2', 'fixes')
 
+# The requirement gauges (gauges/README.md) and the research sims they build on. GAUGES_OUT is untracked.
+GAUGES = os.path.join(REPO, 'gauges')
+GAUGES_OUT = os.path.join(GAUGES, 'out')
+TUMBLE = os.path.join(REPO, 'research', 'tumble')
+# The search whose finalists the gauge pages show (gauges/view.py, gauges/export.py).
+GAUGES_CURRENT = os.path.join(GAUGES_OUT, 'search_body')
+
 
 # Zach's Creality K2 Pro: its stock Moonraker (Klipper's HTTP API), on his LAN, no login. tools/k2.py
 # drives it. The address is what Creality Print found (deviceInfo.json); a DHCP change moves it. It is not

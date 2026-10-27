@@ -3,6 +3,83 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-10-27: The gauge search runs lean; a new step reflex; the body's shape searched
+
+A review of the drive search found that 39 % of its random draws couldn't be built, that its screen read upright
+0.05 high, and that half its refinement idled. Zach asked for the fixes (`gauges/README.md`, "The lean search"). The
+wheels are now drawn as a centre and a tyre gap. Falls are screened at x1.5 and x0.65, and a design is cut once it
+can't make the bar. Refinement runs stop after 3 generations without a gain. The search took 1,354 s against 2,252,
+and the screen-to-final drift in upright fell from -0.057 to -0.011.
+
+- **Not done, with evidence:** the review proposed freezing 14 knobs a random forest ranked as dead. Redrawn together
+  near the front they cost T10 as much as the tail control did. Only three were dead, and only they are frozen; the
+  skin's shape is held at T5's by choice (`docs/lessons/2026-10-27-dead-on-average-is-not-dead-at-the-front.md`).
+  Bisecting the climb ladder was dropped too: 12 of 42 final ladders pass above a height they fail.
+- **Found:** those ladder gaps are the scripted push's (the stall trigger never fires at 40-50 mm, and at 60-70 mm the
+  push is too weak). G2 reads the controller as much as the body. Changing the reflex is a gauge change, Zach's call.
+- Unseeded, the lean search didn't reach T10's corner. Seeded with the drive search's designs, it found nothing
+  better, so T10 (T12 in the lean finals, 0.945 / 100 / 405) is still the all-rounder. (**Superseded** the same day:
+  see the next two points.)
+- **G2's step reflex changed** (Zach: "fix and rerun"). Stalled now means under 15 mm of travel in 0.3 s. Nose up
+  past 12°, the tail pushes; level, it kicks for 0.3 s to free a nose caught on the lip, then looks again. On the
+  drive finalists, worst over the band, T1 went 50 -> 100 mm, T2 and T7 50 -> 90, T8 60 -> 100. Designs without a
+  limb read identically. It is still a script; a learned policy would replace it.
+- **The body's shape is a knob again.** Zach noted the finalists all wore the same body unless skinned, though the
+  shape could be turned. The body search frees the skin's eight shape knobs. The search alone kept the Trainer's
+  body; a refinement held to skinned designs found T5: 0.96 / 150 mm / 403 mm, a 732 g domed skin with a 279 mm tail.
+  It climbs 50 mm more than the best skinless design in the same turn, and is the all-rounder now.
+- **Then the body's shape alone** (Zach: "lock some knobs at a constant since were testing how a new shape effects
+  this"). On T5's platform, wheels, drive and tail held and the tail's mount pinned, the shape study found T3:
+  1.00 / 150 mm / 381 mm with a 485 g skin, low and no wider than the wheels. It beats T5's own skin on all three. The
+  same platform on the Trainer's body reads 1.00 / 90 / 441. Climb hangs on how far the nose reaches. T3's nose is
+  within 10 mm of the point where the climb falls to 50-100 mm, so a real one wants margin.
+- **Hills, proposed as G4 and G5** (Zach: "how far of a hill it can climb/descend before falling"). Read as the
+  steepest slope before tipping, on grippy ground. On the band's floors every design slides first, at 25° up and 30°
+  down, the box included. T3 reads 35° up and 45° down against the box's 45° and 50°. Its tail braced behind
+  like a wheelie bar takes it to 50° up; nothing helps it down. The shape moves the hills only about ±5°. A
+  sharp-turn rollover test was checked and dropped: a skid-steer turn tilts even a fast, top-weighted control under 1°.
+  (The numbers are **superseded** the same day: the 300 mm hill passed designs that were toppling slowly. See the next
+  point.)
+- **Hills with the wheels and packs unlocked** (Zach: "unlock those yes"). The hill went to 2.5 m first: on 300 mm
+  and then 800 mm, designs just past their tip angle passed by toppling slowly, and the search found that gap. Every
+  stowed reading is now held to its static tip angle, the exact limit at constant speed. On it T3 reads 35° / 40°,
+  the box 45° / 45°. The tail braced behind gives T3 45° / 45° at no cost. Hardware past that costs: 50° down takes
+  210 mm more turn (H2), 60° the step as well (H4); keeping T3's step and turn it buys 5° up, nothing down (H5,
+  bigger wheels). On ordinary ground every design is tyre-limited at 35-40°. The finding: T3's platform can stay, and
+  hills can be the tail's job; G4 and G5's targets are still Zach's call (`gauges/README.md`, "The hills run").
+
+## 2026-10-26: The Scorpion's requirements are gauges with levers, three to start
+
+After the paper went in, Zach restarted the design from requirements: nothing built so far is final. His framing:
+each requirement is a reliable test that reads a number, and the number to reach is a lever he sets each iteration,
+because the levers conflict (the E4 shell's righting cost it maneuverability). Real experiments prove a gauge when a
+decision needs it. He chose to start with few gauges, so fewer things are tested and a failure is easier to trace:
+upright after a fall, step up and turn-around space, his three named levers. `gauges/README.md` holds the cards.
+
+- Every reading is the worst over a friction band, and a plain box (the Trainer's parts) is read every time as the
+  baseline. Each gauge has a control that must read worse.
+- The purpose behind them: AI embodiment, a robot dropped anywhere that survives, gets where it needs to and moves
+  things. Indoors and out, up to tall rocks. Learned policies first, scripted moves for fast reflexes.
+- Constraints this iteration: every part fits the K2 Pro's bed (hard), his servos and batteries (softer), and about
+  $50-100 of new parts.
+- Targets (Zach, same day): G1 upright at least 0.75; G2 step up and G3 turn-around space as far as they go. G3 is
+  "a meh gauge but fine for now". A generative search over 18 knobs (`gauges/search.py`) found one shape that meets all
+  three (S1: 0.96 / 40 mm / 442 mm against the box's 0.61 / 30 / 594), but only with a shell of about 0.8 kg, and no
+  shape-only design climbs past 50 mm. The next lever is a limb. (**Superseded** the same day: that shell lay over
+  the whole body, counting the walls twice.)
+- Then Zach asked for a limb in the family: a tail that pushes on steps and rights the robot instead of a shell. He
+  also asked why the model had both a shell and a body: it shouldn't, so the shell became the body (the Trainer's
+  walls out, the parts inside one skin; the head inside for now, his call). With the tail, the finals beat every
+  tail-less design on all three gauges: T12 reads 0.91 / 100 mm / 424 mm with a 287 mm tail on 2.8 N m servos and no
+  skin, and T14 climbs the ladder's top, 150 mm. With the tail limp, the best climber drops from 0.85 / 150 to
+  0.41 / 50 (numbers after the 10 s righting cap was fixed).
+- Zach then asked for track width, motor size and gearing as knobs (2026-10-27). The search kept the 37 mm 30:1 motor
+  and a track a few mm narrower than the Trainer's: the drive guess isn't the bottleneck, the tail is. T10 reads
+  0.97 / 100 mm / 404 mm. The search dropped the skin almost everywhere once a tail could right it.
+- Building the step gauge found that chassis3's sharp step edge acts as a wall to a cylinder tyre
+  (`docs/lessons/2026-10-26-a-sharp-step-edge-is-a-wall.md`). chassis3's climb numbers carry it; its step-down numbers
+  haven't been rechecked.
+
 ## 2026-10-26: This repo is public, its history rewritten first
 
 Zach chose to make the repo public, the leak audit's option B. Before it went public the history was rewritten:

@@ -1,0 +1,330 @@
+<title>Scorpion Knobs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87,600;87,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a lab log. A reference strip (T3's readings), what to read first, the knob table (each cell a knob's sweep
+   drawn to the gauge's own scale), then the two questions asked, new knobs and tests, and the surrogate. */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --ink: #12161b; --ink2: #49515c; --muted: #77808b; --rule: #dce1e7;
+  --braced: #2a78d6; --stowed: #6b7480; --t3: #eb6834; --hi: #e8f0fb;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1114; --surface: #161a1f; --ink: #e7eaee; --ink2: #b2b9c3; --muted: #858e99; --rule: #29303a;
+  --braced: #5b9cf0; --stowed: #9ba4af; --t3: #f2905f; --hi: #18263a; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1114; --surface: #161a1f; --ink: #e7eaee; --ink2: #b2b9c3; --muted: #858e99; --rule: #29303a;
+  --braced: #5b9cf0; --stowed: #9ba4af; --t3: #f2905f; --hi: #18263a; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--f-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 87%; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 2.1rem; font-weight: 700; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+h3 { font-size: 1.08rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font: 600 0.72rem/1 var(--f-data); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--ink2); }
+section { display: grid; gap: 14px; min-width: 0; }
+.num, td.n, .mono { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+/* reference strip */
+.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.strip > div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; }
+.strip .k { font: 600 0.7rem/1.2 var(--f-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.strip .v { font: 600 1.3rem/1.2 var(--f-data); }
+.strip .s { font-size: 0.82rem; color: var(--ink2); }
+ul.find { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; max-width: 76ch; }
+ul.find b { font-weight: 600; }
+/* the knob table */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 0.9rem; color: var(--ink2); }
+.controls select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 8px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; color: var(--ink2); align-items: center; }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; }
+table.knobs { min-width: 860px; }
+table.knobs th { font: 600 0.72rem/1.2 var(--f-data); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
+  text-align: left; padding: 10px 10px 8px; border-bottom: 1px solid var(--rule); vertical-align: bottom; }
+table.knobs th small { display: block; text-transform: none; letter-spacing: 0; font-weight: 400; }
+table.knobs td { padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr.grp td { font: 600 0.72rem/1 var(--f-data); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink2);
+  background: var(--bg); padding: 8px 10px; }
+tr.knob { cursor: pointer; }
+tr.knob:hover td, tr.knob:focus-within td { background: var(--hi); }
+tr.knob:focus-visible { outline: 2px solid var(--braced); outline-offset: -2px; }
+td.name { min-width: 190px; max-width: 250px; }
+td.name b { font-family: var(--f-data); font-weight: 600; font-size: 0.9rem; }
+td.name span { display: block; font-size: 0.82rem; color: var(--ink2); line-height: 1.35; }
+td.name em { font-style: normal; font-family: var(--f-data); font-size: 0.75rem; color: var(--muted); }
+td.cell svg { display: block; width: 124px; height: 42px; overflow: visible; }
+td.cell .r { font: 0.72rem/1.2 var(--f-data); color: var(--muted); white-space: nowrap; }
+tr.detail td { background: var(--bg); padding: 10px 12px 14px; }
+table.vals { width: auto; font-size: 0.82rem; }
+table.vals th, table.vals td { padding: 3px 10px; text-align: right; border-bottom: 1px solid var(--rule); font-family: var(--f-data); }
+table.vals th { color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+table.vals tr.is-t3 td { color: var(--t3); font-weight: 600; }
+/* plain tables */
+table.plain { font-size: 0.9rem; }
+table.plain th, table.plain td { padding: 7px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+table.plain th { font: 600 0.7rem/1.2 var(--f-data); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+table.plain td.n { text-align: right; white-space: nowrap; }
+/* focus charts */
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px 8px; min-width: 0; display: grid; gap: 4px; }
+figure figcaption { font: 600 0.85rem/1.3 var(--f-body); }
+figure figcaption small { display: block; font-weight: 400; color: var(--ink2); }
+figure svg { width: 100%; height: auto; display: block; }
+.tk { font: 10px var(--f-data); fill: var(--muted); }
+.lb { font: 11px var(--f-body); fill: var(--ink2); }
+.ideas { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.ideas > div { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.ideas ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.ideas li span { display: block; font-size: 0.86rem; color: var(--ink2); }
+.tag { font: 600 0.68rem/1 var(--f-data); letter-spacing: 0.05em; padding: 3px 6px; border-radius: 3px; border: 1px solid var(--rule); color: var(--ink2); margin-left: 6px; vertical-align: 2px; white-space: nowrap; }
+.foot { font-size: 0.82rem; color: var(--muted); display: grid; gap: 4px; }
+.foot code { font-family: var(--f-data); font-size: 0.78rem; }
+@media (max-width: 520px) { h1 { font-size: 1.7rem; } .wrap { gap: 32px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header style="display:grid;gap:10px">
+    <div class="eyebrow">Scorpion · gauges · knob log · 2026-10-27</div>
+    <h1>What each knob does to the numbers</h1>
+    <p class="lede" id="lede">Every knob of T3's design swept one at a time across its search range, on all five gauges, with the hills read with the tail stowed and braced: 539 screened designs, a re-read of the braced hills over five tail angles, and a side-slope probe. Two knobs are new: the tyres' width and the tail mount's height.</p>
+  </header>
+
+  <section>
+    <div class="eyebrow">The base design, T3</div>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <section>
+    <h2>Read this first</h2>
+    <ul class="find" id="findings"><li><b>Body height cuts both ways.</b> Below T3's 52 mm ride height the step goes (40 mm: a 50 mm step; 15 mm: 30), because the body's front meets the step's face before the tyres lift it. Above it, the hills go: at 90 mm, 30° / 35° stowed and 35° / 40° braced, against T3's 35° / 40° and 45° / 45°. T3 sits about 10 mm above the step's cliff.</li>
+<li><b>Bracing the tail doesn't cancel height.</b> From 15 to 90 mm of ride height the hills lose 10° both ways with the tail braced, against 15° up and 10° down stowed. Steeper tail angles don't win it back (checked over five, -75° to -15°).</li>
+<li><b>Wheel width costs only the turn.</b> Track 110 to 180 mm widens the turn from 393 to 485 mm (and landing upright drops to 0.87 at 180); tyres 25 to 80 mm wide, 382 to 441. The step and the hills don't move: tipping fore and aft doesn't depend on width. Width pays only across a slope, and only on grippy ground.</li>
+<li><b>The wheelbase is the hill lever, and the step's enemy.</b> A tyre gap of 15 to 150 mm takes the hills from 25° / 30° to 50° / 50° stowed, but the step falls from 150 mm at T3's 62 to 40 mm from 82 up, and the turn grows from 384 to 525 mm.</li>
+<li><b>The stowed tail costs 10° uphill.</b> Without a tail the same robot reads 45° / 45° (but lands upright 0.69 and climbs 40 mm). Braced, the tail gives it back. Stowed lower it helps the hills (50° / 55° braced at 20°) but the turn swells to 900 mm.</li>
+<li><b>Hard floors under the step:</b> gearing under about 1.8x (83 mm at 1.45x; at 0.4x it stalls on a 15° hill), a tail shorter than 260 mm, a push angle shallower than -37°. Under 170 mm of tail or 2 N·m of servo it can't right itself (upright 0.6).</li>
+<li><b>Dead in their ranges:</b> the skin's squareness (p), its top shape (qu), its height above the middle (cu) up to 180 mm, the packs' height, the motor's size from 0.75x to 2x. The screen's noise on T3 over 8 seeds: the step varies by 5 mm, nothing else moves.</li>
+<li><b>Six wheels</b> read 55° / 57° stowed and 55° / 60° braced, the best hills of all, but step 37 mm, turn 623 mm and 790 g more.</li></ul>
+  </section>
+
+  <section>
+    <h2>Every knob, one at a time</h2>
+    <p class="lede">Each cell is one knob swept across its range with everything else at T3's, drawn on the gauge's own scale, so cells in a column compare directly. The orange tick is T3's setting. Tap a row for the numbers.</p>
+    <div class="controls">
+      <label for="order">Order</label>
+      <select id="order">
+        <option value="group">by part of the robot</option>
+        <option value="hills">by effect on the hills</option>
+        <option value="climb">by effect on the step</option>
+        <option value="turn">by effect on the turn</option>
+        <option value="up">by effect on landing upright</option>
+      </select>
+      <div class="legend"><span><i style="border-color:var(--ink)"></i>gauge</span><span><i style="border-color:var(--stowed);border-top-style:dashed"></i>hills, tail stowed</span><span><i style="border-color:var(--braced)"></i>hills, tail braced</span><span><i style="border-color:var(--t3);width:0;height:14px;border-top:0;border-left:2px dashed var(--t3)"></i>T3</span></div>
+    </div>
+    <div class="scroll"><table class="knobs" id="knobs"></table></div>
+    <div class="scroll"><table class="plain" id="switches"></table></div>
+  </section>
+
+  <section>
+    <h2>Body height</h2>
+    <p class="lede" id="h-lede">Two knobs set it: ride height (the belly's height; body, insides and tail mount move together) and the skin's middle height. Ride height trades the step against the hills; the skin's middle height has a narrow band where the step works, and T3 sits in it.</p>
+    <div class="pair" id="h-charts"></div>
+  </section>
+
+  <section>
+    <h2>Wheel width</h2>
+    <p class="lede" id="w-lede">Two knobs: the track (the wheels' centre planes from the centre line) and the tyres' own width, new in this sweep (46 mm in every design so far). Neither moves the step or the hills. The side-slope probe below is the one place width shows: across a slope, on grippy ground.</p>
+    <div class="pair" id="w-charts"></div>
+    <div class="scroll"><table class="plain" id="side"></table></div>
+  </section>
+
+  <section>
+    <h2>Knobs and tests to try next</h2>
+    <div class="ideas"><div><h3>Knobs</h3><ol>
+<li>Tyre grip (tread, compound, grousers)<span>On ordinary ground every hill, up, down and across, ends in a slide at 35-40°. Grip is the only lever there. Cheap: a per-design tyre friction.</span></li>
+<li>The tail as a counterweight<span>Swung forward going up and back going down, instead of held. Held braced already gives 45° / 45°; moving the mass may give more.</span></li>
+<li>Brace angle per design<span>The best held angle moved from -30° (T3) to -15° on most other designs. Let the search tune it, or set it by rule: the foot just on the ground.</span></li>
+<li>Tail foot<span>A 12 mm rubber ball today. Held out as an outrigger at -45° it dug in and stopped the robot on a 5° side slope. A skid or a wider pad changes both bracing and dragging.</span></li>
+<li>A ride height that moves<span>The step wants the body high and the hills want it low. A body that tilts or lifts, or a tail that lifts the rear, could have both.</span></li>
+<li>Hill speed and slip control<span>Braced, uphill ends in a stall, not a tip. A slower crawl or a wheel-slip limit is a controller knob, not a part.</span></li>
+</ol></div>
+<div><h3>Tests</h3><ol>
+<li>Crest and breakover <span class="tag">recommended</span><span>Driving over a ridge or a step down then up, where a low belly high-centres. Today the gauges only charge for height; this is where height pays.</span></li>
+<li>Step down and ledge drop<span>Does it nose-dive and flip coming off a ledge? Unchecked since the sharp-edge lesson.</span></li>
+<li>Push force (drawbar pull) <span class="tag">recommended</span><span>How hard it can shove a box. Moving boxes is in the purpose; mass, gearing and grip set it, and none of the five gauges reads it.</span></li>
+<li>Rough ground<span>A random heightfield (rubble, grass clumps): general mobility, where ride height and wheel size should pay.</span></li>
+<li>Stairs<span>G2's ladder stops at 150 mm; stairs are about 180 mm risers, one after another.</span></li>
+<li>Side slope (probed here)<span>T3 55° at x2.5, 40° at x1 (a slide). Worth a gauge only if traverses matter; on ordinary ground it reads the tyres.</span></li>
+</ol></div></div>
+  </section>
+
+  <section>
+    <h2>A Gaussian-process surrogate</h2>
+    <p class="lede" id="s-lede">Yes, and it already works for two of the gauges. The fitter is written and trains on what the searches already simulated, with no new sims. On the hills run (5 knobs, 712 designs) it predicts both hills to within 1.5-1.6° (the gauge reads in 5° steps) and the turn to 13 mm. Trained on the first even spread alone, it ranks the search's later designs at 0.92-0.94 rank correlation. On the shape study (10 knobs) the turn holds (7 mm) and the step weakens. On the body search (24 knobs, few spread designs) the step fails: it has cliffs, like the nose cliff, that a smooth model blurs. Landing upright can't be predicted among designs that already pass the screen: they differ by a few hundredths, about the screen's own noise. Its 95% bands hold 90-95% of the time. <b>Good for:</b> choosing which designs to simulate in a search (the ones it predicts are good or is unsure of), on the hills and the turn; and a map of which knobs matter across the whole range (last column), where the table above shows only T3's neighbourhood. <b>Not for:</b> final readings, the step, or upright.</p>
+    <div class="scroll"><table class="plain" id="sur"></table></div>
+  </section>
+
+  <footer class="foot" id="foot"><div>Sources: <code>gauges/knobs.py</code> (sweep, rebrace, side), <code>gauges/surrogate.py</code>, <code>gauges/knobs_page.py</code>; data in <code>gauges/out/knobs/</code> and <code>gauges/out/surrogate/</code>.</div>
+<div>Each cell is the knob sweep's screen: 60 falls, the step ladder at x0.65 and x1.5 in 6 tries, the turn at three frictions, both hills at x2.5 in 6 tries; 3 seeds a setting, T3 8. Hills braced: the best of five held tail angles, -75° to -15°, one seed. Not the full 20-try gauges.</div>
+<div>The side-slope probe's first run had a bug (it counted the start's ±10° heading as sliding, so everything read 0°); it is kept as superseded and was rerun.</div></footer>
+</div>
+
+<script>
+const D = /*DATA*/null;
+const G = {   // the gauges: label, unit, the scale every cell in the column shares, better direction
+  up:    {label: 'G1 upright', small: 'share of falls', lo: 0.3, hi: 1.0, fmt: v => v.toFixed(2), better: 1},
+  climb: {label: 'G2 step up', small: 'mm', lo: 0, hi: 150, fmt: v => Math.round(v), better: 1},
+  turn:  {label: 'G3 turn', small: 'mm, smaller is better', lo: 350, hi: 900, fmt: v => Math.round(v), better: -1},
+  hup:   {label: 'G4 up a hill', small: 'degrees, x2.5', lo: 10, hi: 60, fmt: v => Math.round(v), better: 1, s: 'h_up', b: 'hb_up'},
+  hdown: {label: 'G5 down a hill', small: 'degrees, x2.5', lo: 10, hi: 60, fmt: v => Math.round(v), better: 1, s: 'h_down', b: 'hb_down'},
+};
+const COLS = ['up', 'climb', 'turn', 'hup', 'hdown'];
+const GROUPS = {wheels: 'Wheels', body: 'Body', insides: 'Insides', drive: 'Drive', tail: 'Tail'};
+const B = D.base;
+const fmtv = (k, v) => Math.abs(v) >= 10 ? Math.round(v) : (Math.abs(v) >= 1 ? v.toFixed(2).replace(/\.?0+$/, '') : v.toFixed(2));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+
+function strip() {
+  const c = [
+    ['G1 upright', B.up.toFixed(2), 'after a fall, worst friction'],
+    ['G2 step up', Math.round(B.climb) + ' mm', 'screen, sd ' + D.noise.climb.toFixed(0) + ' mm over 8 seeds'],
+    ['G3 turn', Math.round(B.turn) + ' mm', 'turn-around space'],
+    ['G4 / G5 hills', B.h_up + '° / ' + B.h_down + '°', 'tail stowed, friction x2.5'],
+    ['Tail braced', B.hb_up + '° / ' + B.hb_down + '°', 'best tail angle held'],
+    ['Mass, CoM', (B.mass / 1000).toFixed(2) + ' kg', 'centre of mass ' + Math.round(B.com_z) + ' mm up'],
+  ];
+  document.getElementById('strip').innerHTML = c.map(([k, v, s]) => `<div><span class="k">${k}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`).join('');
+}
+
+function spark(kn, col) {
+  const g = G[col], W = 124, H = 42, px = 3, rows = kn.rows.filter(r => r.v !== null);
+  const x = v => px + (v - kn.lo) / (kn.hi - kn.lo) * (W - 2 * px);
+  const y = v => H - 3 - (Math.max(g.lo, Math.min(g.hi, v)) - g.lo) / (g.hi - g.lo) * (H - 6);
+  const series = g.s ? [[g.s, 'var(--stowed)', '3 2', 1.5], [g.b, 'var(--braced)', '', 2]] : [[col, 'var(--ink)', '', 1.6]];
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(kn.key)} against ${esc(g.label)}">`;
+  s += `<line x1="0" x2="${W}" y1="${H - 0.5}" y2="${H - 0.5}" stroke="var(--rule)"/>`;
+  s += `<line x1="${x(kn.t3v)}" x2="${x(kn.t3v)}" y1="0" y2="${H}" stroke="var(--t3)" stroke-width="1.5" stroke-dasharray="2 2"/>`;
+  for (const [key, color, dash, w] of series) {
+    const pts = rows.filter(r => r[key] !== null && r[key] !== undefined);
+    if (!pts.length) continue;
+    s += `<polyline fill="none" stroke="${color}" stroke-width="${w}" stroke-linejoin="round" ${dash ? `stroke-dasharray="${dash}"` : ''} points="${pts.map(r => x(r.v).toFixed(1) + ',' + y(r[key]).toFixed(1)).join(' ')}"/>`;
+    for (const r of pts) s += `<circle cx="${x(r.v).toFixed(1)}" cy="${y(r[key]).toFixed(1)}" r="2.6" fill="${color}" stroke="var(--surface)" stroke-width="1"><title>${esc(kn.key)} ${fmtv(kn.key, r.v)}: ${g.fmt(r[key])}${g.s ? (key === g.s ? ' stowed' : ' braced') : ''}</title></circle>`;
+  }
+  s += '</svg>';
+  const rng = key => { const v = rows.map(r => r[key]).filter(v => v !== null && v !== undefined); return v.length ? `${g.fmt(Math.min(...v))}–${g.fmt(Math.max(...v))}` : '–'; };
+  const txt = g.s ? `s ${rng(g.s)} · b ${rng(g.b)}` : rng(col);
+  return s + `<div class="r">${txt}</div>`;
+}
+
+function effect(kn, col) {
+  const rows = kn.rows.filter(r => r.v !== null);
+  const keys = col === 'hills' ? ['h_up', 'h_down', 'hb_up', 'hb_down'] : [col];
+  let e = 0;
+  for (const k of keys) { const v = rows.map(r => r[k]).filter(v => v !== null); if (v.length) e = Math.max(e, (Math.max(...v) - Math.min(...v)) / ({up: 1, climb: 150, turn: 550}[k] || 50)); }
+  return e;
+}
+
+function table() {
+  const order = document.getElementById('order').value; const el = document.getElementById('knobs');
+  let h = `<thead><tr><th>Knob <small>range · T3's setting</small></th>${COLS.map(c => `<th>${G[c].label}<small>${G[c].small}</small></th>`).join('')}</tr></thead><tbody>`;
+  let list = D.knobs.slice(), last = null;
+  if (order !== 'group') list.sort((a, b) => effect(b, order) - effect(a, order));
+  for (const kn of list) {
+    if (order === 'group' && kn.group !== last) { h += `<tr class="grp"><td colspan="6">${GROUPS[kn.group]}</td></tr>`; last = kn.group; }
+    h += `<tr class="knob" tabindex="0" data-k="${kn.key}" aria-expanded="false"><td class="name"><b>${esc(kn.key)}</b><span>${esc(kn.what)}</span><em>${fmtv(kn.key, kn.lo)} to ${fmtv(kn.key, kn.hi)} · T3 ${fmtv(kn.key, kn.t3v)}</em></td>${COLS.map(c => `<td class="cell">${spark(kn, c)}</td>`).join('')}</tr>`;
+    h += `<tr class="detail" data-for="${kn.key}" hidden><td colspan="6">${detail(kn)}</td></tr>`;
+  }
+  el.innerHTML = h + '</tbody>';
+  el.querySelectorAll('tr.knob').forEach(tr => {
+    const tog = () => { const d = el.querySelector(`tr.detail[data-for="${tr.dataset.k}"]`); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); };
+    tr.addEventListener('click', tog); tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
+  });
+}
+
+function detail(kn) {
+  const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
+  const rows = kn.rows.filter(r => r.v !== null).slice();
+  const t3 = Object.assign({}, B, {v: kn.t3v, t3: true}); rows.push(t3); rows.sort((a, b) => a.v - b.v);
+  return `<table class="vals"><thead><tr><th>${esc(kn.key)}</th><th>upright</th><th>step mm</th><th>turn mm</th><th>up s/b</th><th>down s/b</th><th>static tip</th><th>CoM z</th><th>mass g</th><th>width</th></tr></thead><tbody>` +
+    rows.map(r => `<tr class="${r.t3 ? 'is-t3' : ''}"><td>${fmtv(kn.key, r.v)}${r.t3 ? ' T3' : ''}</td><td>${f(r.up, 2)}</td><td>${f(r.climb)}</td><td>${f(r.turn)}</td><td>${f(r.h_up)} / ${f(r.hb_up)}</td><td>${f(r.h_down)} / ${f(r.hb_down)}</td><td>${f(r.tip_static, 1)}°</td><td>${f(r.com_z)}</td><td>${f(r.mass)}</td><td>${f(r.width)}</td></tr>`).join('') +
+    '</tbody></table>';
+}
+
+function switches() {
+  const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
+  const rows = [{name: 'T3', row: B}].concat(D.switches);
+  document.getElementById('switches').innerHTML = `<thead><tr><th>Switch</th><th>upright</th><th>step mm</th><th>turn mm</th><th>hills stowed</th><th>hills braced</th><th>mass g</th></tr></thead><tbody>` +
+    rows.map(({name, row: r}) => `<tr><td>${esc(name)}</td><td class="n">${f(r.up, 2)}</td><td class="n">${f(r.climb)}</td><td class="n">${f(r.turn)}</td><td class="n">${f(r.h_up)}° / ${f(r.h_down)}°</td><td class="n">${r.hb_up === null ? 'no tail' : f(r.hb_up) + '° / ' + f(r.hb_down) + '°'}</td><td class="n">${f(r.mass)}</td></tr>`).join('') + '</tbody>';
+}
+
+// a focus chart: one knob, several series, one y scale
+function chart(key, series, ylo, yhi, ystep, title, sub, xlab) {
+  const kn = D.knobs.find(k => k.key === key), rows = kn.rows.filter(r => r.v !== null);
+  const W = 460, H = 230, L = 44, R = 92, T = 12, Bm = 38;
+  const x = v => L + (v - kn.lo) / (kn.hi - kn.lo) * (W - L - R), y = v => T + (yhi - v) / (yhi - ylo) * (H - T - Bm);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(title)}">`;
+  for (let v = ylo; v <= yhi + 1e-9; v += ystep) s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--rule)"/><text class="tk" x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${v}</text>`;
+  const xt = [kn.lo, (kn.lo + kn.hi) / 2, kn.hi];
+  for (const v of xt) s += `<text class="tk" x="${x(v)}" y="${H - Bm + 14}" text-anchor="middle">${fmtv(key, v)}</text>`;
+  s += `<text class="lb" x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle">${esc(xlab)}</text>`;
+  s += `<line x1="${x(kn.t3v)}" x2="${x(kn.t3v)}" y1="${T}" y2="${H - Bm}" stroke="var(--t3)" stroke-width="1.5" stroke-dasharray="3 3"/><text class="tk" x="${x(kn.t3v) + 4}" y="${T + 9}" style="fill:var(--t3)">T3</text>`;
+  const ends = [];
+  for (const sr of series) {
+    const pts = rows.filter(r => r[sr.k] !== null);
+    s += `<polyline fill="none" stroke="${sr.c}" stroke-width="2" ${sr.d ? `stroke-dasharray="${sr.d}"` : ''} points="${pts.map(r => x(r.v) + ',' + y(r[sr.k])).join(' ')}"/>`;
+    for (const r of pts) s += `<circle cx="${x(r.v)}" cy="${y(r[sr.k])}" r="3.5" fill="${sr.c}" stroke="var(--surface)" stroke-width="1.5"><title>${esc(key)} ${fmtv(key, r.v)}: ${Math.round(r[sr.k])} (${esc(sr.l)})</title></circle>`;
+    const lp = pts[pts.length - 1]; ends.push({y: y(lp[sr.k]), l: sr.l, c: sr.c});
+  }
+  ends.sort((a, b) => a.y - b.y); for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 12) ends[i].y = ends[i - 1].y + 12;
+  for (const e of ends) s += `<text class="lb" x="${W - R + 8}" y="${e.y + 4}">${esc(e.l)}</text>`;
+  return `<figure><figcaption>${esc(title)}<small>${esc(sub)}</small></figcaption>${s}</svg></figure>`;
+}
+
+function side() {
+  if (!D.side.length) return;
+  const by = {}; for (const r of D.side) { (by[r.name] = by[r.name] || {})[r.mu + '|' + r.tail] = r; }
+  const tails = [...new Set(D.side.map(r => r.tail))];
+  let h = `<thead><tr><th>Design</th><th>width mm</th><th>static tip</th>${tails.map(t => `<th>x2.5, ${esc(t)}</th>`).join('')}${tails.map(t => `<th>x1, ${esc(t)}</th>`).join('')}</tr></thead><tbody>`;
+  for (const [n, m] of Object.entries(by)) {
+    const any = Object.values(m)[0];
+    h += `<tr><td>${esc(n)}</td><td class="n">${Math.round(any.width)}</td><td class="n">${any.static.toFixed(0)}°</td>` +
+      ['2.5', '1.0'].map(mu => tails.map(t => { const r = m[mu + '|' + t]; return `<td class="n" title="${r ? esc(JSON.stringify(r.why)) : ''}">${r ? r.side + '°' : '–'}</td>`; }).join('')).join('') + '</tr>';
+  }
+  document.getElementById('side').innerHTML = h + '</tbody>';
+}
+
+function surrogate() {
+  const S = D.surrogate; if (!S || !Object.keys(S).length) return;
+  const name = {search_hills: 'Hills run, 5 knobs', search_shape: 'Shape study, 10 knobs', search_body: 'Body search, 24 knobs'};
+  const gl = {up: 'G1 upright', climb: 'G2 step', turn: 'G3 turn', h_up: 'G4 up', h_down: 'G5 down'};
+  let h = `<thead><tr><th>Data</th><th>Gauge</th><th>spread (sd)</th><th>held-out error</th><th>R²</th><th>straight line</th><th>95% band holds</th><th>search's picks: rank match</th><th>top tenth caught</th><th>knobs that matter most</th></tr></thead><tbody>`;
+  for (const [run, r] of Object.entries(S)) for (const [g, q] of Object.entries(r.gauges)) {
+    const top = Object.entries(q.first_order).sort((a, b) => b[1] - a[1]).slice(0, 3).filter(t => t[1] > 0.03).map(t => `${t[0]} ${Math.round(100 * t[1])}%`).join(', ');
+    const f = v => g === 'up' ? v.toFixed(3) : v.toFixed(1);
+    h += `<tr><td>${name[run]} <span class="mono" style="color:var(--muted)">n ${r.n}</span></td><td>${gl[g]}</td><td class="n">${f(q.cv.sd)}</td><td class="n">${f(q.cv.gp.rmse)}</td><td class="n">${q.cv.gp.r2.toFixed(2)}</td><td class="n">${q.cv.linear.r2.toFixed(2)}</td><td class="n">${Math.round(100 * q.cv.gp.cover95)}%</td>` +
+      `<td class="n">${q.forward ? q.forward.rho.toFixed(2) : '–'}</td><td class="n">${q.forward ? Math.round(100 * q.forward.top10_in_pred_top20) + '%' : '–'}</td><td>${top}</td></tr>`;
+  }
+  document.getElementById('sur').innerHTML = h + '</tbody>';
+}
+
+strip(); table(); switches(); side(); surrogate();
+document.getElementById('order').addEventListener('change', table);
+const ink = 'var(--ink)', st = 'var(--stowed)', br = 'var(--braced)';
+document.getElementById('h-charts').innerHTML =
+  chart('clr', [{k: 'climb', l: 'step', c: ink}], 0, 150, 50, 'Ride height against the step', 'G2, mm: below 52 mm the body meets the step face', 'ride height, mm') +
+  chart('clr', [{k: 'h_up', l: 'stowed', c: st, d: '4 3'}, {k: 'hb_up', l: 'braced', c: br}], 25, 55, 5, 'Ride height against the climb', 'G4 up a hill, degrees at x2.5', 'ride height, mm') +
+  chart('clr', [{k: 'h_down', l: 'stowed', c: st, d: '4 3'}, {k: 'hb_down', l: 'braced', c: br}], 25, 55, 5, 'Ride height against the descent', 'G5 down a hill, degrees at x2.5', 'ride height, mm') +
+  chart('zc', [{k: 'climb', l: 'step', c: ink}], 0, 150, 50, "The skin's middle height against the step", 'G2, mm: a narrow band works', "skin's middle height, mm");
+document.getElementById('w-charts').innerHTML =
+  chart('track', [{k: 'turn', l: 'turn', c: ink}], 350, 500, 50, 'Track against the turn', 'G3, mm: the only gauge that moves', 'track (wheel planes from centre), mm') +
+  chart('TW', [{k: 'turn', l: 'turn', c: ink}], 350, 500, 50, "Tyres' width against the turn", 'G3, mm', 'tyre width, mm');
+</script>
