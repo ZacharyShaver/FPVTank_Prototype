@@ -9,6 +9,7 @@ go wrong. More come after the first build and real tests.
 
 ```
 python gauges/gauges.py            # every design and control under the band -> gauges/out/scorecard.json (~4 min, 30 cores)
+python gauges/card.py read         # G4-G7 on the page's designs, G1-G3 on its knob variant -> gauges/out/card/card.json (~6 min)
 python gauges/export.py            # the scorecard as the page's row files, gauges/out/dash/ (the page itself: dashboard.html)
 python gauges/gauges.py --quick    # smoke run: 40 falls, 6 tries a step (~75 s)
 python gauges/gauges.py --cached   # reuse out/roster.pkl instead of rebuilding the designs from chassis-v2 (~50 s saved)
@@ -90,12 +91,20 @@ bounding box of its body and pods, on the Trainer's wheels. Same mass, CoM and i
 - **Trust:** none yet. How far a skid-steer spin drifts depends on the tyres' scrub on the floor.
 - **Doesn't read:** speed, or the narrowest gap it fits through (its width is listed with the costs). Zach
   (2026-10-26): "a meh gauge but fine for now".
+- **What it mostly reads (2026-10-28, `card.py com`):** the spin is open-loop, so a CoM fore or aft of the wheels' centre walks the
+  robot off its start. T3 with 150 g placed to move its CoM reads 394-407 mm within 1 mm, 411-440 at 3-5 mm and
+  492-513 at 7-9 mm: 12-15 mm of circle for each millimetre. The same 150 g at the CoM is the control (394 against
+  381). Every T design's CoM sits within about 1 mm of its wheels' centre; the roster's sit 6-18 mm off and spin
+  100-190 mm wider than their outline (T3's outline 367 mm, the box's 479). So the T designs' lead on G3 is about half
+  shape and half a CoM placed to the millimetre, which a camera head or a moved battery would undo. A controller
+  that holds heading and position would probably win much of the drift back (unchecked).
 
 ## G4 Hill up, G5 Hill down (adopted 2026-10-27; target: as steep as it goes)
 
 Zach asked "how far of a hill it can climb/descend before falling", the designs being top heavy with the tail doing
-the righting. Not yet on the scorecard page; read on the shape study (`gauges/hills.py`) and in the hills run's
-search.
+the righting. On the scorecard page since 2026-10-28 (`card.py`), as the better of the tail stowed and held at -30°,
+-15° or 0° (rule 1); the static check and the control are read stowed. First read on the shape study
+(`gauges/hills.py`) and in the hills run's search.
 - **Lever:** staying on its wheels on a slope, up (G4) and down (G5).
 - **Reads:** the steepest slope (degrees, 5° steps) it drives 2.5 m up (down) in at least 18 of 20 tries without
   tipping (tilt from the slope's normal past 60°, or past 30° at the end), the better direction counting, every
@@ -151,6 +160,10 @@ where height pays. `SCORPION_SEARCH=search_hills python gauges/crest.py read` ->
   the same way; only drops to 20° or less that hold over neighbouring settings are effects (a tail foot of 23 mm or
   more, a tyre gap of 105 mm or more, gearing at 1.1x or less, a push face, no tail). A pass rate at one angle would
   read smoother; not changed (Zach's call).
+- **Not only T3** (2026-10-28, `card.py`, fresh seeds): the Trainer read 20° (10° before), the step layout 35° (25°)
+  and T3 40° (25°); the box and the six-wheel held at 15°, and both controls passed again. At 20 tries a crest
+  difference under 15° is noise. A steadier read (a pass rate at a fixed angle, or 40 tries an angle) is a gauge
+  change, Zach's call.
 - **Trust:** none yet.
 
 ## G7 Push (adopted 2026-10-27; target: at least 3 kg)
@@ -172,6 +185,7 @@ Zach picked it from the same list: moving boxes is in the purpose, and nothing e
   on the nose (knob `bumper`) pushes 4 kg but kills the step (30 mm). The tail mount at 170 mm pushes 4 kg at 20 tries
   with the step intact (150 mm), for 5° of braced hill. Its control: a 200 mm box catches the 170 mm mount again
   (0.5 kg at x1.5). The rule: nothing on the rear face below the top of what it pushes.
+- **Repeatable:** read again with fresh seeds (2026-10-28, `card.py`), every design and control read the same.
 - **Trust:** none yet.
 
 ## Costs (read every time, no target)
@@ -195,8 +209,8 @@ The live scorecard is the "Scorpion Gauges" page (a private claude.ai page), fil
 | G2 step up | 30 mm | Six-wheel 50 mm | as tall as it goes |
 | G3 turn-around space | 594 mm | Six-wheel 542 mm | as small as it goes |
 
-Iteration 2 adds the hills, the crest and the push (Zach, 2026-10-27). They are not on the scorecard page yet; the
-readings are from their own reads (`hills.py`, `crest.py`, `push.py`), 20 tries.
+Iteration 2 adds the hills, the crest and the push (Zach, 2026-10-27). The table is from their own reads (`hills.py`,
+`crest.py`, `push.py`), 20 tries; the scorecard page reads them again on all its designs (`card.py`, 2026-10-28).
 
 | Gauge | Box reads | Best design (2026-10-27) | Target (Zach, 2026-10-27) |
 |---|---|---|---|
@@ -204,7 +218,10 @@ readings are from their own reads (`hills.py`, `crest.py`, `push.py`), 20 tries.
 | G6 crest | 15° | T3, step layout 25° (T3 25-40° by luck) | at least 20° |
 | G7 push (worst friction) | 2 kg | Six-wheel 3 kg; T3 with a 170 mm tail mount 4 kg | at least 3 kg |
 
-On these, T3 as it stands meets the crest and misses the push (1 kg); the 170 mm tail mount meets it.
+On these, T3 as it stands meets the crest and misses the push (1 kg); the 170 mm tail mount meets it. On the page
+(2026-10-28) two designs meet every target with a number: T3 with the 170 mm tail mount (1.00, crest 25°, 4 kg;
+step 150 mm, turn 387 mm, hills 40° / 45° braced) and T5 on the Trainer body (1.00, 40°, 4 kg; but step 90 mm, turn
+441 mm).
 
 G1 is a floor; G2 and G3 are pushed as far as they go, together. Zach on G3: "a meh gauge but fine for now", so it is
 the first candidate to supersede.
@@ -212,10 +229,10 @@ the first candidate to supersede.
 No design beat the box on all three. The Trainer is a coin flip after a fall (0.45; half its falls end on its back),
 below the plain box, which is 167 mm tall all over.
 
-## The body search (current, 2026-10-27)
+## The body search (superseded as the current run by the shape study, 2026-10-28)
 
 `SCORPION_SEARCH=search_body python gauges/search.py body`, then `... skin`, then `... finals` (results in
-`out/search_body/`, which GAUGES_CURRENT now names). The lean search's process on G2's new step reflex (G2's card),
+`out/search_body/`, which GAUGES_CURRENT named until 2026-10-28). The lean search's process on G2's new step reflex (G2's card),
 with the skin's eight shape knobs searched again, 24 in all. Zach, seeing the lean finalists: "the shape of the body
 does not change much between these unless its the shell ... it could be another knob we can turn". Without a skin a
 design wears the Trainer's body, which has no knobs, and the lean search held the skin's shape at T5's. B was seeded
@@ -247,11 +264,12 @@ with the lean and drive searches' fronts and finalists (33 designs).
 - T5 is geared about 2x down and its track puts the motors 17 mm into the hull. G3 doesn't read speed, and "repack" is
   a guess that the parts can move.
 
-## The shape study (2026-10-27)
+## The shape study (current, 2026-10-27)
 
 `SCORPION_SEARCH=search_shape python gauges/search.py sweep`, then `... shape`, then `... finals`; then
 `python gauges/shape_sheet.py` (the picture sheet) and `python gauges/view.py search_shape` (page "Scorpion Body
-Shapes"). Results in `out/search_shape/`. Zach: "with the tail
+Shapes"). Results in `out/search_shape/`, which GAUGES_CURRENT names since 2026-10-28 (its finalists are the
+scorecard's). Zach: "with the tail
 covering most of what the sobol shape was giving us lets see what body shape can give us for climb and
 maneuverability ... lock some knobs at a constant". So everything but the skin's ten shape knobs is held at T5's
 (wheels, drive, insides, tail). The tail's mount is pinned where T5 has it, because it otherwise follows the hull: a
@@ -403,6 +421,22 @@ pass's six candidate knobs, worked through:
   code). The first run timed slow drives out at 8 s and read them 0: **superseded** (`superseded - speed_timeout.json`).
 - **K7 push face: no; raise the tail mount** (G7 above). The push face costs the step (143 to 30 mm; 60-80 with its
   top at 125-150), the turn about 45 mm, and upright to 0.94-0.97.
+
+**Which knobs matter (a review, 2026-10-28).** Read off the sweep against the noise (upright 0.05, step 20 mm, turn
+20 mm, hills 10°, push 1.5 kg; the crest only where it drops to 20° or less, its plateau being noise):
+- **Dead:** cu (the skin's height above its middle) and qu (its top's squareness) move nothing over their whole
+  range. With the tail doing the righting, the top of the body is free: room for the head or an arm.
+- **Settled:** track, TW, b, p, ar, xc, cd, qd, dzp, msize, foot_r, th_push and th_stow only cost when moved off T3's
+  value; no setting of them is better on any gauge. Most are held by the turn (track, TW, b, p, ar).
+- **Floors:** gear, L and tq lose when lowered and gain nothing above a floor: gearing about 1.8x, a 260 mm tail, a
+  2.2-2.8 N·m tail servo (upright 1.00 from 2.2, the full step from 2.8; the MG90S is about 0.2).
+- **Levers** (better on one gauge, paid for on another): gap and xw (hills against step and turn), clr, zc and dxp
+  (push or hills against the step), R (turn against step and crest), mount_z (push), the six-wheel switch (hills
+  against step and turn) and bumper (push against step).
+- **Caveats:** one knob at a time around T3, so another platform (six wheels, no tail) may need a settled knob back.
+  The drive search's claim that 14 knobs were dead failed its check (redrawn over their range, they moved the step);
+  this claim is weaker, settled at T3's value rather than dead. Freezing them is Zach's call; the check is a
+  refinement with them frozen against one with them free.
 
 **The reel** (`SCORPION_SEARCH=search_hills python gauges/reel.py` -> `out/film/reel.mp4`, 46 s): five chapters of
 side-by-side gauge tries (the gauges on T3, the braced tail, ride height, wheelbase, wheel width). Hills are drawn on
@@ -615,3 +649,9 @@ middle axle, and a shell (shell3's superellipsoid over the body, cut at the bell
   takes T3's push from 1 to 4 kg.
 - 2026-10-27: Zach adopted G4-G7 with targets: the hills as steep as they go, the crest at least 20°, the push at
   least 3 kg. None is on the scorecard page or in a search's screen yet.
+- 2026-10-28: G4-G7 on the scorecard page (`card.py read`, then `export.py`): the roster, the shape study's finalists
+  and T3 with a 170 mm tail mount, each gauge's controls passing in the same pass. GAUGES_CURRENT moved from the body
+  search to the shape study. The hills and the push re-read the same; the crest moved by up to 15° on three designs
+  (G6). `export.py` had dropped each G1-G3 control's claim and reading from the page (a comment swallowed them);
+  fixed. G3 found to read mostly the CoM's fore-aft offset from the wheels (G3). A knob review sorts the knobs into
+  dead, settled, floors and levers (the knob log).

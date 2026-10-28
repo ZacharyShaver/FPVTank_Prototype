@@ -44,8 +44,8 @@
   </header>
 
   <section class="sg-section" id="gauges">
-    <h2>Three gauges, iteration 1</h2>
-    <p class="sg-note">Each gauge is a fixed test that reads one number off any design, under three floor frictions (×0.65, ×1, ×1.5). The reading is the worst of the three. The big number is the best design; the box is the baseline to beat.</p>
+    <h2>Seven gauges, iterations 1 and 2</h2>
+    <p class="sg-note">Each gauge is a fixed test that reads one number off any design. G1–G3 and G7 read under three floor frictions (×0.65, ×1, ×1.5) and count the worst; the hills and the crest read on grippy ground (×2.5), where the design tips before its tyres slide. The big number is the best design; the box is the baseline to beat.</p>
     <div class="sg-grid">
       <article class="sg-card" id="g1">
         <h3>G1 Upright after a fall</h3>
@@ -68,13 +68,41 @@
         <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=turn" data-field="design">—</div>
         <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="turn_mm">—</span></div>
       </article>
+      <article class="sg-card" id="g4">
+        <h3>G4 Hill up</h3>
+        <p class="sg-note">The steepest slope it drives 2.5 m up in 18 of 20 tries without tipping, its tail stowed or braced behind. As steep as it goes; the best that meets the G1 target.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=hill_up" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=hill_up" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="hill_up_deg">—</span></div>
+      </article>
+      <article class="sg-card" id="g5">
+        <h3>G5 Hill down</h3>
+        <p class="sg-note">The same coming down, without tipping or skidding. As steep as it goes; the best that meets the G1 target.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=hill_down" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=hill_down" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="hill_down_deg">—</span></div>
+      </article>
+      <article class="sg-card" id="g6">
+        <h3>G6 Crest</h3>
+        <p class="sg-note">The steepest ridge (degrees a side) it crawls over without high-centring or tipping. Target: at least 20°; the best that meets the G1 target.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=crest" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=crest" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="crest_deg">—</span></div>
+      </article>
+      <article class="sg-card" id="g7">
+        <h3>G7 Push</h3>
+        <p class="sg-note">The heaviest box (200 × 260 × 150 mm) it shoves 0.5 m, worst over the frictions. Target: at least 3 kg; the best that meets the G1 target.</p>
+        <div class="sg-big dash-skeleton" data-source="best" data-where="gauge=push" data-field="value">—</div>
+        <div class="sg-who dash-skeleton" data-source="best" data-where="gauge=push" data-field="design">—</div>
+        <div class="sg-vs"><span>Box</span><span class="dash-skeleton" data-source="designs" data-where="design=Box" data-field="push_kg">—</span></div>
+      </article>
     </div>
   </section>
 
   <section class="sg-section" id="scorecard">
     <h2>The scorecard</h2>
     <div class="sg-card">
-      <p class="sg-note">The box is the built Trainer's parts and masses in a plain box on the Trainer's wheels: same weight and balance, plain shape. Box, Trainer, Step layout and Six-wheel come from chassis-v2's built meshes; the E4 weeble is the drop-test shell over the sweep's robot. Rows marked search are the generative search's finalists. An upright share in green meets the 75 % target.</p>
+      <p class="sg-note">The box is the built Trainer's parts and masses in a plain box on the Trainer's wheels: same weight and balance, plain shape. Box, Trainer, Step layout and Six-wheel come from chassis-v2's built meshes; the E4 weeble is the drop-test shell over the sweep's robot. Rows marked search are the shape study's finalists (T3 is the design the targets were set against); the row marked knob is T3 with its tail mount raised to 170 mm, the knob log's fix for the push. A reading in green meets its target (upright 75 %, crest 20°, push 3 kg). A hill reading marked braced is with the tail held down behind as a wheelie bar.</p>
       <div class="sg-wrap">
         <table id="score-table" data-source="designs" data-row-key="design">
           <thead><tr>
@@ -82,6 +110,10 @@
             <th data-field="upright">Upright after a fall</th>
             <th data-field="step_up_mm">Step up</th>
             <th data-field="turn_mm">Turn-around space</th>
+            <th data-field="hill_up_deg">Hill up</th>
+            <th data-field="hill_down_deg">Hill down</th>
+            <th data-field="crest_deg">Crest</th>
+            <th data-field="push_kg">Push</th>
             <th data-field="mass_g">Mass</th>
             <th data-field="width_mm">Width</th>
             <th data-field="length_mm">Length</th>
@@ -98,7 +130,7 @@
 
   <section class="sg-section" id="tradeoffs">
     <h2>The trade-offs</h2>
-    <p class="sg-note">The shaded corner beats the box on both gauges at once: up and to the left. Search finalists are in the second colour; the dashed line is the 75 % upright target.</p>
+    <p class="sg-note">The shaded corner beats the box on both gauges at once: up and to the left. Search finalists are in the second colour and the knob variant in the third; the dashed line is the 75 % upright target.</p>
     <div class="sg-grid">
       <article class="sg-card" id="trade-upright">
         <h3>Upright after a fall vs room to turn</h3>
@@ -127,6 +159,7 @@
       <article class="sg-card" id="fr-upright"><h3>Upright after a fall</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
       <article class="sg-card" id="fr-climb"><h3>Step up</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
       <article class="sg-card" id="fr-turn"><h3>Turn-around space</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
+      <article class="sg-card" id="fr-push"><h3>Push</h3><div class="sg-chart sg-short" data-source="physics"></div></article>
     </div>
     <div class="sg-legend" id="fr-legend" data-source="physics"></div>
   </section>
@@ -134,7 +167,7 @@
   <section class="sg-section" id="checks">
     <h2>The checks behind the readings</h2>
     <div class="sg-card">
-      <p class="sg-note">A gauge is read only when its controls pass: a design known to be worse has to read worse. The step edge check guards the fix for a sharp edge that acted as a wall.</p>
+      <p class="sg-note">A gauge is read only when its controls pass: a design known to be worse has to read worse. The step edge check guards the fix for a sharp edge that acted as a wall. The hills, crest and push controls were read in the same pass as their readings above.</p>
       <div class="sg-wrap">
         <table id="checks-table" data-source="checks" data-row-key="check">
           <thead><tr>
@@ -158,7 +191,10 @@
         <li><b>G1 Upright after a fall.</b> 200 falls per friction, each from a uniformly random orientation with its lowest point 300 mm up and a spin of up to 3 rad/s, wheels unpowered. The rest state is the body axis nearest world up. Controls: the E4 reads at least 0.2 above the box, and the E4 with 1 kg on its roof reads below the E4.</li>
         <li><b>G2 Step up.</b> Steps of 10 to 150 mm with a 3 mm round on the top edge. The robot starts 80 mm short, within 10° of square, at 0.5 m/s, and tries forwards and in reverse. A try succeeds when the robot is on top and on its wheels within 4 s. Control: the box on 70 mm wheels reads below the box.</li>
         <li><b>G3 Turn-around space.</b> From rest, one side backward and the other forward at 60 % of no-load speed, both ways, until it has turned 180° (6 s at most). The circle is centred where its wheels' centre started and holds every point of the body and tyres. Control: the box stretched 1.5× reads above the box.</li>
-        <li><b>Trust.</b> Only G1 has been checked against real drops, and only on printed bodies. G2 and G3 ride on tyre grip, which hasn't been measured on a real floor yet.</li>
+        <li><b>G4 Hill up, G5 Hill down.</b> The floor with gravity tipped by the slope, friction ×2.5, from rest, the set speed (0.5 m/s) ramped up over 1 s, the better direction counting. It fails if it tips (past 60° from the slope's normal, or 30° at the end) or, coming down, skids. The reading is the better of the tail stowed and held at −30°, −15° or 0° (a design may use its limbs); stowed, no reading may beat the static tip angle. Control: T3 with 1 kg high on its top reads below T3 both ways.</li>
+        <li><b>G6 Crest.</b> Two planks at ± the angle meeting at a peak 150 mm up, rounded by 3 mm; crawling at 0.15 m/s with the step's tail reflex, friction ×2.5. It passes with its centre of mass 0.1 m past the far foot, upright. T3 reads on a plateau: from 25° to 40° it crosses in 75–95 % of tries, so 20 tries read it 25° or 40° by luck. Other designs do too: read again with fresh seeds (2026-10-28), the Trainer went from 10° to 20°, the step layout from 25° to 35° and T3 from 25° to 40°, while the box and the six-wheel held at 15°. Treat a crest difference under 15° as noise. Controls: the box with its belly 15 mm lower, and the box 1.5× long, read below the box.</li>
+        <li><b>G7 Push.</b> A box 200 mm deep, 260 wide and 150 tall on the floor's own friction, pushed 0.5 m at 0.3 m/s within 6 s, square on ±10°, tail stowed, the better direction counting. It fails if the robot tips or rides 40 mm up the box. Controls: T3 geared 0.4× reads below T3; T3 at half tread grip reads below T3 at ×0.65.</li>
+        <li><b>Trust.</b> Only G1 has been checked against real drops, and only on printed bodies. The other six ride on tyre grip, which hasn't been measured on a real floor yet, and the tail's 3.3 N m servo is a size Zach doesn't own yet.</li>
       </ol>
     </div>
   </section>
@@ -169,22 +205,30 @@
   const pct = d3.format('.1%');
   const num = d3.format(',');
   const mmf = (v) => (v == null ? 'can’t spin' : num(v) + ' mm');
-  const val = {upright: (v) => pct(v), step_up: (v) => mmf(v), turn: (v) => mmf(v)};
+  const degf = (v) => (v == null ? '—' : num(v) + '°');
+  const kgf = (v) => (v == null ? '—' : num(v) + ' kg');
+  const val = {upright: (v) => pct(v), step_up: (v) => mmf(v), turn: (v) => mmf(v), hill_up: degf, hill_down: degf, crest: degf, push: kgf};
+  const FIELD_FMT = {upright: (v) => pct(Number(v)), hill_up_deg: degf, hill_down_deg: degf, crest_deg: degf, push_kg: kgf};
+  const TARGET = {upright: 0.75, crest_deg: 20, push_kg: 3};   // Zach's targets with a number (2026-10-26, 2026-10-27)
+  const scored = (r) => r.role === 'design' || r.role === 'finalist' || r.role === 'variant';
   const NS = 'http://www.w3.org/2000/svg';
 
   dash.calc('best', {
     inputs: ['designs'],
     title: 'Best design on each gauge',
-    description: 'For each gauge, the best reading among the designs and the search finalists (the box and the controls left out): the highest upright share; then, among those meeting the 0.75 upright target, the tallest step and the smallest turn-around circle.',
+    description: 'For each gauge, the best reading among the designs, the search finalists and the knob variant (the box and the controls left out): the highest upright share; then, among those meeting the 0.75 upright target, the tallest step, the smallest turn-around circle, the steepest hills and crest, and the heaviest push.',
     fn: (designs) => {
-      const ds = designs.filter((r) => r.role === 'design' || r.role === 'finalist');
+      const ds = designs.filter((r) => r.role === 'design' || r.role === 'finalist' || r.role === 'variant');
       const meet = ds.filter((r) => Number(r.upright) >= 0.75);
       const pick = (rows, key, better) => rows.filter((r) => r[key] != null).reduce((a, b) => (better(Number(b[key]), Number(a[key])) ? b : a));
-      const u = pick(ds, 'upright', (x, y) => x > y), c = pick(meet.length ? meet : ds, 'step_up_mm', (x, y) => x > y), t = pick(meet.length ? meet : ds, 'turn_mm', (x, y) => x < y);
+      const hi = (x, y) => x > y, lo = (x, y) => x < y, m = meet.length ? meet : ds;
+      const u = pick(ds, 'upright', hi);
       return [
         {gauge: 'upright', design: u.design, value: Number(u.upright)},
-        {gauge: 'step_up', design: c.design, value: Number(c.step_up_mm)},
-        {gauge: 'turn', design: t.design, value: Number(t.turn_mm)},
+        ...[['step_up', 'step_up_mm', hi], ['turn', 'turn_mm', lo], ['hill_up', 'hill_up_deg', hi], ['hill_down', 'hill_down_deg', hi],
+          ['crest', 'crest_deg', hi], ['push', 'push_kg', hi]].map(([gauge, key, better]) => {
+          const r = pick(m, key, better); return {gauge, design: r.design, value: Number(r[key])};
+        }),
       ];
     },
   });
@@ -192,13 +236,14 @@
   dash.calc('summary', {
     inputs: ['designs'],
     title: 'Designs that beat the box on every gauge',
-    description: 'Among the designs and the search finalists: how many read better than the box on all three gauges at once (more upright, a taller step, a smaller turn-around circle), and how many meet the 0.75 upright target.',
+    description: 'Among the designs, the search finalists and the knob variant: how many read better than the box on the first three gauges at once (more upright, a taller step, a smaller turn-around circle), how many meet the 0.75 upright target, and how many meet all three targets with a number (upright 0.75, crest 20 degrees, push 3 kg).',
     fn: (designs) => {
       const box = designs.find((r) => r.role === 'baseline');
-      const ds = designs.filter((r) => r.role === 'design' || r.role === 'finalist');
+      const ds = designs.filter((r) => r.role === 'design' || r.role === 'finalist' || r.role === 'variant');
       const beats = ds.filter((r) => Number(r.upright) > Number(box.upright) && Number(r.step_up_mm) > Number(box.step_up_mm)
         && r.turn_mm != null && Number(r.turn_mm) < Number(box.turn_mm));
-      return [{designs: ds.length, beats_all: beats.length, meets_g1: ds.filter((r) => Number(r.upright) >= 0.75).length}];
+      const all = ds.filter((r) => Number(r.upright) >= 0.75 && r.crest_deg != null && Number(r.crest_deg) >= 20 && r.push_kg != null && Number(r.push_kg) >= 3);
+      return [{designs: ds.length, beats_all: beats.length, meets_g1: ds.filter((r) => Number(r.upright) >= 0.75).length, meets_targets: all.length}];
     },
   });
 
@@ -308,8 +353,8 @@
     const c0 = dash.colors[0];
     svg.append('g').selectAll('circle').data(pts).join('circle')
       .attr('cx', (d) => x(Number(d.turn_mm))).attr('cy', (d) => y(Number(d[yKey]))).attr('r', 6)
-      .attr('fill', (d) => (d.role === 'baseline' ? 'var(--color-panel)' : d.role === 'finalist' ? dash.colors[1] : c0))
-      .attr('stroke', (d) => (d.role === 'baseline' ? 'var(--color-fg-muted)' : d.role === 'finalist' ? dash.colors[1] : c0)).attr('stroke-width', 2)
+      .attr('fill', (d) => (d.role === 'baseline' ? 'var(--color-panel)' : d.role === 'finalist' ? dash.colors[1] : d.role === 'variant' ? dash.colors[2] : c0))
+      .attr('stroke', (d) => (d.role === 'baseline' ? 'var(--color-fg-muted)' : d.role === 'finalist' ? dash.colors[1] : d.role === 'variant' ? dash.colors[2] : c0)).attr('stroke-width', 2)
       .on('mouseenter mousemove', (ev, d) => showTip(card, tip, ev, d.design, [
         'Upright after a fall: ' + pct(Number(d.upright)), 'Step up: ' + mmf(d.step_up_mm), 'Turn-around space: ' + mmf(d.turn_mm)]))
       .on('mouseleave', () => { tip.hidden = true; });
@@ -384,8 +429,9 @@
     const take = document.getElementById('takeaway');
     if (ok && S.status === 'ok' && S.data.length) {
       const box = main.find((r) => r.role === 'baseline');
-      const ds = main.filter((r) => r.role === 'design' || r.role === 'finalist');
+      const ds = main.filter(scored);
       const meet = ds.filter((r) => Number(r.upright) >= 0.75);
+      const allT = ds.filter((r) => Number(r.upright) >= 0.75 && Number(r.crest_deg) >= 20 && Number(r.push_kg) >= 3);
       const up = ds.reduce((a, b) => (Number(b.upright) > Number(a.upright) ? b : a));
       const cl = (meet.length ? meet : ds).reduce((a, b) => (Number(b.step_up_mm) > Number(a.step_up_mm) ? b : a));
       const b = (text, src, w, f) => { const e = el('b', null, text); return mark(e, src, w, f); };
@@ -398,7 +444,10 @@
         b(mmf(up.turn_mm), 'designs', where('design', up.design), 'turn_mm'), ' to turn around, against the box’s ',
         b(mmf(box.turn_mm), 'designs', 'design=Box', 'turn_mm'), '. The best climber that meets the target, ', cl.design, ', tops out at ',
         b(mmf(cl.step_up_mm), 'designs', where('design', cl.design), 'step_up_mm'), ', and the box at ',
-        b(mmf(box.step_up_mm), 'designs', 'design=Box', 'step_up_mm'), '.',
+        b(mmf(box.step_up_mm), 'designs', 'design=Box', 'step_up_mm'), '. ',
+        b(num(S.data[0].meets_targets), 'summary', null, 'meets_targets'),
+        S.data[0].meets_targets === 1 ? ' design meets every target with a number (upright 75 %, crest 20°, push 3 kg)' : ' designs meet every target with a number (upright 75 %, crest 20°, push 3 kg)',
+        ...(allT.length ? [': ', allT.map((r) => r.design).join(', '), '.'] : ['.']),
       ];
       take.replaceChildren(...parts.map((p) => (typeof p === 'string' ? document.createTextNode(p) : p)));
     } else if (D.status === 'error' || S.status === 'error') {
@@ -418,7 +467,7 @@
         e.textContent = r ? (f === 'design' ? r.design : val[r.gauge](r.value)) : '';
       } else {
         const r = rows.find((x) => x.design === w.get('design'));
-        e.textContent = r ? (f === 'upright' ? pct(Number(r[f])) : mmf(r[f])) : '';
+        e.textContent = r ? (FIELD_FMT[f] || mmf)(r[f]) : '';
       }
     });
 
@@ -426,8 +475,13 @@
     const tb = document.querySelector('#score-table tbody');
     tb.replaceChildren(...main.map((r) => {
       const tr = el('tr', r.role === 'baseline' ? 'sg-base' : null); tr.setAttribute('data-key', r.design);
-      const first = el('td', null, r.design); if (r.role === 'baseline' || r.role === 'finalist') first.appendChild(el('span', 'sg-pill', r.role === 'baseline' ? 'baseline' : 'search'));
-      tr.append(first, el('td', Number(r.upright) >= 0.75 ? 'sg-pass' : null, pct(Number(r.upright))), el('td', null, mmf(r.step_up_mm)), el('td', null, mmf(r.turn_mm)),
+      const first = el('td', null, r.design);
+      const pill = {baseline: 'baseline', finalist: 'search', variant: 'knob'}[r.role]; if (pill) first.appendChild(el('span', 'sg-pill', pill));
+      const hit = (k) => (r[k] != null && Number(r[k]) >= TARGET[k] ? 'sg-pass' : null);
+      const hill = el('td', null, degf(r.hill_up_deg)), hillD = el('td', null, degf(r.hill_down_deg));
+      if (r.hill_pose && r.hill_pose !== 'stowed') hill.appendChild(el('span', 'sg-pill', 'braced'));
+      tr.append(first, el('td', hit('upright'), pct(Number(r.upright))), el('td', null, mmf(r.step_up_mm)), el('td', null, mmf(r.turn_mm)),
+        hill, hillD, el('td', hit('crest_deg'), degf(r.crest_deg)), el('td', hit('push_kg'), kgf(r.push_kg)),
         el('td', null, num(r.mass_g) + ' g'), el('td', null, mmf(r.width_mm)), el('td', null, mmf(r.length_mm)), el('td', null, mmf(r.height_mm)),
         el('td', null, mmf(r.belly_mm)), el('td', null, num(r.wheels)), el('td', null, mmf(r.wheel_d_mm)));
       return tr;
@@ -447,7 +501,7 @@
     if (!failed(lb, L) && ok) ladderChart(lb, lg, L.data.filter((r) => lorder.includes(r.design)), lorder); else lg.replaceChildren();
 
     // friction spread
-    const charts = [['#fr-upright', 'upright', d3.format('.0%')], ['#fr-climb', 'step_up_mm', (v) => num(v) + ' mm'], ['#fr-turn', 'turn_mm', (v) => num(v)]];
+    const charts = [['#fr-upright', 'upright', d3.format('.0%')], ['#fr-climb', 'step_up_mm', (v) => num(v) + ' mm'], ['#fr-turn', 'turn_mm', (v) => num(v)], ['#fr-push', 'push_kg', (v) => num(v) + ' kg']];
     for (const [id, key, fmt] of charts) {
       const bx = document.querySelector(id + ' .sg-chart');
       if (!failed(bx, P) && ok) dumbbell(bx, P.data, key, fmt, order);

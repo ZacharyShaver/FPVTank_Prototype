@@ -37,8 +37,9 @@ FIXES = os.path.join(REPO, 'head-v2', 'fixes')
 GAUGES = os.path.join(REPO, 'gauges')
 GAUGES_OUT = os.path.join(GAUGES, 'out')
 TUMBLE = os.path.join(REPO, 'research', 'tumble')
-# The search whose finalists the gauge pages show (gauges/view.py, gauges/export.py).
-GAUGES_CURRENT = os.path.join(GAUGES_OUT, 'search_body')
+# The search whose finalists the gauge pages show (gauges/view.py, gauges/export.py). The shape study since 2026-10-28,
+# when G4-G7 went on the scorecard: its T3 is the design the targets are read against (the body search's before).
+GAUGES_CURRENT = os.path.join(GAUGES_OUT, 'search_shape')
 
 
 # Zach's Creality K2 Pro: its stock Moonraker (Klipper's HTTP API), on his LAN, no login. tools/k2.py
