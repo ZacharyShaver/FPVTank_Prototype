@@ -8,16 +8,19 @@
 :root {
   --bg: #f4f6f8; --surface: #ffffff; --ink: #12161b; --ink2: #49515c; --muted: #77808b; --rule: #dce1e7;
   --braced: #2a78d6; --stowed: #6b7480; --t3: #eb6834; --hi: #e8f0fb;
+  --mfill: #c3ccd6; --mbody: #b4bfcb; --mtyre: #2f353d; --mtail: #9a7440; --mview: #fbfcfd;
   --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
   --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --f-data: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0e1114; --surface: #161a1f; --ink: #e7eaee; --ink2: #b2b9c3; --muted: #858e99; --rule: #29303a;
-  --braced: #5b9cf0; --stowed: #9ba4af; --t3: #f2905f; --hi: #18263a; color-scheme: dark } }
+  --braced: #5b9cf0; --stowed: #9ba4af; --t3: #f2905f; --hi: #18263a;
+  --mfill: #3d4652; --mbody: #9aa6b3; --mtyre: #3c434c; --mtail: #c9a46a; --mview: #1b2026; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0e1114; --surface: #161a1f; --ink: #e7eaee; --ink2: #b2b9c3; --muted: #858e99; --rule: #29303a;
-  --braced: #5b9cf0; --stowed: #9ba4af; --t3: #f2905f; --hi: #18263a; color-scheme: dark }
+  --braced: #5b9cf0; --stowed: #9ba4af; --t3: #f2905f; --hi: #18263a;
+  --mfill: #3d4652; --mbody: #9aa6b3; --mtyre: #3c434c; --mtail: #c9a46a; --mview: #1b2026; color-scheme: dark }
 body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--f-body); }
 .wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -92,6 +95,31 @@ figure svg { width: 100%; height: auto; display: block; }
 .pass { color: var(--braced); font-weight: 600; } .fail { color: var(--t3); font-weight: 600; }
 .foot { font-size: 0.82rem; color: var(--muted); display: grid; gap: 4px; }
 .foot code { font-family: var(--f-data); font-size: 0.78rem; }
+/* little models: a side view under each knob (lowest setting filled, highest outlined), a 3D view in the open row */
+svg.mini { display: block; width: 100%; max-width: 220px; height: auto; margin-top: 6px; overflow: visible; }
+svg.mini .gnd { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+svg.mini .lo path, svg.mini .lo circle { fill: var(--mfill); }
+svg.mini .lo line { stroke: var(--mfill); stroke-linecap: round; }
+svg.mini .hi path, svg.mini .hi circle { fill: none; stroke: var(--ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+svg.mini .hi line { stroke: var(--ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.mkey { display: inline-flex; gap: 6px; align-items: center; }
+.mkey i { display: inline-block; width: 14px; height: 9px; border-radius: 2px; }
+.det { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 14px; align-items: start; }
+@media (max-width: 860px) { .det { grid-template-columns: minmax(0, 1fr); } }
+.v3slot { min-width: 0; }
+.v3slot > button, .vbtn button { font: 600 0.8rem/1 var(--f-data); color: var(--ink2); background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; cursor: pointer; }
+.v3 { display: grid; gap: 8px; }
+.cvbox { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--mview); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; touch-action: none; cursor: grab; }
+.cvbox canvas { display: block; width: 100%; height: 100%; }
+.vbtn { position: absolute; right: 8px; top: 8px; display: flex; gap: 4px; }
+.vbtn button { padding: 5px 8px; min-width: 30px; }
+.v3ctl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; font-size: 0.85rem; color: var(--ink2); }
+.v3ctl input[type=range] { width: 100%; accent-color: var(--t3); }
+.v3ctl output { grid-column: 1 / -1; font: 0.8rem/1.4 var(--f-data); color: var(--ink); }
+table.vals tr[data-i] { cursor: pointer; }
+.det table.vals td { white-space: nowrap; }
+table.vals tr.is-cur td { background: var(--hi); }
 @media (max-width: 520px) { h1 { font-size: 1.7rem; } .wrap { gap: 32px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -125,7 +153,7 @@ figure svg { width: 100%; height: auto; display: block; }
 
   <section>
     <h2>Every knob, one at a time</h2>
-    <p class="lede">Each cell is one knob swept across its range with everything else at T3's, drawn on the gauge's own scale, so cells in a column compare directly. The orange tick is T3's setting. Tap a row for the numbers.</p>
+    <p class="lede">Each cell is one knob swept across its range with everything else at T3's, drawn on the gauge's own scale, so cells in a column compare directly. The orange tick is T3's setting. Under each knob is its little model, side on, all at one scale: filled at the lowest setting, outlined at the highest. Tap a row for the numbers and a 3D model to turn over, with a slider through the settings and T3 as a ghost.</p>
     <div class="controls">
       <label for="order">Order</label>
       <select id="order">
@@ -137,7 +165,7 @@ figure svg { width: 100%; height: auto; display: block; }
         <option value="crest">by effect on the crest</option>
         <option value="push">by effect on the push</option>
       </select>
-      <div class="legend"><span><i style="border-color:var(--ink)"></i>gauge</span><span><i style="border-color:var(--stowed);border-top-style:dashed"></i>hills, tail stowed</span><span><i style="border-color:var(--braced)"></i>hills, tail braced</span><span><i style="border-color:var(--t3);width:0;height:14px;border-top:0;border-left:2px dashed var(--t3)"></i>T3</span></div>
+      <div class="legend"><span><i style="border-color:var(--ink)"></i>gauge</span><span><i style="border-color:var(--stowed);border-top-style:dashed"></i>hills, tail stowed</span><span><i style="border-color:var(--braced)"></i>hills, tail braced</span><span><i style="border-color:var(--t3);width:0;height:14px;border-top:0;border-left:2px dashed var(--t3)"></i>T3</span><span class="mkey"><i style="background:var(--mfill)"></i>model, lowest</span><span class="mkey"><i style="border:1.2px solid var(--ink)"></i>model, highest</span></div>
     </div>
     <div class="scroll"><table class="knobs" id="knobs"></table></div>
     <div class="scroll"><table class="plain" id="switches"></table></div>
@@ -211,6 +239,7 @@ figure svg { width: 100%; height: auto; display: block; }
 <div>The side-slope probe's first run had a bug (it counted the start's ±10° heading as sliding, so everything read 0°); it is kept as superseded and was rerun.</div></footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const D = /*DATA*/null;
 const G = {   // the gauges: label, unit, the scale every cell in the column shares, better direction
@@ -227,6 +256,142 @@ const GROUPS = {wheels: 'Wheels', body: 'Body', insides: 'Insides', drive: 'Driv
 const B = D.base;
 const fmtv = (k, v) => Math.abs(v) >= 10 ? Math.round(v) : (Math.abs(v) >= 1 ? v.toFixed(2).replace(/\.?0+$/, '') : v.toFixed(2));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+
+// ---------- little models ----------
+const M = D.models, MD = M ? M.designs : {}, T3M = MD.T3 ? MD.T3[0] : null;
+
+function settings(key) {        // a knob's settings, low to high, with T3's in its place
+  const kn = D.knobs.find(k => k.key === key), L = (MD[key] || []).map(m => ({v: m.v, m}));
+  if (kn && T3M && !L.some(a => Math.abs(a.v - kn.t3v) < 1e-6)) L.push({v: kn.t3v, m: T3M, t3: true});
+  return L.sort((a, b) => a.v - b.v);
+}
+
+function hull2(P) {             // the side view's outline: a 2D convex hull (monotone chain)
+  P = P.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], up = [];
+  for (const p of P) { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (const p of P.reverse()) { while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+
+const PROF = new Map();
+function profile(m) {           // x along the robot, z up
+  if (PROF.has(m)) return PROF.get(m);
+  const P = [];
+  for (const i of m.hulls) { const v = M.meshes[i].v; for (let j = 0; j < v.length; j += 3) P.push([v[j], v[j + 2]]); }
+  const r = {poly: hull2(P), wheels: [...new Set(m.wheels.map(w => w[0]))], R: m.R, tail: m.tail};
+  PROF.set(m, r); return r;
+}
+
+const BOUNDS = (() => {         // one scale for every little model
+  let x0 = 1e9, x1 = -1e9, z1 = 0;
+  for (const L of Object.values(MD)) for (const m of L) {
+    const p = profile(m);
+    for (const [x, z] of p.poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z1 = Math.max(z1, z); }
+    for (const x of p.wheels) { x0 = Math.min(x0, x - p.R); x1 = Math.max(x1, x + p.R); z1 = Math.max(z1, 2 * p.R); }
+    if (p.tail) { const t = p.tail.tip, f = p.tail.foot; x0 = Math.min(x0, t[0] - f); x1 = Math.max(x1, t[0] + f); z1 = Math.max(z1, t[2] + f); }
+  }
+  return [x0 - 8, x1 + 8, z1 + 8];
+})();
+
+function miniSVG(lo, hi) {
+  const [x0, x1, z1] = BOUNDS, X = x => (x - x0).toFixed(0), Z = z => (z1 - z).toFixed(0);
+  const shape = (m, cls) => {
+    const p = profile(m), t = p.tail;
+    return `<g class="${cls}"><path d="M${p.poly.map(([x, z]) => X(x) + ',' + Z(z)).join('L')}Z"/>` +
+      p.wheels.map(x => `<circle cx="${X(x)}" cy="${Z(p.R)}" r="${p.R}"/>`).join('') +
+      (t ? `<line x1="${X(t.base[0])}" y1="${Z(t.base[2])}" x2="${X(t.tip[0])}" y2="${Z(t.tip[2])}"${cls === 'lo' ? ` stroke-width="${2 * t.r}"` : ''}/><circle cx="${X(t.tip[0])}" cy="${Z(t.tip[2])}" r="${t.foot}"/>` : '') + '</g>';
+  };
+  return `<svg class="mini" viewBox="0 0 ${(x1 - x0).toFixed(0)} ${(z1 + 4).toFixed(0)}" role="img" aria-label="side view"><line class="gnd" x1="0" x2="${(x1 - x0).toFixed(0)}" y1="${Z(0)}" y2="${Z(0)}"/>${shape(lo, 'lo')}${hi && hi !== lo ? shape(hi, 'hi') : ''}</svg>`;
+}
+
+function miniKnob(key) {
+  const at = settings(key); if (!at.length) return '';
+  return miniSVG(at[0].m, at[at.length - 1].m);
+}
+
+let V = null;                   // the one 3D view, moved into whichever row was opened last
+function viewer() {
+  if (V || typeof THREE === 'undefined' || !M) return V;
+  const el = document.createElement('div'); el.className = 'v3';
+  el.innerHTML = `<div class="cvbox"><canvas aria-label="3D model of the selected setting; drag to turn it"></canvas><div class="vbtn"><button type="button" data-z="0.8" aria-label="Zoom in">+</button><button type="button" data-z="1.25" aria-label="Zoom out">&minus;</button><button type="button" data-z="0" aria-label="Reset the view">reset</button></div></div>` +
+    `<div class="v3ctl"><input type="range" min="0" step="1" aria-label="Setting"><label><input type="checkbox" checked> T3 as a ghost</label><output></output></div>`;
+  const box = el.querySelector('.cvbox'), cv = el.querySelector('canvas'), sl = el.querySelector('input[type=range]'), gh = el.querySelector('input[type=checkbox]'), out = el.querySelector('output');
+  const renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true}); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(30, 4 / 3, 5, 20000); cam.up.set(0, 0, 1);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x555555, 0.55); hemi.position.set(0, 0, 1); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.55); sun.position.set(700, -900, 1500); scene.add(sun);
+  const grid = new THREE.GridHelper(1600, 16); grid.rotation.x = Math.PI / 2; scene.add(grid);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
+  const mats = {};
+  const material = () => {
+    const c = n => new THREE.Color(css(n));
+    mats.body = new THREE.MeshStandardMaterial({color: c('--mbody'), roughness: 0.75, metalness: 0.05});
+    mats.tyre = new THREE.MeshStandardMaterial({color: c('--mtyre'), roughness: 0.9});
+    mats.tail = new THREE.MeshStandardMaterial({color: c('--mtail'), roughness: 0.5});
+    mats.ghost = new THREE.MeshBasicMaterial({color: c('--t3'), transparent: true, opacity: 0.28, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 8});   // pushed back: it shows only where T3 sticks out
+    grid.material.color = c('--rule');
+  };
+  const GEO = new Map(), geo = i => {
+    if (!GEO.has(i)) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(M.meshes[i].v, 3)); g.setIndex(M.meshes[i].f); g.computeVertexNormals(); GEO.set(i, g); }
+    return GEO.get(i);
+  };
+  const robot = (m, ghost) => {
+    const g = new THREE.Group(), mb = ghost ? mats.ghost : mats.body;
+    for (const i of m.hulls) g.add(new THREE.Mesh(geo(i), mb));
+    const wg = new THREE.CylinderGeometry(m.R, m.R, m.TW, 36);
+    for (const [x, y] of m.wheels) { const w = new THREE.Mesh(wg, ghost ? mats.ghost : mats.tyre); w.position.set(x, y, m.R); g.add(w); }
+    if (m.tail) {
+      const Bv = new THREE.Vector3(...m.tail.base), T = new THREE.Vector3(...m.tail.tip), d = T.clone().sub(Bv), len = d.length(), mt = ghost ? mats.ghost : mats.tail;
+      const link = new THREE.Mesh(new THREE.CylinderGeometry(m.tail.r, m.tail.r, len, 14), mt);
+      link.position.copy(Bv.clone().add(T).multiplyScalar(0.5)); link.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(link);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(m.tail.foot, 18, 12), mt); foot.position.copy(T); g.add(foot);
+    }
+    return g;
+  };
+  let orbit0 = {az: -0.9, el: 0.32, r: 1500, tz: 110}, orbit = Object.assign({}, orbit0), cur = null, ghostG = null, key = null, at = [], i0 = 0;
+  let queued = false;
+  const draw = () => { if (queued) return; queued = true; requestAnimationFrame(() => {
+    queued = false; const {az, el: e, r, tz} = orbit;
+    cam.position.set(r * Math.cos(e) * Math.cos(az), r * Math.cos(e) * Math.sin(az), tz + r * Math.sin(e)); cam.lookAt(0, 0, tz); renderer.render(scene, cam); }); };
+  const clear = g => { if (g) { scene.remove(g); g.traverse(o => { if (o.geometry && ![...GEO.values()].includes(o.geometry)) o.geometry.dispose(); }); } };
+  const show = i => {
+    i = Math.max(0, Math.min(at.length - 1, i)); i0 = i; sl.value = i; const a = at[i];
+    clear(cur); cur = robot(a.m, false); scene.add(cur);
+    clear(ghostG); ghostG = null;
+    if (gh.checked && !a.t3 && T3M) { ghostG = robot(T3M, true); scene.add(ghostG); }
+    const kn = D.knobs.find(k => k.key === key), r = a.t3 ? B : (kn.rows.find(q => Math.abs(q.v - a.v) < 1e-6) || {});
+    const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
+    out.textContent = `${key} ${fmtv(key, a.v)}${a.t3 ? ' (T3)' : ''} · step ${f(r.climb)} mm · turn ${f(r.turn)} mm · hills ${f(r.h_up)}°/${f(r.h_down)}°, braced ${f(r.hb_up)}°/${f(r.hb_down)}° · crest ${f(r.crest)}° · push ${f(r.push, 1)} kg`;
+    const det = el.closest('tr.detail');
+    if (det) det.querySelectorAll('table.vals tr[data-i]').forEach(t => t.classList.toggle('is-cur', +t.dataset.i === i));
+    draw();
+  };
+  const size = () => { const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); draw(); };
+  sl.addEventListener('input', () => show(+sl.value)); gh.addEventListener('change', () => show(i0));
+  let drag = null;
+  box.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; drag = {x: e.clientX, y: e.clientY, az: orbit.az, el: orbit.el}; box.setPointerCapture(e.pointerId); });
+  box.addEventListener('pointermove', e => { if (!drag) return; orbit.az = drag.az - (e.clientX - drag.x) * 0.008; orbit.el = Math.max(0.02, Math.min(1.45, drag.el + (e.clientY - drag.y) * 0.006)); draw(); });
+  const stop = () => { drag = null; }; box.addEventListener('pointerup', stop); box.addEventListener('pointercancel', stop);
+  el.querySelectorAll('.vbtn button').forEach(b => b.addEventListener('click', () => {
+    const z = +b.dataset.z; if (z) orbit.r = Math.max(500, Math.min(4000, orbit.r * z)); else orbit = Object.assign({}, orbit0); draw(); }));
+  new ResizeObserver(size).observe(box);
+  const retheme = () => { material(); if (key) show(i0); };
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+  new MutationObserver(retheme).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+  material();
+  V = {el, load(k) { key = k; at = settings(k); sl.max = at.length - 1; show(Math.max(0, at.findIndex(a => a.t3 || Math.abs(a.v - D.knobs.find(q => q.key === k).t3v) < 1e-6))); size(); }, show};
+  return V;
+}
+
+function attach(key, det) {     // the 3D view into this row's slot, the row's button back in the one it left
+  if (!viewer()) return;
+  const slot = det.querySelector('.v3slot'); if (!slot) return;
+  const prev = V.el.parentElement; if (prev === slot) return;
+  if (prev) prev.querySelector('button')?.removeAttribute('hidden');
+  slot.querySelector('button')?.setAttribute('hidden', ''); slot.appendChild(V.el); V.load(key);
+}
 
 function strip() {
   const c = [
@@ -277,12 +442,16 @@ function table() {
   if (order !== 'group') list.sort((a, b) => effect(b, order) - effect(a, order));
   for (const kn of list) {
     if (order === 'group' && kn.group !== last) { h += `<tr class="grp"><td colspan="8">${GROUPS[kn.group]}</td></tr>`; last = kn.group; }
-    h += `<tr class="knob" tabindex="0" data-k="${kn.key}" aria-expanded="false"><td class="name"><b>${esc(kn.key)}</b><span>${esc(kn.what)}</span><em>${fmtv(kn.key, kn.lo)} to ${fmtv(kn.key, kn.hi)} · T3 ${fmtv(kn.key, kn.t3v)}</em></td>${COLS.map(c => `<td class="cell">${spark(kn, c)}</td>`).join('')}</tr>`;
+    h += `<tr class="knob" tabindex="0" data-k="${kn.key}" aria-expanded="false"><td class="name"><b>${esc(kn.key)}</b><span>${esc(kn.what)}</span><em>${fmtv(kn.key, kn.lo)} to ${fmtv(kn.key, kn.hi)} · T3 ${fmtv(kn.key, kn.t3v)}</em>${miniKnob(kn.key)}</td>${COLS.map(c => `<td class="cell">${spark(kn, c)}</td>`).join('')}</tr>`;
     h += `<tr class="detail" data-for="${kn.key}" hidden><td colspan="8">${detail(kn)}</td></tr>`;
   }
   el.innerHTML = h + '</tbody>';
+  el.querySelectorAll('tr.detail').forEach(d => {
+    d.querySelector('.v3slot > button')?.addEventListener('click', () => attach(d.dataset.for, d));
+    d.querySelectorAll('table.vals tr[data-i]').forEach(r => r.addEventListener('click', () => { attach(d.dataset.for, d); V && V.show(+r.dataset.i); }));
+  });
   el.querySelectorAll('tr.knob').forEach(tr => {
-    const tog = () => { const d = el.querySelector(`tr.detail[data-for="${tr.dataset.k}"]`); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); };
+    const tog = () => { const d = el.querySelector(`tr.detail[data-for="${tr.dataset.k}"]`); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); if (!d.hidden) attach(tr.dataset.k, d); };
     tr.addEventListener('click', tog); tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
   });
 }
@@ -291,16 +460,19 @@ function detail(kn) {
   const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
   const rows = kn.rows.filter(r => r.v !== null).slice();
   const t3 = Object.assign({}, B, {v: kn.t3v, t3: true}); rows.push(t3); rows.sort((a, b) => a.v - b.v);
-  return `<table class="vals"><thead><tr><th>${esc(kn.key)}</th><th>upright</th><th>step mm</th><th>turn mm</th><th>up s/b</th><th>down s/b</th><th>crest</th><th>push kg</th><th>static tip</th><th>CoM z</th><th>mass g</th><th>width</th></tr></thead><tbody>` +
-    rows.map(r => `<tr class="${r.t3 ? 'is-t3' : ''}"><td>${fmtv(kn.key, r.v)}${r.t3 ? ' T3' : ''}</td><td>${f(r.up, 2)}</td><td>${f(r.climb)}</td><td>${f(r.turn)}</td><td>${f(r.h_up)} / ${f(r.hb_up)}</td><td>${f(r.h_down)} / ${f(r.hb_down)}</td><td>${f(r.crest)}</td><td>${f(r.push, 1)}</td><td>${f(r.tip_static, 1)}°</td><td>${f(r.com_z)}</td><td>${f(r.mass)}</td><td>${f(r.width)}</td></tr>`).join('') +
-    '</tbody></table>';
+  const at = settings(kn.key);
+  const idx = r => at.findIndex(a => Math.abs(a.v - r.v) < 1e-6);
+  const slot = M ? `<div class="v3slot">${typeof THREE === 'undefined' ? '' : '<button type="button">Show the 3D model here</button>'}</div>` : '';
+  return `<div class="det">${slot}<div class="scroll"><table class="vals"><thead><tr><th>${esc(kn.key)}</th><th>upright</th><th>step mm</th><th>turn mm</th><th>up s/b</th><th>down s/b</th><th>crest</th><th>push kg</th><th>static tip</th><th>CoM z</th><th>mass g</th><th>width</th></tr></thead><tbody>` +
+    rows.map(r => `<tr class="${r.t3 ? 'is-t3' : ''}"${idx(r) >= 0 ? ` data-i="${idx(r)}"` : ''}><td>${fmtv(kn.key, r.v)}${r.t3 ? ' T3' : ''}</td><td>${f(r.up, 2)}</td><td>${f(r.climb)}</td><td>${f(r.turn)}</td><td>${f(r.h_up)} / ${f(r.hb_up)}</td><td>${f(r.h_down)} / ${f(r.hb_down)}</td><td>${f(r.crest)}</td><td>${f(r.push, 1)}</td><td>${f(r.tip_static, 1)}°</td><td>${f(r.com_z)}</td><td>${f(r.mass)}</td><td>${f(r.width)}</td></tr>`).join('') +
+    '</tbody></table></div></div>';
 }
 
 function switches() {
   const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
   const rows = [{name: 'T3', row: B}].concat(D.switches);
   document.getElementById('switches').innerHTML = `<thead><tr><th>Switch</th><th>upright</th><th>step mm</th><th>turn mm</th><th>hills stowed</th><th>hills braced</th><th>crest</th><th>push kg</th><th>mass g</th></tr></thead><tbody>` +
-    rows.map(({name, row: r}) => `<tr><td>${esc(name)}</td><td class="n">${f(r.up, 2)}</td><td class="n">${f(r.climb)}</td><td class="n">${f(r.turn)}</td><td class="n">${f(r.h_up)}° / ${f(r.h_down)}°</td><td class="n">${r.hb_up === null ? 'no tail' : f(r.hb_up) + '° / ' + f(r.hb_down) + '°'}</td><td class="n">${f(r.crest)}°</td><td class="n">${f(r.push, 1)}</td><td class="n">${f(r.mass)}</td></tr>`).join('') + '</tbody>';
+    rows.map(({name, row: r}) => `<tr><td>${esc(name)}${MD[name] ? miniSVG(MD[name][0]) : ''}</td><td class="n">${f(r.up, 2)}</td><td class="n">${f(r.climb)}</td><td class="n">${f(r.turn)}</td><td class="n">${f(r.h_up)}° / ${f(r.h_down)}°</td><td class="n">${r.hb_up === null ? 'no tail' : f(r.hb_up) + '° / ' + f(r.hb_down) + '°'}</td><td class="n">${f(r.crest)}°</td><td class="n">${f(r.push, 1)}</td><td class="n">${f(r.mass)}</td></tr>`).join('') + '</tbody>';
 }
 
 // a focus chart: one knob, several series, one y scale

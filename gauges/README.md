@@ -91,10 +91,11 @@ bounding box of its body and pods, on the Trainer's wheels. Same mass, CoM and i
 - **Doesn't read:** speed, or the narrowest gap it fits through (its width is listed with the costs). Zach
   (2026-10-26): "a meh gauge but fine for now".
 
-## G4 Hill up, G5 Hill down (proposed, 2026-10-27)
+## G4 Hill up, G5 Hill down (adopted 2026-10-27; target: as steep as it goes)
 
 Zach asked "how far of a hill it can climb/descend before falling", the designs being top heavy with the tail doing
-the righting. Not yet in the scorecard or the searches; read on the shape study (`gauges/hills.py`).
+the righting. Not yet on the scorecard page; read on the shape study (`gauges/hills.py`) and in the hills run's
+search.
 - **Lever:** staying on its wheels on a slope, up (G4) and down (G5).
 - **Reads:** the steepest slope (degrees, 5° steps) it drives 2.5 m up (down) in at least 18 of 20 tries without
   tipping (tilt from the slope's normal past 60°, or past 30° at the end), the better direction counting, every
@@ -125,7 +126,7 @@ the righting. Not yet in the scorecard or the searches; read on the shape study 
   before they push sideways, so the gauge would read nothing. A side slope or a kerb mid-turn is the case to build.
 - **Trust:** none yet. Rests on the friction guesses, and on the tail's foot gripping like a tyre.
 
-## G6 Crest (proposed, 2026-10-27)
+## G6 Crest (adopted 2026-10-27; target: at least 20°)
 
 Zach picked it from the knob log's recommended tests: the other gauges only charge for body height, and a crest is
 where height pays. `SCORPION_SEARCH=search_hills python gauges/crest.py read` -> `out/crest/read.json`.
@@ -152,7 +153,7 @@ where height pays. `SCORPION_SEARCH=search_hills python gauges/crest.py read` ->
   read smoother; not changed (Zach's call).
 - **Trust:** none yet.
 
-## G7 Push (proposed, 2026-10-27)
+## G7 Push (adopted 2026-10-27; target: at least 3 kg)
 
 Zach picked it from the same list: moving boxes is in the purpose, and nothing else reads force.
 `SCORPION_SEARCH=search_hills python gauges/push.py read` -> `out/push/read.json`.
@@ -193,6 +194,17 @@ The live scorecard is the "Scorpion Gauges" page (a private claude.ai page), fil
 | G1 upright after a fall | 0.61 | E4 weeble 0.995 | at least 0.75 |
 | G2 step up | 30 mm | Six-wheel 50 mm | as tall as it goes |
 | G3 turn-around space | 594 mm | Six-wheel 542 mm | as small as it goes |
+
+Iteration 2 adds the hills, the crest and the push (Zach, 2026-10-27). They are not on the scorecard page yet; the
+readings are from their own reads (`hills.py`, `crest.py`, `push.py`), 20 tries.
+
+| Gauge | Box reads | Best design (2026-10-27) | Target (Zach, 2026-10-27) |
+|---|---|---|---|
+| G4 / G5 hill up / down (x2.5) | 45° / 45° | Box, Trainer 45° / 45°; T3 braced 45° / 45° (T3 on six wheels 55° / 57°, a 6-try screen) | as steep as it goes |
+| G6 crest | 15° | T3, step layout 25° (T3 25-40° by luck) | at least 20° |
+| G7 push (worst friction) | 2 kg | Six-wheel 3 kg; T3 with a 170 mm tail mount 4 kg | at least 3 kg |
+
+On these, T3 as it stands meets the crest and misses the push (1 kg); the 170 mm tail mount meets it.
 
 G1 is a floor; G2 and G3 are pushed as far as they go, together. Zach on G3: "a meh gauge but fine for now", so it is
 the first candidate to supersede.
@@ -342,7 +354,8 @@ with the sweep's bigger wheels.
 
 `SCORPION_SEARCH=search_hills python gauges/knobs.py sweep`, then `... rebrace` and `... side`; `python
 gauges/knobs_page.py` builds the page "Scorpion Knobs", every
-knob's sweep drawn on each gauge's scale. Results in `out/knobs/`. Zach asked for a log of "how ... the height of the
+knob's sweep drawn on each gauge's scale, with a little model of every setting (a side view on each row, a 3D view
+with a slider and T3 as a ghost in the opened row; `out/knobs/models.json`, rebuilt by `knobs_page.py models`). Results in `out/knobs/`. Zach asked for a log of "how ... the height of the
 body and the width of the wheels actually translate to the numbers". Every knob of T3 takes 7 settings across its
 search range, the rest at T3's, 3 seeds each (T3 8): the lean screen without its cut, and both hills at x2.5 in 6
 tries, the tail stowed and braced. The sweep braced at -30° and -15°. `rebrace` re-read the braced hills at the best
@@ -600,3 +613,5 @@ middle axle, and a shell (shell3's superellipsoid over the body, cut at the bell
   gauge's terrain or objects now go in after the robot's body, so its free joint stays first in the state; the tyres
   take contact priority. T3's crest sits on a plateau and reads 25° or 40° by luck. Raising the tail mount to 170 mm
   takes T3's push from 1 to 4 kg.
+- 2026-10-27: Zach adopted G4-G7 with targets: the hills as steep as they go, the crest at least 20°, the push at
+  least 3 kg. None is on the scorecard page or in a search's screen yet.
