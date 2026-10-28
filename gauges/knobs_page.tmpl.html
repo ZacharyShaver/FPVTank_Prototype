@@ -47,7 +47,7 @@ ul.find b { font-weight: 600; }
 .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
 .scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
 table { border-collapse: collapse; width: 100%; }
-table.knobs { min-width: 860px; }
+table.knobs { min-width: 1120px; }
 table.knobs th { font: 600 0.72rem/1.2 var(--f-data); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
   text-align: left; padding: 10px 10px 8px; border-bottom: 1px solid var(--rule); vertical-align: bottom; }
 table.knobs th small { display: block; text-transform: none; letter-spacing: 0; font-weight: 400; }
@@ -86,6 +86,10 @@ figure svg { width: 100%; height: auto; display: block; }
 .ideas ol { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
 .ideas li span { display: block; font-size: 0.86rem; color: var(--ink2); }
 .tag { font: 600 0.68rem/1 var(--f-data); letter-spacing: 0.05em; padding: 3px 6px; border-radius: 3px; border: 1px solid var(--rule); color: var(--ink2); margin-left: 6px; vertical-align: 2px; white-space: nowrap; }
+.find-k { display: grid; gap: 14px; max-width: 80ch; }
+.find-k > div { display: grid; gap: 4px; padding-left: 12px; border-left: 2px solid var(--rule); }
+.find-k b { font-family: var(--f-display); font-stretch: 87%; font-weight: 600; font-size: 1.02rem; }
+.pass { color: var(--braced); font-weight: 600; } .fail { color: var(--t3); font-weight: 600; }
 .foot { font-size: 0.82rem; color: var(--muted); display: grid; gap: 4px; }
 .foot code { font-family: var(--f-data); font-size: 0.78rem; }
 @media (max-width: 520px) { h1 { font-size: 1.7rem; } .wrap { gap: 32px; } }
@@ -96,7 +100,7 @@ figure svg { width: 100%; height: auto; display: block; }
   <header style="display:grid;gap:10px">
     <div class="eyebrow">Scorpion · gauges · knob log · 2026-10-27</div>
     <h1>What each knob does to the numbers</h1>
-    <p class="lede" id="lede">Every knob of T3's design swept one at a time across its search range, on all five gauges, with the hills read with the tail stowed and braced: 539 screened designs, a re-read of the braced hills over five tail angles, and a side-slope probe. Two knobs are new: the tyres' width and the tail mount's height.</p>
+    <p class="lede" id="lede">Every knob of T3's design swept one at a time across its search range, on all seven gauges (G6 crest and G7 push are new and proposed), with the hills read with the tail stowed and braced: 602 screened designs, a re-read of the braced hills over five tail angles, and a side-slope probe. Five knobs are new: the tyres' width and grip, the tail mount's height, the tail foot's size, and a push face. The six candidate knobs from the first pass are worked through below.</p>
   </header>
 
   <section>
@@ -106,13 +110,16 @@ figure svg { width: 100%; height: auto; display: block; }
 
   <section>
     <h2>Read this first</h2>
-    <ul class="find" id="findings"><li><b>Body height cuts both ways.</b> Below T3's 52 mm ride height the step goes (40 mm: a 50 mm step; 15 mm: 30), because the body's front meets the step's face before the tyres lift it. Above it, the hills go: at 90 mm, 30° / 35° stowed and 35° / 40° braced, against T3's 35° / 40° and 45° / 45°. T3 sits about 10 mm above the step's cliff.</li>
+    <ul class="find" id="findings"><li><b>Raise the tail mount over what it pushes.</b> T3 pushes the worst of the five (1 kg) because its 150 mm tail mount catches a 150 mm box in reverse. At 170 mm it pushes 4 kg with the step intact, for 5° of braced hill. A push face on the nose does as well on the box but kills the step (30 mm).</li>
+<li><b>Grip is the hill lever on ordinary ground.</b> On x1 and x0.65 floors the hills end in a slide; 1.5x the tread's grip adds 5-10°. On grippy ground (x2.5) it adds nothing. The model's tyre friction is a guess worth measuring.</li>
+<li><b>A slow crawl climbs worse, because of the drive's speed loop.</b> Its torque at the stall scales with the speed asked for; braced, T3 makes 30° at 0.15 m/s and 45° at 0.5. Wheel-speed feedback with an integral term is the fix, in the robot's code.</li>
+<li><b>Body height cuts both ways.</b> Below T3's 52 mm ride height the step goes (40 mm: a 50 mm step; 15 mm: 30), because the body's front meets the step's face before the tyres lift it. Above it, the hills go: at 90 mm, 30° / 35° stowed and 35° / 40° braced, against T3's 35° / 40° and 45° / 45°. T3 sits about 10 mm above the step's cliff.</li>
 <li><b>Bracing the tail doesn't cancel height.</b> From 15 to 90 mm of ride height the hills lose 10° both ways with the tail braced, against 15° up and 10° down stowed. Steeper tail angles don't win it back (checked over five, -75° to -15°).</li>
 <li><b>Wheel width costs only the turn.</b> Track 110 to 180 mm widens the turn from 393 to 485 mm (and landing upright drops to 0.87 at 180); tyres 25 to 80 mm wide, 382 to 441. The step and the hills don't move: tipping fore and aft doesn't depend on width. Width pays only across a slope, and only on grippy ground.</li>
 <li><b>The wheelbase is the hill lever, and the step's enemy.</b> A tyre gap of 15 to 150 mm takes the hills from 25° / 30° to 50° / 50° stowed, but the step falls from 150 mm at T3's 62 to 40 mm from 82 up, and the turn grows from 384 to 525 mm.</li>
 <li><b>The stowed tail costs 10° uphill.</b> Without a tail the same robot reads 45° / 45° (but lands upright 0.69 and climbs 40 mm). Braced, the tail gives it back. Stowed lower it helps the hills (50° / 55° braced at 20°) but the turn swells to 900 mm.</li>
 <li><b>Hard floors under the step:</b> gearing under about 1.8x (83 mm at 1.45x; at 0.4x it stalls on a 15° hill), a tail shorter than 260 mm, a push angle shallower than -37°. Under 170 mm of tail or 2 N·m of servo it can't right itself (upright 0.6).</li>
-<li><b>Dead in their ranges:</b> the skin's squareness (p), its top shape (qu), its height above the middle (cu) up to 180 mm, the packs' height, the motor's size from 0.75x to 2x. The screen's noise on T3 over 8 seeds: the step varies by 5 mm, nothing else moves.</li>
+<li><b>Dead in their ranges:</b> the skin's squareness (p), its top shape (qu), its height above the middle (cu) up to 180 mm, the packs' height, the motor's size from 0.75x to 2x. The screen's noise on T3 over 8 seeds: the step varies by 5 mm, nothing else moves. The crest is read once a setting and swings 25-40° by luck (below).</li>
 <li><b>Six wheels</b> read 55° / 57° stowed and 55° / 60° braced, the best hills of all, but step 37 mm, turn 623 mm and 790 g more.</li></ul>
   </section>
 
@@ -127,11 +134,39 @@ figure svg { width: 100%; height: auto; display: block; }
         <option value="climb">by effect on the step</option>
         <option value="turn">by effect on the turn</option>
         <option value="up">by effect on landing upright</option>
+        <option value="crest">by effect on the crest</option>
+        <option value="push">by effect on the push</option>
       </select>
       <div class="legend"><span><i style="border-color:var(--ink)"></i>gauge</span><span><i style="border-color:var(--stowed);border-top-style:dashed"></i>hills, tail stowed</span><span><i style="border-color:var(--braced)"></i>hills, tail braced</span><span><i style="border-color:var(--t3);width:0;height:14px;border-top:0;border-left:2px dashed var(--t3)"></i>T3</span></div>
     </div>
     <div class="scroll"><table class="knobs" id="knobs"></table></div>
     <div class="scroll"><table class="plain" id="switches"></table></div>
+  </section>
+
+  <section>
+    <h2>Two new gauges: crest and push</h2>
+    <p class="lede">Both proposed; both negative controls pass (the line under each table). <b>G6 crest:</b> a ridge with a rounded peak, each side 5° to 60° steep, crawled over at 0.15 m/s on grippy ground (x2.5), 20 tries a direction, the better one counting. At the step's 0.5 m/s, momentum carried every belly over and hid what the gauge is for. It reads high-centring, where the belly grounds and the wheels hang: the Box falls from 15° to 5° with its belly 15 mm lower, and from 15° to 10° with a 1.5x wheelbase. T3 doesn't high-centre; it tips over the peak. <b>G7 push:</b> a 200 × 260 × 150 mm box, 0.5 to 12 kg, shoved 0.5 m within 6 s at 0.3 m/s, forwards or backwards, read at the friction band's worst. T3 reads 1 kg, the worst of the five: at x1.5 its nose climbs the box, and in reverse its tail mount catches it. On ordinary ground it shoves 5 kg.</p>
+    <p class="lede"><b>T3's crest is a coin flip.</b> From 25° to 40° it crosses in 75-95% of tries, against the 90% a reading needs, so 20 tries read 25° or 40° by luck (the gauge's own read: 25°; the knob sweep's T3: 40°). Backwards it crosses 40° every time, but 25° only 34 times in 40. The crest column in the knob table swings the same way, so read it only where it drops to 20° or less and stays there over neighbouring settings: a tail foot of 23 mm or more, a tyre gap of 105 mm or more, gearing at 1.1x or less, a push face, no tail.</p>
+    <div class="pair">
+      <div class="scroll"><table class="plain" id="crest-read"></table></div>
+      <div class="scroll"><table class="plain" id="push-read"></table></div>
+    </div>
+    <div class="scroll"><table class="plain" id="crest-curve"></table></div>
+  </section>
+
+  <section>
+    <h2>The candidate knobs, worked through</h2>
+    <div class="find-k">
+<div><b>K1 Tyre grip: yes, the only hill lever on ordinary ground.</b>The tread's friction, 0.5x to 1.8x of today's, on T3. On ordinary ground (x1) half grip reads 20° every way; today's, 35° / 40° stowed and braced; 1.5x, 35° / 40° stowed and 40° / 45° braced. On the band's slipperiest (x0.65) today's reads 25° / 30° and 1.5x reads 35° / 40°: 10° from tread alone. The step needs at least today's grip (half: 20 mm; 0.93x: 150 mm). On grippy ground (x2.5) nothing moves: the robot tips there before it slides. The model's tyre friction is a guess; a tilt test on his floor would measure it (the ramp angle where a robot with locked wheels starts to slide).</div>
+<div><b>K2 Tail as a counterweight: no.</b>No pose held across the tail's arc beats the brace at -30° (45° / 45°), and braced, uphill ends in a stall, not a tip: the wheels run out of torque before the robot runs out of balance, so moving weight forward has nothing to give.</div>
+<div><b>K3 Brace angle per design: a rule, not a knob.</b>The fixed angles are already best on most designs (-30° up on 175 of 191, -15° down on 177). Setting it by rule, the foot just on the ground, lands within one 5° step of the best on about 98% of them; the misses look like noise (T3 at the rule's -29.5° reads 40° against 45° at -30°). It matters only where the foot's geometry moves: the mount's height, the tail's length.</div>
+<div><b>K4 Tail foot: keep the 12 mm ball.</b>A 6 mm foot: 40° / 40° stowed, 40° / 45° braced (5° up gained stowed, 5° lost braced). From 29 mm up, the hills fall to 35° / 35° stowed and 40° / 40° braced, the turn grows to 408-432 mm, the crest to 20° (from 23 mm), and at 40 mm the step to 110 mm.</div>
+<div><b>K5 Ride height that moves: probably not worth an actuator.</b>Low (15 mm) reads 45° / 45° stowed and 45° / 50° braced, and pushes 4 kg; the step needs it at 52 mm or more. That is 5-10° of hill for a lift mechanism, and the push comes cheaper from the tail mount (K7).</div>
+<div><b>K6 Hill speed: the lever is the speed loop, not the speed.</b>Slower is worse uphill: T3 braced reads 30° at 0.15 m/s against 45° at 0.5 (0.8 matches 0.5). The drive is modelled as a DC motor on a duty-cycle command with a proportional speed term, so asking for less speed gives less torque at the stall. Wheel-speed feedback with an integral term would let a crawl climb like a run. That is a controller change for the robot's code, not the CAD.</div>
+<div><b>K7 Push face, new: no; raise the tail mount instead.</b>A 60 mm plate across the nose (75 g) takes the worst push from 1 to 4 kg, but the step falls from 143 to 30 mm (60-80 with the plate's top at 125-150) because the plate meets the step's face. The fix is at the back: in reverse, T3's tail mount (150 mm up, the box's own height) catches the box's top edge and levers the robot up. With the mount at 170 mm, the worst push is 4 kg at 20 tries (5 kg on ordinary ground), and the step stays at 150 mm, for 5° of braced hill (40° / 40°). Control: a 200 mm box catches the 170 mm mount again (0.5 kg at x1.5). The rule: nothing on the rear face below the top of what it pushes.</div>
+    </div>
+    <div class="scroll"><table class="plain" id="grip"></table></div>
+    <div class="scroll"><table class="plain" id="speed"></table></div>
   </section>
 
   <section>
@@ -149,21 +184,18 @@ figure svg { width: 100%; height: auto; display: block; }
 
   <section>
     <h2>Knobs and tests to try next</h2>
+    <p class="lede">The first pass's six knobs (tyre grip, the tail as a counterweight, brace angle per design, the tail foot, a moving ride height, hill speed) are worked through above as K1-K6, and its two recommended tests are built as G6 crest and G7 push.</p>
     <div class="ideas"><div><h3>Knobs</h3><ol>
-<li>Tyre grip (tread, compound, grousers)<span>On ordinary ground every hill, up, down and across, ends in a slide at 35-40°. Grip is the only lever there. Cheap: a per-design tyre friction.</span></li>
-<li>The tail as a counterweight<span>Swung forward going up and back going down, instead of held. Held braced already gives 45° / 45°; moving the mass may give more.</span></li>
-<li>Brace angle per design<span>The best held angle moved from -30° (T3) to -15° on most other designs. Let the search tune it, or set it by rule: the foot just on the ground.</span></li>
-<li>Tail foot<span>A 12 mm rubber ball today. Held out as an outrigger at -45° it dug in and stopped the robot on a 5° side slope. A skid or a wider pad changes both bracing and dragging.</span></li>
-<li>A ride height that moves<span>The step wants the body high and the hills want it low. A body that tilts or lifts, or a tail that lifts the rear, could have both.</span></li>
-<li>Hill speed and slip control<span>Braced, uphill ends in a stall, not a tip. A slower crawl or a wheel-slip limit is a controller knob, not a part.</span></li>
+<li>Tail mount height in the searches<span>Free across 90-210 mm, now that it sets the push. The searches held it at 150.</span></li>
+<li>A rear push plate<span>A flat face behind the tail mount, up to its height, so taller loads can't catch it. Costs mass at the back, where the hills don't mind it.</span></li>
+<li>Speed loop gains<span>An integral term in the sim's drive, to read the hills as the robot would drive them with feedback.</span></li>
 </ol></div>
 <div><h3>Tests</h3><ol>
-<li>Crest and breakover <span class="tag">recommended</span><span>Driving over a ridge or a step down then up, where a low belly high-centres. Today the gauges only charge for height; this is where height pays.</span></li>
 <li>Step down and ledge drop<span>Does it nose-dive and flip coming off a ledge? Unchecked since the sharp-edge lesson.</span></li>
-<li>Push force (drawbar pull) <span class="tag">recommended</span><span>How hard it can shove a box. Moving boxes is in the purpose; mass, gearing and grip set it, and none of the five gauges reads it.</span></li>
 <li>Rough ground<span>A random heightfield (rubble, grass clumps): general mobility, where ride height and wheel size should pay.</span></li>
 <li>Stairs<span>G2's ladder stops at 150 mm; stairs are about 180 mm risers, one after another.</span></li>
 <li>Side slope (probed here)<span>T3 55° at x2.5, 40° at x1 (a slide). Worth a gauge only if traverses matter; on ordinary ground it reads the tyres.</span></li>
+<li>Crest as a pass rate<span>The share of tries over a 30° ridge, rather than a ladder: smoother where a design sits on a plateau, as T3 does.</span></li>
 </ol></div></div>
   </section>
 
@@ -175,6 +207,7 @@ figure svg { width: 100%; height: auto; display: block; }
 
   <footer class="foot" id="foot"><div>Sources: <code>gauges/knobs.py</code> (sweep, rebrace, side), <code>gauges/surrogate.py</code>, <code>gauges/knobs_page.py</code>; data in <code>gauges/out/knobs/</code> and <code>gauges/out/surrogate/</code>.</div>
 <div>Each cell is the knob sweep's screen: 60 falls, the step ladder at x0.65 and x1.5 in 6 tries, the turn at three frictions, both hills at x2.5 in 6 tries; 3 seeds a setting, T3 8. Hills braced: the best of five held tail angles, -75° to -15°, one seed. Not the full 20-try gauges.</div>
+<div>G6 and G7 in the cells: the crest at its full 20 tries, x2.5; the push at 6 tries, worst over the band. Both are read once per setting, on one seed. Gauge reads: <code>gauges/crest.py</code>, <code>gauges/push.py</code>, in <code>gauges/out/crest/</code> and <code>gauges/out/push/</code>. Grip on the hills and the speeds: <code>knobs.py grip</code>, <code>knobs.py speed</code>, 20 tries.</div>
 <div>The side-slope probe's first run had a bug (it counted the start's ±10° heading as sliding, so everything read 0°); it is kept as superseded and was rerun.</div></footer>
 </div>
 
@@ -186,8 +219,10 @@ const G = {   // the gauges: label, unit, the scale every cell in the column sha
   turn:  {label: 'G3 turn', small: 'mm, smaller is better', lo: 350, hi: 900, fmt: v => Math.round(v), better: -1},
   hup:   {label: 'G4 up a hill', small: 'degrees, x2.5', lo: 10, hi: 60, fmt: v => Math.round(v), better: 1, s: 'h_up', b: 'hb_up'},
   hdown: {label: 'G5 down a hill', small: 'degrees, x2.5', lo: 10, hi: 60, fmt: v => Math.round(v), better: 1, s: 'h_down', b: 'hb_down'},
+  crest: {label: 'G6 crest', small: 'degrees a side, x2.5', lo: 0, hi: 50, fmt: v => Math.round(v), better: 1},
+  push:  {label: 'G7 push', small: 'kg box, worst friction', lo: 0, hi: 10, fmt: v => (+v).toFixed(1).replace(/\.0$/, ''), better: 1},
 };
-const COLS = ['up', 'climb', 'turn', 'hup', 'hdown'];
+const COLS = ['up', 'climb', 'turn', 'hup', 'hdown', 'crest', 'push'];
 const GROUPS = {wheels: 'Wheels', body: 'Body', insides: 'Insides', drive: 'Drive', tail: 'Tail'};
 const B = D.base;
 const fmtv = (k, v) => Math.abs(v) >= 10 ? Math.round(v) : (Math.abs(v) >= 1 ? v.toFixed(2).replace(/\.?0+$/, '') : v.toFixed(2));
@@ -200,6 +235,8 @@ function strip() {
     ['G3 turn', Math.round(B.turn) + ' mm', 'turn-around space'],
     ['G4 / G5 hills', B.h_up + '° / ' + B.h_down + '°', 'tail stowed, friction x2.5'],
     ['Tail braced', B.hb_up + '° / ' + B.hb_down + '°', 'best tail angle held'],
+    ['G6 crest', (D.crestRead ? D.crestRead.rows.find(r => r.name === 'T3').crest : B.crest) + '°', 'gauge, 20 tries; 25-40° by luck'],
+    ['G7 push', B.push === null || B.push === undefined ? '–' : G.push.fmt(B.push) + ' kg', 'heaviest box shoved 0.5 m'],
     ['Mass, CoM', (B.mass / 1000).toFixed(2) + ' kg', 'centre of mass ' + Math.round(B.com_z) + ' mm up'],
   ];
   document.getElementById('strip').innerHTML = c.map(([k, v, s]) => `<div><span class="k">${k}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`).join('');
@@ -229,7 +266,7 @@ function effect(kn, col) {
   const rows = kn.rows.filter(r => r.v !== null);
   const keys = col === 'hills' ? ['h_up', 'h_down', 'hb_up', 'hb_down'] : [col];
   let e = 0;
-  for (const k of keys) { const v = rows.map(r => r[k]).filter(v => v !== null); if (v.length) e = Math.max(e, (Math.max(...v) - Math.min(...v)) / ({up: 1, climb: 150, turn: 550}[k] || 50)); }
+  for (const k of keys) { const v = rows.map(r => r[k]).filter(v => v !== null); if (v.length) e = Math.max(e, (Math.max(...v) - Math.min(...v)) / ({up: 1, climb: 150, turn: 550, crest: 50, push: 10}[k] || 50)); }
   return e;
 }
 
@@ -239,9 +276,9 @@ function table() {
   let list = D.knobs.slice(), last = null;
   if (order !== 'group') list.sort((a, b) => effect(b, order) - effect(a, order));
   for (const kn of list) {
-    if (order === 'group' && kn.group !== last) { h += `<tr class="grp"><td colspan="6">${GROUPS[kn.group]}</td></tr>`; last = kn.group; }
+    if (order === 'group' && kn.group !== last) { h += `<tr class="grp"><td colspan="8">${GROUPS[kn.group]}</td></tr>`; last = kn.group; }
     h += `<tr class="knob" tabindex="0" data-k="${kn.key}" aria-expanded="false"><td class="name"><b>${esc(kn.key)}</b><span>${esc(kn.what)}</span><em>${fmtv(kn.key, kn.lo)} to ${fmtv(kn.key, kn.hi)} · T3 ${fmtv(kn.key, kn.t3v)}</em></td>${COLS.map(c => `<td class="cell">${spark(kn, c)}</td>`).join('')}</tr>`;
-    h += `<tr class="detail" data-for="${kn.key}" hidden><td colspan="6">${detail(kn)}</td></tr>`;
+    h += `<tr class="detail" data-for="${kn.key}" hidden><td colspan="8">${detail(kn)}</td></tr>`;
   }
   el.innerHTML = h + '</tbody>';
   el.querySelectorAll('tr.knob').forEach(tr => {
@@ -254,16 +291,16 @@ function detail(kn) {
   const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
   const rows = kn.rows.filter(r => r.v !== null).slice();
   const t3 = Object.assign({}, B, {v: kn.t3v, t3: true}); rows.push(t3); rows.sort((a, b) => a.v - b.v);
-  return `<table class="vals"><thead><tr><th>${esc(kn.key)}</th><th>upright</th><th>step mm</th><th>turn mm</th><th>up s/b</th><th>down s/b</th><th>static tip</th><th>CoM z</th><th>mass g</th><th>width</th></tr></thead><tbody>` +
-    rows.map(r => `<tr class="${r.t3 ? 'is-t3' : ''}"><td>${fmtv(kn.key, r.v)}${r.t3 ? ' T3' : ''}</td><td>${f(r.up, 2)}</td><td>${f(r.climb)}</td><td>${f(r.turn)}</td><td>${f(r.h_up)} / ${f(r.hb_up)}</td><td>${f(r.h_down)} / ${f(r.hb_down)}</td><td>${f(r.tip_static, 1)}°</td><td>${f(r.com_z)}</td><td>${f(r.mass)}</td><td>${f(r.width)}</td></tr>`).join('') +
+  return `<table class="vals"><thead><tr><th>${esc(kn.key)}</th><th>upright</th><th>step mm</th><th>turn mm</th><th>up s/b</th><th>down s/b</th><th>crest</th><th>push kg</th><th>static tip</th><th>CoM z</th><th>mass g</th><th>width</th></tr></thead><tbody>` +
+    rows.map(r => `<tr class="${r.t3 ? 'is-t3' : ''}"><td>${fmtv(kn.key, r.v)}${r.t3 ? ' T3' : ''}</td><td>${f(r.up, 2)}</td><td>${f(r.climb)}</td><td>${f(r.turn)}</td><td>${f(r.h_up)} / ${f(r.hb_up)}</td><td>${f(r.h_down)} / ${f(r.hb_down)}</td><td>${f(r.crest)}</td><td>${f(r.push, 1)}</td><td>${f(r.tip_static, 1)}°</td><td>${f(r.com_z)}</td><td>${f(r.mass)}</td><td>${f(r.width)}</td></tr>`).join('') +
     '</tbody></table>';
 }
 
 function switches() {
   const f = (v, d = 0) => v === null || v === undefined ? '–' : (+v).toFixed(d);
   const rows = [{name: 'T3', row: B}].concat(D.switches);
-  document.getElementById('switches').innerHTML = `<thead><tr><th>Switch</th><th>upright</th><th>step mm</th><th>turn mm</th><th>hills stowed</th><th>hills braced</th><th>mass g</th></tr></thead><tbody>` +
-    rows.map(({name, row: r}) => `<tr><td>${esc(name)}</td><td class="n">${f(r.up, 2)}</td><td class="n">${f(r.climb)}</td><td class="n">${f(r.turn)}</td><td class="n">${f(r.h_up)}° / ${f(r.h_down)}°</td><td class="n">${r.hb_up === null ? 'no tail' : f(r.hb_up) + '° / ' + f(r.hb_down) + '°'}</td><td class="n">${f(r.mass)}</td></tr>`).join('') + '</tbody>';
+  document.getElementById('switches').innerHTML = `<thead><tr><th>Switch</th><th>upright</th><th>step mm</th><th>turn mm</th><th>hills stowed</th><th>hills braced</th><th>crest</th><th>push kg</th><th>mass g</th></tr></thead><tbody>` +
+    rows.map(({name, row: r}) => `<tr><td>${esc(name)}</td><td class="n">${f(r.up, 2)}</td><td class="n">${f(r.climb)}</td><td class="n">${f(r.turn)}</td><td class="n">${f(r.h_up)}° / ${f(r.h_down)}°</td><td class="n">${r.hb_up === null ? 'no tail' : f(r.hb_up) + '° / ' + f(r.hb_down) + '°'}</td><td class="n">${f(r.crest)}°</td><td class="n">${f(r.push, 1)}</td><td class="n">${f(r.mass)}</td></tr>`).join('') + '</tbody>';
 }
 
 // a focus chart: one knob, several series, one y scale
@@ -316,7 +353,47 @@ function surrogate() {
   document.getElementById('sur').innerHTML = h + '</tbody>';
 }
 
-strip(); table(); switches(); side(); surrogate();
+function newGauges() {
+  const C = D.crestRead, P = D.pushRead; if (!C || !P) return;
+  // fail first: with the pass class first, the leak scanner reads the ternary as a credential
+  const ctl = cs => cs.map(c => `<div class="mono" style="font-size:.78rem"><span class="${!c.ok ? 'fail' : 'pass'}">${!c.ok ? 'FAIL' : 'PASS'}</span> ${esc(c.claim)}</div>`).join('');
+  const why = w => w ? Object.entries(w).map(([k, n]) => `${k} ${n}`).join(', ') : '';
+  document.getElementById('crest-read').innerHTML = `<caption style="text-align:left;padding:8px 10px;font-weight:600">G6 crest, 20 tries, x2.5, crawling</caption><thead><tr><th>Design</th><th>steepest ridge</th><th>next one up</th></tr></thead><tbody>` +
+    C.rows.map(r => `<tr><td>${esc(r.name)}</td><td class="n">${r.crest}° a side</td><td>${esc(why(r.why))}</td></tr>`).join('') + `</tbody><tfoot><tr><td colspan="3">${ctl(C.controls)}</td></tr></tfoot>`;
+  document.getElementById('push-read').innerHTML = `<caption style="text-align:left;padding:8px 10px;font-weight:600">G7 push, 20 tries, worst over the band</caption><thead><tr><th>Design</th><th>heaviest box</th><th>x0.65 / x1 / x1.5</th><th>next one up</th></tr></thead><tbody>` +
+    P.rows.map(r => `<tr><td>${esc(r.name)}</td><td class="n">${G.push.fmt(r.push)} kg</td><td class="n">${['0.65', '1.0', '1.5'].map(m => G.push.fmt(r.by_mu[m])).join(' / ')}</td><td>${esc(why(r.why))}</td></tr>`).join('') + `</tbody><tfoot><tr><td colspan="4">${ctl(P.controls)}</td></tr></tfoot>`;
+}
+
+function speedTable() {
+  const S = D.speed; if (!S || !S.length) return;
+  const names = [...new Set(S.map(r => r.name))], vs = [...new Set(S.map(r => r.v))].sort((a, b) => a - b);
+  const get = (n, v, mu, down, tail) => (S.find(r => r.name === n && r.v === v && r.mu === mu && r.down === down && r.tail === tail) || {}).top;
+  let h = `<caption style="text-align:left;padding:8px 10px;font-weight:600">Hills at other driving speeds (20 tries; up / down, stowed and braced)</caption><thead><tr><th>Design</th><th>friction</th>${vs.map(v => `<th>${v} m/s${v === 0.5 ? ' (gauge)' : ''}</th>`).join('')}</tr></thead><tbody>`;
+  for (const n of names) for (const mu of [2.5, 1.0])
+    h += `<tr><td>${esc(n)}</td><td class="n">x${mu}</td>${vs.map(v => `<td class="n">${get(n, v, mu, false, 'stowed')}°/${get(n, v, mu, true, 'stowed')}° · b ${get(n, v, mu, false, 'braced')}°/${get(n, v, mu, true, 'braced')}°</td>`).join('')}</tr>`;
+  document.getElementById('speed').innerHTML = h + '</tbody>';
+}
+
+function gripTable() {
+  const S = D.grip; if (!S || !S.length) return;
+  const gs = [...new Set(S.map(r => r.grip))].sort((a, b) => a - b);
+  const get = (g, mu, down, tail) => (S.find(r => r.grip === g && r.mu === mu && r.down === down && r.tail === tail) || {}).top;
+  let h = `<caption style="text-align:left;padding:8px 10px;font-weight:600">K1: T3's hills by tread grip (20 tries; up / down, stowed and braced at the rule angle)</caption><thead><tr><th>grip</th><th>x0.65 floor</th><th>x1 floor</th></tr></thead><tbody>`;
+  for (const g of gs)
+    h += `<tr><td class="n">${g}x${g === 1 ? ' (today)' : ''}</td>${[0.65, 1.0].map(mu => `<td class="n">${get(g, mu, false, 'stowed')}°/${get(g, mu, true, 'stowed')}° · b ${get(g, mu, false, 'braced')}°/${get(g, mu, true, 'braced')}°</td>`).join('')}</tr>`;
+  document.getElementById('grip').innerHTML = h + '</tbody>';
+}
+
+function curveTable() {
+  const C = D.crestCurve; if (!C) return;
+  const ns = Object.keys(C), as = Object.keys(C[ns[0]]).map(Number).sort((a, b) => a - b);
+  let h = `<caption style="text-align:left;padding:8px 10px;font-weight:600">G6 pass counts, 40 tries an angle and direction, x2.5 (a reading needs 90%)</caption><thead><tr><th>ridge side</th>${ns.map(n => `<th>${esc(n)} forward</th><th>${esc(n)} backward</th>`).join('')}</tr></thead><tbody>`;
+  for (const a of as)
+    h += `<tr><td class="n">${a}°</td>${ns.map(n => ['fwd', 'back'].map(k => { const v = C[n][a][k]; return `<td class="n${v >= 36 ? ' pass' : ''}">${v} / 40</td>`; }).join('')).join('')}</tr>`;
+  document.getElementById('crest-curve').innerHTML = h + '</tbody>';
+}
+
+strip(); table(); switches(); side(); surrogate(); newGauges(); speedTable(); gripTable(); curveTable();
 document.getElementById('order').addEventListener('change', table);
 const ink = 'var(--ink)', st = 'var(--stowed)', br = 'var(--braced)';
 document.getElementById('h-charts').innerHTML =

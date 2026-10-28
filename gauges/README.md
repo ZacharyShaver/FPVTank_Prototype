@@ -125,6 +125,54 @@ the righting. Not yet in the scorecard or the searches; read on the shape study 
   before they push sideways, so the gauge would read nothing. A side slope or a kerb mid-turn is the case to build.
 - **Trust:** none yet. Rests on the friction guesses, and on the tail's foot gripping like a tyre.
 
+## G6 Crest (proposed, 2026-10-27)
+
+Zach picked it from the knob log's recommended tests: the other gauges only charge for body height, and a crest is
+where height pays. `SCORPION_SEARCH=search_hills python gauges/crest.py read` -> `out/crest/read.json`.
+- **Lever:** getting over a ridge without ending up balanced on the belly (high-centred) or tipped.
+- **Reads:** the steepest ridge (degrees a side, 5° steps) it crosses in at least 18 of 20 tries, the better
+  direction counting, every gentler ridge crossed. The crest bends the path by twice the reading.
+- **Test:** two planks at ±the angle meeting at a peak 150 mm up (G2's top step, tall enough to reach any belly),
+  the peak rounded by a 3 mm capsule tangent to both (the step's edge lesson). Square on ±10°, the lead just short of
+  the foot, crawling at 0.15 m/s with the step's tail reflex. It passes with its CoM 0.1 m past the far foot, upright,
+  within the drive time plus 3 s. Read at x2.5, as the hills: on the band's floors the ramps slide everything first.
+- **Why a crawl:** at the step's 0.5 m/s, momentum carried a 15 mm belly over the peak, which hid high-centring. It
+  also threw T3 into a nose-dive off the peak (25°, against 40° at 0.25 m/s and 35° at 0.12).
+- **Controls:** the box with its belly 15 mm lower reads below the box (5° against 15°), and the box stretched 1.5x
+  reads below it (10°). A first control failed: T3 at 15 mm ride height tied T3 (25°), because T3 tips before its belly
+  touches. It stays as a row, not a control.
+- **Readings (20 tries):** T3 25°, step layout 25°, box 15°, six-wheel 15°, Trainer 10°. The box and Trainer
+  high-centre. T3 sometimes stalls teetering on the peak: the step reflex then pushes, and 3 tries in 18 at 30° went
+  over the nose. A crest-aware reflex is a controller lever.
+- **T3 reads on a plateau** (`crest.py curve`, 40 tries an angle and direction, no early stop): from 25° to 40° it
+  crosses in 75-95% of tries, against the 90% a reading needs, so 20 tries read it 25° or 40° by luck (the knob
+  sweep's T3 read 40°). Backwards it crosses 40° 40 times in 40 but 25° only 34. The knob sweep's crest column swings
+  the same way; only drops to 20° or less that hold over neighbouring settings are effects (a tail foot of 23 mm or
+  more, a tyre gap of 105 mm or more, gearing at 1.1x or less, a push face, no tail). A pass rate at one angle would
+  read smoother; not changed (Zach's call).
+- **Trust:** none yet.
+
+## G7 Push (proposed, 2026-10-27)
+
+Zach picked it from the same list: moving boxes is in the purpose, and nothing else reads force.
+`SCORPION_SEARCH=search_hills python gauges/push.py read` -> `out/push/read.json`.
+- **Lever:** shoving a load.
+- **Reads:** the heaviest box (kg) it pushes 0.5 m in at least 18 of 20 tries, the better direction counting, every
+  lighter box pushed; the worst over the band.
+- **Test:** a box 200 mm deep, 260 wide and 150 tall on the floor's own friction (at x1 it takes 5.9 N a kilogram),
+  scaled with the band. Square on ±10°, the lead 20 mm short, ramped over 0.5 s to 0.3 m/s, holding its heading. It
+  fails if the box is short of 0.5 m at 6 s, the robot tips, or its front rides 40 mm up onto the box. Tail stowed.
+- **Controls:** each read where its claim applies. On a grippier floor the box drags harder, so the motors bind at
+  x1.5 and the tyres at x0.65. T3 at 0.4x gearing reads below T3 (0.5 against 1 kg, worst). T3 at half grip reads
+  below T3 at x0.65 (2 against 4 kg). Read at the band's worst, half grip tied T3, since both rode up the box at x1.5.
+- **Readings (20 tries, worst; by friction x0.65 / x1 / x1.5):** six-wheel 3 kg (5/4/3), Trainer 2.5, box 2, step
+  layout 2, **T3 1 kg (4/5/1)**. T3 has the force (5 kg at x1), but at x1.5 its domed nose rides up onto the box, and
+  in reverse its tail mount, 150 mm up (the box's height), catches the box's top edge and levers it up. A push face
+  on the nose (knob `bumper`) pushes 4 kg but kills the step (30 mm). The tail mount at 170 mm pushes 4 kg at 20 tries
+  with the step intact (150 mm), for 5° of braced hill. Its control: a 200 mm box catches the 170 mm mount again
+  (0.5 kg at x1.5). The rule: nothing on the rear face below the top of what it pushes.
+- **Trust:** none yet.
+
 ## Costs (read every time, no target)
 
 Mass, length, width, height, belly clearance.
@@ -318,6 +366,30 @@ height (clr) moves the body, its insides and the tail mount together.
   110 55°, 180 60°, ride height 15 60°, 90 50°; the control, 1 kg on top, 45°. At x1 every design slides at 40°. The
   tail held out as an outrigger didn't help (at -45° the foot dug in and failed every slope). The first run counted
   the start's ±10° heading as sliding and read 0° everywhere: **superseded** (`superseded - side_drift_bug.json`).
+
+**G6, G7 and the candidate knobs** (`... knobs.py sweep67` reads G6 and G7 on every setting, `crest20` re-reads
+the crest at 20 tries, `grip` the hills by tread grip on x0.65 and x1, `speed` the hills at 0.15-0.8 m/s, `rule` the
+brace angle set by rule). Three knobs are new: the tyres' grip (`tyre_mu`; the tyres take MuJoCo contact priority, so
+a tread below the floor's friction is no longer overruled by it, and at 1x nothing changed: the fixed-seed regression
+matched), the tail foot's radius (`foot_r`) and a push face across the nose (`bumper`, 60 mm tall, 75 g). The first
+pass's six candidate knobs, worked through:
+- **K1 tyre grip: yes, the hill lever on ordinary ground.** On x1, half grip reads 20° every way, today's 35° / 40°
+  stowed and braced, 1.5x 35° / 40° and 40° / 45°. On x0.65, today's 25° / 30°, 1.5x 35° / 40°. The step needs at least
+  today's grip (half: 20 mm). On x2.5 nothing moves (it tips before it slides). The model's tyre friction is a guess.
+- **K2 tail as a counterweight: no.** No held pose beats the brace at -30° (45° / 45°), and braced, uphill ends in a
+  stall, not a tip.
+- **K3 brace angle per design: a rule, not a knob.** -30° up and -15° down are best on 175 and 177 of 191 designs; the
+  rule (foot just on the ground) is within 5° of the best on about 98%, the misses noise.
+- **K4 tail foot: keep 12 mm.** 6 mm: 40° / 40° stowed, 40° / 45° braced. From 29 mm the hills fall to 35° / 35° and
+  40° / 40°, the turn grows to 408-432 mm, the crest to 20° (from 23 mm), the step to 110 mm at 40.
+- **K5 a moving ride height: probably not worth an actuator.** At 15 mm the hills read 45° / 45° and 45° / 50°, and it
+  pushes 4 kg; the step needs 52 mm or more. 5-10° of hill for a lift mechanism.
+- **K6 hill speed: the lever is the speed loop.** Slower is worse uphill: braced, T3 30° at 0.15 m/s, 45° at 0.5 and
+  0.8. The drive is a DC motor on a duty-cycle command with a proportional speed term, so its stall torque scales with
+  the speed asked for. Wheel-speed feedback with an integral term would let a crawl climb like a run (the robot's
+  code). The first run timed slow drives out at 8 s and read them 0: **superseded** (`superseded - speed_timeout.json`).
+- **K7 push face: no; raise the tail mount** (G7 above). The push face costs the step (143 to 30 mm; 60-80 with its
+  top at 125-150), the turn about 45 mm, and upright to 0.94-0.97.
 
 **The reel** (`SCORPION_SEARCH=search_hills python gauges/reel.py` -> `out/film/reel.mp4`, 46 s): five chapters of
 side-by-side gauge tries (the gauges on T3, the braced tail, ride height, wheelbase, wheel width). Hills are drawn on
@@ -522,3 +594,9 @@ middle axle, and a shell (shell3's superellipsoid over the body, cut at the bell
 - 2026-10-27: the knob log (`knobs.py`): every knob of T3 one at a time on all five gauges, two new knobs (tyre width,
   tail mount height), a side-slope probe (its first run had a drift bug, superseded), a reel of gauge tries
   (`reel.py`) and a Gaussian-process surrogate check (`surrogate.py`). No gauge changed.
+- 2026-10-27: G6 crest and G7 push proposed (`crest.py`, `push.py`), both controls passing after two first picks
+  failed (T3 at 15 mm ride height for the crest; half grip read at the band's worst for the push). The knob log reads
+  them on every setting and works through the six candidate knobs plus three new (tyre grip, tail foot, push face). A
+  gauge's terrain or objects now go in after the robot's body, so its free joint stays first in the state; the tyres
+  take contact priority. T3's crest sits on a plateau and reads 25° or 40° by luck. Raising the tail mount to 170 mm
+  takes T3's push from 1 to 4 kg.

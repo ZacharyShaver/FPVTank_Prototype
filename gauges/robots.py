@@ -21,7 +21,9 @@ sys.path.insert(0, config.TUMBLE)
 
 S = 1e-3
 CONTACT = dict(tc=0.002, dr=0.35, dt=0.0002)      # hard floor, the ball's measured bounce (chassis3.CONTACT)
-FRICTION = dict(floor=0.6, tyre=0.9, body=0.4)    # at x1; MuJoCo takes the larger of a contact pair's
+FRICTION = dict(floor=0.6, tyre=0.9, body=0.4)    # at x1; MuJoCo takes the larger of a contact pair's, except that the
+# tyres have contact priority (2026-10-27), so a tread grip (sp['tyre_mu']) below the floor's is not overruled. At grip 1
+# the tyre's 0.9 was the larger anyway, so nothing read before changes.
 
 
 def inertia(items, box):
@@ -107,7 +109,7 @@ def limb_points(lm, yaw, pitch, k=8):
     y, p = np.radians(yaw), np.radians(pitch); h = np.array([-np.cos(y), -np.sin(y), 0.0])
     d = np.cos(p) * h + np.array([0.0, 0.0, np.sin(p)]); B = np.asarray(lm['base'], float)
     line = B + np.outer(np.linspace(0, 1, k), d * lm['L'])
-    tip = B + d * lm['L']; foot = tip + FOOT_R * np.vstack([np.eye(3), -np.eye(3)])
+    tip = B + d * lm['L']; foot = tip + lm.get('foot_r', FOOT_R) * np.vstack([np.eye(3), -np.eye(3)])
     return np.vstack([line, foot])
 
 
@@ -123,21 +125,27 @@ def add_limb(sp, L, tq, th_push, th_stow, mz=1.0, base=None):
 EDGE_R = 3.0                                      # mm: the step's top edge is this round (a capsule)
 
 
-def xml(sp, mu=1.0, step=None, dt=None, edge='round'):
+def xml(sp, mu=1.0, step=None, dt=None, edge='round', extra=None):
     """MJCF: the robot (free) with its hulls and its wheels on armatured hinges (wheels3's rotor model, chassis3's
     layout); `step` (mm) a step up at X 0. mu scales every friction.
 
     edge 'round' (2026-10-26): the step's top edge is a capsule of EDGE_R, its face EDGE_R behind it. A sharp box edge
     met by a cylinder gets the face's normal, (1, 0, 0): the tyre hits a wall and spins in place, so the Trainer
-    stalled at a 10 mm step 1 time in 5. chassis3's steps have that sharp edge. 'sharp' keeps it, for the control."""
+    stalled at a 10 mm step 1 time in 5. chassis3's steps have that sharp edge. 'sharp' keeps it, for the control.
+
+    extra (2026-10-27): a function (frictions, the tail's contact attribute) -> more worldbody XML, after the robot (so
+    the robot's free joint stays first in qpos, as Sim.place assumes): a gauge's own terrain or objects (crest.py's
+    ridge, push.py's box). None builds the model exactly as before."""
     dt = dt or CONTACT['dt']; M, G, I = sp['M'], sp['com'], sp['I'] * 1e-9
     full = ' '.join('%.8g' % v for v in (I[0, 0], I[1, 1], I[2, 2], I[0, 1], I[0, 2], I[1, 2]))
     mo = sp['motor']; Ie = sp['I_w'] + mo['N'] * mo['Ir']; arm = (mo['N'] ** 2 - mo['N']) * mo['Ir']; R = sp['R']
     mk = sp['m_w'] * 1e-3; It = max(mk * (3 * (R * S) ** 2 + (sp['TW'] * S) ** 2) / 12, 0.5 * Ie * 1.001)
     f = {k: '%.4f 0.005 0.0005' % (v * mu) for k, v in FRICTION.items()}
+    f['foot'] = f['tyre']                                                 # the tail's rubber, which the tread grip doesn't change
+    f['tyre'] = '%.4f 0.005 0.0005' % (FRICTION['tyre'] * mu * sp.get('tyre_mu', 1.0))   # tread grip (2026-10-27), 1: as before
     wb = ''.join(f'<body name="w{i}" pos="{x * S:.4f} {y * S:.4f} {R * S:.4f}"><joint name="j{i}" type="hinge" axis="0 1 0" armature="{arm:.6g}"/>'
                  f'<inertial pos="0 0 0" mass="{mk:.4f}" diaginertia="{It:.6g} {Ie:.6g} {It:.6g}"/>'
-                 f'<geom type="cylinder" size="{R * S:.4f} {sp["TW"] / 2 * S:.4f}" euler="90 0 0" friction="{f["tyre"]}"/></body>'
+                 f'<geom type="cylinder" size="{R * S:.4f} {sp["TW"] / 2 * S:.4f}" euler="90 0 0" friction="{f["tyre"]}" priority="1"/></body>'
                  for i, (x, y) in enumerate(sp['wheels']))
     lm = sp.get('limb'); ca = ' conaffinity="3"' if lm else ''           # the floor also meets the tail (contype 2)
     floor = f'<geom type="plane" size="8 8 0.1" friction="{f["floor"]}"{ca}/>'
@@ -155,8 +163,8 @@ def xml(sp, mu=1.0, step=None, dt=None, edge='round'):
                 f'damping="{LIMB_DAMP}" armature="{LIMB_ARM}"/><inertial pos="0 0 0" mass="{mb:.4f}" diaginertia="2e-5 2e-5 2e-5"/>'
                 f'<body name="llink"><joint name="lp" type="hinge" axis="0 1 0" range="{LIMB_PITCH[0]} {LIMB_PITCH[1]}" damping="{LIMB_DAMP}" armature="{LIMB_ARM}"/>'
                 f'<inertial pos="{cx:.5f} 0 0" mass="{ml:.4f}" diaginertia="2e-6 {Iy:.6g} {Iy:.6g}"/>'
-                f'<geom type="capsule" fromto="0 0 0 {-L:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["tyre"]}"/>'
-                f'<geom type="sphere" pos="{-L:.5f} 0 0" size="{FOOT_R * S:.4f}" contype="2" conaffinity="0" friction="{f["tyre"]}"/></body></body>')
+                f'<geom type="capsule" fromto="0 0 0 {-L:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
+                f'<geom type="sphere" pos="{-L:.5f} 0 0" size="{lm.get("foot_r", FOOT_R) * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/></body></body>')
         act = (f'<actuator><position name="ay" joint="ly" kp="{LIMB_KP}" forcelimited="true" forcerange="{-lm["tq"]:.3f} {lm["tq"]:.3f}"/>'
                f'<position name="ap" joint="lp" kp="{LIMB_KP}" forcelimited="true" forcerange="{-lm["tq"]:.3f} {lm["tq"]:.3f}"/></actuator>')
     meshes = ''.join(f'<mesh name="h{i}" vertex="{" ".join("%.5f" % v for v in (P * S).ravel())}"/>' for i, P in enumerate(sp['hulls']))
@@ -165,7 +173,7 @@ def xml(sp, mu=1.0, step=None, dt=None, edge='round'):
       <asset>{meshes}</asset><worldbody>{floor}
       <body name="robot" pos="0 0 0.5"><freejoint/>
         <inertial pos="{G[0] * S:.5f} {G[1] * S:.5f} {G[2] * S:.5f}" mass="{M * 1e-3:.4f}" fullinertia="{full}"/>
-        {geoms}{wb}{tail}</body></worldbody>{act}</mujoco>"""
+        {geoms}{wb}{tail}</body>{extra(f, ca) if extra else ''}</worldbody>{act}</mujoco>"""
 
 
 # ---------- the roster ----------

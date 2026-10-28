@@ -37,10 +37,10 @@ def classify(R):
 
 
 class Sim:
-    def __init__(self, sp, mu=1.0, step=None, dt=None, edge='round'):
+    def __init__(self, sp, mu=1.0, step=None, dt=None, edge='round', extra=None):
         import mujoco
         self.mj = mujoco; self.sp = sp
-        self.m = mujoco.MjModel.from_xml_string(RB.xml(sp, mu, step, dt, edge)); self.d = mujoco.MjData(self.m)
+        self.m = mujoco.MjModel.from_xml_string(RB.xml(sp, mu, step, dt, edge, extra)); self.d = mujoco.MjData(self.m)
         self.jw = np.array([self.m.joint(f'j{i}').dofadr[0] for i in range(len(sp['wheels']))])
         self.left = np.array([y > 0 for _, y in sp['wheels']]); self.rid = self.m.body('robot').id
         self.E = RB.extremes(sp) * 1e-3

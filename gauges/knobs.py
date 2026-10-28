@@ -4,6 +4,11 @@ to the numbers on the hill climbing and all that".
 
     SCORPION_SEARCH=search_hills python gauges/knobs.py sweep   -> gauges/out/knobs/knobs_raw.jsonl, knobs_sweep.json
     SCORPION_SEARCH=search_hills python gauges/knobs.py rebrace -> knobs_brace.jsonl (braced over five tail angles)
+    SCORPION_SEARCH=search_hills python gauges/knobs.py sweep67 -> knobs_g67.jsonl (G6 crest and G7 push for every design)
+    SCORPION_SEARCH=search_hills python gauges/knobs.py rule    -> knobs_brace_rule.jsonl (a brace-angle rule against the best)
+    SCORPION_SEARCH=search_hills python gauges/knobs.py speed   -> speed.json (the hills at other driving speeds)
+    SCORPION_SEARCH=search_hills python gauges/knobs.py crest20 -> knobs_g67.jsonl's crest at the gauge's 20 tries
+    SCORPION_SEARCH=search_hills python gauges/knobs.py grip    -> grip_hills.json (T3's hills by tread grip, x0.65 and x1)
     SCORPION_SEARCH=search_hills python gauges/knobs.py side    -> gauges/out/knobs/side.json (a side slope, exploratory)
 
 T3 is the shape study's best (1.00 / 150 mm / 381 mm; hills 35 / 40 stowed, 45 / 45 braced). Each knob takes 7
@@ -29,7 +34,8 @@ import gauges as GG, robots as RB, search as S, hills as H
 OUT = os.path.join(config.GAUGES_OUT, 'knobs')
 T3 = dict(R=44.908, xw=14.684, gap=62.052, clr=51.943, dxp=23.189, dzp=0.56, six=0.0, shell=1.0, xc=27.025, af=166.408,
           ar=156.628, b=120.606, zc=159.624, cu=71.913, cd=71.847, p=3.26, qu=2.256, qd=2.565, limb=1.0, L=279.186, tq=3.306,
-          th_push=-46.177, th_stow=111.658, mz=0.431, track=113.977, msize=1.0, gear=2.091, TW=46.0, mount_z=149.6)
+          th_push=-46.177, th_stow=111.658, mz=0.431, track=113.977, msize=1.0, gear=2.091, TW=46.0, mount_z=149.6, foot_r=12.0,
+          tyre_mu=1.0, bumper=0.0)
 MOUNT = (-154.83, 0.0)                    # the tail mount's x and y (T5's, pinned); its z is mount_z
 # (group, knob, low, high, what it is). The ranges are the searches' own; TW and mount_z are new.
 KNOBS = [('wheels', 'R', 35.0, 95.0, "the wheels' radius, mm"),
@@ -56,7 +62,10 @@ KNOBS = [('wheels', 'R', 35.0, 95.0, "the wheels' radius, mm"),
          ('tail', 'tq', 0.3, 4.0, "the tail servo's stall torque, N m"),
          ('tail', 'th_push', -90.0, -10.0, "the tail's pitch when it pushes on a step, degrees (below level)"),
          ('tail', 'th_stow', 20.0, 160.0, "the tail's stowed pitch, degrees (90 up, 180 forward over the body)"),
-         ('tail', 'mount_z', 90.0, 210.0, "the tail mount's height, mm (new)")]
+         ('tail', 'mount_z', 90.0, 210.0, "the tail mount's height, mm (new)"),
+         ('tail', 'foot_r', 6.0, 40.0, "the tail foot's radius, mm (12 so far; a pad or skid when big; new)"),
+         ('wheels', 'tyre_mu', 0.5, 1.8, "the tread's grip, times the stock tyre's (0.9 at x1; new)"),
+         ('body', 'bumper', 0.0, 150.0, "a flat push face at the very front: its top, mm (60 tall, 75 g; under 40: none; new)")]
 SWITCHES = [('tail off', dict(limb=0.0)), ('six wheels', dict(six=1.0))]
 N_VAL, SEEDS, T3_SEEDS = 7, 3, 8
 BRACE = (-30.0, -15.0)
@@ -70,7 +79,15 @@ def make(q):
     sp = S.build(np.array([q[k] for k in S.KEYS]))
     if sp is None:
         return None
-    return RB.dims(dict(sp, TW=q['TW'])) if q['TW'] != 46.0 else sp
+    if q['foot_r'] != 12.0 and sp.get('limb'):                           # a bigger foot weighs more, as a shell: 15 g at 12 mm
+        sp = dict(sp, limb=dict(sp['limb'], foot_r=q['foot_r'], m_foot=15.0 * (q['foot_r'] / 12.0) ** 2))
+    if q['tyre_mu'] != 1.0:
+        sp = dict(sp, tyre_mu=q['tyre_mu'])
+    if q['bumper'] > 40.0:                                                # a 3 mm plate and its struts, flush with the front-most point
+        P = np.vstack(sp['hulls']); x0 = float(P[:, 0].max()); z1 = q['bumper']; z0 = max(30.0, z1 - 60.0)
+        plate = np.array([[x, y, z] for x in (x0 - 3.0, x0 + 0.5) for y in (-100.0, 100.0) for z in (z0, z1)])
+        sp = H.add_mass(dict(sp, hulls=list(sp['hulls']) + [plate]), 75.0, (x0, 0.0, (z0 + z1) / 2), sp['name'])
+    return RB.dims(dict(sp, TW=q['TW'])) if (q['TW'], q['foot_r']) != (46.0, 12.0) else sp
 
 
 def screen(a):
@@ -97,7 +114,7 @@ def jobs():
     return J
 
 
-G_KEYS = ('up', 'climb', 'turn', 'h_up', 'h_down', 'hb_up', 'hb_down')
+G_KEYS = ('up', 'climb', 'turn', 'h_up', 'h_down', 'hb_up', 'hb_down', 'crest', 'push')
 
 
 def summarise(rows):
@@ -114,7 +131,8 @@ def summarise(rows):
             ok = [q for q in ss if q is not None]
             res[k].append(dict(v=v, built=len(ok), of=len(ss), **{g: mean(ok, g) for g in G_KEYS + ('tip_static', 'com_x', 'com_z', 'mass', 'length', 'width', 'height', 'belly')}))
     t3 = [r['s'] for r in rows if r['tag'] == 'T3']
-    noise = {g: float(np.std([q[g] for q in t3])) for g in G_KEYS}
+    noise = {g: float(np.std([q[g] for q in t3])) for g in G_KEYS if g not in ('crest', 'push')   # read once, copied to every seed
+             and all(q.get(g) is not None for q in t3)}
     return res, noise
 
 
@@ -148,9 +166,12 @@ def rebrace():
     """the braced hills again, over BRACE_ALL, one seed (T3's hills don't move over 8 seeds). The sweep's -30 and -15
     left the foot in the air once the body or the mount rose or the tail got short. -> knobs_brace.jsonl"""
     rows = [json.loads(l) for l in open(os.path.join(OUT, 'knobs_raw.jsonl'))]
-    J = [(r['tag'], r['ch']) for r in rows if r['seed'] == 85000 and r['s'] is not None and r['s'].get('hb_up') is not None]
+    bf = os.path.join(OUT, 'knobs_brace.jsonl')
+    done = {(b['tag'], json.dumps(b['ch'], sort_keys=True)) for b in map(json.loads, open(bf))} if os.path.exists(bf) else set()
+    J = [(r['tag'], r['ch']) for r in rows if r['seed'] == 85000 and r['s'] is not None and r['s'].get('hb_up') is not None
+         and (r['tag'], json.dumps(r['ch'], sort_keys=True)) not in done]                # only designs not braced yet
     t0 = time.time()
-    with Pool(GG.WORKERS) as pool, open(os.path.join(OUT, 'knobs_brace.jsonl'), 'w') as f:
+    with Pool(GG.WORKERS) as pool, open(bf, 'a') as f:
         for i, (tag, ch, out) in enumerate(pool.imap_unordered(brace_job, J, chunksize=1)):
             f.write(json.dumps(dict(tag=tag, ch=ch, **out), default=float) + '\n'); f.flush()
     print(f'{len(J)} designs braced again, {time.time() - t0:.0f} s'); write()
@@ -167,6 +188,13 @@ def write():
             if b and r['s'] is not None:
                 for g in ('up', 'down'):
                     r['s']['hb_' + g + '_2'] = r['s']['hb_' + g]; r['s']['hb_' + g] = b['hb_' + g]; r['s']['hb_' + g + '_th'] = b['hb_' + g + '_th']
+    gf = os.path.join(OUT, 'knobs_g67.jsonl')
+    if os.path.exists(gf):                                                # crest and push: one seed, given to every seed's row
+        Q = {(q['tag'], json.dumps(q['ch'], sort_keys=True)): q for q in map(json.loads, open(gf))}
+        for r in rows:
+            q = Q.get((r['tag'], json.dumps(r['ch'], sort_keys=True)))
+            if q and r['s'] is not None:
+                r['s'].update(crest=q['crest'], push=q['push'])
     res, noise = summarise(rows)
     t3 = res['T3'][0]
     json.dump(dict(base=T3, brace=BRACE_ALL if os.path.exists(bf) else BRACE, knobs=[dict(group=g, key=k, lo=lo, hi=hi, what=w) for g, k, lo, hi, w in KNOBS],
@@ -212,6 +240,133 @@ def side():
     print(f'{len(J)} ladders, {time.time() - t0:.0f} s')
 
 
+def g67_job(a):
+    import crest as CR, push as PU
+    tag, ch = a; sp = make(dict(T3, **ch))
+    if sp is None:
+        return tag, ch, None
+    c, cs = CR.ladder(sp, CR.GRIP, H.N_SCREEN, 85000)
+    P = {mu: PU.ladder(sp, mu, H.N_SCREEN, 85000) for mu in GG.BAND}; w = min(P, key=lambda mu: P[mu][0])
+    return tag, ch, dict(crest=c, crest_why=cs.get(c + 5), push=P[w][0], push_mu=w, push_by_mu={str(mu): v[0] for mu, v in P.items()},
+                         push_why=P[w][1].get(PU.nxt(P[w][0])))
+
+
+def sweep67():
+    """G6 crest and G7 push for every design of the sweep, one seed, 6 tries (the screen's): crest at x2.5, push the
+    worst over the band. -> knobs_g67.jsonl, then knobs_sweep.json"""
+    gf = os.path.join(OUT, 'knobs_g67.jsonl')
+    done = {(q['tag'], json.dumps(q['ch'], sort_keys=True)) for q in map(json.loads, open(gf))} if os.path.exists(gf) else set()
+    J = [(t, c) for t, c, sd in jobs() if sd == 85000 and (t, json.dumps(c, sort_keys=True)) not in done]; t0 = time.time()
+    print(f'{len(J)} designs for crest and push', flush=True)
+    with Pool(GG.WORKERS) as pool, open(gf, 'a') as f:
+        for i, (tag, ch, out) in enumerate(pool.imap_unordered(g67_job, J, chunksize=1)):
+            if out is not None:
+                f.write(json.dumps(dict(tag=tag, ch=ch, **out), default=float) + '\n'); f.flush()
+            if i % 30 == 0:
+                print(f'{i + 1}/{len(J)}, {time.time() - t0:.0f} s', flush=True)
+    write()
+
+
+def rule_angle(sp):
+    """the brace angle that puts the foot just on the ground, degrees (pitch below level), within the servo's range"""
+    lm = sp['limb']; r = lm.get('foot_r', RB.FOOT_R)
+    return max(-75.0, min(-5.0, math.degrees(math.asin(max(-1.0, min(1.0, (r - lm['base'][2]) / lm['L']))))))
+
+
+def rule_job(a):
+    tag, ch = a; sp = make(dict(T3, **ch)); th = rule_angle(sp)
+    return tag, ch, dict(th=th, **{'hr_' + g: H.ladder(sp, H.GRIP, d, H.N_SCREEN, 85000, th)[0] for d, g in ((False, 'up'), (True, 'down'))})
+
+
+def brace_rule():
+    """K3: does a rule (the foot just on the ground) pick as well as the best of five held angles? Every braced
+    design at its rule angle, one seed. -> knobs_brace_rule.jsonl"""
+    B = list(map(json.loads, open(os.path.join(OUT, 'knobs_brace.jsonl')))); t0 = time.time()
+    with Pool(GG.WORKERS) as pool:
+        R = pool.map(rule_job, [(b['tag'], b['ch']) for b in B], chunksize=1)
+    by = {(t, json.dumps(c, sort_keys=True)): o for t, c, o in R}; tally = {}
+    with open(os.path.join(OUT, 'knobs_brace_rule.jsonl'), 'w') as f:
+        for b in B:
+            o = by[(b['tag'], json.dumps(b['ch'], sort_keys=True))]
+            f.write(json.dumps(dict(tag=b['tag'], ch=b['ch'], best_up=b['hb_up'], best_down=b['hb_down'], **o)) + '\n')
+            for g in ('up', 'down'):
+                dd = o['hr_' + g] - b['hb_' + g]; tally[(g, dd)] = tally.get((g, dd), 0) + 1
+    print(f'{len(B)} designs, {time.time() - t0:.0f} s; rule minus best (degrees: count):', {f'{g} {d:+d}': n for (g, d), n in sorted(tally.items())})
+
+
+SPEEDS = (0.15, 0.25, 0.5, 0.8)
+
+
+def speed_job(a):
+    name, ch, v, down, th, mu = a; sp = make(dict(T3, **ch))
+    H.V_HILL, H.T_HILL = v, max(8.0, H.HILL_MM * 1e-3 / v + H.RAMP + 2.0)   # the 2.5 m at v, with room (8 s timed out every try under 0.5)
+    if th == 'rule':
+        th = rule_angle(sp)
+    return a, H.ladder(sp, mu, down, 20, 61, th)
+
+
+def speed():
+    """K6: the hills at other driving speeds (H.V_HILL, 0.5 m/s in the gauge), T3 and two knob extremes, stowed and
+    braced at the rule angle, 20 tries, at x2.5 and x1. -> speed.json"""
+    designs = [('T3', {}), ('ride height 90', dict(clr=90.0)), ('tyre gap 150', dict(gap=150.0))]
+    J = [(n, ch, v, down, th, mu) for n, ch in designs for v in SPEEDS for down in (False, True) for th in (None, 'rule') for mu in (H.GRIP, 1.0)]
+    t0 = time.time()
+    with Pool(GG.WORKERS) as pool:
+        R = pool.map(speed_job, J, chunksize=1)
+    out = [dict(name=n, v=v, down=down, tail='stowed' if th is None else 'braced', mu=mu, top=top, why=seen.get(top + 5))
+           for (n, ch, v, down, th, mu), (top, seen) in R]
+    for n, _ in designs:
+        for mu in (H.GRIP, 1.0):
+            line = []
+            for v in SPEEDS:
+                g = {(r['down'], r['tail']): r['top'] for r in out if r['name'] == n and r['v'] == v and r['mu'] == mu}
+                line.append(f"{v}: {g[(False, 'stowed')]}/{g[(True, 'stowed')]} b {g[(False, 'braced')]}/{g[(True, 'braced')]}")
+            print(f'{n:15s} x{mu}: ' + '  '.join(line), flush=True)
+    json.dump(dict(wall_s=round(time.time() - t0), rows=out), open(os.path.join(OUT, 'speed.json'), 'w'), indent=1, default=str)
+
+
+def crest20_job(a):
+    import crest as CR
+    tag, ch = a; sp = make(dict(T3, **ch)); c, cs = CR.ladder(sp, CR.GRIP, 20, 85000)
+    return tag, ch, c, cs.get(c + 5)
+
+
+def crest20():
+    """G6 again at the gauge's 20 tries for every design: at 6, T3 (which tips about 1 try in 6 at 30 degrees) passed
+    or failed by luck, and its push-angle neighbours read 40 against its 25. Rewrites knobs_g67.jsonl's crest (the
+    6-try reading kept as crest_6), then knobs_sweep.json"""
+    gf = os.path.join(OUT, 'knobs_g67.jsonl'); Q = [json.loads(l) for l in open(gf)]
+    J = [(q['tag'], q['ch']) for q in Q if 'crest_6' not in q]; t0 = time.time()
+    with Pool(GG.WORKERS) as pool:
+        R = pool.map(crest20_job, J, chunksize=1)
+    by = {(t, json.dumps(c, sort_keys=True)): (v, w) for t, c, v, w in R}
+    with open(gf, 'w') as f:
+        for q in Q:
+            k = (q['tag'], json.dumps(q['ch'], sort_keys=True))
+            if k in by:
+                q['crest_6'], q['crest_why_6'] = q['crest'], q['crest_why']; q['crest'], q['crest_why'] = by[k]
+            f.write(json.dumps(q, default=float) + '\n')
+    print(f'{len(J)} designs, crest at 20 tries, {time.time() - t0:.0f} s'); write()
+
+
+def grip_job(a):
+    g, down, th, mu = a; sp = make(dict(T3, tyre_mu=g))
+    return a, H.ladder(sp, mu, down, 20, 61, rule_angle(sp) if th else None)
+
+
+def grip_hills():
+    """K1: tread grip on the hills on ordinary ground (x1) and the band's slipperiest (x0.65), where the tyres bind;
+    the sweep reads hills at x2.5, where they don't. T3, stowed and braced at the rule angle, 20 tries. -> grip_hills.json"""
+    G_ = (0.5, 0.75, 1.0, 1.25, 1.5, 1.8); J = [(g, d, th, mu) for g in G_ for d in (False, True) for th in (False, True) for mu in (0.65, 1.0)]
+    with Pool(GG.WORKERS) as pool:
+        R = pool.map(grip_job, J, chunksize=1)
+    out = [dict(grip=g, down=d, tail='braced' if th else 'stowed', mu=mu, top=top, why=seen.get(top + 5)) for (g, d, th, mu), (top, seen) in R]
+    for mu in (0.65, 1.0):
+        print(f'x{mu}: ' + '  '.join(f"grip {g}: " + '/'.join(str(next(r['top'] for r in out if r['grip'] == g and r['mu'] == mu and r['down'] == d and r['tail'] == t))
+                                                       for t in ('stowed', 'braced') for d in (False, True)) for g in G_), flush=True)
+    json.dump(dict(rows=out), open(os.path.join(OUT, 'grip_hills.json'), 'w'), indent=1, default=str)
+
+
 def check():
     """T3 rebuilt from its knobs must match the shape study's T3 (its mass and centre of mass)"""
     import pickle
@@ -224,4 +379,4 @@ def check():
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else ''
-    {'sweep': sweep, 'check': check, 'side': side, 'rebrace': rebrace, 'write': write}.get(cmd, lambda: print(__doc__))()
+    {'sweep': sweep, 'check': check, 'side': side, 'rebrace': rebrace, 'write': write, 'sweep67': sweep67, 'rule': brace_rule, 'speed': speed, 'crest20': crest20, 'grip': grip_hills}.get(cmd, lambda: print(__doc__))()
