@@ -3,6 +3,23 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-10-28: G4-G7 on the scorecard; two dead knobs dropped
+
+Zach adopted the hills, crest and push gauges with targets on 2026-10-27, and asked for them on the scorecard. The page
+now shows the shape study's finalists and T3 with its tail mount raised to 170 mm, which with T5 on the Trainer's body
+meets every target with a number (`gauges/README.md`, "Targets").
+
+- **Two knobs dropped** (Zach: "yes"): the skin's height above its middle (cu) and its top's squareness (qu) moved no
+  gauge over their whole range. With the tail righting the robot, the top of the body is free. New searches hold them
+  at T3's.
+- **Fourteen "settled" knobs not frozen:** one at a time, each only cost when moved off T3's value. Held together,
+  they cost the best design 17 mm of turn: the free search narrowed tyres, track and skin at once
+  (`gauges/knobs.py freeze`; `docs/lessons/2026-10-28-small-effects-add-up.md`). The check's control failed (holding
+  the levers lost nothing on step and turn), so it says nothing about the levers.
+- **Found:** G3 (turn-around space) reads mostly the centre of mass's fore-aft offset from the wheels' centre, 12-15 mm
+  of circle per millimetre, because the spin is open-loop. The T designs' lead on it is half shape, half a centre of
+  mass placed to the millimetre. G6 (crest) moved by up to 15° on a re-read with fresh seeds.
+
 ## 2026-10-27: The gauge search runs lean; a new step reflex; the body's shape searched
 
 A review of the drive search found that 39 % of its random draws couldn't be built, that its screen read upright

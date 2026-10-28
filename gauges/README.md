@@ -11,6 +11,7 @@ go wrong. More come after the first build and real tests.
 python gauges/gauges.py            # every design and control under the band -> gauges/out/scorecard.json (~4 min, 30 cores)
 python gauges/card.py read         # G4-G7 on the page's designs, G1-G3 on its knob variant -> gauges/out/card/card.json (~6 min)
 python gauges/export.py            # the scorecard as the page's row files, gauges/out/dash/ (the page itself: dashboard.html)
+python gauges/scorecard_page.py    # a static copy of the scorecard for the public gallery (tools/gallery), gauges/out/dash/scorecard.html
 python gauges/gauges.py --quick    # smoke run: 40 falls, 6 tries a step (~75 s)
 python gauges/gauges.py --cached   # reuse out/roster.pkl instead of rebuilding the designs from chassis-v2 (~50 s saved)
 python gauges/gauges.py port       # the step sim against chassis3's, sharp edge and round
@@ -373,7 +374,9 @@ with the sweep's bigger wheels.
 `SCORPION_SEARCH=search_hills python gauges/knobs.py sweep`, then `... rebrace` and `... side`; `python
 gauges/knobs_page.py` builds the page "Scorpion Knobs", every
 knob's sweep drawn on each gauge's scale, with a little model of every setting (a side view on each row, a 3D view
-with a slider and T3 as a ghost in the opened row; `out/knobs/models.json`, rebuilt by `knobs_page.py models`). Results in `out/knobs/`. Zach asked for a log of "how ... the height of the
+with a slider and T3 as a ghost in the opened row; `out/knobs/models.json`, rebuilt by `knobs_page.py models`). For phones
+(2026-10-28) the page thins each hull to 140 corners and packs them, and loads three.js on the first 3D tap: 2.5 MB to
+425 kB. Both pages are in the public gallery's "Requirements as tests". Results in `out/knobs/`. Zach asked for a log of "how ... the height of the
 body and the width of the wheels actually translate to the numbers". Every knob of T3 takes 7 settings across its
 search range, the rest at T3's, 3 seeds each (T3 8): the lean screen without its cut, and both hills at x2.5 in 6
 tries, the tail stowed and braced. The sweep braced at -30° and -15°. `rebrace` re-read the braced hills at the best
@@ -425,9 +428,16 @@ pass's six candidate knobs, worked through:
 **Which knobs matter (a review, 2026-10-28).** Read off the sweep against the noise (upright 0.05, step 20 mm, turn
 20 mm, hills 10°, push 1.5 kg; the crest only where it drops to 20° or less, its plateau being noise):
 - **Dead:** cu (the skin's height above its middle) and qu (its top's squareness) move nothing over their whole
-  range. With the tail doing the righting, the top of the body is free: room for the head or an arm.
+  range. With the tail doing the righting, the top of the body is free: room for the head or an arm. **Dropped**
+  (Zach, 2026-10-28): held at T3's in every new search (`knobs.DEAD`).
 - **Settled:** track, TW, b, p, ar, xc, cd, qd, dzp, msize, foot_r, th_push and th_stow only cost when moved off T3's
-  value; no setting of them is better on any gauge. Most are held by the turn (track, TW, b, p, ar).
+  value; no setting of them is better on any gauge. Most are held by the turn (track, TW, b, p, ar). af (the nose's
+  reach) is settled too, though the first list missed it: T3 sits 10 mm from its climb cliff. The tread's grip
+  (tyre_mu) is a property to measure, not a knob.
+  **Not frozen** (the check, `knobs.py freeze`, 2026-10-28): held at T3's together they cost 17 mm of turn (378 against
+  361 mm at a 150 mm step), because the free search narrowed the tyres (46 to 34 mm), the track and the skin at once,
+  each by less than the bar. The check's control (the levers held) lost nothing, since it scored only step and turn,
+  where T3's levers are already best (`docs/lessons/2026-10-28-small-effects-add-up.md`).
 - **Floors:** gear, L and tq lose when lowered and gain nothing above a floor: gearing about 1.8x, a 260 mm tail, a
   2.2-2.8 N·m tail servo (upright 1.00 from 2.2, the full step from 2.8; the MG90S is about 0.2).
 - **Levers** (better on one gauge, paid for on another): gap and xw (hills against step and turn), clr, zc and dxp
@@ -435,8 +445,16 @@ pass's six candidate knobs, worked through:
   against step and turn) and bumper (push against step).
 - **Caveats:** one knob at a time around T3, so another platform (six wheels, no tail) may need a settled knob back.
   The drive search's claim that 14 knobs were dead failed its check (redrawn over their range, they moved the step);
-  this claim is weaker, settled at T3's value rather than dead. Freezing them is Zach's call; the check is a
-  refinement with them frozen against one with them free.
+  this claim is weaker, settled at T3's value rather than dead. It failed its check too (above).
+- **To add: front flippers** (Zach, 2026-10-28: "flippers have got to be a future knob i bet they would help a lot
+  with the steps"). Not in the capability search; a knob for the next round. Why they should pay on G2: the tail only
+  pushes from behind, and at 60-80 mm the nose catches on the step's lip (the reflex note above). A flipper reaching
+  forward lifts the nose onto the top. The tracked version (`chassis-v2/guard_flippers.py`, Guard arm E) turned down
+  lifts the claws 69 -> 153 mm and pitches the robot 27° at under 5 kg·cm per flipper, for +185 g and 275 -> 319 mm of
+  width. On wheels: a link pair on the front axle, modelled like the tail (`robots.add_limb`), with length, torque,
+  stow angle and outboard-or-centre-line as the knobs, and a front move in the step's reflex. Read it on the 300 mm
+  ladder (`capability.HEIGHTS_EXT`): T3 tops out at 150 there too, and big wheels reach 225. Costs to watch: the turn (it reads the widest point), mass,
+  and upright.
 
 **The reel** (`SCORPION_SEARCH=search_hills python gauges/reel.py` -> `out/film/reel.mp4`, 46 s): five chapters of
 side-by-side gauge tries (the gauges on T3, the braced tail, ride height, wheelbase, wheel width). Hills are drawn on
@@ -449,6 +467,26 @@ predicts both hills to 1.5-1.6° and the turn to 13 mm, 95% bands holding 94-95%
 ranks the refinements' designs at 0.92-0.94. At 24 knobs the turn still holds (42 mm, R2 0.89, rank 0.79). The step is weaker (R2 0.83 at 5 knobs, 0.55 at 24, where cliffs and
 few spread designs sink it), and upright among screen passers is noise. Good for choosing which designs to simulate
 on the hills and turn, and for a whole-range knob map; not for final readings.
+
+## The capability search (2026-10-28)
+
+`python gauges/capability.py run` (about 7 h: B, then refinement rounds until 15:15, then the finals) and `python
+gauges/capability_page.py` -> `out/capability/`, the page "Scorpion Capability"
+(a private claude.ai page). Zach: "max out every single goal dont set the percentages ...
+were shooting to test out the capability of this project so we can learn from the results". Every knob free (28 with
+the tail, six-wheel and skin switches; the dead two and the tread grip held), all seven gauges screened at 6 tries a
+rung, the step ladder to 300 mm. 1,024 Sobol designs, then 10 rounds of 8 CEM streams (one per gauge, and an
+all-rounder that raises a design's worst percentile rank), 3,424 screened; the streams' bests and four front
+all-rounders read on the full gauges (`finals.json`).
+- **Ceilings:** upright 1.00 (T3's); step 225 mm (140 mm wheels, 71 mm ride height, 324 mm tail; turn 784, push
+  0.5 kg); turn about 389 mm (none beat T3's 381); hills 60° up / 65° down and push 8 kg (one design: six wheels,
+  5.5 kg, packs at the space's 2x bound); crest 45°. No test's top capped a champion.
+- **Two families, nothing between:** four wheels and a tail own the step and the turn; six wheels and weight own the
+  hills, crest and push (no six-wheeler of 2,176 stepped over 100 mm). No design stepped 100 mm and turned in 450.
+  T3's corner holds: on the front, and nothing near it on step and turn together.
+- **The all-rounder stream failed** (`docs/lessons/2026-10-28-a-pool-rank-measures-the-search.md`): it settled on the
+  hill-and-push champion (step 50, turn 659, upright 0.51). T3 with the 170 mm mount is still the best all-rounder.
+- The screen read the six-wheelers' upright high (hill champion 0.70 screened, 0.505 full).
 
 ## The lean search (superseded as the current run by the body search, 2026-10-27)
 
@@ -655,3 +693,6 @@ middle axle, and a shell (shell3's superellipsoid over the body, cut at the bell
   (G6). `export.py` had dropped each G1-G3 control's claim and reading from the page (a comment swallowed them);
   fixed. G3 found to read mostly the CoM's fore-aft offset from the wheels (G3). A knob review sorts the knobs into
   dead, settled, floors and levers (the knob log).
+- 2026-10-28: the capability search (every knob free, every gauge maxed, no weights): each gauge's ceiling, two
+  families, T3 still the all-rounder; the all-rounder stream's percentile score failed. Front flippers logged as the
+  next knob (Zach).

@@ -9,6 +9,7 @@ A manifest item may carry "hold": "<reason>" (not built, listed); on a page, "st
 built as a plain box of the same bounds) and "licence": "<text>" (credit for the third-party parts the item shows: its page prints it in a
 footer with links to the sources, and its card in the index has a Credits line). Every 3D page's footer also says who "you" is.
 An item of kind "link" has an https "href" and opens it in a new tab; a section may carry an "intro".
+An item may carry a "label" for its card's kind line, in place of the kind's (a page that isn't 3D).
 """
 import os, re, sys, json, html, shutil, argparse, datetime, subprocess, urllib.parse, base64, binascii
 import numpy as np
@@ -358,7 +359,7 @@ def card(item, href, thumb):
     hide = '' if thumb else ' aria-hidden="true"'                            # the title is read once, from the line below
     tab = ' target="_blank" rel="noopener"' if item['kind'] == 'link' else ''
     main = (f'<a class="card" href="{html.escape(href, quote=True)}"{tab}><div class="thumb"{bg}{hide}>{label}</div><div class="meta">'
-            f'<span class="kind">{KIND[item["kind"]]}</span><b>{html.escape(item["title"])}</b><span>{html.escape(item["caption"])}</span></div></a>')
+            f'<span class="kind">{html.escape(item.get("label") or KIND[item["kind"]])}</span><b>{html.escape(item["title"])}</b><span>{html.escape(item["caption"])}</span></div></a>')
     if not item.get('licence'):
         return main
     return f'<div class="cardbox">{main}<p class="credits">{credits_line(item["licence"])}</p></div>'      # a link cannot sit inside the card's own link

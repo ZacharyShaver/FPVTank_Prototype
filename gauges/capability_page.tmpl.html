@@ -1,0 +1,396 @@
+<title>Scorpion Capability</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@87,600;87,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* A capability report: how far each gauge goes when pushed alone (a card each, with the champion's side view), the
+   all-rounders, one 3D view, the full readings, the champions' knobs as a heat strip, and the trade-off clouds. The knob
+   log's look (gauges/knobs_page.tmpl.html), so the two read as one set. */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --ink: #12161b; --ink2: #49515c; --muted: #77808b; --rule: #dce1e7;
+  --acc: #2a78d6; --t3: #eb6834; --hi: #e8f0fb; --good: #1a7f45; --dot: #9aa6b3; --dot2: #2a78d6; --frontc: #eb6834;
+  --mfill: #c3ccd6; --mbody: #b4bfcb; --mtyre: #2f353d; --mtail: #9a7440; --mview: #fbfcfd; --heat: 42, 120, 214;
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --f-data: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1114; --surface: #161a1f; --ink: #e7eaee; --ink2: #b2b9c3; --muted: #858e99; --rule: #29303a;
+  --acc: #5b9cf0; --t3: #f2905f; --hi: #18263a; --good: #4cc184; --dot: #59626d; --dot2: #5b9cf0; --frontc: #f2905f;
+  --mfill: #3d4652; --mbody: #9aa6b3; --mtyre: #3c434c; --mtail: #c9a46a; --mview: #1b2026; --heat: 91, 156, 240; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e1114; --surface: #161a1f; --ink: #e7eaee; --ink2: #b2b9c3; --muted: #858e99; --rule: #29303a;
+  --acc: #5b9cf0; --t3: #f2905f; --hi: #18263a; --good: #4cc184; --dot: #59626d; --dot2: #5b9cf0; --frontc: #f2905f;
+  --mfill: #3d4652; --mbody: #9aa6b3; --mtyre: #3c434c; --mtail: #c9a46a; --mview: #1b2026; --heat: 91, 156, 240; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--f-body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--f-display); font-stretch: 87%; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 2.1rem; font-weight: 700; } h2 { font-size: 1.45rem; font-weight: 700; } h3 { font-size: 1.02rem; font-weight: 600; }
+p { margin: 0; max-width: 70ch; }
+.eyebrow { font: 600 0.72rem/1 var(--f-data); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--ink2); }
+section { display: grid; gap: 14px; min-width: 0; }
+.num, .mono, td.n { font-family: var(--f-data); font-variant-numeric: tabular-nums; }
+.strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--rule);
+  border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.strip > div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; }
+.strip .k { font: 600 0.7rem/1.2 var(--f-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.strip .v { font: 600 1.3rem/1.2 var(--f-data); }
+.strip .s { font-size: 0.82rem; color: var(--ink2); }
+ul.find { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; max-width: 78ch; }
+ul.find b { font-weight: 600; }
+/* champion cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; display: grid; gap: 6px;
+  align-content: start; min-width: 0; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.card:hover, .card:focus-visible, .card.is-cur { border-color: var(--acc); background: var(--hi); outline: none; }
+.card .k { font: 600 0.7rem/1.2 var(--f-data); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.card .v { font: 600 1.55rem/1.1 var(--f-data); }
+.card .vs { font: 0.78rem/1.35 var(--f-data); color: var(--ink2); }
+.card .who { font-size: 0.82rem; color: var(--ink2); }
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chips span { font: 0.7rem/1 var(--f-data); padding: 3px 5px; border-radius: 3px; border: 1px solid var(--rule); color: var(--ink2); white-space: nowrap; }
+.chips span.up { border-color: var(--good); color: var(--good); }
+.chips span.dn { border-color: var(--t3); color: var(--t3); }
+svg.mini { display: block; width: 100%; max-width: 230px; height: auto; overflow: visible; }
+svg.mini .gnd { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+svg.mini .me path, svg.mini .me circle { fill: var(--mfill); }
+svg.mini .me line { stroke: var(--mfill); stroke-linecap: round; }
+svg.mini .ref path, svg.mini .ref circle { fill: none; stroke: var(--t3); stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-dasharray: 3 2; }
+svg.mini .ref line { stroke: var(--t3); stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-dasharray: 3 2; }
+.mkey { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; color: var(--ink2); align-items: center; }
+.mkey i { display: inline-block; width: 16px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+/* the 3D view */
+.v3wrap { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .v3wrap { grid-template-columns: minmax(0, 1fr); } }
+.cvbox { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--mview); border: 1px solid var(--rule); border-radius: 6px;
+  overflow: hidden; touch-action: none; cursor: grab; display: grid; place-items: center; }
+.cvbox canvas { display: block; width: 100%; height: 100%; position: absolute; inset: 0; }
+.cvbox > button.go, .vbtn button, .pick button { font: 600 0.8rem/1 var(--f-data); color: var(--ink2); background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px; cursor: pointer; }
+.vbtn { position: absolute; right: 8px; top: 8px; display: flex; gap: 4px; z-index: 1; }
+.vbtn button { padding: 5px 8px; min-width: 30px; }
+.pick { display: flex; flex-wrap: wrap; gap: 6px; }
+.pick button[aria-pressed="true"] { border-color: var(--acc); color: var(--ink); background: var(--hi); }
+.v3side { display: grid; gap: 10px; align-content: start; min-width: 0; font-size: 0.9rem; }
+.v3side label { color: var(--ink2); }
+.v3side output { font: 0.82rem/1.5 var(--f-data); color: var(--ink); }
+/* tables */
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; }
+table.plain { font-size: 0.88rem; }
+table.plain th, table.plain td { padding: 7px 10px; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+table.plain th { font: 600 0.7rem/1.2 var(--f-data); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+table.plain td.n { text-align: right; white-space: nowrap; }
+table.plain tr[data-id] { cursor: pointer; }
+table.plain tr[data-id]:hover td { background: var(--hi); }
+td.best { color: var(--good); font-weight: 600; }
+td.ref, tr.ref td { color: var(--muted); }
+td small { display: block; color: var(--muted); font-size: 0.72rem; }
+/* knob heat strip */
+table.heat { font-size: 0.78rem; min-width: 860px; }
+table.heat th { font: 600 0.66rem/1.1 var(--f-data); color: var(--muted); padding: 4px 2px; writing-mode: vertical-rl; transform: rotate(180deg);
+  text-align: left; height: 70px; white-space: nowrap; }
+table.heat th.row, table.heat td.row { writing-mode: horizontal-tb; transform: none; height: auto; text-align: left; padding: 4px 8px; white-space: nowrap;
+  font-family: var(--f-data); position: sticky; left: 0; background: var(--surface); z-index: 1; }
+table.heat td.c { width: 26px; height: 26px; padding: 0; border: 1px solid var(--surface); position: relative; }
+table.heat td.c i { position: absolute; left: 3px; right: 3px; height: 2px; background: var(--t3); }
+/* clouds */
+.clouds { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px 8px; min-width: 0; display: grid; gap: 4px; position: relative; }
+figure figcaption { font: 600 0.88rem/1.3 var(--f-body); }
+figure figcaption small { display: block; font-weight: 400; color: var(--ink2); }
+figure svg { width: 100%; height: auto; display: block; }
+.tk { font: 10px var(--f-data); fill: var(--muted); }
+.lb { font: 11px var(--f-body); fill: var(--ink2); }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 4px 7px;
+  font: 0.72rem/1.4 var(--f-data); color: var(--ink); box-shadow: 0 3px 10px rgba(0,0,0,.15); white-space: nowrap; z-index: 2; }
+.foot { font-size: 0.82rem; color: var(--muted); display: grid; gap: 4px; max-width: 90ch; }
+.foot code { font-family: var(--f-data); font-size: 0.78rem; }
+@media (max-width: 520px) { h1 { font-size: 1.7rem; } .wrap { gap: 32px; } }
+</style>
+
+<div class="wrap">
+<header style="display:grid; gap:10px">
+  <div class="eyebrow">Scorpion · gauges · capability search · 2026-10-28</div>
+  <h1>How far each gauge goes</h1>
+  <p class="lede" id="lede"></p>
+</header>
+
+<div class="strip" id="strip"></div>
+
+<section id="learned">
+  <h2>What we learned</h2>
+  <ul class="find" id="find"><li>The findings go here when the finals are in.</li></ul>
+</section>
+
+<section>
+  <h2>Each gauge pushed alone</h2>
+  <p class="lede">One search stream per gauge, each pushing only its own number (ties go to the better all-rounder), and one all-rounder stream with no weights: it raises a design's worst rank across the seven. Each card shows the best design the stream found, its side view (filled) over T3's (dashed), and how its other six readings compare with T3's: green better, orange worse. Tap a card to turn it in 3D below.</p>
+  <div class="mkey"><span><i style="background:var(--mfill)"></i>the champion</span><span><i style="border:1.5px dashed var(--t3)"></i>T3, the best design before this search</span></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section id="v3sec">
+  <h2>In 3D</h2>
+  <div class="v3wrap">
+    <div class="cvbox" id="cvbox"><button type="button" class="go" id="go">Show the 3D view</button></div>
+    <div class="v3side">
+      <div class="pick" id="pick" role="group" aria-label="Design"></div>
+      <label><input type="checkbox" id="ghost" checked> T3 as a ghost</label>
+      <output id="v3out"></output>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The readings</h2>
+  <p class="lede" id="readlede"></p>
+  <div class="scroll"><table class="plain" id="reads"></table></div>
+</section>
+
+<section>
+  <h2>Which knobs each one turned</h2>
+  <p class="lede">Each knob's setting as a share of its range, dark at the top of the range and pale at the bottom; the orange tick is T3's setting. Read across a row for one design, down a column for one knob.</p>
+  <div class="scroll"><table class="heat" id="heat"></table></div>
+</section>
+
+<section>
+  <h2>Everything screened</h2>
+  <p class="lede" id="cloudlede"></p>
+  <div class="mkey"><span><i style="background:var(--dot)"></i>no tail</span><span><i style="background:var(--dot2)"></i>with a tail</span><span><i style="background:var(--frontc)"></i>on the seven-way front</span><span><i style="border:1.5px solid var(--ink)"></i>T3</span></div>
+  <div class="clouds" id="clouds"></div>
+</section>
+
+<div class="foot" id="foot"></div>
+</div>
+
+<script>
+const D = /*DATA*/null;
+const L = D.labels, GK = D.gauges;
+const UNIT = {up: '', climb: ' mm', turn: ' mm', h_up: '°', h_down: '°', crest: '°', push: ' kg'};
+const BETTER = {up: 1, climb: 1, turn: -1, h_up: 1, h_down: 1, crest: 1, push: 1};
+const fmt = (g, v) => v === null || v === undefined ? '–' : g === 'up' ? (+v).toFixed(2) : g === 'push' ? (+v).toFixed(1).replace(/\.0$/, '') + ' kg' : Math.round(v) + UNIT[g];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const byId = Object.fromEntries(D.designs.map(d => [d.id, d]));
+const T3 = byId.T3, BOX = byId.Box;
+const read = d => d.full || d.screen || {};                     // a design's best-known readings: the full gauges', else the screen's
+const t3r = () => T3.full || {};
+const ALSO = {};                                               // a champion that other streams also picked: their labels
+for (const d of D.designs) if (d.same) (ALSO['c_' + d.same] = ALSO['c_' + d.same] || []).push(L[d.id.slice(2)]);
+const nameOf = d => d.kind === 'champion' ? L[d.id.slice(2)] + ' best' + (ALSO[d.id] ? ` (also ${ALSO[d.id].join(', ')})` : '') : d.label;
+
+// ---------- the little models ----------
+const M = D.models;
+const unb64 = (s, T) => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return new T(u.buffer); };
+M.meshes = M.meshes.map(m => ({v: unb64(m.v, Int16Array), f: unb64(m.f, m.w === 1 ? Uint8Array : Uint16Array)}));
+function hull2(P) {
+  P = P.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], up = [];
+  for (const p of P) { while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (const p of P.reverse()) { while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+const PROF = {};
+function profile(id) {
+  if (PROF[id]) return PROF[id];
+  const m = M.designs[id], P = [];
+  for (const i of m.hulls) { const v = M.meshes[i].v; for (let j = 0; j < v.length; j += 3) P.push([v[j], v[j + 2]]); }
+  return PROF[id] = {poly: hull2(P), wheels: [...new Set(m.wheels.map(w => w[0]))], R: m.R, tail: m.tail};
+}
+const BOUNDS = (() => {
+  let x0 = 1e9, x1 = -1e9, z1 = 0;
+  for (const id of Object.keys(M.designs)) {
+    const p = profile(id);
+    for (const [x, z] of p.poly) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z1 = Math.max(z1, z); }
+    for (const x of p.wheels) { x0 = Math.min(x0, x - p.R); x1 = Math.max(x1, x + p.R); z1 = Math.max(z1, 2 * p.R); }
+    if (p.tail) { const t = p.tail.tip, f = p.tail.foot; x0 = Math.min(x0, t[0] - f); x1 = Math.max(x1, t[0] + f); z1 = Math.max(z1, t[2] + f); }
+  }
+  return [x0 - 8, x1 + 8, z1 + 8];
+})();
+function miniSVG(id, ref) {
+  const [x0, x1, z1] = BOUNDS, X = x => (x - x0).toFixed(0), Z = z => (z1 - z).toFixed(0);
+  const shape = (id, cls) => {
+    const p = profile(id), t = p.tail;
+    return `<g class="${cls}"><path d="M${p.poly.map(([x, z]) => X(x) + ',' + Z(z)).join('L')}Z"/>` +
+      p.wheels.map(x => `<circle cx="${X(x)}" cy="${Z(p.R)}" r="${p.R}"/>`).join('') +
+      (t ? `<line x1="${X(t.base[0])}" y1="${Z(t.base[2])}" x2="${X(t.tip[0])}" y2="${Z(t.tip[2])}"${cls === 'me' ? ` stroke-width="${2 * t.r}"` : ''}/><circle cx="${X(t.tip[0])}" cy="${Z(t.tip[2])}" r="${t.foot}"/>` : '') + '</g>';
+  };
+  return `<svg class="mini" viewBox="0 0 ${(x1 - x0).toFixed(0)} ${(z1 + 4).toFixed(0)}" role="img" aria-label="side view"><line class="gnd" x1="0" x2="${(x1 - x0).toFixed(0)}" y1="${Z(0)}" y2="${Z(0)}"/>${shape(id, 'me')}${ref && ref !== id ? shape(ref, 'ref') : ''}</svg>`;
+}
+
+// ---------- header, cards ----------
+function header() {
+  document.getElementById('lede').textContent = `Every knob free at once (${D.knobs.length}, the three switches included), every gauge pushed as far as it goes, with no weights between them. ${D.n.toLocaleString()} designs screened on all seven gauges: ${D.rounds ? `1,024 spread over the whole space, then ${D.rounds} rounds of refinement` : 'the first spread over the whole space'}${D.finals ? ', then the best read again on the full gauges' : ''}. The step ladder runs to 300 mm here, past G2's 150 mm top, because T3 already reached it.`;
+  const c = [['Designs screened', D.n.toLocaleString(), `${D.built.toLocaleString()} could be built`],
+             ['Seven-way front', D.front_n.toLocaleString(), 'designs no other beats on every gauge'],
+             ['Refinement rounds', String(D.rounds), `8 streams × 30 designs, until ${D.deadline}`],
+             ['Full readings', D.finals ? 'in' : 'pending', D.finals ? '200 falls, 20 tries a rung' : 'after the last round']];
+  document.getElementById('strip').innerHTML = c.map(([k, v, s]) => `<div><span class="k">${k}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`).join('');
+}
+function cards() {
+  const el = document.getElementById('cards'); const r3 = t3r();
+  el.innerHTML = D.designs.filter(d => d.kind === 'champion').map(d => {
+    const st = d.id.slice(2), r = read(d), main = st === 'all' ? null : st;
+    const v = main ? fmt(main, r[main]) : 'rank ' + (d.rank ?? 0).toFixed(2);
+    const vs = main ? `T3 ${fmt(main, r3[main])} · box ${fmt(main, (BOX.full || {})[main])}` : 'its worst rank across the seven';
+    const chips = GK.filter(g => g !== main).map(g => {
+      const a = r[g], b = r3[g]; let c = '';
+      if (a !== null && a !== undefined && b !== null && b !== undefined && a !== b) c = (a - b) * BETTER[g] > 0 ? 'up' : 'dn';
+      return `<span class="${c}" title="${esc(L[g])}">${esc(L[g].split(' ')[0])} ${fmt(g, a)}</span>`;
+    }).join('');
+    const src = (d.full ? 'full gauges' : 'screen, 6 tries') + (d.same ? ` · the same design as ${L[d.same]}’s` : '');
+    return `<button type="button" class="card" data-id="${d.id}"><span class="k">${esc(L[st])}</span><span class="v num">${v}</span><span class="vs">${vs}</span>` +
+      `${miniSVG(d.id, 'T3')}<span class="who">${d.tail ? 'tail' : 'no tail'} · ${d.wheels} wheels · ${d.skin ? 'skin' : 'Trainer body'} · ${(d.mass / 1000).toFixed(2)} kg · ${src}</span><div class="chips">${chips}</div></button>`;
+  }).join('');
+  el.querySelectorAll('.card').forEach(b => b.addEventListener('click', () => { show(b.dataset.id); document.getElementById('v3sec').scrollIntoView({behavior: 'smooth', block: 'start'}); }));
+}
+
+// ---------- readings table ----------
+function readings() {
+  const rows = D.designs.filter(d => !d.same), best = {};
+  for (const g of GK) { const v = rows.filter(d => d.kind !== 'reference').map(d => read(d)[g]).filter(v => v !== null && v !== undefined); best[g] = BETTER[g] > 0 ? Math.max(...v) : Math.min(...v); }
+  document.getElementById('readlede').textContent = D.finals
+    ? 'Each design read again on the full gauges: 200 falls, 20 tries a rung, every friction; the step ladder to 300 mm. Green is the best of the search\'s designs on that gauge; the screen\'s reading is beside it in small type. Tap a row to see it in 3D.'
+    : 'The screen\'s readings (6 tries a rung) while the search runs; the full gauges read the finalists after the last round. Tap a row to see it in 3D.';
+  const head = `<thead><tr><th>Design</th>${GK.map(g => `<th>${esc(L[g])}</th>`).join('')}<th>Mass</th><th>L × W × H</th><th>Build</th></tr></thead>`;
+  const body = rows.map(d => {
+    const r = read(d), sc = d.screen || {};
+    return `<tr data-id="${d.id}" class="${d.kind === 'reference' ? 'ref' : ''}"><td>${esc(nameOf(d))}</td>` +
+      GK.map(g => `<td class="n${d.kind !== 'reference' && r[g] === best[g] ? ' best' : ''}">${fmt(g, r[g])}${d.full && d.screen ? `<small>${fmt(g, sc[g])}</small>` : ''}</td>`).join('') +
+      `<td class="n">${(d.mass / 1000).toFixed(2)} kg</td><td class="n">${d.length} × ${d.width} × ${d.height}</td><td>${[d.tail ? 'tail' : 'no tail', d.wheels + ' wh'].concat(d.skin === null ? [] : [d.skin ? 'skin' : 'Trainer body']).join(', ')}</td></tr>`;
+  }).join('');
+  const t = document.getElementById('reads'); t.innerHTML = head + '<tbody>' + body + '</tbody>';
+  t.querySelectorAll('tr[data-id]').forEach(tr => tr.addEventListener('click', () => { show(tr.dataset.id); document.getElementById('v3sec').scrollIntoView({behavior: 'smooth', block: 'start'}); }));
+}
+
+// ---------- knob heat strip ----------
+function heat() {
+  const rows = D.designs.filter(d => d.z && !d.same);
+  const head = `<thead><tr><th class="row">Design</th>${D.knobs.map(k => `<th title="${esc(k.what)}">${esc(k.key)}</th>`).join('')}</tr></thead>`;
+  const body = rows.map(d => `<tr><td class="row">${esc(d.kind === 'champion' ? L[d.id.slice(2)] + (ALSO[d.id] ? ' +' + ALSO[d.id].length : '') : d.label)}</td>` + d.z.map((v, i) => {
+    const k = D.knobs[i], t3 = k.t3;
+    return `<td class="c" style="background: rgba(var(--heat), ${(0.08 + 0.92 * v).toFixed(2)})" title="${esc(k.key)}: ${(k.lo + v * (k.hi - k.lo)).toFixed(k.hi - k.lo < 10 ? 2 : 0)} (${esc(k.what)})">${t3 === null ? '' : `<i style="top:${((1 - t3) * 22 + 1).toFixed(0)}px"></i>`}</td>`;
+  }).join('') + '</tr>').join('');
+  document.getElementById('heat').innerHTML = head + '<tbody>' + body + '</tbody>';
+}
+
+// ---------- clouds ----------
+const S = D.scatter;   // [up, climb, turn, h_up, h_down, crest, push, tail, wheels, skin, front]
+function cloud(fig, xi, yi, xl, yl, xr, yr) {
+  const W = 340, H = 240, m = {l: 40, r: 10, t: 10, b: 30}, sx = v => m.l + (v - xr[0]) / (xr[1] - xr[0]) * (W - m.l - m.r), sy = v => H - m.b - (v - yr[0]) / (yr[1] - yr[0]) * (H - m.t - m.b);
+  const jit = (i, k) => (((i * 9301 + k * 49297) % 233280) / 233280 - 0.5);   // a fixed jitter: the gauges read in steps
+  const pts = S.map((p, i) => ({p, i})).filter(({p}) => p[xi] !== null && p[yi] !== null);
+  pts.sort((a, b) => a.p[10] - b.p[10]);
+  const dx = (xr[1] - xr[0]) / 90, dy = (yr[1] - yr[0]) / 70;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(yl)} against ${esc(xl)}">`;
+  for (const t of [0, 0.25, 0.5, 0.75, 1]) {
+    const xv = xr[0] + t * (xr[1] - xr[0]), yv = yr[0] + t * (yr[1] - yr[0]);
+    s += `<line x1="${sx(xv)}" x2="${sx(xv)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--rule)"/><text class="tk" x="${sx(xv)}" y="${H - m.b + 13}" text-anchor="middle">${Math.round(xv)}</text>`;
+    s += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(yv)}" y2="${sy(yv)}" stroke="var(--rule)"/><text class="tk" x="${m.l - 5}" y="${sy(yv) + 3}" text-anchor="end">${yr[1] - yr[0] < 5 ? yv.toFixed(1) : Math.round(yv)}</text>`;
+  }
+  s += pts.map(({p, i}) => `<circle cx="${sx(p[xi] + jit(i, 1) * dx * 3).toFixed(1)}" cy="${sy(p[yi] + jit(i, 2) * dy * 3).toFixed(1)}" r="${p[10] ? 2.6 : 1.7}" fill="${p[10] ? 'var(--frontc)' : p[7] ? 'var(--dot2)' : 'var(--dot)'}" fill-opacity="${p[10] ? 0.95 : 0.45}"/>`).join('');
+  const t3 = read(T3); const t3v = [t3.up, t3.climb, t3.turn, t3.h_up, t3.h_down, t3.crest, t3.push];
+  if (t3v[xi] !== undefined && t3v[yi] !== undefined && t3v[xi] !== null && t3v[yi] !== null) s += `<circle cx="${sx(t3v[xi])}" cy="${sy(t3v[yi])}" r="6" fill="none" stroke="var(--ink)" stroke-width="1.6"/><text class="lb" x="${sx(t3v[xi]) + 8}" y="${sy(t3v[yi]) - 6}">T3</text>`;
+  s += `<text class="lb" x="${W - m.r}" y="${H - 3}" text-anchor="end">${esc(xl)}</text><text class="lb" x="${m.l}" y="${m.t + 2}" dy="-2">${esc(yl)}</text></svg>`;
+  fig.innerHTML = `<figcaption>${esc(yl)} against ${esc(xl)}<small>${pts.length.toLocaleString()} designs, jittered within their reading's step</small></figcaption>` + s;
+}
+function clouds() {
+  document.getElementById('cloudlede').textContent = `Every design the search built, three pairs of gauges at a time. The orange points are the seven-way front: ${D.front_n.toLocaleString()} designs that no other beats on all seven at once.`;
+  const el = document.getElementById('clouds'); el.innerHTML = '';
+  const mx = (i, d) => Math.max(d, ...S.map(p => p[i]).filter(v => v !== null));
+  const specs = [[2, 1, 'turn, mm (smaller is better)', 'step up, mm', [340, Math.min(1100, mx(2, 600))], [0, mx(1, 150)]],
+                 [2, 4, 'turn, mm (smaller is better)', 'hill down, degrees', [340, Math.min(1100, mx(2, 600))], [0, mx(4, 50)]],
+                 [1, 6, 'step up, mm', 'push, kg', [0, mx(1, 150)], [0, mx(6, 5)]],
+                 [0, 5, 'upright after a fall, share', 'crest, degrees', [0, 1], [0, mx(5, 40)]]];
+  for (const [xi, yi, xl, yl, xr, yr] of specs) { const f = document.createElement('figure'); el.appendChild(f); cloud(f, xi, yi, xl, yl, xr, yr); }
+}
+
+// ---------- the 3D view ----------
+let THREE_P = null, V = null, cur = byId.c_climb ? 'c_climb' : D.designs[0].id;
+const loadThree = () => THREE_P || (THREE_P = new Promise((ok, no) => {
+  if (window.THREE) return ok();
+  const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload = () => ok(); s.onerror = () => { THREE_P = null; no(); }; document.head.appendChild(s);
+}));
+function viewer() {
+  const box = document.getElementById('cvbox');
+  box.innerHTML = '<canvas aria-label="3D model of the selected design; drag to turn it"></canvas><div class="vbtn"><button type="button" data-z="0.8" aria-label="Zoom in">+</button><button type="button" data-z="1.25" aria-label="Zoom out">&minus;</button><button type="button" data-z="0" aria-label="Reset the view">reset</button></div>';
+  const cv = box.querySelector('canvas');
+  const renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true, alpha: true}); renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(30, 4 / 3, 5, 20000); cam.up.set(0, 0, 1);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x555555, 0.55); hemi.position.set(0, 0, 1); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffffff, 0.55); sun.position.set(700, -900, 1500); scene.add(sun);
+  const grid = new THREE.GridHelper(1600, 16); grid.rotation.x = Math.PI / 2; scene.add(grid);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || '#888';
+  const mats = {};
+  const material = () => { const c = n => new THREE.Color(css(n));
+    mats.body = new THREE.MeshStandardMaterial({color: c('--mbody'), roughness: 0.75, metalness: 0.05});
+    mats.tyre = new THREE.MeshStandardMaterial({color: c('--mtyre'), roughness: 0.9});
+    mats.tail = new THREE.MeshStandardMaterial({color: c('--mtail'), roughness: 0.5});
+    mats.ghost = new THREE.MeshBasicMaterial({color: c('--t3'), transparent: true, opacity: 0.28, depthWrite: false, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 8});
+    grid.material.color = c('--rule'); };
+  const GEO = new Map(), geo = i => { if (!GEO.has(i)) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(M.meshes[i].v, 3)); g.setIndex(new THREE.BufferAttribute(Uint16Array.from(M.meshes[i].f), 1)); g.computeVertexNormals(); GEO.set(i, g); } return GEO.get(i); };
+  const robot = (id, ghost) => {
+    const m = M.designs[id], g = new THREE.Group(), mb = ghost ? mats.ghost : mats.body;
+    for (const i of m.hulls) g.add(new THREE.Mesh(geo(i), mb));
+    const wg = new THREE.CylinderGeometry(m.R, m.R, m.TW, 36);
+    for (const [x, y] of m.wheels) { const w = new THREE.Mesh(wg, ghost ? mats.ghost : mats.tyre); w.position.set(x, y, m.R); g.add(w); }
+    if (m.tail) { const Bv = new THREE.Vector3(...m.tail.base), T = new THREE.Vector3(...m.tail.tip), d = T.clone().sub(Bv), len = d.length(), mt = ghost ? mats.ghost : mats.tail;
+      const link = new THREE.Mesh(new THREE.CylinderGeometry(m.tail.r, m.tail.r, len, 14), mt);
+      link.position.copy(Bv.clone().add(T).multiplyScalar(0.5)); link.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(link);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(m.tail.foot, 18, 12), mt); foot.position.copy(T); g.add(foot); }
+    return g;
+  };
+  let orbit0 = {az: -0.9, el: 0.32, r: 1600, tz: 120}, orbit = Object.assign({}, orbit0), body = null, ghostG = null, queued = false;
+  const draw = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; const {az, el, r, tz} = orbit;
+    cam.position.set(r * Math.cos(el) * Math.cos(az), r * Math.cos(el) * Math.sin(az), tz + r * Math.sin(el)); cam.lookAt(0, 0, tz); renderer.render(scene, cam); }); };
+  const clear = g => { if (g) { scene.remove(g); g.traverse(o => { if (o.geometry && ![...GEO.values()].includes(o.geometry)) o.geometry.dispose(); }); } };
+  const size = () => { const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); draw(); };
+  let drag = null;
+  box.addEventListener('pointerdown', e => { if (e.target.closest('button')) return; drag = {x: e.clientX, y: e.clientY, az: orbit.az, el: orbit.el}; box.setPointerCapture(e.pointerId); });
+  box.addEventListener('pointermove', e => { if (!drag) return; orbit.az = drag.az - (e.clientX - drag.x) * 0.008; orbit.el = Math.max(0.02, Math.min(1.45, drag.el + (e.clientY - drag.y) * 0.006)); draw(); });
+  const stop = () => { drag = null; }; box.addEventListener('pointerup', stop); box.addEventListener('pointercancel', stop);
+  box.querySelectorAll('.vbtn button').forEach(b => b.addEventListener('click', () => { const z = +b.dataset.z; if (z) orbit.r = Math.max(500, Math.min(4000, orbit.r * z)); else orbit = Object.assign({}, orbit0); draw(); }));
+  new ResizeObserver(size).observe(box);
+  const retheme = () => { material(); V && V.load(cur); };
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+  new MutationObserver(retheme).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+  material();
+  return {load(id) { clear(body); body = robot(id, false); scene.add(body); clear(ghostG); ghostG = null;
+    if (document.getElementById('ghost').checked && id !== 'T3') { ghostG = robot('T3', true); scene.add(ghostG); } size(); draw(); }};
+}
+function describe(id) {
+  const d = byId[id], r = read(d);
+  document.getElementById('v3out').textContent = `${nameOf(d)}: ` + GK.map(g => `${L[g].split(' ').slice(1).join(' ')} ${fmt(g, r[g])}`).join(' · ') +
+    ` · ${(d.mass / 1000).toFixed(2)} kg, ${d.length} × ${d.width} × ${d.height} mm (${d.full ? 'full gauges' : 'screen'})`;
+  document.querySelectorAll('#pick button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+  document.querySelectorAll('.card').forEach(b => b.classList.toggle('is-cur', b.dataset.id === id));
+}
+function show(id) {
+  cur = id; describe(id);
+  if (V) { V.load(id); return; }
+  const go = document.getElementById('go'); if (go) { go.disabled = true; go.textContent = 'Loading the 3D view…'; }
+  loadThree().then(() => { V = viewer(); V.load(cur); }, () => { if (go) { go.disabled = false; go.textContent = 'The 3D view didn’t load: tap to try again'; } });
+}
+function picker() {
+  const el = document.getElementById('pick');
+  el.innerHTML = D.designs.filter(d => !d.same).map(d => `<button type="button" data-id="${d.id}" aria-pressed="false">${esc(d.kind === 'champion' ? L[d.id.slice(2)].replace(/^G\d /, '') : d.label)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => show(b.dataset.id)));
+  document.getElementById('go').addEventListener('click', () => show(cur));
+  document.getElementById('ghost').addEventListener('change', () => V && V.load(cur));
+  describe(cur);
+}
+
+function foot() {
+  document.getElementById('foot').innerHTML = [
+    'How it was read: <code>gauges/capability.py</code> (the search, the finals) and <code>gauges/capability_page.py</code> (this page), from MuJoCo in the gauges\' physics band. The screen reads all seven gauges at 6 tries a rung; the finals at the full gauges\' 200 falls and 20 tries. Held at T3\'s: ' + D.held.map(esc).join(', ') + ' (the two dead knobs, and the tread\'s grip, a property to measure).',
+    'Known soft spots: G6 (crest) moves by up to 15° between reads; G3 (turn) reads the centre of mass\'s offset from the wheels\' centre as much as the shape; the tail\'s servo torque and the motors\' size are knobs here, so a champion may need hardware Zach doesn\'t own. Nothing here has been checked on the real robot except falls of printed bodies.',
+  ].map(s => `<p>${s}</p>`).join('');
+}
+
+if (D.findings) document.getElementById('find').innerHTML = D.findings.map(s => `<li>${s}</li>`).join('');   // our own text, with <b>
+header(); cards(); picker(); readings(); heat(); clouds(); foot();
+</script>

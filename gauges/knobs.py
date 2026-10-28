@@ -10,6 +10,7 @@ to the numbers on the hill climbing and all that".
     SCORPION_SEARCH=search_hills python gauges/knobs.py crest20 -> knobs_g67.jsonl's crest at the gauge's 20 tries
     SCORPION_SEARCH=search_hills python gauges/knobs.py grip    -> grip_hills.json (T3's hills by tread grip, x0.65 and x1)
     SCORPION_SEARCH=search_hills python gauges/knobs.py side    -> gauges/out/knobs/side.json (a side slope, exploratory)
+    SCORPION_SEARCH=search_hills python gauges/knobs.py freeze  -> freeze.json (the settled knobs held at T3's: does a search lose anything?)
 
 T3 is the shape study's best (1.00 / 150 mm / 381 mm; hills 35 / 40 stowed, 45 / 45 braced). Each knob takes 7
 values across its range, the rest at T3's, 3 seeds each; T3 itself takes 8 seeds, the noise a knob's effect is read
@@ -367,6 +368,89 @@ def grip_hills():
     json.dump(dict(rows=out), open(os.path.join(OUT, 'grip_hills.json'), 'w'), indent=1, default=str)
 
 
+# The knob review (2026-10-28, README "Which knobs matter"). Zach: "yes" to dropping the dead two and checking the
+# settled ones. DEAD are held at T3's in every search from here; SETTLED only cost when moved off T3's value (af too,
+# which the review's list missed: T3 sits 10 mm from its climb cliff); LEVERS trade one gauge for another.
+DEAD = ('cu', 'qu')
+SETTLED = ('track', 'TW', 'b', 'p', 'ar', 'xc', 'cd', 'qd', 'dzp', 'msize', 'foot_r', 'th_push', 'th_stow', 'af')
+LEVERS = ('gap', 'xw', 'clr', 'zc', 'dxp', 'R', 'mount_z')
+FREEZE_ARMS = (('free', ()), ('settled frozen', SETTLED), ('levers frozen', LEVERS))   # the last is the control
+HELD = DEAD + ('tyre_mu', 'bumper')                       # never searched here: the tread is a property, the push face a switch
+
+
+def freeze_job(a):
+    arm, tag, q, seed = a
+    sp = make(dict(T3, **q))
+    if sp is None:
+        return a, None
+    s = S.screen_lean(sp, seed)
+    return a, dict(up=s['up'], climb=s['climb'], turn=s['turn'])
+
+
+def freeze(n_b=256, gens=6, pop=60, ws=(0.25, 1.0)):
+    """does freezing the settled knobs at T3's cost a search anything? Three searches over the knob log's space (its
+    switches off, HELD at T3's): every knob free; SETTLED held at T3's; LEVERS held at T3's (the control: it must lose
+    some of the front). Each starts from the same n_b designs (an arm overwrites its held knobs with T3's) and
+    refines by cross-entropy under each weighting in ws (climb - w * turn, upright at least S.UP_SCREEN), every arm on
+    the same seeds. Read: the front (climb against turn) and its area. -> out/knobs/freeze.json
+    From random designs, holding knobs at T3's is a head start (T3's values are near the best) and the control would
+    pass for the wrong reason (a smoke run had both held arms beat the free one), so every arm starts at T3 and the
+    designs within a quarter of each knob's range of it: the claim is about T3's neighbourhood, as the sweep was."""
+    from scipy.stats import qmc
+    K = [(k, lo, hi) for _, k, lo, hi, _ in KNOBS if k not in HELD]; keys = [k for k, _, _ in K]
+    LO = np.array([lo for _, lo, _ in K]); HI = np.array([hi for _, _, hi in K]); span = HI - LO
+    zT = np.array([T3[k] for k in keys])                                  # T3, then designs within a quarter of each range of it:
+    U = qmc.Sobol(len(K), scramble=True, seed=41).random_base2(int(math.ceil(math.log2(n_b))))[:n_b - 1]   # the review's claim is
+    Z0 = np.vstack([zT, np.clip(zT + (U - 0.5) * 0.5 * span, LO, HI)])                                    # about T3's neighbourhood
+    def q_of(z, held):
+        return {k: (T3[k] if k in held else float(v)) for k, v in zip(keys, z)}
+    def score(r, w):
+        return -1e9 if (r is None or r['up'] < S.UP_SCREEN or r['turn'] is None) else r['climb'] - w * r['turn']
+    t0 = time.time(); rows = {arm: [] for arm, _ in FREEZE_ARMS}
+    with Pool(GG.WORKERS) as pool:
+        def run(J):
+            out = pool.map(freeze_job, J, chunksize=1)
+            for (arm, tag, q, seed), r in out:
+                rows[arm].append(dict(tag=tag, q=q, seed=seed, **(r or dict(up=0.0, climb=0, turn=None))))
+            return out
+        run([(arm, 'B', q_of(z, held), 40000) for arm, held in FREEZE_ARMS for z in Z0])
+        for arm, held in FREEZE_ARMS:
+            ok = [r for r in rows[arm] if r['up'] >= S.UP_SCREEN and r['turn'] is not None]
+            print(f"{arm:15s} B: {len(ok)} of {n_b} feasible, front {[(r['climb'], round(r['turn'])) for r in sorted(S.front(rows[arm]), key=lambda r: r['climb'])]}, {time.time() - t0:.0f} s", flush=True)
+        rng = np.random.default_rng(43); free_ix = {arm: [i for i, k in enumerate(keys) if k not in held] for arm, held in FREEZE_ARMS}
+        for j, w in enumerate(ws):                                        # one cross-entropy run per arm and weighting, as search.cem
+            st = {}
+            for arm, held in FREEZE_ARMS:
+                el = sorted(rows[arm], key=lambda r: -score(r, w))[:8]; E = np.array([[r['q'][k] for k in keys] for r in el])
+                st[arm] = [E.mean(0), np.maximum(E.std(0), 0.05 * span), el]
+            for g in range(gens):
+                J = []
+                for arm, held in FREEZE_ARMS:
+                    mu, sd, _ = st[arm]; Z = np.clip(mu + sd * rng.normal(size=(pop, len(keys))), LO, HI)
+                    J += [(arm, f'C{w}', q_of(z, held), 50000 + 100 * j + g) for z in Z]
+                new = run(J)
+                for arm, held in FREEZE_ARMS:
+                    got = [dict(q=q, **(r or dict(up=0.0, climb=0, turn=None))) for (a, _, q, _), r in new if a == arm]
+                    mu, sd, el = st[arm]; el = sorted(el + got, key=lambda r: -score(r, w))[:8]
+                    E = np.array([[r['q'][k] for k in keys] for r in el]); mu = 0.6 * E.mean(0) + 0.4 * mu
+                    sd = np.maximum(0.6 * E.std(0) + 0.4 * sd * 0.8, 0.01 * span); st[arm] = [mu, sd, el]
+                    b = el[0]
+                    print(f"{arm:15s} w={w} gen {g}: best climb {b['climb']} turn {b['turn'] and round(b['turn'])} up {b['up']:.2f}; {time.time() - t0:.0f} s", flush=True)
+    res = {}
+    for arm, held in FREEZE_ARMS:
+        F = sorted(S.front(rows[arm]), key=lambda r: r['climb'])
+        area, prev = 0.0, 0                                               # the front's area against (0 mm climb, 900 mm turn)
+        for r in F:
+            area += (r['climb'] - prev) * max(0.0, 900.0 - min(o['turn'] for o in F if o['climb'] >= r['climb'])); prev = r['climb']
+        res[arm] = dict(held=list(held), n=len(rows[arm]), front=[dict(climb=r['climb'], turn=r['turn'], up=r['up'], q=r['q']) for r in F], area=area)
+        print(f"{arm:15s} front {[(r['climb'], round(r['turn'])) for r in F]}  area {area / 1e3:.1f} k", flush=True)
+    a = {arm: res[arm]['area'] for arm in res}
+    print(('PASS ' if a['levers frozen'] < 0.95 * a['free'] else 'FAIL ') + 'control: holding the levers loses at least 5% of the free front', flush=True)
+    print(f"settled frozen: {a['settled frozen'] / a['free']:.3f} of the free front's area", flush=True)
+    os.makedirs(OUT, exist_ok=True)
+    json.dump(dict(wall_s=round(time.time() - t0), n_b=n_b, gens=gens, pop=pop, ws=ws, keys=keys, arms=res), open(os.path.join(OUT, 'freeze.json'), 'w'), indent=1, default=float)
+
+
 def check():
     """T3 rebuilt from its knobs must match the shape study's T3 (its mass and centre of mass)"""
     import pickle
@@ -379,4 +463,4 @@ def check():
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else ''
-    {'sweep': sweep, 'check': check, 'side': side, 'rebrace': rebrace, 'write': write, 'sweep67': sweep67, 'rule': brace_rule, 'speed': speed, 'crest20': crest20, 'grip': grip_hills}.get(cmd, lambda: print(__doc__))()
+    {'sweep': sweep, 'check': check, 'side': side, 'rebrace': rebrace, 'write': write, 'sweep67': sweep67, 'rule': brace_rule, 'speed': speed, 'crest20': crest20, 'grip': grip_hills, 'freeze': freeze}.get(cmd, lambda: print(__doc__))()

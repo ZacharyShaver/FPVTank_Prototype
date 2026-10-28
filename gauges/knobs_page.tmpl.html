@@ -104,7 +104,8 @@ svg.mini .hi path, svg.mini .hi circle { fill: none; stroke: var(--ink); stroke-
 svg.mini .hi line { stroke: var(--ink); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 .mkey { display: inline-flex; gap: 6px; align-items: center; }
 .mkey i { display: inline-block; width: 14px; height: 9px; border-radius: 2px; }
-.det { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 14px; align-items: start; }
+.det { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 14px; align-items: start;
+  position: sticky; left: 10px; width: min(100%, calc(100vw - 64px)); }   /* the screen's width, not the wide table's, and kept in view as it scrolls */
 @media (max-width: 860px) { .det { grid-template-columns: minmax(0, 1fr); } }
 .v3slot { min-width: 0; }
 .v3slot > button, .vbtn button { font: 600 0.8rem/1 var(--f-data); color: var(--ink2); background: var(--surface);
@@ -239,7 +240,6 @@ table.vals tr.is-cur td { background: var(--hi); }
 <div>The side-slope probe's first run had a bug (it counted the start's ±10° heading as sliding, so everything read 0°); it is kept as superseded and was rerun.</div></footer>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const D = /*DATA*/null;
 const G = {   // the gauges: label, unit, the scale every cell in the column shares, better direction
@@ -259,6 +259,16 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', 
 
 // ---------- little models ----------
 const M = D.models, MD = M ? M.designs : {}, T3M = MD.T3 ? MD.T3[0] : null;
+// the hulls come packed (knobs_page.packed): corners as int16 mm, triangles as uint8 or uint16, each base64
+const unb64 = (s, T) => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return new T(u.buffer); };
+if (M) M.meshes = M.meshes.map(m => typeof m.v === 'string' ? {v: unb64(m.v, Int16Array), f: unb64(m.f, m.w === 1 ? Uint8Array : Uint16Array)} : m);
+// three.js loads on the first tap of a 3D button, not with the page (a phone needn't fetch it to read the tables)
+let THREE_P = null;
+const loadThree = () => THREE_P || (THREE_P = new Promise((ok, no) => {
+  if (window.THREE) return ok();
+  const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload = () => ok(); s.onerror = () => { THREE_P = null; no(); }; document.head.appendChild(s);
+}));
 
 function settings(key) {        // a knob's settings, low to high, with T3's in its place
   const kn = D.knobs.find(k => k.key === key), L = (MD[key] || []).map(m => ({v: m.v, m}));
@@ -334,7 +344,7 @@ function viewer() {
     grid.material.color = c('--rule');
   };
   const GEO = new Map(), geo = i => {
-    if (!GEO.has(i)) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(M.meshes[i].v, 3)); g.setIndex(M.meshes[i].f); g.computeVertexNormals(); GEO.set(i, g); }
+    if (!GEO.has(i)) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(M.meshes[i].v, 3)); g.setIndex(new THREE.BufferAttribute(Uint16Array.from(M.meshes[i].f), 1)); g.computeVertexNormals(); GEO.set(i, g); }
     return GEO.get(i);
   };
   const robot = (m, ghost) => {
@@ -386,8 +396,14 @@ function viewer() {
 }
 
 function attach(key, det) {     // the 3D view into this row's slot, the row's button back in the one it left
-  if (!viewer()) return;
   const slot = det.querySelector('.v3slot'); if (!slot) return;
+  if (typeof THREE === 'undefined') {
+    const b = slot.querySelector('button'); if (b) { b.disabled = true; b.textContent = 'Loading the 3D view…'; }
+    loadThree().then(() => { if (b) { b.disabled = false; b.textContent = 'Show the 3D model here'; } attach(key, det); },
+                     () => { if (b) { b.disabled = false; b.textContent = 'The 3D view didn’t load: tap to try again'; } });
+    return;
+  }
+  if (!viewer()) return;
   const prev = V.el.parentElement; if (prev === slot) return;
   if (prev) prev.querySelector('button')?.removeAttribute('hidden');
   slot.querySelector('button')?.setAttribute('hidden', ''); slot.appendChild(V.el); V.load(key);
@@ -443,15 +459,19 @@ function table() {
   for (const kn of list) {
     if (order === 'group' && kn.group !== last) { h += `<tr class="grp"><td colspan="8">${GROUPS[kn.group]}</td></tr>`; last = kn.group; }
     h += `<tr class="knob" tabindex="0" data-k="${kn.key}" aria-expanded="false"><td class="name"><b>${esc(kn.key)}</b><span>${esc(kn.what)}</span><em>${fmtv(kn.key, kn.lo)} to ${fmtv(kn.key, kn.hi)} · T3 ${fmtv(kn.key, kn.t3v)}</em>${miniKnob(kn.key)}</td>${COLS.map(c => `<td class="cell">${spark(kn, c)}</td>`).join('')}</tr>`;
-    h += `<tr class="detail" data-for="${kn.key}" hidden><td colspan="8">${detail(kn)}</td></tr>`;
+    h += `<tr class="detail" data-for="${kn.key}" hidden><td colspan="8"></td></tr>`;   // filled when first opened
   }
   el.innerHTML = h + '</tbody>';
-  el.querySelectorAll('tr.detail').forEach(d => {
+  const fill = d => {
+    if (d.dataset.built) return; d.dataset.built = '1';
+    d.firstElementChild.innerHTML = detail(D.knobs.find(k => k.key === d.dataset.for));
     d.querySelector('.v3slot > button')?.addEventListener('click', () => attach(d.dataset.for, d));
-    d.querySelectorAll('table.vals tr[data-i]').forEach(r => r.addEventListener('click', () => { attach(d.dataset.for, d); V && V.show(+r.dataset.i); }));
-  });
+    d.querySelectorAll('table.vals tr[data-i]').forEach(r => r.addEventListener('click', () => {
+      if (V) { attach(d.dataset.for, d); V.show(+r.dataset.i); } }));
+  };
   el.querySelectorAll('tr.knob').forEach(tr => {
-    const tog = () => { const d = el.querySelector(`tr.detail[data-for="${tr.dataset.k}"]`); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden)); if (!d.hidden) attach(tr.dataset.k, d); };
+    const tog = () => { const d = el.querySelector(`tr.detail[data-for="${tr.dataset.k}"]`); fill(d); d.hidden = !d.hidden; tr.setAttribute('aria-expanded', String(!d.hidden));
+      if (!d.hidden && V) attach(tr.dataset.k, d); };            // once the 3D view is up it follows the opened row
     tr.addEventListener('click', tog); tr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tog(); } });
   });
 }
@@ -462,7 +482,7 @@ function detail(kn) {
   const t3 = Object.assign({}, B, {v: kn.t3v, t3: true}); rows.push(t3); rows.sort((a, b) => a.v - b.v);
   const at = settings(kn.key);
   const idx = r => at.findIndex(a => Math.abs(a.v - r.v) < 1e-6);
-  const slot = M ? `<div class="v3slot">${typeof THREE === 'undefined' ? '' : '<button type="button">Show the 3D model here</button>'}</div>` : '';
+  const slot = M ? '<div class="v3slot"><button type="button">Show the 3D model here</button></div>' : '';
   return `<div class="det">${slot}<div class="scroll"><table class="vals"><thead><tr><th>${esc(kn.key)}</th><th>upright</th><th>step mm</th><th>turn mm</th><th>up s/b</th><th>down s/b</th><th>crest</th><th>push kg</th><th>static tip</th><th>CoM z</th><th>mass g</th><th>width</th></tr></thead><tbody>` +
     rows.map(r => `<tr class="${r.t3 ? 'is-t3' : ''}"${idx(r) >= 0 ? ` data-i="${idx(r)}"` : ''}><td>${fmtv(kn.key, r.v)}${r.t3 ? ' T3' : ''}</td><td>${f(r.up, 2)}</td><td>${f(r.climb)}</td><td>${f(r.turn)}</td><td>${f(r.h_up)} / ${f(r.hb_up)}</td><td>${f(r.h_down)} / ${f(r.hb_down)}</td><td>${f(r.crest)}</td><td>${f(r.push, 1)}</td><td>${f(r.tip_static, 1)}°</td><td>${f(r.com_z)}</td><td>${f(r.mass)}</td><td>${f(r.width)}</td></tr>`).join('') +
     '</tbody></table></div></div>';

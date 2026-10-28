@@ -30,6 +30,26 @@ def mesh(P):
     return dict(v=np.round(P[used]).astype(int).ravel().tolist(), f=idx[F].ravel().tolist())
 
 
+N_PAGE = 140                              # a hull's corners on the page (models.json keeps them all, ~600)
+
+
+def packed(h, n=N_PAGE):
+    """a hull for the page: thinned to n corners (farthest-point picks, then hulled again) and packed as base64 (corners
+    as int16 mm, triangles as uint8 or uint16), about a tenth of the plain numbers (2026-10-28: the page was 2.5 MB and
+    loaded badly on Zach's phone)"""
+    import base64
+    P = np.asarray(h['v'], float).reshape(-1, 3)
+    if len(P) > n:
+        pick = [int(np.argmax(P[:, 0]))]; d = np.linalg.norm(P - P[pick[0]], axis=1)
+        while len(pick) < n:
+            i = int(np.argmax(d)); pick.append(i); d = np.minimum(d, np.linalg.norm(P - P[i], axis=1))
+        h = mesh(P[pick])
+    v = np.asarray(h['v'], '<i2'); w = 1 if len(v) // 3 < 256 else 2
+    f = np.asarray(h['f'], '<u1' if w == 1 else '<u2')
+    b = lambda a: base64.b64encode(a.tobytes()).decode('ascii')
+    return dict(v=b(v), f=b(f), w=w)
+
+
 def model_job(a):
     import knobs as K, robots as RB
     tag, ch = a; sp = K.make(dict(K.T3, **ch))
@@ -84,7 +104,10 @@ def main():
     curve = curve and {n: {a: {k: sum(r == 'ok' for r in v) for k, v in s.items()} for a, s in c.items()} for n, c in curve.items()}
     data = dict(base={q: rnd(res['T3'][0].get(q)) for q in KEEP}, noise=d['noise'], knobs=knobs, switches=sw, side=side, surrogate=sur,
                 crestRead=crest, pushRead=push, speed=spd['rows'] if spd else [], grip=grip['rows'] if grip else [], crestCurve=curve,
-                models=ld(MODELS))
+                models=None)
+    M = ld(MODELS)
+    if M:
+        data['models'] = dict(M, meshes=[packed(h) for h in M['meshes']])
     html = open(TEMPLATE, encoding='utf-8').read().replace('/*DATA*/null', json.dumps(data, separators=(',', ':')))
     path = os.path.join(OUT, 'knobs.html'); open(path, 'w', encoding='utf-8').write(html); print(path, f'{len(html) / 1024:.0f} kB')
 

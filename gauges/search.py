@@ -478,6 +478,8 @@ if RUN == 'search_hills':
     SPACE = [('R', 35.0, 95.0), ('xw', -80.0, 80.0), ('gap', 15.0, 150.0), ('dxp', -80.0, 80.0), ('dzp', -8.0, 15.0)]
     LIMB_BASE = (-154.83, 0.0, 149.6)
 T3_PLAT = dict(R=44.908, xw=14.684, gap=62.052, dxp=23.189, dzp=0.56)    # T3's wheels and packs
+# From 2026-10-28 (Zach, the knob review in gauges/README.md): cu and qu are dead (knobs.DEAD). A new run holds them at
+# T3's; the runs above keep their own spaces so they reproduce.
 T5_SHAPE =dict(xc=7.319, af=197.941, ar=146.141, b=149.966, zc=177.329, cu=167.509, cd=72.181, p=3.0, qu=2.771, qd=2.023)
 ZK = [k for k, _, _ in SPACE]; ZLO = np.array([a for _, a, _ in SPACE]); ZHI = np.array([b for _, _, b in SPACE])
 SEED_FROM = {'search_body': ('search_lean', 'search_drive')}.get(RUN, ())  # earlier runs whose fronts and finalists seed B
