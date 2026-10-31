@@ -1,11 +1,28 @@
-# For tools/ and head-v2/{fixes,checks}. On Zach's machine these are installed in `python`
-# (the Microsoft Store Python 3.10). The generator's own list is in its folder: requirements-cad.txt.
+# Every package this repo imports, pinned to the versions on Zach's machine (the Microsoft Store Python 3.10.11),
+# read 2026-10-30. Pinned because the checks lean on library behaviour: pymeshlab has renamed its filters between
+# releases, and the mesh report once read a missing filter as "no self-intersections" (code review, 2026-10-30).
+# Upgrade on purpose: change a pin, re-run head-v2/checks/regression.py, then commit the pin.
 #
 #   python -m pip install -r tools/requirements.txt
 #
-numpy
-cadquery            # OpenCascade (OCP): exact solids, booleans, STEP (~400 MB)
-pymeshlab           # mesh report, needle repair
-scikit-image        # the generator imports it (marching cubes)
-matplotlib          # picture sheets
-pillow              # renders
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+# CAD: tools/, head-v2/{fixes,checks}, the generator
+numpy==2.2.6
+cadquery==2.7.0             # OpenCascade (OCP): exact solids, booleans, STEP (~400 MB)
+cadquery-ocp==7.8.1.1.post1
+pymeshlab==2025.7.post1     # mesh report, needle repair
+scikit-image==0.25.2        # the generator's marching cubes
+matplotlib==3.10.9          # picture sheets
+pillow==12.1.1              # renders
+
+# sims and searches: gauges/, research/, sim/mujoco/
+scipy==1.15.3
+scikit-learn==1.7.2         # the surrogates
+mujoco==3.14.0
+torch==2.11.0+cu128         # gauges/unibody.py's FEM, on the GPU
+glfw==2.10.2                # sim/mujoco viewers
+
+# the rest
+requests==2.33.1            # tools/k2.py, the printer's Moonraker API
+vtk==9.3.1                  # chassis-v2/ideal_render.py

@@ -12,7 +12,8 @@ NEGATIVE CONTROL: --broken re-runs with the servo put back where it was when Zac
 it -- 4 mm toward the pan axis and 2.5 mm up, into the deck plate. Rows that stay at 0.00
 under that are not measuring anything, and should not be trusted. The lift matters: moving
 the servo sideways alone hits the bay first and leaves `servo vs well` reading zero, which
-is precisely the row that needs proving.
+is precisely the row that needs proving. --broken also breaks each check in CONTROLLED, and exits 1 when any of them
+does not fail on its own.
 
     python pan_coil_b_check.py [--broken]
 """
@@ -23,6 +24,9 @@ from tree_parts import U
 
 STEP = 0.35
 PANS = (-270, -135, 0, 135, 270)
+# insertion's stops, mm of travel left: every 2, under the shaft's 4.65 across, so nothing the servo passes can fall
+# between two stops. Until 2026-10-30 eight stops, up to 8 apart: its control showed at one stop only (code review).
+SLIDE = tuple(range(40, -1, -2))
 
 # (a, b, note). Pairs that are MEANT to touch are listed with an allowance.
 PAIRS = [
@@ -141,7 +145,27 @@ def nest():
     return fn, (np.array(lo, float), np.array(hi, float))
 
 
+# The checks --broken breaks, each with its own control. Each must fail on its own on the broken copy: one control that
+# no longer fails is a check that has stopped measuring, however many others still fail (code review, 2026-10-30).
+# wire_axis, merged_shelf and screw_alignment run their controls inline on every run, so they aren't here.
+CONTROLLED = ('pairs', 'insertion', 'assembly', 'gear_play', 'bearing_races')
+
+
 def main(broken=False):
+    return sum(run(broken).values())
+
+
+def control():
+    """the negative control: every CONTROLLED check on the broken copy; returns the ones that did NOT fail"""
+    found = run(broken=True)
+    dead = [k for k in CONTROLLED if not found.get(k)]
+    print('\nNEGATIVE CONTROL: ' + ('every controlled check failed, as it should' if not dead else
+                                    'these did NOT fail on the broken copy, so they are not measuring: ' + ', '.join(dead)))
+    return dead
+
+
+def run(broken=False):
+    """every check, by name -> how many faults it found"""
     fns = {k: v[0] for k, v in P.PARTS.items()}
     box = {k: (np.array(v[1], float), np.array(v[2], float)) for k, v in P.PARTS.items()}
     nfn, nbox = nest()
@@ -175,19 +199,20 @@ def main(broken=False):
         tag = f' (worst at pan {where:+.0f})' if (a in ROTATES or b in ROTATES) and worst > 1.0 else ''
         print(f'{a + " vs " + b:<22}{worst:>13.2f}   {note}{tag}{flag}')
     print(f'\n{bad} clash(es)' + ('   [NEGATIVE CONTROL -- these SHOULD appear]' if broken else ''))
-    bad += insertion(fns, box, broken)
-    bad += assembly(fns, box, broken)
-    bad += gear_play(broken)
-    bad += bearing_races(broken)
-    bad += screw_threads()
+    found = dict(pairs=bad)
+    found['insertion'] = insertion(fns, box, broken)
+    found['assembly'] = assembly(fns, box, broken)
+    found['gear_play'] = gear_play(broken)
+    found['bearing_races'] = bearing_races(broken)
+    found['screw_threads'] = screw_threads()
     if P.HORN_GEAR:
-        bad += block_air()
+        found['block_air'] = block_air()
     if P.HOLLOW_AXIS:
-        bad += wire_axis()
+        found['wire_axis'] = wire_axis()
     if P.SHELF_MERGED:
-        bad += merged_shelf()
-    bad += screw_alignment()
-    return bad
+        found['merged_shelf'] = merged_shelf()
+    found['screw_alignment'] = screw_alignment()
+    return found
 
 
 def block_air():
@@ -547,24 +572,37 @@ def insertion(fns, box, broken=False):
     It goes in along -Y. Slide it from clear of the tower to seated and watch for anything
     it has to pass through. A window that does not admit the part is the fault variant B's
     _insert.py was written for -- three rows there read zero while the geometry was wrong.
+
+    NEGATIVE CONTROL (--broken): the shaft's channel out through the window closed (SHAFT_SLOT_R 0), the fault this
+    sweep found on 2026-09-28. Seated, the servo is clear of it, so only the slide can see it; it must read BLOCKED.
+    Until 2026-10-30 `broken` did nothing here (registry K02).
     """
-    lo = np.minimum(box['servo'][0], box['base'][0]) - 1
-    hi = np.maximum(box['servo'][1], box['base'][1]) + 1
-    lo[1], hi[1] = lo[1] - 2, hi[1] + 42
+    # only where the servo goes can it collide: its box, stretched over the travel (as sweep() does). Until 2026-10-30
+    # this was the base's whole box too, sampled at every stop for nothing.
+    lo, hi = box['servo'][0] - 1, box['servo'][1] + 1
+    hi[1] += max(SLIDE)
     worst, where = 0.0, 0.0
+    keep = P.SHAFT_SLOT_R
+    if broken:
+        P.SHAFT_SLOT_R = 0.0
     print(f'\n{"servo insertion, -Y":<22}{"overlap mm3":>13}   travel')
-    for dy in (40, 30, 22, 16, 10, 6, 3, 0):
-        f = shift_servo(P.servo, 0.0, 0.0) if dy == 0 else (
-            lambda q, features=True, d=dy: P.servo((q[0], q[1] - d, q[2]), features))
-        v = overlap(f, fns['base'], lo, hi, STEP)   # the bay fused to the well
-        if v > worst:
-            worst, where = v, dy
-        print(f'{"  +" + str(dy) + " mm":<22}{v:>13.2f}')
+    try:
+        for dy in SLIDE:
+            f = shift_servo(P.servo, 0.0, 0.0) if dy == 0 else (
+                lambda q, features=True, d=dy: P.servo((q[0], q[1] - d, q[2]), features))
+            v = overlap(f, fns['base'], lo, hi, STEP)   # the bay fused to the well
+            if v > worst:
+                worst, where = v, dy
+            print(f'{"  +" + str(dy) + " mm":<22}{v:>13.2f}')
+    finally:
+        P.SHAFT_SLOT_R = keep                       # the checks after this one see the real part
     ok = worst <= 1.0
     print(f'{"worst":<22}{worst:>13.2f}   ' +
-          ('clear all the way in' if ok else f'<== BLOCKED at +{where:.0f} mm'))
+          ('clear all the way in' if ok else f'<== BLOCKED at +{where:.0f} mm') +
+          ('   [NEGATIVE CONTROL -- this SHOULD be blocked]' if broken else ''))
     return 0 if ok else 1
 
 
 if __name__ == '__main__':
-    sys.exit(1 if main('--broken' in sys.argv) and '--broken' not in sys.argv else 0)
+    # --broken exits 1 when a control did NOT fail (it used to exit 0 whatever the controls read)
+    sys.exit(1 if (control() if '--broken' in sys.argv else main()) else 0)

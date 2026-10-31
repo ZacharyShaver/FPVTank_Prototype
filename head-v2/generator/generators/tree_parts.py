@@ -434,13 +434,15 @@ def mesh_set(v, f):
     return ms
 
 def self_intersections(ms):
+    """faces that cut through another face; None when pymeshlab can't count them. It used to return 0 there, so a
+    renamed or failing filter read as clean (code review, 2026-10-30): callers test `== 0`, and None fails that."""
     try:
         ms.compute_selection_by_self_intersections_per_face()
         n = ms.current_mesh().selected_face_number()
         ms.set_selection_none()
         return n
     except Exception:
-        return 0
+        return None
 
 def tidy(ms):
     ms.meshing_remove_duplicate_vertices()
@@ -506,7 +508,7 @@ def report(ms):
         and t['connected_components_number'] == 1 and si == 0
     return ok, (f"{t['faces_number']:>7} faces  watertight={t['boundary_edges'] == 0}  "
                 f"manifold={t['non_two_manifold_edges'] == 0 and t['non_two_manifold_vertices'] == 0}  "
-                f"bodies={t['connected_components_number']}  self-int={si}  vol={g.get('mesh_volume', float('nan')) / 1000:.2f} cm3")
+                f"bodies={t['connected_components_number']}  self-int={'UNKNOWN' if si is None else si}  vol={g.get('mesh_volume', float('nan')) / 1000:.2f} cm3")
 
 def build(name, lines):
     fn, lo, hi, step, to_print, (fz_blank, fz_full) = PARTS[name]

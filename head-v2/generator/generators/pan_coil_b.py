@@ -197,6 +197,8 @@ SPL_LEAD = 0.4                     # post3: lead-in chamfer on the bore's mouth
 SV_CASE = 22.4                     # case, face -> far end
 SV_HUMP_L, SV_HUMP_H = 15.0, 6.0   # the block on the case face, from the shaft end, full width
 SV_SHAFT_R, SV_SHAFT = 2.325, 10.0 # output shaft, case face -> tip
+SHAFT_SLOT_R = 3.75                # half-width of the shaft's channel out through the window (bay()); 0 closes it, the
+                                   # fault the insertion sweep found (pan_coil_b_check.insertion's control)
 SV_Z1 = DECK_Z0 - 0.1              # body top, tucked under the deck plate
 SV_Z0 = SV_Z1 - SV_CASE            # -24.9: the case face, pointing DOWN
 SV_X0, SV_X1 = CENTRE - SW / 2, CENTRE + SW / 2                 # 24.9 .. 37.1
@@ -852,11 +854,11 @@ def bay(p, features=True):
     # The MG90S's block and shaft reach 6.0 and 10.0 below the case face, through the slab over the gear
     # cavity that the old 4 mm stub cleared. Both get a channel out through the window (2026-09-28).
     humpway = box(p, (SV_X0 - FIT, SV_Y0 - FIT, SV_Z0 - SV_HUMP_H - 0.3), (SV_X1 + FIT, win_y, SV_Z0 + 0.1))
-    shaftslot = box(p, (CENTRE - 3.75, 0.0, SV_Z0 - SV_SHAFT - 0.5), (CENTRE + 3.75, win_y + 2, SV_Z0 + 0.4))
+    shaftslot = box(p, (CENTRE - SHAFT_SLOT_R, 0.0, SV_Z0 - SV_SHAFT - 0.5), (CENTRE + SHAFT_SLOT_R, win_y + 2, SV_Z0 + 0.4))
     # The tab block's grooves: blind at the -Y end (its stop), out through the window.
     grooves = box(p, (SV_X0 - FIT - TB_RAIL - TB_SLIDE, TB_Y0 - TB_SLIDE, TAB_Z0 - TB_H - TB_SLIDE),
                   (SV_X1 + FIT + TB_RAIL + TB_SLIDE, win_y + 1, TAB_Z0 - TB_H + TB_RAIL_H + TB_SLIDE))
-    cuts = [pocket, tabs, shaftway, barrelway, humpway, shaftslot, grooves]
+    cuts = [pocket, tabs, shaftway, barrelway, humpway, grooves] + ([shaftslot] if SHAFT_SLOT_R > 0 else [])
     for ty in (SV_YC - TAB_PITCH / 2, SV_YC + TAB_PITCH / 2):
         cuts.append(cyl_z(p, CENTRE, ty, M2_PILOT, TAB_Z0 - 6.0, TAB_Z0 + 0.2))
     return np.maximum(s, -U(*cuts))

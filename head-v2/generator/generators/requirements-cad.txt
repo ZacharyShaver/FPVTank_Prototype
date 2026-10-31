@@ -1,10 +1,7 @@
-# Dev-machine only. NOTHING on the Pi imports any of this -- the root requirements.txt
-# stays minimal on purpose and must not gain these.
+# Dev-machine only. NOTHING on the Pi imports any of this.
+# Superseded 2026-10-30 by one pinned list for the whole repo: this file and tools/requirements.txt listed the same
+# packages, neither with versions (code review). Kept so the old command still works.
 #
 #   pip install -r requirements-cad.txt
 #
-numpy
-scikit-image        # marching cubes, for the SDF -> mesh parts
-pymeshlab           # mesh repair, decimation, topology report
-cadquery            # BREP kernel (brings OpenCascade, ~400 MB) -- the STEP solids
-pillow              # render sheets
+-r ../../../tools/requirements.txt
