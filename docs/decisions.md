@@ -3,6 +3,34 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-10-30: The drive motor is the JGB37-520; one-piece bodies capped and on bumpers
+
+- **The drive motor** (Zach: "put JGB37-520"): the cheaper of chassis-v2's two 37 mm gearmotors, 12 V 333 rpm with an
+  encoder, about 200 rpm on the 2S packs. Buy one and caliper it before the pods are sized to it
+  (`gauges/SHOPPING.md`).
+- **The two RC ESCs stay** (Zach: "Keep the ESCs"): each side's motors in parallel on that side's ESC, skid steering
+  as the rover does; the Control code and wiring don't change. Per-wheel drivers stay an option for later.
+- **One-piece bodies** (Zach: "Yes, do that"): growth answers the wheel landings alone, the falls are the verdict, the
+  printed shape is capped at 2 kg, and soft TPU bumpers are always on. Falls past PLA's strength: 71 of 288 -> 8
+  (`gauges/README.md`, "One-piece bodies"). Growing against the falls is superseded: it made warts and broke more.
+
+## 2026-10-28 (evening): Designs are sampled as one body; the capability search runs again strict
+
+Zach, on the capability page's shapes: "a lot of floating parts ... some of the shapes are impossible to make", and
+asked that the body "morph towards the wheel base" to loose parts, that the push plate merge in smoothly, that the
+wheels clear the skin, and that wheel size be limited to what a motor can move.
+
+- **One body** (`gauges/README.md`, "One body"): a part touches the body or stands off it on at most a 10 mm bracket.
+  Strict sampling grows the body's hull to any loose part and fairs the push plate in. A drive that can't hold the
+  robot on a 30° slope at a third of its stall torque is refused, which caps the wheel's size by the motor and gearing.
+  Every tyre gets a 5 mm well in the drawn body. The thresholds are guesses for Zach to set.
+- **The first capability run is superseded for its numbers, not deleted:** 55 % of its designs had a loose part, and
+  two of its champions among them. `SCORPION_CAP=capability_strict` reruns it with the same space, seeds and protocol.
+- **The drive motors stay the stock 37 mm** in the strict run (Zach: "hold the drive motors at the stock 37 mm size").
+  The first run's champions had grown them 1.3-2x; the gearing still searches.
+- **Front flippers** are a knob (`robots.add_flippers`). Hand-set moves gained nothing on T3, so their settings
+  search (`gauges/flippers.py`), against the same budget without them.
+
 ## 2026-10-28: G4-G7 on the scorecard; two dead knobs dropped
 
 Zach adopted the hills, crest and push gauges with targets on 2026-10-27, and asked for them on the scorecard. The page

@@ -114,8 +114,8 @@ figure svg { width: 100%; height: auto; display: block; }
 
 <div class="wrap">
 <header style="display:grid; gap:10px">
-  <div class="eyebrow">Scorpion · gauges · capability search · 2026-10-28</div>
-  <h1>How far each gauge goes</h1>
+  <div class="eyebrow" id="eyebrow">Scorpion · gauges · capability search</div>
+  <h1 id="title">How far each gauge goes</h1>
   <p class="lede" id="lede"></p>
 </header>
 
@@ -127,8 +127,8 @@ figure svg { width: 100%; height: auto; display: block; }
 </section>
 
 <section>
-  <h2>Each gauge pushed alone</h2>
-  <p class="lede">One search stream per gauge, each pushing only its own number (ties go to the better all-rounder), and one all-rounder stream with no weights: it raises a design's worst rank across the seven. Each card shows the best design the stream found, its side view (filled) over T3's (dashed), and how its other six readings compare with T3's: green better, orange worse. Tap a card to turn it in 3D below.</p>
+  <h2 id="cardh">Each gauge pushed alone</h2>
+  <p class="lede" id="cardlede">One search stream per gauge, each pushing only its own number (ties go to the better all-rounder), and one all-rounder stream with no weights: it raises a design's worst rank across the seven. Each card shows the best design the stream found, its side view (filled) over T3's (dashed), and how its other six readings compare with T3's: green better, orange worse. Tap a card to turn it in 3D below.</p>
   <div class="mkey"><span><i style="background:var(--mfill)"></i>the champion</span><span><i style="border:1.5px dashed var(--t3)"></i>T3, the best design before this search</span></div>
   <div class="cards" id="cards"></div>
 </section>
@@ -223,20 +223,27 @@ function miniSVG(id, ref) {
 
 // ---------- header, cards ----------
 function header() {
-  document.getElementById('lede').textContent = `Every knob free at once (${D.knobs.length}, the three switches included), every gauge pushed as far as it goes, with no weights between them. ${D.n.toLocaleString()} designs screened on all seven gauges: ${D.rounds ? `1,024 spread over the whole space, then ${D.rounds} rounds of refinement` : 'the first spread over the whole space'}${D.finals ? ', then the best read again on the full gauges' : ''}. The step ladder runs to 300 mm here, past G2's 150 mm top, because T3 already reached it.`;
+  document.getElementById('eyebrow').textContent += ` · ${D.date}`;
+  if (D.low) {                                                  // the low step-and-turn run (capability_low)
+    document.getElementById('title').textContent = 'Can a low body step and turn like T3?';
+    document.getElementById('lede').textContent = `Bodies whose top stands under ${D.low.top} mm (T3's skin: ${T3.top} mm), upright at least ${D.low.up}, pushed for T3's corner: a high step and a tight turn together. ${D.n.toLocaleString()} designs screened in ${D.rounds} round${D.rounds === 1 ? '' : 's'} of refinement, started from the ${D.low.seeds.toLocaleString()} of the wide overnight run (which seed the search but can't win it)${D.finals ? ', then the best read again on the full gauges' : ''}.`;
+    document.getElementById('cardh').textContent = 'Step against turn';
+    document.getElementById('cardlede').textContent = `Five streams, each trading the step against the turn by its own weight (step − w × turn, in mm), and one asking for the highest step inside a ${D.low.cap} mm turn. A design over the height, under the upright, or past the circle is scored by how far it misses. Each card shows the stream's best design, its height, its side view (filled) over T3's (dashed), and its other readings against T3's: green better, orange worse. Tap a card to turn it in 3D below.`;
+  } else
+  document.getElementById('lede').textContent = `Every knob free at once (${D.knobs.length}, the ${D.switches} switches included), every gauge pushed as far as it goes, with no weights between them. ${D.n.toLocaleString()} designs screened on all seven gauges: ${D.rounds ? `${D.n_b.toLocaleString()} spread over the whole space, then ${D.rounds} rounds of refinement` : 'the first spread over the whole space'}${D.finals ? ', then the best read again on the full gauges' : ''}. The step ladder runs to 300 mm here, past G2's 150 mm top, because T3 already reached it.`;
   const c = [['Designs screened', D.n.toLocaleString(), `${D.built.toLocaleString()} could be built`],
              ['Seven-way front', D.front_n.toLocaleString(), 'designs no other beats on every gauge'],
-             ['Refinement rounds', String(D.rounds), `8 streams × 30 designs, until ${D.deadline}`],
+             ['Refinement rounds', String(D.rounds), `${D.streams} streams × 30 designs, until ${D.deadline}`],
              ['Full readings', D.finals ? 'in' : 'pending', D.finals ? '200 falls, 20 tries a rung' : 'after the last round']];
   document.getElementById('strip').innerHTML = c.map(([k, v, s]) => `<div><span class="k">${k}</span><span class="v num">${v}</span><span class="s">${s}</span></div>`).join('');
 }
 function cards() {
   const el = document.getElementById('cards'); const r3 = t3r();
   el.innerHTML = D.designs.filter(d => d.kind === 'champion').map(d => {
-    const st = d.id.slice(2), r = read(d), main = st === 'all' ? null : st;
-    const v = main ? fmt(main, r[main]) : 'rank ' + (d.rank ?? 0).toFixed(2);
-    const vs = main ? `T3 ${fmt(main, r3[main])} · box ${fmt(main, (BOX.full || {})[main])}` : 'its worst rank across the seven';
-    const chips = GK.filter(g => g !== main).map(g => {
+    const st = d.id.slice(2), r = read(d), low = D.low && !GK.includes(st) && st !== 'all', main = st === 'all' || low ? null : st;
+    const v = low ? `${fmt('climb', r.climb)} / ${fmt('turn', r.turn)}` : main ? fmt(main, r[main]) : 'rank ' + (d.rank ?? 0).toFixed(2);
+    const vs = low ? `step / turn · T3 ${fmt('climb', r3.climb)} / ${fmt('turn', r3.turn)} · top ${d.top} mm` : main ? `T3 ${fmt(main, r3[main])} · box ${fmt(main, (BOX.full || {})[main])}` : 'its worst rank across the seven';
+    const chips = GK.filter(g => g !== main && !(low && (g === 'climb' || g === 'turn'))).map(g => {
       const a = r[g], b = r3[g]; let c = '';
       if (a !== null && a !== undefined && b !== null && b !== undefined && a !== b) c = (a - b) * BETTER[g] > 0 ? 'up' : 'dn';
       return `<span class="${c}" title="${esc(L[g])}">${esc(L[g].split(' ')[0])} ${fmt(g, a)}</span>`;

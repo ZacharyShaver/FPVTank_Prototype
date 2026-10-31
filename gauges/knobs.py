@@ -11,6 +11,7 @@ to the numbers on the hill climbing and all that".
     SCORPION_SEARCH=search_hills python gauges/knobs.py grip    -> grip_hills.json (T3's hills by tread grip, x0.65 and x1)
     SCORPION_SEARCH=search_hills python gauges/knobs.py side    -> gauges/out/knobs/side.json (a side slope, exploratory)
     SCORPION_SEARCH=search_hills python gauges/knobs.py freeze  -> freeze.json (the settled knobs held at T3's: does a search lose anything?)
+    python gauges/knobs.py cohere                               # the one-body check and its controls (2026-10-28)
 
 T3 is the shape study's best (1.00 / 150 mm / 381 mm; hills 35 / 40 stowed, 45 / 45 braced). Each knob takes 7
 values across its range, the rest at T3's, 3 seeds each; T3 itself takes 8 seeds, the noise a knob's effect is read
@@ -29,14 +30,14 @@ from multiprocessing import Pool
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, '..', 'tools'))
-import config
+import config, stamp
 import gauges as GG, robots as RB, search as S, hills as H
 
 OUT = os.path.join(config.GAUGES_OUT, 'knobs')
 T3 = dict(R=44.908, xw=14.684, gap=62.052, clr=51.943, dxp=23.189, dzp=0.56, six=0.0, shell=1.0, xc=27.025, af=166.408,
           ar=156.628, b=120.606, zc=159.624, cu=71.913, cd=71.847, p=3.26, qu=2.256, qd=2.565, limb=1.0, L=279.186, tq=3.306,
           th_push=-46.177, th_stow=111.658, mz=0.431, track=113.977, msize=1.0, gear=2.091, TW=46.0, mount_z=149.6, foot_r=12.0,
-          tyre_mu=1.0, bumper=0.0)
+          tyre_mu=1.0, bumper=0.0, L2=0.0, rear_up=0.0)
 MOUNT = (-154.83, 0.0)                    # the tail mount's x and y (T5's, pinned); its z is mount_z
 # (group, knob, low, high, what it is). The ranges are the searches' own; TW and mount_z are new.
 KNOBS = [('wheels', 'R', 35.0, 95.0, "the wheels' radius, mm"),
@@ -65,21 +66,67 @@ KNOBS = [('wheels', 'R', 35.0, 95.0, "the wheels' radius, mm"),
          ('tail', 'th_stow', 20.0, 160.0, "the tail's stowed pitch, degrees (90 up, 180 forward over the body)"),
          ('tail', 'mount_z', 90.0, 210.0, "the tail mount's height, mm (new)"),
          ('tail', 'foot_r', 6.0, 40.0, "the tail foot's radius, mm (12 so far; a pad or skid when big; new)"),
+         ('tail', 'L2', 0.0, 250.0, "a second link on an elbow servo, mm (under 40: one link; 2026-10-30)"),
+         ('tail', 'rear_up', 0.0, 1.0, "the tail-first climb reflex: the tail sets its foot on the step and lifts the rear (above half; 2026-10-30)"),
          ('wheels', 'tyre_mu', 0.5, 1.8, "the tread's grip, times the stock tyre's (0.9 at x1; new)"),
          ('body', 'bumper', 0.0, 150.0, "a flat push face at the very front: its top, mm (60 tall, 75 g; under 40: none; new)")]
 SWITCHES = [('tail off', dict(limb=0.0)), ('six wheels', dict(six=1.0))]
 N_VAL, SEEDS, T3_SEEDS = 7, 3, 8
+# Front flippers (2026-10-28, robots.add_flippers): off unless q['flip'] > 0.5; kept apart from KNOBS so the runs
+# before them rebuild as they ran. The defaults are a starting guess, not a tested design.
+FLIP0 = dict(flip=0.0, f_nose=0.0, f_tail=0.0, FL=150.0, ftq=2.0, f_stow=30.0, f_up=60.0, f_press=-45.0, fz=0.5)
+FLIP_KNOBS = [('flipper', 'FL', 60.0, 300.0, "the flipper's length, pivot to tip, mm"),
+              ('flipper', 'ftq', 0.3, 4.0, "each flipper servo's stall torque, N m"),
+              ('flipper', 'f_stow', 0.0, 180.0, "the flippers' stowed angle, degrees (0 ahead, 90 up, 180 back over the top)"),
+              ('flipper', 'f_up', 20.0, 110.0, 'the angle they lift to over a step, degrees'),
+              ('flipper', 'f_press', -90.0, -10.0, 'the angle they press down to, degrees (below level)'),
+              ('flipper', 'fz', 0.0, 1.0, "the centre-line flipper's pivot height, belly (0) to the top of the nose (1)")]
 BRACE = (-30.0, -15.0)
 
 
-def make(q):
-    """the spec of a design given as T3's knobs with changes; None when it can't be built"""
+def make(q, strict=False, real=False, why=None):
+    """the spec of a design given as T3's knobs with changes; None when it can't be built. strict (2026-10-28): None
+    too when a part isn't fixed to the body (problems()); searches from then on sample strict, the runs before don't,
+    so they rebuild as they ran. real (2026-10-31, strict as well): the body weighs as its one-piece print, the
+    motors' pods are in the sims, the motors clear the parts inside and the flippers mount on the body (_real,
+    real_problems). why: a list the refusals are added to"""
+    strict = strict or real
+    sp = _make(q)
+    if sp is None:
+        return None
+    if strict:
+        sp = _cohere(q, sp)
+        if sp.get('limb'):
+            sp = dict(sp, solid_tail=True)                                # the body and tyres stop the tail (robots.xml)
+    if q.get('flip', 0.0) > 0.5:                                          # after the tyres' width: the pair sits outside them
+        f = dict(FLIP0, **{k: q[k] for k in FLIP0 if k in q})
+        sp = RB.add_flippers(sp, f['FL'], f['ftq'], f['f_stow'], f['f_up'], f['f_press'], nose=f['f_nose'] > 0.5, fz=f['fz'], with_tail=f['f_tail'] > 0.5)
+    if real and sp is not None:
+        sp = _real(q, sp)
+    if strict and sp is not None:
+        p = problems(q, sp) + (real_problems(q, sp) if real else [])
+        if why is not None:
+            why += p
+        if p:
+            return None
+    if real and sp is not None:                                          # (add_flippers can refuse: None)
+        sp = _real_shape(sp)
+    return sp
+
+
+def _make(q):
     q = dict(q); wb = 2 * q['R'] + q['gap'] if q['six'] <= 0.5 else 2 * (2 * q['R'] + q['gap'])
     q['xf'], q['xr'] = q['xw'] + wb / 2, q['xw'] - wb / 2
     S.LIMB_BASE = (MOUNT[0], MOUNT[1], q['mount_z'] + q['clr'] - T3['clr'])   # the mount rides with the body
+    S.TRACK_R = q.get('track_r')                                         # front and rear tracks apart (Zach, 2026-10-28: "two knobs for wheel width")
     sp = S.build(np.array([q[k] for k in S.KEYS]))
     if sp is None:
         return None
+    if q.get('L2', 0.0) >= 40.0 and sp.get('limb'):                     # a second link on an elbow (2026-10-30; under 40: one link)
+        lm = sp['limb']; nl = RB.add_limb(dict(sp, limb=None), lm['L'], lm['tq'], lm['th_push'], lm['th_stow'], lm['mz'], base=lm['base'], L2=q['L2'])['limb']
+        sp = RB.dims(dict(sp, limb=dict(lm, **{k: nl[k] for k in ('L2', 'tq2', 'm_link2', 'm_elbow')})))
+    if q.get('rear_up', 0.0) > 0.5 and sp.get('limb'):                   # the tail-first climb reflex (gauges.RearUp, 2026-10-30)
+        sp = dict(sp, limb=dict(sp['limb'], rear_up=True))
     if q['foot_r'] != 12.0 and sp.get('limb'):                           # a bigger foot weighs more, as a shell: 15 g at 12 mm
         sp = dict(sp, limb=dict(sp['limb'], foot_r=q['foot_r'], m_foot=15.0 * (q['foot_r'] / 12.0) ** 2))
     if q['tyre_mu'] != 1.0:
@@ -89,6 +136,278 @@ def make(q):
         plate = np.array([[x, y, z] for x in (x0 - 3.0, x0 + 0.5) for y in (-100.0, 100.0) for z in (z0, z1)])
         sp = H.add_mass(dict(sp, hulls=list(sp['hulls']) + [plate]), 75.0, (x0, 0.0, (z0 + z1) / 2), sp['name'])
     return RB.dims(dict(sp, TW=q['TW'])) if (q['TW'], q['foot_r']) != (46.0, 12.0) else sp
+
+
+# ---------- one body (2026-10-28) ----------
+# Zach, on the capability page's shapes: "a lot of floating parts. Make a check to ensure everythings connected when
+# sampling these and they actually fit as a cohesive body. some of the shapes are impossible to make due to that".
+# A design's parts are mass items and hulls; nothing tied them together. Each part that must be fixed to the body:
+MOTOR_HALF = (18.5, 40.7, 18.5)           # mm: chassis3's motor box, at (axle x, its side's |y| - 31, R)
+PACK_HALF = (70.5, 13.0, 22.8)            # mm: chassis3's battery pack box
+# The rule: a part touches the body or stands off it on at most a 10 mm bracket*. A motor reaches 5 mm* into the body
+# (the Trainer's own layout: 10); the tail's turntable, about 40 mm across*, has its centre within 30 mm (limb_mount
+# puts it 20 out; T3's is 26); the push plate within 10; a pack inside the tub within 2 (the wall).
+MOTOR_IN, TAIL_OUT, PLATE_OUT, PACK_OUT = 5.0, 30.0, 10.0, 2.0
+# Zach: "many times the tail moves through the body which is not possible". The turntable sits on the body's surface:
+# its centre at least 15 mm* out (a buried one can't turn; limb_mount puts it 20 out), and the stowed tail clears the
+# body and the tyres. Strict builds also let the body and tyres stop the tail in the sims (robots.xml, solid_tail).
+TAIL_IN = 15.0
+# Zach: "There should be size limits on the wheels to a realistic proportion for a motor that can move this thing". The
+# sim's motors give their stall torque for as long as asked; a real one runs at about a third of it* without cooking.
+# So each wheel's motor, at a third of its stall torque, must hold the robot still on a 30-degree slope*: bigger wheels
+# need more torque for the same push (torque = force x radius), so this caps the wheel's size by the motor and gearing.
+RATED, HOLD_DEG = 1.0 / 3.0, 30.0
+
+
+def drive_need(sp):
+    """(N m a wheel the robot needs on a HOLD_DEG slope, N m its motor gives at RATED of stall)"""
+    need = sp['mass'] * 9.81e-3 * math.sin(math.radians(HOLD_DEG)) * sp['R'] * 1e-3 / len(sp['wheels'])
+    return need, sp['motor']['stall'] * RATED
+
+
+def problems(q, sp):
+    """the parts not fixed to the body, as 'part: how far off', and a drive too weak for its wheels"""
+    out = []
+    for k, v in cohesion(q, sp).items():
+        if k.startswith('motor') and v < MOTOR_IN:
+            out.append(f'{k}: {"reaches " + format(v, ".0f") + " mm in" if v >= 0 else format(-v, ".0f") + " mm from the body"}')
+        elif k == 'tail mount' and v < TAIL_IN:
+            out.append(f'tail mount: ' + (f'buried {-v:.0f} mm in the body' if v < 0 else f'{v:.0f} mm out, too close to the body to turn'))
+        elif (k == 'tail mount' and v > TAIL_OUT) or (k == 'push plate' and v > PLATE_OUT) or (k.startswith('pack') and v > PACK_OUT):
+            out.append(f'{k}: {v:.0f} mm {"outside" if k.startswith("pack") else "from"} the body')
+    lm = sp.get('limb')
+    if lm:                                                                # the stowed tail, past its turntable, clear of body and tyres
+        P = RB.limb_points(lm, 0.0, lm['th_stow'], k=24); P = P[np.linalg.norm(P - np.asarray(lm['base']), axis=1) > 20.0]
+        if (RB.hull_dist(sp['hulls'][0], P) < RB.LINK_R - 1.0).any():
+            out.append('tail: stowed through the body')
+        for x, y in sp['wheels']:
+            if np.any((np.hypot(P[:, 0] - x, P[:, 2] - sp['R']) < sp['R'] + RB.LINK_R) & (np.abs(P[:, 1] - y) < sp['TW'] / 2 + RB.LINK_R)):
+                out.append('tail: stowed through a tyre'); break
+    need, have = drive_need(sp)
+    if need > have:
+        out.append(f'drive: each wheel needs {need:.2f} N m on a {HOLD_DEG:.0f}° slope, its motor gives {have:.2f} at a third of stall')
+    return out
+
+
+def _add_body(M, c, I, m, cm, Im):
+    """M, c, I with a body of mass m at cm, inertia Im about it, added (m < 0 with -Im takes one away)"""
+    M2 = M + m; c2 = (M * c + m * cm) / M2; d0, d1 = c - c2, cm - c2
+    return M2, c2, I + M * (d0 @ d0 * np.eye(3) - np.outer(d0, d0)) + Im + m * (d1 @ d1 * np.eye(3) - np.outer(d1, d1))
+
+
+def _wheels_in(q, sp, c):
+    """_cohere's first step: each loose wheel in to the widest |y| where its motor reaches MOTOR_IN into the body (by
+    bisection, its tyres at least 80 mm apart), its motor's mass moved with it. (spec, cohesion)"""
+    body, R = sp['hulls'][0], sp['R']; wheels = list(sp['wheels']); M, cm, I = sp['M'], sp['com'], sp['I']
+    m_mot = 205.0 * q['msize'] + 34.6; moved = []                         # search.build's motor
+    depth = lambda x, sg, a: -float(RB.hull_dist(body, _grid((x, sg * (a - 31.0), R), MOTOR_HALF)).min())
+    for i, (x, y) in enumerate(wheels):
+        if c[f'motor {i}'] >= MOTOR_IN:
+            continue
+        sg, lo, hi = np.sign(y), sp['TW'] / 2 + 40.0, abs(y)
+        if depth(x, sg, lo) < MOTOR_IN:
+            continue                                                      # no width reaches: the body grows to it
+        for _ in range(12):
+            mid = 0.5 * (lo + hi); lo, hi = (mid, hi) if depth(x, sg, mid) >= MOTOR_IN else (lo, mid)
+        wheels[i] = (x, sg * lo); moved.append(abs(y) - lo)
+        for p, s in (((x, sg * (abs(y) - 31.0), R), -1.0), ((x, sg * (lo - 31.0), R), 1.0)):
+            M, cm, I = _add_body(M, cm, I, s * m_mot, np.asarray(p, float), np.zeros((3, 3)))
+    if not moved:
+        return sp, c
+    sp = RB.dims(dict(sp, wheels=wheels, M=M, com=cm, I=I, notes=list(sp['notes']) + [f'{len(moved)} wheel(s) in to the body, up to {max(moved):.0f} mm']))
+    return sp, cohesion(q, sp)
+
+
+def _mount_on_surface(sp):
+    """the tail's turntable moved onto the body's rear surface: at its height (kept 15 mm inside the body's height
+    range at the rear), 20 mm behind the surface along the centre line, then back until it is 20 mm clear of the body
+    (a slanted rear). Unchanged when no height meets the body (problems() then refuses it)."""
+    lm = sp['limb']; B = np.asarray(lm['base'], float); body = sp['hulls'][0]
+    lo = float(body[:, 2].min()); hi = float(body[body[:, 0] < body[:, 0].min() + 40][:, 2].max())
+    z = float(np.clip(B[2], lo + 15.0, hi - 15.0)) if hi - lo > 30.0 else 0.5 * (lo + hi); xs = RB.rear_surface([body], z)
+    if xs is None:
+        return sp
+    nb = np.array([xs - 20.0, 0.0, z])
+    for _ in range(6):
+        d = float(RB.hull_dist(body, [nb])[0])
+        if d >= 19.5:
+            break
+        nb[0] -= 20.0 - d + 0.5
+    note = f"tail mount moved {np.linalg.norm(nb - B):.0f} mm, onto the body's rear"
+    return RB.dims(dict(sp, limb=dict(lm, base=nb.tolist()), notes=list(sp['notes']) + [note]))
+
+
+def _cohere(q, sp):
+    """the strict body (2026-10-28). Zach: "it kinda needs to morph towards the wheel base when the shapes are further
+    out and not connected", and of the push plate, "merge in something like the front plate in a smooth way to the
+    shape of it". The body's hull grows to take in each part problems() finds off it: a motor (its box, out to 2 mm
+    short of its tyre), a pack outside the tub, a tail turntable too far out (a 40 mm block round its centre). The
+    push plate always joins the body's hull, which fairs it in. Parts already on the body leave it as it is, so T3
+    and the Trainer's layout don't change. The added hull weighs as the skin does (1.5 mm PLA, search.shell_mass).
+    First, without a skin (Zach: "wheels must attach to the body, you can put them on different widths? that may fix
+    some"): a loose wheel comes in toward the tub, each axle on its own width, to the widest place its motor reaches
+    MOTOR_IN into it (the track knob is then the widest the wheels may sit). Only a wheel no width can attach (ahead
+    of, behind or under the tub) grows the body. A skin wraps its motors, so its wheels never move."""
+    c = cohesion(q, sp); body = sp['hulls'][0]; add = []
+    if q['shell'] <= 0.5 and any(c[f'motor {i}'] < MOTOR_IN for i in range(len(sp['wheels']))):
+        sp, c = _wheels_in(q, sp, c)
+    for i, (x, y) in enumerate(sp['wheels']):
+        if c[f'motor {i}'] < MOTOR_IN:
+            sg = np.sign(y); y0, y1 = abs(y) - 31.0 - MOTOR_HALF[1], abs(y) - sp['TW'] / 2 - 2.0
+            add.append(np.array([[x + a, sg * b, sp['R'] + e] for a in (-MOTOR_HALF[0], MOTOR_HALF[0]) for b in (y0, y1) for e in (-MOTOR_HALF[2], MOTOR_HALF[2])]))
+    if q['shell'] <= 0.5:
+        import chassis3 as C3
+        b = C3.base(); dz = q['clr'] - b['clr0']
+        for n, _, p in b['items']:
+            if n in ('pack_L', 'pack_R') and c[n.replace('_', ' ')] > PACK_OUT:
+                add.append(_grid(np.asarray(p, float) + [q['dxp'], 0.0, dz + q['dzp']], PACK_HALF, (2, 2, 2)))
+    if sp.get('limb') and not TAIL_IN <= c['tail mount'] <= TAIL_OUT:  # buried or off it: the turntable to the rear surface
+        sp = _mount_on_surface(sp); c = cohesion(q, sp)
+    hulls = list(sp['hulls']); plate = q['bumper'] > 40.0
+    if plate:
+        add.append(hulls.pop())                                           # the plate, the last hull (make)
+    if not add:
+        return sp
+    new = RB.hull(np.vstack([body] + add))
+    M, cm, I = sp['M'], sp['com'], sp['I']
+    for Q, s in ((body, -1.0), (new, 1.0)):                               # the skin's change: the old surface out, the new in
+        m, cq, Iq = S.shell_mass(Q); M, cm, I = _add_body(M, cm, I, s * m, cq, s * Iq)
+    notes = list(sp['notes']) + [f'body grown to {len(add) - plate} part(s) off it' if len(add) > plate else ''] + (['push plate faired into the body'] if plate else [])
+    return RB.dims(dict(sp, hulls=[new] + hulls[1:], M=M, com=cm, I=I, plate_merged=plate, grown=len(add) - plate, notes=[n for n in notes if n]))
+
+
+def _grid(c, h, n=(5, 9, 5)):
+    ax = [np.linspace(ci - hi, ci + hi, k) for ci, hi, k in zip(c, h, n)]
+    return np.stack(np.meshgrid(*ax, indexing='ij'), -1).reshape(-1, 3)
+
+
+def cohesion(q, sp):
+    """how each part meets the body (hulls[0], the skin or the Trainer's tub), mm: a motor's depth into it (negative:
+    a gap), the tail's turntable centre's distance outside it, the push plate's gap to it, a pack's worst corner
+    outside it (no skin; a skin wraps the packs by construction)"""
+    import chassis3 as C3
+    body = sp['hulls'][0]; out = {}
+    for i, (x, y) in enumerate(sp['wheels']):
+        out[f'motor {i}'] = -float(RB.hull_dist(body, _grid((x, np.sign(y) * (abs(y) - 31.0), sp['R']), MOTOR_HALF)).min())
+    if sp.get('limb'):
+        out['tail mount'] = float(RB.hull_dist(body, [sp['limb']['base']])[0])
+    if q['bumper'] > 40.0 and not sp.get('plate_merged'):
+        P = sp['hulls'][-1]; lo, hi = P.min(0), P.max(0)
+        out['push plate'] = float(RB.hull_dist(body, _grid((lo + hi) / 2, (hi - lo) / 2, (2, 9, 9))).min())
+    if q['shell'] <= 0.5:
+        b = C3.base(); dz = q['clr'] - b['clr0']
+        for n, m, c in b['items']:
+            if n in ('pack_L', 'pack_R'):
+                c = np.asarray(c, float) + [q['dxp'], 0.0, dz + q['dzp']]
+                out[n.replace('_', ' ')] = float(RB.hull_dist(body, _grid(c, PACK_HALF, (2, 2, 2))).max())
+    return out
+
+
+# ---------- a real build (2026-10-31) ----------
+# Zach, when the search's winners grown as one piece (unibody.design_knobs) lost 20-120 mm of step: "an unrealistic
+# robot in simulation can tell us things about design, it can give us general ideas of how knobs effect the design. it
+# cannot give us a workable design ... the system works if the tests can be trusted". The strict build still passed
+# what the one-piece print can't have:
+#   weight: the body weighs as its print, unibody's 6 mm shell (two 1.6 mm walls, 15 % infill)*, pods to the motors,
+#     the tail's boss and TPU bumpers*: fitted to 36 one-piece shapes drawn from the wide and low runs' designs (mean
+#     error 3.9 %, worst 14 %; the shell alone, by theory, 4.49e-3 g a mm2). The search had counted a 1.5 mm skin or the
+#     Trainer's 415 g tub and carapace: 0.8-1.2 kg light, and its winners' servos were too weak for the real weight.
+#   pods: each motor's pod past the body's width is in the sims (the strict build had motors as mass only).
+#   (Wheel wells, tried the same day and dropped: the hull lies within 10 mm of the print's outer surface, and the
+#     print's wheel rooms hold only the tyres, so the hull meets a step as the print would; cut back as boxes round the
+#     tyres, it took skin the print keeps. The step readings that seemed to tell wells apart were seed noise: T3 at the
+#     one piece's weight reads 50, 90 or 150 mm from one set of tries to the next.)
+#   motor fit: the picked gearmotor (JGB37-520, unibody.MOT), placed as the one piece holds it, clear of every part
+#     inside (the packs, ESCs, UBECs ...).
+#   mounts: a flipper's servo on the body, its pivot within MOUNT_OUT* of it (as the tail's turntable, TAIL_OUT).
+PRINT_G_MM2, PRINT_G0 = 4.617e-3, 180.4                     # g a mm2 of the body's hull, g
+BUMP_G_MM2, BUMP_G_POD, BUMP_G0 = 1.034e-3, 0.295, 38.0     # the bumpers: g a mm2, g a mm of pod past the hull's width, g
+WELL_GAP, MOUNT_OUT = 5.0, 30.0                             # mm a pod stops short of its tyre (unibody.WHEEL_GAP); a flipper pivot off the body
+
+
+def _uni():
+    """unibody, for its motor and pod geometry (imported late; it sets SCORPION_SEARCH when unset, put back here)"""
+    had = 'SCORPION_SEARCH' in os.environ
+    import unibody as U
+    if not had:
+        os.environ.pop('SCORPION_SEARCH', None)
+    return U
+
+
+def _bosses(sp):
+    """each wheel's motor as the one piece holds it (unibody._boss): [(x, side, boss)]"""
+    U = _uni(); R, TW = sp['R'], sp['TW']; dish = R - U.RIM_IN - U.WHEEL_GAP >= U.POD_R + 2.0
+    return [(x, np.sign(y), U._boss(x, abs(y), R, TW, dish)) for x, y in sp['wheels']]
+
+
+def _counted_body(q, sp):
+    """the body's mass as the search counted it, (g, centre, inertia): the skin (search.shell_mass of the hull), or the
+    Trainer's printed structure (chassis3's STRUCT items) with _cohere's added skin; the push plate's 75 g on either"""
+    import chassis3 as C3
+    body = np.asarray(sp['hulls'][0], float)
+    if q['shell'] > 0.5:
+        M, c, I = S.shell_mass(body)
+    else:
+        p = dict(zip(S.KEYS, sp['x'])); D = C3.design({k: p[k] for k in C3.KEYS})
+        M, c, I = RB.inertia([it for it in D['items'] if it[0].startswith(S.STRUCT)], D['box'])
+        if sp.get('grown') or sp.get('plate_merged'):                  # _cohere's skin on the grown hull, less the tub's
+            for Q, s in ((body, 1.0), (np.asarray(D['pts'], float), -1.0)):
+                m, cq, Iq = S.shell_mass(Q); M, c, I = _add_body(M, c, I, s * m, cq, s * Iq)
+    if q['bumper'] > 40.0:                                              # the plate (_make), now part of the print
+        z1 = q['bumper']; M, c, I = _add_body(M, c, I, 75.0, np.array([body[:, 0].max(), 0.0, (max(30.0, z1 - 60.0) + z1) / 2]), np.zeros((3, 3)))
+    return M, c, I
+
+
+def print_mass(q, sp):
+    """the body's printed mass with its bumpers, spread as the hull's skin: (g, centre, inertia)"""
+    from scipy.spatial import ConvexHull
+    body = np.asarray(sp['hulls'][0], float); A = ConvexHull(body).area; hy = float(body[:, 1].max())
+    pods = sum(2 * max(0.0, b['y1'] - hy) for _, s, b in _bosses(sp) if s > 0)
+    g = PRINT_G_MM2 * A + PRINT_G0 + BUMP_G_MM2 * A + BUMP_G_POD * pods + BUMP_G0
+    m, c, I = S.shell_mass(body)
+    return g, c, I * (g / m)
+
+
+def _real(q, sp):
+    """the spec with its body's counted mass swapped for its print's"""
+    m0, c0, I0 = _counted_body(q, sp); m1, c1, I1 = print_mass(q, sp)
+    M, c, I = _add_body(sp['M'], sp['com'], sp['I'], -m0, c0, -I0); M, c, I = _add_body(M, c, I, m1, c1, I1)
+    return RB.dims(dict(sp, M=M, com=c, I=I, print_g=m1, notes=list(sp['notes']) + [f'printed body {m1:.0f} g (counted {m0:.0f})']))
+
+
+def real_problems(q, sp):
+    """what a real build can't have: a motor through a part inside ('motor: N mm into pack_L'), a flipper's pivot off
+    the body"""
+    U = _uni(); out = []; body = np.asarray(sp['hulls'][0], float)
+    C, _, _, clr0 = U.B.parts(); dz = q['clr'] - clr0; a = np.linspace(0, 2 * np.pi, 16, endpoint=False); worst = {}
+    parts = {k: RB.hull(np.asarray(P, float) + ([q['dxp'], 0.0, dz + q['dzp']] if k.startswith('pack') else [0.0, 0.0, dz])) for k, P in C.items()}
+    for x, s, b in _bosses(sp):
+        ys = s * np.linspace(b['face'] - U.MOT_L, b['face'], 6); R = sp['R']
+        Mp = np.vstack([np.c_[x + U.MOTOR_R * np.cos(a), np.full(16, yy), R + U.MOTOR_R * np.sin(a)] for yy in ys])
+        for k, Q in parts.items():                                      # the motor's surface in the part, or the part in the motor
+            r = np.hypot(Q[:, 0] - x, Q[:, 2] - R); inside = (np.abs(Q[:, 1] - ys.mean()) < U.MOT_L / 2)
+            d = min(float(RB.hull_dist(Q, Mp).min()), float((r[inside] - U.MOTOR_R).min()) if inside.any() else 1e9)
+            if d < 0.0:
+                worst[k] = min(worst.get(k, 0.0), d)
+    out += [f'motor: {-d:.0f} mm into {k}' for k, d in sorted(worst.items(), key=lambda t: t[1])]
+    fl = sp.get('flip')
+    if fl:
+        d = max(float(RB.hull_dist(body, [p])[0]) for p in fl['pivots'])
+        if d > MOUNT_OUT:
+            out.append(f'flipper: {d:.0f} mm off the body')
+    return out
+
+
+def _real_shape(sp):
+    """the sims' body: the hull as it is (the print's outer surface; wells were tried and dropped, see above), with each
+    motor's pod past the body's width, TUBE_R round its axle out to WELL_GAP short of its tyre"""
+    U = _uni(); P = np.asarray(sp['hulls'][0], float); R, TW = sp['R'], sp['TW']; hy = float(P[:, 1].max())
+    a = np.linspace(0, 2 * np.pi, 12, endpoint=False); pods = []
+    for x, s, b in _bosses(sp):
+        y1 = b['y'] - TW / 2 - WELL_GAP
+        if y1 > hy - 5.0:
+            pods.append(np.vstack([np.c_[x + U.T.TUBE_R * np.cos(a), np.full(12, s * yy), R + U.T.TUBE_R * np.sin(a)] for yy in (hy - 5.0, y1)]))
+    return dict(sp, hulls=[P] + pods + list(sp['hulls'][1:]), pods=len(pods))
 
 
 def screen(a):
@@ -139,7 +458,7 @@ def summarise(rows):
 
 def sweep():
     os.makedirs(OUT, exist_ok=True); J = jobs(); raw = os.path.join(OUT, 'knobs_raw.jsonl'); t0 = time.time()
-    done = set()
+    done = set(); stamp.check(raw)                                        # only rows made by this code
     if os.path.exists(raw):                                               # resume after a stop
         done = {(r['tag'], json.dumps(r['ch'], sort_keys=True), r['seed']) for r in map(json.loads, open(raw))}
     J = [j for j in J if (j[0], json.dumps(j[1], sort_keys=True), j[2]) not in done]
@@ -167,7 +486,7 @@ def rebrace():
     """the braced hills again, over BRACE_ALL, one seed (T3's hills don't move over 8 seeds). The sweep's -30 and -15
     left the foot in the air once the body or the mount rose or the tail got short. -> knobs_brace.jsonl"""
     rows = [json.loads(l) for l in open(os.path.join(OUT, 'knobs_raw.jsonl'))]
-    bf = os.path.join(OUT, 'knobs_brace.jsonl')
+    bf = os.path.join(OUT, 'knobs_brace.jsonl'); stamp.check(bf)
     done = {(b['tag'], json.dumps(b['ch'], sort_keys=True)) for b in map(json.loads, open(bf))} if os.path.exists(bf) else set()
     J = [(r['tag'], r['ch']) for r in rows if r['seed'] == 85000 and r['s'] is not None and r['s'].get('hb_up') is not None
          and (r['tag'], json.dumps(r['ch'], sort_keys=True)) not in done]                # only designs not braced yet
@@ -255,7 +574,7 @@ def g67_job(a):
 def sweep67():
     """G6 crest and G7 push for every design of the sweep, one seed, 6 tries (the screen's): crest at x2.5, push the
     worst over the band. -> knobs_g67.jsonl, then knobs_sweep.json"""
-    gf = os.path.join(OUT, 'knobs_g67.jsonl')
+    gf = os.path.join(OUT, 'knobs_g67.jsonl'); stamp.check(gf)
     done = {(q['tag'], json.dumps(q['ch'], sort_keys=True)) for q in map(json.loads, open(gf))} if os.path.exists(gf) else set()
     J = [(t, c) for t, c, sd in jobs() if sd == 85000 and (t, json.dumps(c, sort_keys=True)) not in done]; t0 = time.time()
     print(f'{len(J)} designs for crest and push', flush=True)
@@ -451,6 +770,72 @@ def freeze(n_b=256, gens=6, pop=60, ws=(0.25, 1.0)):
     json.dump(dict(wall_s=round(time.time() - t0), n_b=n_b, gens=gens, pop=pop, ws=ws, keys=keys, arms=res), open(os.path.join(OUT, 'freeze.json'), 'w'), indent=1, default=float)
 
 
+COHERE = [   # (name, changes to T3, whole as it is, built strict)
+    ('T3', {}, True, True), ("the Trainer's own layout (no skin, no tail)", dict(shell=0.0, limb=0.0, R=55.0, xw=-1.0, gap=74.0, track=131.0, clr=32.4, dxp=0.0, dzp=0.0), True, True),
+    ('T3, tail mount 170 mm', dict(mount_z=170.0), True, True),
+    ('control: no skin, wheels out at track 180', dict(shell=0.0, track=180.0), False, True),
+    ('control: no skin, six wheels on a long wheelbase', dict(shell=0.0, six=1.0, gap=120.0), False, True),
+    ('control: no skin, packs 80 mm forward', dict(shell=0.0, dxp=80.0), False, True),
+    ('control: tail mount 210 mm, skin 120 tall', dict(mount_z=210.0, zc=60.0), False, True),
+    ('control: push plate topping at 100 mm', dict(bumper=100.0), False, True),
+    ('control: skin reaching 250 mm back, burying the tail mount', dict(ar=250.0), False, True),
+    ('control: 190 mm wheels on half-size motors geared 0.4x', dict(R=95.0, msize=0.5, gear=0.4), False, False),
+    ('control: tail stowed forward over the top, 170 degrees', dict(th_stow=170.0), False, False)]
+
+
+def cohere():
+    """the one-body check: T3, the Trainer's own layout and T3's 170 mm tail mount pass; each control has a part
+    off the body (or a drive too weak for its wheels) and must fail. Then strict: the body grown to its parts must
+    pass, except the weak drive and a tail stowed through the body, which growing can't fix; T3 strict must be T3 to
+    the gram; and a tail swung through the body must pass through it loose and stop on it strict"""
+    for name, ch, want, want_st in COHERE:
+        q = dict(T3, **ch); sp = make(q); pr = problems(q, sp) if sp is not None else ['not built']
+        print(('PASS ' if (not pr) == want else 'FAIL ') + f'{name}: ' + ('; '.join(pr) if pr else 'every part on the body'))
+        st = make(q, strict=True)
+        print(('PASS ' if (st is not None) == want_st else 'FAIL ') + '   strict: ' + ('refused: ' + '; '.join(problems(q, _cohere(q, sp))) if st is None else
+              f"built, {st['mass'] - sp['mass']:+.0f} g, {'; '.join(n for n in st['notes'] if any(w in n for w in ('grown', 'faired', 'in to the body', 'tail mount moved'))) or 'unchanged'}"))
+    a, b = make(T3), make(T3, strict=True)
+    same = a['mass'] == b['mass'] and np.array_equal(a['hulls'][0], b['hulls'][0]) and np.array_equal(a['com'], b['com'])
+    print(('PASS ' if same else 'FAIL ') + 'T3 strict is T3 (mass, hull and centre of mass identical)')
+    reach = {}
+    for nm, sp in (('loose', a), ('strict', b)):                           # the tail swung forward through the body, 1 s
+        sim = GG.Sim(sp); sim.place(GG.yaw_quat(0.0), 0.0005); sim.limb_goal(0.0, math.radians(RB.LIMB_PITCH[1]))
+        for _ in range(200):
+            sim.drive(None, None)
+        reach[nm] = math.degrees(sim.limb_pose()[1])
+    ok = reach['loose'] > 170.0 and reach['strict'] < reach['loose'] - 20.0
+    print(('PASS ' if ok else 'FAIL ') + f"T3's tail swung forward to 180 degrees: loose reaches {reach['loose']:.0f}, strict stops at {reach['strict']:.0f} (the body)")
+
+
+TRAINER = dict(shell=0.0, limb=0.0, R=55.0, xw=-1.0, gap=74.0, track=131.0, clr=32.4, dxp=0.0, dzp=0.0)
+REAL = [   # (name, changes to T3, the refusal it must give (None: none))
+    ("the Trainer's own layout", TRAINER, None), ('T3, track 130 (its motors clear)', dict(track=130.0), None),
+    ('T3, track 130, a nose flipper', dict(track=130.0, flip=1.0, f_nose=1.0), None),
+    ("the Trainer's layout, a nose flipper", dict(TRAINER, flip=1.0, f_nose=1.0), None),
+    ('control: T3 as it is (track 114): its motors in the ESCs and packs', {}, 'motor'),
+    ('control: T3, track 120', dict(track=120.0), 'motor'),
+    ('control: T3, track 130, a flipper pair outside the tyres', dict(track=130.0, flip=1.0, f_nose=0.0), 'flipper'),
+    ("control: the Trainer's layout, a flipper pair", dict(TRAINER, flip=1.0, f_nose=0.0), 'flipper')]
+
+
+def real():
+    """the real build's checks (2026-10-31), each with its control: the motor fit and the flipper mounts refuse what
+    they should and only that; the printed weight replaces the counted one (T3: about +1.2 kg, as its one piece weighs);
+    a pod goes in where a motor's wheel stands off the body (the Trainer's layout) and not where the skin wraps the
+    motors (T3). Exits 1 on a failure"""
+    bad = 0
+    for name, ch, want in REAL:
+        q = dict(T3, **ch); why = []; sp = make(q, real=True, why=why)
+        got = None if not why else why[0].split(':')[0]; ok = got == want; bad += not ok
+        print(('PASS ' if ok else 'FAIL ') + f"{name}: {'; '.join(why) if why else 'built'}")
+    a, b = make(dict(T3, track=130.0), strict=True), make(dict(T3, track=130.0), real=True)
+    ok = 1000.0 < b['mass'] - a['mass'] < 1400.0; bad += not ok
+    print(('PASS ' if ok else 'FAIL ') + f"T3 at track 130 weighs {a['mass']:.0f} g strict, {b['mass']:.0f} g real (its one piece: about +1.2 kg)")
+    tr = make(dict(T3, **TRAINER), real=True); ok = tr['pods'] == 4 and b['pods'] == 0; bad += not ok
+    print(('PASS ' if ok else 'FAIL ') + f"pods in the sims: the Trainer's layout {tr['pods']} (its wheels stand off the tub), T3 {b['pods']} (its skin wraps the motors)")
+    sys.exit(1 if bad else 0)
+
+
 def check():
     """T3 rebuilt from its knobs must match the shape study's T3 (its mass and centre of mass)"""
     import pickle
@@ -463,4 +848,4 @@ def check():
 
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else ''
-    {'sweep': sweep, 'check': check, 'side': side, 'rebrace': rebrace, 'write': write, 'sweep67': sweep67, 'rule': brace_rule, 'speed': speed, 'crest20': crest20, 'grip': grip_hills, 'freeze': freeze}.get(cmd, lambda: print(__doc__))()
+    {'sweep': sweep, 'check': check, 'side': side, 'rebrace': rebrace, 'write': write, 'sweep67': sweep67, 'rule': brace_rule, 'speed': speed, 'crest20': crest20, 'grip': grip_hills, 'freeze': freeze, 'cohere': cohere, 'real': real}.get(cmd, lambda: print(__doc__))()

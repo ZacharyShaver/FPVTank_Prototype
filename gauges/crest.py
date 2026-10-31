@@ -66,19 +66,11 @@ def crest_try(sim, deg, back, rng, far):
     sim.place(GG.yaw_quat(yaw), 0.0005, x=-GG.lead(sp, back) * 1e-3 - 0.03)
     d.qvel[0] = V_CREST; d.qvel[sim.jw] = sgn * V_CREST / R; sim.mj.mj_forward(sim.m, d)   # toward +X either way, as climb_try
     u0 = sgn * min(V_CREST / (sim.w0 * R), 1.0); T = (far + 0.4) / V_CREST + 3.0
-    move, t_move, xs = None, 0.0, []
+    rf = GG.Reflex(sim)
     for k in range(int(T * 1000 / GG.TICK)):
         t = k * GG.TICK / 1000
-        if sim.limb and not back:                                         # the step's reflex (gauges.climb_try), unchanged
-            xs.append(d.xipos[sim.rid][0])
-            if move is None and t > 0.45 and len(xs) > GG.STALL_N and xs[-1] - xs[-1 - GG.STALL_N] < GG.STALL_MM * 1e-3:
-                Rm = sim.rot(); up = math.degrees(math.atan2(Rm[2, 0], Rm[2, 2]))
-                move, t_move = ('push' if up > GG.NOSE_UP else 'kick'), t
-            if move is not None:
-                tp = t - t_move; hold, end = (0.9, 1.6) if move == 'push' else (0.3, 0.6)
-                sim.limb_goal(0.0, math.radians(sp['limb']['th_push']) if tp < hold else sim.stow[1])
-                if tp >= end:
-                    move, xs = None, xs[-1:]
+        if (sim.limb or sim.flip) and not back:                           # the step's reflex (gauges.Reflex), shared
+            rf.tick(t)
         sim.drive(u0, u0)
         Rm = sim.rot()
         if math.degrees(math.acos(max(-1.0, min(1.0, Rm[2, 2])))) > 75.0:

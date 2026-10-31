@@ -21,7 +21,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, '..', 'tools'))
-import config
+import config, stamp
 sys.path.insert(0, config.TUMBLE)
 import robots as RB
 import gauges as GG
@@ -38,6 +38,7 @@ HI = np.array([95.0, 200.0, -40.0, 90.0, 80.0, 15.0, 1.0, 1.0, 60.0, 320.0, 320.
                1.0, 350.0, 4.0, -10.0, 160.0, 1.0, 180.0, 2.0, 2.5])
 NO_LIMB = [0.0, 200.0, 1.0, -60.0, 150.0, 1.0, 131.0, 1.0, 1.0]           # knobs 18 on, for shorter vectors: no tail, the Trainer's drive
 TRACK0 = 131.0                                                            # chassis3.Y_W: the wheels' centre planes from the centre line
+TRACK_R = None                                                            # the rear axle's own track (mm; knobs.make sets it): None, as front
 LIMB_ON = 0.3                                                             # limb > 0.3: a tail (seven designs in ten)
 BASE = dict(R=55.0, xf=91.0, xr=-93.0, clr=32.4, dxp=0.0, dzp=0.0, six=0.0, shell=0.0, xc=0.0, af=200.0, ar=200.0, b=200.0,
             zc=100.0, cu=200.0, cd=150.0, p=2.0, qu=2.0, qd=2.0, **dict(zip(KEYS[18:], NO_LIMB)))   # chassis3's Trainer stand-in
@@ -128,9 +129,11 @@ def build(x, name='gen'):
             items.append(('motor_M' + ('L' if y > 0 else 'R'), 205.0 + 34.6, np.array([xm, np.sign(y) * 100.0, R]))); axles.append((xm, y))
         notes.append('six wheels')
     tr, msz, gr = p['track'], p['msize'], p['gear']                      # the drive's knobs (2026-10-26); at their defaults, as before
-    if (tr, msz, gr) != (TRACK0, 1.0, 1.0):
-        axles = [(xa, np.sign(ya) * tr) for xa, ya in axles]
-        items = [(n, 205.0 * msz + 34.6, np.array([q[0], np.sign(q[1]) * (tr - 31.0), q[2]])) if n.startswith('motor_') else (n, m, q)
+    if (tr, msz, gr) != (TRACK0, 1.0, 1.0) or TRACK_R is not None:
+        trr = tr if TRACK_R is None else TRACK_R                         # the rear axle's own track (2026-10-28), a middle one between
+        tx = lambda xa: tr if xa >= p['xf'] - 1e-6 else trr if xa <= p['xr'] + 1e-6 else 0.5 * (tr + trr)
+        axles = [(xa, np.sign(ya) * tx(xa)) for xa, ya in axles]
+        items = [(n, 205.0 * msz + 34.6, np.array([q[0], np.sign(q[1]) * (tx(q[0]) - 31.0), q[2]])) if n.startswith('motor_') else (n, m, q)
                  for n, m, q in items]                                    # each motor scales its mass and rides with its wheel
         if tr < TRACK0:                                                   # the Trainer's pods just fit at 131
             notes.append(f'motor {TRACK0 - tr:.0f} mm into the hull: repack')
@@ -155,8 +158,8 @@ def build(x, name='gen'):
     if (msz, gr) != (1.0, 1.0):                                           # a motor msize times the 37 mm one, geared gear times 30:1
         mo = sp['motor']; sp['motor'] = dict(stall=mo['stall'] * msz * gr, w0=mo['w0'] / gr, N=mo['N'] * gr, Ir=mo['Ir'] * msz)
         sp['notes'] = sp['notes'] + [f'motor x{msz:.2f}, gear x{gr:.2f}']
-    if tr != TRACK0:
-        sp['notes'] = sp['notes'] + [f'track {tr:.0f}']
+    if tr != TRACK0 or TRACK_R is not None:
+        sp['notes'] = sp['notes'] + [f'track {tr:.0f}' if TRACK_R is None else f'track {tr:.0f} front, {TRACK_R:.0f} rear']
     if p['limb'] > LIMB_ON:
         sp = RB.add_limb(sp, p['L'], p['tq'], p['th_push'], p['th_stow'], p['mz'], base=LIMB_BASE)
     sp['x'] = [float(v) for v in x]
@@ -273,6 +276,7 @@ def load_statics():
 
 def run_screens(jobs, tag, pool=None, fn=None):
     """jobs on the pool (a new one when None), appended to screen_<tag>.jsonl"""
+    stamp.check(os.path.join(OUT, f'screen_{tag}.jsonl'))                 # only rows made by this code
     fn = fn or _screen
     if pool is None:
         with Pool(WORKERS) as p:
@@ -506,6 +510,8 @@ def ladder_lean(sp, mu, seed, cap=None):
     """the step ladder at one friction, 6 tries, as ladder_screen; it stops past cap (the climb is the worst over the
     frictions, so the second needn't go higher than the first). Each height's tries draw from (seed, mu, height): the
     same yaws for every design given one seed."""
+    if GG.STEP_RULE == 'pooled':
+        return ladder_lean_pooled(sp, mu, seed, cap)
     top = 0
     for h in GG.HEIGHTS:
         if cap is not None and h > cap:
@@ -518,6 +524,25 @@ def ladder_lean(sp, mu, seed, cap=None):
             break
         top = h
     return top
+
+
+def ladder_lean_pooled(sp, mu, seed, cap=None):
+    """ladder_lean under GG.STEP_RULE 'pooled' (2026-10-31): N_TRY tries a height nose first, then tail first unless nose
+    first passed them all, every height until two in a row pass half or fewer, or until 25 mm past cap; read by
+    GG.ladder_pooled (the heights not tried count as failed). Each height's tries draw from (seed, mu, height), as
+    ladder_lean's"""
+    res, low = {}, 0
+    for h in GG.HEIGHTS:
+        if cap is not None and h - 25 > cap:
+            break
+        sim = GG.Sim(sp, mu, step=h); rng = np.random.default_rng([seed, int(round(100 * mu)), h])
+        res[(h, False)] = sum(GG.climb_try(sim, h, False, rng) for _ in range(N_TRY))
+        if res[(h, False)] < N_TRY:
+            res[(h, True)] = sum(GG.climb_try(sim, h, True, rng) for _ in range(N_TRY))
+        low = low + 1 if max(res.get((h, b), 0) for b in (False, True)) <= N_TRY / 2 else 0
+        if low >= 2:
+            break
+    return GG.ladder_pooled(res, N_TRY)
 
 
 def screen_lean(sp, seed, cut=True):

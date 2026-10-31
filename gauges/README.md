@@ -487,6 +487,255 @@ all-rounders read on the full gauges (`finals.json`).
 - **The all-rounder stream failed** (`docs/lessons/2026-10-28-a-pool-rank-measures-the-search.md`): it settled on the
   hill-and-push champion (step 50, turn 659, upright 0.51). T3 with the 170 mm mount is still the best all-rounder.
 - The screen read the six-wheelers' upright high (hill champion 0.70 screened, 0.505 full).
+- **Floating parts (found the same evening, below):** 55 % of its designs had a part off the body. Its champions for
+  upright and crest were bare-tub six-wheelers, one with motors 42 mm off the tub, one with motors reaching only 4 mm
+  into it; its 225 mm stepper had a push
+  plate 19 mm off its nose (without the plate it still reads 225 mm on its own seed, 200 on another). Its hill, push
+  and turn champions were whole. The strict run replaces it.
+
+## One body (2026-10-28)
+
+Zach, on the capability page: "a lot of floating parts. Make a check to ensure everythings connected when sampling
+these and they actually fit as a cohesive body", then "it kinda needs to morph towards the wheel base when the shapes
+are further out and not connected", "merge in something like the front plate in a smooth way to the shape of it",
+"there also are not enough of a smoothing for the wheels. it clips only in the middle", and "There should be size
+limits on the wheels to a realistic proportion for a motor that can move this thing".
+
+A design was a body hull plus mass items, and nothing tied the items to the hull. Without a skin the body is the
+Trainer's tub (140 mm wide, 328 long, its wheel pods left out), so wheels moved by the wheel knobs could sit far from
+it. `knobs.cohesion()` measures how each part meets the body; `knobs.problems()` applies the rule; `python
+gauges/knobs.py cohere` runs it on T3, the Trainer's own layout and T3's 170 mm mount (all pass) and five controls
+(each fails on its loose part, then builds whole under strict).
+- **The rule:** a part touches the body or stands off it on at most a 10 mm bracket*. A motor reaches 5 mm* into the
+  body (the Trainer's own layout: 10); the tail's turntable, about 40 mm across*, has its centre within 30 mm (T3's:
+  26); the push plate within 10; a pack inside the tub within 2.
+- **Strict** (`knobs.make(q, strict=True)`): the body's hull grows to take in each loose part (a motor's box out to
+  2 mm short of its tyre, a pack, a 40 mm block at the tail's turntable), and the push plate always joins the hull,
+  which fairs it in. The added hull weighs as the skin does (1.5 mm PLA). Whole designs don't change: T3 strict is T3
+  to the gram. Searches from here sample strict; the runs before rebuild as they ran.
+- **Wheels and motors:** the sim's motor gives its stall torque as long as asked; a real one runs at about a third of
+  it* without cooking. Each wheel's motor, at a third of stall, must hold the robot on a 30° slope*, so the wheel's
+  size is capped by the motor and gearing: with the stock 37 mm motor geared 2x, a 3.4 kg robot may run wheels to
+  167 mm radius, a 5 kg one to 114. It refused 6 % of the first run's designs and none of its champions. Its
+  champions ran motors 1.3-2x the stock size (msize) geared about 2x, so the strict run holds the motors at the stock
+  37 mm (Zach: "hold the drive motors at the stock 37 mm size"); the gearing still searches.
+- **Wheel wells:** the skin is widest at its middle, so a six-wheeler's middle tyres sat 22-56 % inside it (front and
+  rear 13-30 %; T3's 14-16 %). Every tyre now gets a well, 5 mm* clear all round, cut from the body for the page and
+  the picture (`robots.with_wells`, exact booleans). The sims keep the convex hull: what a well removes lies inside
+  its tyre's reach. No internal part can reach a well: the narrowest track (110) with the widest tyres (80) leaves the
+  packs outside the tyre's path.
+- **First run, checked:** 1,549 of 3,423 designs whole (45 %). Failures: 1,115 motors short of the tub, 479 packs out
+  of the tub, 956 push plates, 271 tail mounts. Skinned designs always held their motors (the skin wraps them).
+- Picture: `python gauges/cohere_sheet.py` -> `out/cohere/cohere_sheet.png` (three designs, first run against strict).
+- **The strict run** (`SCORPION_CAP=capability_strict python gauges/capability.py run`, `out/capability_strict/`, to
+  00:30 on 2026-10-29): the capability search's space, seeds and protocol, every design strict, the motors at the
+  stock size (27 knobs). A first start with the motor size free was stopped after 253 screens
+  (`out/capability_strict/superseded_msize_free/`). Results: below when it ends.
+
+## Front flippers (2026-10-28, in progress)
+
+Zach: "flippers have got to be a future knob i bet they would help a lot with the steps", then "build front flippers as
+a knob and test them on the step". `robots.add_flippers`: a pair on the front axle's line, outboard of the tyres and
+the body, or one on the centre line 20 mm ahead of the nose; each a link with a rubber tip on a pitch servo
+(`knobs.FLIP_KNOBS`: length, torque, stowed, lift and press angles, the nose pivot's height; switches for the
+placement and for working with the tail). They meet the floor and terrain, never the robot. Their move is in the step
+reflex (`gauges.Reflex`, now shared with G6): on a stall they lift over the step and press down. Designs without
+flippers read exactly as before (20 of 20 climb and crest runs identical to the bit; a changed seed changes all 20).
+- **First look, by hand on T3:** no gain (150 mm with or without). Lifting the front alone rears the robot to 63-65°
+  and it falls back: T3's wheelbase (152 mm) is its step, and past it the back has to rise too. Lifting with the tail
+  pushing raised the whole robot to the step's height, then left it bridged on the flipper tips and the tail foot,
+  wheels in the air; easing the flippers to level after the press brought 150 back, not 175. Hand-set moves are the
+  wrong tool here (a learned policy would choose them).
+- **The search** (`python gauges/flippers.py run`, `out/flippers/`): flipper settings with the wheels' size and
+  wheelbase, everything else at T3's, strict, the turn held to 450 mm; the same budget without flippers as the
+  control. **No gain:** both arms top out at 150 mm (with flippers 150 mm at 410-436 mm of turn and 320-550 g more;
+  without, the best is T3 itself, 150 / 392). Read under the old tail physics (the tail passed through the body).
+- Guessed*: each flipper servo 45 g + 8 g per N m (as the tail's), the link 0.3 g a mm, the tip 10 g and 10 mm round,
+  6 mm clear of the tyre; the move's timing (lift 0.3 s, press to 1.0-1.2 s, ease or stow after).
+
+## Anchor-first bodies and printed trees (2026-10-28, prototypes, not in a search yet)
+
+Zach, on the strict search's random shapes: "those do not look good ... lets see if we can find a more elegant
+solution", then "you could try picking the points you need before generation instead of after". The old generator
+built a body and placed parts by their own knobs, then repaired what floated; these pick the points first and make the
+body join them, so nothing floats by construction.
+- **`gauges/body.py`:** wheels (radius, width, the axles along the body, front and rear widths), the nose point, the
+  rear point and the ride height are picked in that order; the parts inside set the top (Zach: "maybe not the top
+  point"). The body is the hull of that profile with a flat bottom and a round mount (a ring of points) in its side at
+  each axle, as the old skin's flat bottom was a ring at the cut (Zach: "can you basically do that with little circles
+  on the sides for wheels"). The motor's round housing runs from the mount to the tyre; the tail sits on a round boss
+  on the rear face, its stowed and push angles picked only from those that clear. `python gauges/body.py sheet` draws
+  Sobol samples, rendered by MuJoCo (the matplotlib sheets drew wheels in front of the body: its depth sorting).
+- **`gauges/body_tree.py`:** the wheels on printed legs (Zach: "like trees on 3d printed supports"): per side a
+  trunk from a round root in the side, out to a fork, branching to each wheel, or a leg per wheel. The legs' angle up
+  or down comes from the anchors (the ride height is its own knob). Clearances are built into the anchors (a wheel
+  starts where its motor tube clears the body; a curve's controls stay between the body and the tyres): 186 of 256
+  draws could be made, against 24 when clearances were only checked after. Each 37 mm motor slides into a printed
+  tube (6 mm wall*); its leg lands on the tube's top and merges into it, clear of the motor (Zach: "it clips through
+  the motors"); a leg flares 1.8x where it meets the body (Zach: "the width of the trunk should widen").
+- **Braced legs** (Zach: "they dont have to be exactly like the supports work"): without a tree, each wheel takes 1, 2
+  or 3 legs from roots spread along and up the side, each gripping the motor's tube on its own root's side, so a pair
+  or a tripod clamps the tube from two or three sides. A single leg is a cantilever; a triangle carries a load along
+  its members (`python gauges/frame.py check`: the same tip load, 18 times less stress braced).
+- **How thick a leg must be: the sim** (`gauges/snap.py`; Zach: "can we test where it would snap? maybe we should just
+  let the simulation do the thinking"). MuJoCo gives the loads where the structure meets the world (each wheel's push
+  on its axle, any contact on a leg or tube), in the robot's frame, through G1's falls (24 from 300 mm, every step, a
+  5 ms running mean); `gauges/frame.py` solves the legs as round beams clamped at the body, each tube a stiff link, so
+  braced legs share the load by stiffness; each segment is sized to half of PLA's strength across its layers and the
+  design dropped again. `python gauges/snap.py check`: the loads agree moved and turned (the world-frame reading, the
+  control, differs by 1,808 %); the roots hold exactly what the wheels push.
+- **What the sim says** (`python gauges/snap.py compare`, `out/body/snap.png`, four base designs): legs as first built
+  snap (37-65 MPa against PLA's 25); sized from the falls every design holds, single beams needing 330-862 g of legs,
+  braced pairs 17-25 % less (261-688 g), tripods no better (one tripod didn't settle: 24 MPa). In a pair the stiffer
+  leg takes most of the load. The tyres' softness sets the landing loads: the gauges' contact puts 64 times the
+  robot's weight on one wheel in a flat landing, a 30 N/mm* tyre 7; tumbling landings put 1.3-1.7 kN through an axle.
+- **One shape, the generator's output** (`gauges/blend.py`; Zach: "blend or generate it into one shape with the motor
+  attached properly", then "were not printing here were updating the generator"): the body, legs, tubes and tail boss
+  as distance fields under a smooth union (8 mm* fillets), each motor's bore and each wheel's room cut sharp, marching
+  cubes at 2 mm. `body_tree.sized(q)` is the generator's design: legs sized from the falls, refused when the sized legs
+  no longer fit their routes or still snap; then it braces harder and tries again (Zach: "retry"): a single leg a
+  wheel to 2, then 3; a tree to 2 legs a wheel, then 3. `python gauges/body_tree.py sheet`: of 15 Sobol designs, 11
+  hold as one body (8-24 MPa; two of them braced from one leg to two), 4 are refused: their sized legs don't fit even
+  at 3 legs a wheel (three six-wheelers, their tyres 15 mm apart, and one tree). Before the retry, 9 held
+  (`out/body/trees_before_brace.png`). A slim leg's end sits by its own radius (the first blend left two tubes loose). The sims keep the
+  convex pieces and capsules: the blend only adds fillets. (A clamp, bore fit and print split were drafted and dropped:
+  not this stage.)
+- **Superseded, the same evening:** the first snap test read the loads in the world's frame but the legs in the
+  robot's (right only at rest at the origin, where its check ran), and reported 180-310 MPa: wrong lever arms.
+- Guessed*: the tyre's 30 N/mm and 0.3 damping (a weight on one wheel and its squash would measure it), PLA's 25 MPa
+  across layers, the 0.7 bending efficiency, the safety factor 2, the tube's 6 mm wall, the 1.8x flare over 30 mm,
+  half fill for the legs' mass. Not modelled: the body's wall where a leg roots (clamped as rigid), the joints' detail.
+- **Found weak where it wasn't modelled (2026-10-29):** the same designs, landed on one wheel by `gauges/fem.py` with
+  the root modelled (below), read 41-136 MPa, every peak where a leg meets the body's side. "Holds" above is
+  superseded for these designs (`docs/lessons/2026-10-29-a-rigid-root-hides-the-joint.md`).
+
+## One-piece bodies (2026-10-29, a prototype, not in a search yet)
+
+Zach, on `out/body/trees.png`: "it doesnt look right like it is a realistic thing id be able to print the shape seems
+weak in key areas", "the bodies seem weakest if there dropped onto a single wheel at an angle", "it needs to feel more
+like one shape and less like a shape with 3d printed trees on it. Maybe trees were the wrong path".
+- **`gauges/unibody.py`:** the robot is one signed distance field from the start: body_tree's anchors (the same wheel
+  layouts) give the body (its edges rounded), a boss round each motor and the parts bay; random pieces join them (an
+  arm from each boss into the side, a deep oval, not a rod; a pod along each side; a beam across an end pair clear of
+  the body; up to 6 blobs a side; a ripple), all under one smooth union of 15-60 mm (webs, not 8 mm fillets), mirror
+  symmetric. Then the wheels' rooms, the motors' bores, the bay (the body hollow to a 6 mm* sandwich) and the ground
+  are cut. Whatever the cuts leave loose is dropped, and a loose motor boss refuses the design, so every draw is one
+  piece. 13 shape knobs on top of body_tree's layout knobs.
+- **Fixed the same evening:** the ripple first ran both ways and dented the body's skin through to the bay: 7 of the
+  first sheet's 15 had holes in the top, 6 came out in 2-34 pieces (`out/unibody/superseded_ripple_holes/`). It adds
+  bumps only now; the seven read one piece, the skin whole, and with the ripple off they did before too.
+- **Strength from the shape, not rods:** a print's strength is its walls far apart, so a big hollow section beats a
+  solid rod per gram. `gauges/fem.py` solves the shape's own voxels (4 mm bricks, PLA, each voxel's stiffness the
+  share that is wall, 1.6 mm*, plus 15 % infill at 0.06 of PLA's stiffness*), on the GPU with a multigrid
+  preconditioner (29 iterations, 5 s a landing; plain Jacobi took 4,000 and 68 s). A landing is held by the robot's
+  inertia on the bay's walls, not a clamp. `python gauges/fem.py check`: a cantilever's stress and tip against beam
+  theory, half as deep reads 3.5x (the control), a printed box beam against thin-wall theory, the inertia's 3-2-1
+  reactions zero.
+- **The landing:** each left wheel pushed by 1.5x* a 300 mm drop into one tyre's 30 N/mm spring (1.3-1.4 kN, snap's
+  measured range), up, 45 degrees in, out, forward and back, and flat sideways. The motor's collar (14 mm* round its
+  bore) is read apart: it's the mount's number (a 25 mm collar on an 81 mm motor whose load sits 47 mm outboard).
+- **Grown where it's weak:** the field swells up to 5 mm* a round where the wall passes 12.5 MPa, carried 12 mm* out
+  from the voxel so a peak under the surface moves the surface, for up to 6 rounds. It's Mattheck's CAO (1990,
+  shape optimization by biological growth); its partner SKO (1992) removes what carries nothing, not built yet.
+- **Against the trees** (`python gauges/unibody.py compare`, `out/unibody/compare.png`): body_tree's sheet designs 2,
+  5, 7, 10 and 12, the same landing, the same bay and print. Trees 41-136 MPa (roots; collars 48-134); unibodies on
+  the same wheels 13-23 MPa as drawn, 12-17 grown (collars 12-21), one under 12.5 (growth stalls about 15). They
+  weigh more: shape 2.1-2.9 kg against 1.6-2.1, robot 5.0-6.3 kg against 4.2-5.0. Tipping angles match (32-62
+  degrees): the wheel layout sets them, not the body.
+- **First sample, superseded** (`out/unibody/superseded_collar_mount/`): 15 of 15 one piece, 2 held, the rest 14-27
+  MPa where growth stalled beside a short, overloaded collar (30-48 MPa); shape 1.5-3.7 kg, robot 4.5-7.4 kg.
+- **The motor by its face plate** (Zach: "the motor i have has screws and a face plate"): the Trainer's corner module
+  (`chassis-v2/wheels.py`). The pod ends in a 5 mm* lip the gearbox face screws to (6 M3 on a 31 circle*), the wheel
+  is a dish over the pod, and a landing goes in through the gearbox face as a rigid motor would carry it. The wheel's
+  centre sits within a few mm of the face, where the collar had it up to 47 mm out. A wheel too small to wrap the pod
+  (R under 43) sits outboard on a shaft extension (flagged on the sheet); if that pushes the motor into the parts,
+  the design is refused. `python gauges/unibody.py section [seed] [k]` draws the cut through a pod, the motor in it.
+  The motor's numbers are the 37D class's datasheet* until Zach's are in.
+- **SKO** (Mattheck's soft kill, 1992): each round also cuts back, up to 6 mm*, where nothing within 6 mm carries half
+  the allowed, never into what must stay (the body, the pods, the bay wall). A knob, `trim` (0-40 mm), caps how far
+  it may cut: fully trimmed, the blobs go and stress-shaped legs return (they're the efficient load path), so the
+  search holds the trade between one blobby piece and a light one. First tried at 4 MPa within 12 mm: 7 % off in
+  three rounds. On sheet design 5, full trim took the shape from 3.5 to 2.4 kg.
+- **Fixed:** only the left wheels land (the shape is mirror symmetric), but the growth and trim maps weren't mirrored:
+  CAO had grown only the left side, and SKO found the right side idle and cut a motor loose. Both maps now take each
+  voxel's larger stress of itself and its mirror, and the grid is mirror symmetric sample for sample.
+- **The solve's resolution:** the same design's first peak read 11.6 and 13.5 MPa on grids a voxel apart. Read the
+  voxel solve's peaks as about 15 % either way.
+- **Drops as it goes** (Zach: "test there durability as you go"; `gauges/drops.py`): each design falls as G1 drops
+  it (24 from 300 mm, random orientation and spin, tyres on snap's spring). MuJoCo gives every push at each fall's
+  hardest moment (a 5 ms mean): each wheel's on its axle, every floor contact on the body (the body as 40 convex
+  pieces cut from its own voxels). The stress solve takes them all; a body contact is spread over the surface within
+  15 mm*, and that patch is read apart like the motor seats. `python gauges/drops.py check`: at rest the pushes sum
+  to the body's weight, all through the wheels (53.7 N against 53.7); mid-air, the control, they read 0.
+- **Body hits, not wheel landings:** sheet design 4 holds its wheel landings (12-13 MPa) but its falls read 33 MPa, 14
+  of 24 over; the worst fall puts 86 % of a 3.4 kN push on the body, and the peaks sit on the body box's top edges.
+  SKO had been cutting against the wheel landings alone. Each round now grows against both. Grown against the falls
+  recorded at the first round (dropped afresh each round, the hits moved and the peaks wandered 29-41), design 4 went
+  33 -> 25; dropped afresh at the end it read 34, 19 of 24 over: the box's 6 mm walls are thin all round its top
+  edges, not in one spot. A thicker or rounder box, or bumpers, not local growth.
+- **The fall load is a guess:** a body hit is the fall's momentum over the 5 ms mean; nothing models how much a PLA
+  edge or the floor gives. TPU bumpers would set that give, as the tyres' spring does (Zach prints TPU).
+- Fixed on the way: a body contact first spread over its 8 nearest nodes; the voxels beside them read 74-98 MPa.
+- **Hard bodies all fail their falls:** the first three of a sheet grown against falls read 42-57 MPa (19-24 of 24
+  over), and growth piled on 0.1-0.5 kg chasing them; that sheet was stopped there (`out/unibody/` 2026-10-29 23:30).
+- **TPU bumpers** (`python gauges/drops.py bumpers`, `out/unibody/bumpers.png`): one design, the same 24 falls, the
+  body hard or on a spring as the tyres are. Hard: worst 25 MPa, 15 over, 1 past PLA's 25, the worst push 3.75 kN, 86 %
+  on the body. 100 N/mm: 21, 16 over, none past. 30 N/mm: 17, 13 over, none past; the worst push 1.6 kN, now on a
+  wheel. Bumpers are a knob now (`bumper`, `bumper_k` 20-150 N/mm*); their mass is 3 mm* of TPU over 30 %* of the
+  surface; where they sit isn't drawn yet.
+- **The falls are noisy:** the worst of 24 moves a lot with small shape changes (design 1 read 25 as drawn, 42 grown).
+  Read the count over the allowed before the single worst.
+- **Sample with falls and bumpers** (`python gauges/unibody.py sheet 23823 [resume]`, `out/unibody/sheet_1to7.png`
+  and `sheet_from_8.png`, `falls_vs_mass.png`; 12 designs, 6 rounds each against both tests, 2 workers: three ran the
+  12 GB card out at design 8). Every one is over on its falls (28-84 MPa); the landings read 10-23. Weight decides it:
+  the only design that mostly survives its falls (6, 4 of 24 over) has the lightest shape, 1.65 kg; every shape over
+  2.6 kg fails 13-24. Bumpers help a little at a weight (design 10, the softest at 23 N/mm: 17 over at 7.5 kg). The
+  growth against falls adds 0.1-0.7 kg chasing them. The next lever is weight: trim harder, smaller blobs.
+  *Corrected 2026-10-30:* the bumpered designs' shape masses counted the TPU over the whole skin, the bay's walls too
+  (1.6-2.1x its hull share), so they read 0.3-0.8 kg heavy: design 12 was about 1.9 kg of PLA and still 17 over, at
+  107 N/mm. Weight alone doesn't decide it; only one design (6) supports the cap.
+- **Against the trees, with falls** (`python gauges/unibody.py compare`, `out/unibody/compare.png`; rows cached in
+  `compare_rows.pkl`, so a crash keeps finished pairs). Falls past PLA's 25, of 24:
+
+  | body_tree design | trees: landings, falls broken, shape | unibody grown: landings, falls broken, shape |
+  |---|---|---|
+  | 2 | 136 MPa, 10, 1.7 kg | 19 MPa, 13, 3.0 kg |
+  | 5 | 73, 4, 1.6 | 12, 1, 3.8 |
+  | 7 | 54, 7, 1.6 | 21, 7, 2.8 |
+  | 10 | 75, 2, 1.7 | 11, 8, 3.8 |
+  | 12 | 41, 5, 2.1 | 17, 16, 3.1 |
+
+  The unibody cures the wheel joints every time (11-21 MPa against 41-136), but at 1.0-2.2 kg more it breaks in
+  more falls (45 against 28). **Growing against the falls doesn't work:** round the fixed hits it raises warts (a lump
+  ringing each contact patch, which is read apart), and on design 12 the falls got worse round by round (36 -> 47,
+  53 dropped afresh). Next: the falls as the verdict only, growth against the wheel landings alone, and the body hits
+  answered by weight and soft bumpers.
+- **Capped, on soft bumpers (2026-10-30, Zach: "Yes, do that")**: growth answers the wheel landings alone; the falls
+  are dropped on the drawn shape and the finished one, the verdict; the printed shape is capped at 2 kg* (`CAP_G`); TPU
+  bumpers are always on, the knob their stiffness (`bumper_k`, 20-60 N/mm*).
+  - **Trimming can't take weight off:** a print weighs its walls (area x 1.6 mm); shaving a surface moves the wall in
+    and takes only infill. One 2.97 kg shape, SKO cutting all it could (everything carrying under the allowed): down
+    50 g a round, 2.83 kg after 6 rounds; the same design uncapped, the control, 3.18 kg. So the cap refuses a draw
+    over it as drawn (about 6 draws in 7 at today's knob ranges), and the harder cut stays for shapes that grow past it.
+  - **The bumpers' mass was overcounted:** their TPU had been spread over the whole skin, the bay's walls too, 1.6-2.1x
+    its share. Now 30 %* of the convex hull's area, 3 mm* thick, on the skin within 10 mm of the hull (about 400 g),
+    and kept out of the shape's mass (`bumper_g`; the robot carries it).
+  - The sheet (`python gauges/unibody.py sheet 1030 [resume]`, `out/unibody/sheet.png` and `sheet_from_8.png`; the
+    sheet grown against the falls moved to `out/unibody/superseded_grown_against_falls/`): 12 designs made of 81 draws,
+    4.7-6.7 kg robots (were 5.3-7.9). **Falls past PLA's 25 MPa: 8 of 288, 10 designs with none** (the sheet grown
+    against the falls: 71, 1 design). Over the allowed still 168 of 288 (were 223): break-free, but at half the
+    safety factor. Growth against the landings alone helped the falls too (broken 33 drawn -> 8 finished). None holds
+    its landings (14-26 MPa; were 10-23), and 4 grew past the cap chasing them. The lighter shapes, the soft bumpers
+    and the mass fix all changed at once, so the sheet can't say which did it.
+- Not yet: the sims still see the pieces' convex hulls (the blend and the growth add material they don't see); the
+  print split; SKO; a motor mount that isn't a collar.
+- Guessed*: the 6 mm bay sandwich, 1.6 mm walls, infill's 0.06 stiffness and 15 % mass, the 1.5x landing, the 30 N/mm
+  tyre (snap's; Zach will print TPU tyres of any kind, so a softer one is a lever: the load goes as its square root),
+  25 MPa across layers and the factor 2 (snap's), the growth's 5 mm and 12 mm reach, SKO's half the allowed within
+  6 mm at 6 mm a round, the motor (37D datasheet: gearbox 37 x 22, motor 34.5 x 33, encoder 30.5 x 11, shaft 6 x 15.5,
+  6 M3 on 31), the 5 mm lip, the 8 mm seat read apart; the 2 kg cap, the bumpers' 20-60 N/mm, 3 mm and 30 % of the
+  hull. The motor is a JGB37-520 (Zach, 2026-10-30; shopping list and the ESC question in `gauges/SHOPPING.md`), not
+  bought yet, so its numbers are still the 37D class's datasheet; Zach's two INJORA 540 55T stay with the rover.
 
 ## The lean search (superseded as the current run by the body search, 2026-10-27)
 

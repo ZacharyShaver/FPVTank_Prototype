@@ -27,19 +27,71 @@ from multiprocessing import Pool
 import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, '..', 'tools'))
-import config
+import config, stamp
 import gauges as GG, search as S, hills as H, crest as C, push as P, knobs as K
 
-OUT = os.path.join(config.GAUGES_OUT, 'capability')
+# The strict run (SCORPION_CAP=capability_strict, 2026-10-28 evening): Zach, on the first run's shapes, "a lot of
+# floating parts ... some of the shapes are impossible to make", then "it kinda needs to morph towards the wheel base"
+# and "size limits on the wheels to a realistic proportion for a motor that can move this thing". The same space, seeds
+# and protocol, every design built strict (knobs.make: the body grown to any part off it, the push plate faired in,
+# a drive too weak for its wheels refused). The first run stays as it ran.
+RUN = os.environ.get('SCORPION_CAP', 'capability')
+STRICT = RUN != 'capability'
+# The wide run (SCORPION_CAP=capability_tail, 2026-10-30 night): Zach, after the tail upgrades, "kick of an overnight
+# search. try to use the full night. the goals to learn here so explore with a wide net". The strict run's space plus
+# the new tail knobs (knobs.L2, rear_up) and the front flippers (knobs.FLIP_KNOBS and their switches), B twice as big
+# (an even sample to learn from, before any stream leans on it), and a ninth stream, 'low': the all-rounder among
+# bodies whose top stands under LOW_TOP (T3's skin tops out at 231 mm). The runs before keep their spaces.
+# The low step-and-turn run (SCORPION_CAP=capability_low, 2026-10-31): the wide run's best all-rounder was a low body,
+# but no design reached T3's corner (step 150 mm, turn inside 450 mm, upright 0.9), and T3 itself was found by a search
+# that asked for the step and the turn together. Zach: "Yes, run it". The wide run's space; no B: its streams start
+# from the wide run's 5,288 screens (SEED_FROM, which also stay in the pool to pick elites from, but are never this
+# run's champions); five streams of step - w x turn, the body under LOW_TOP and upright at UP_MIN, a miss scored by how
+# far it misses so the streams can steer back (LOW_STREAMS).
+# The real run (SCORPION_CAP=capability_real, 2026-10-31): the winners grown as one piece (unibody.design_knobs) lost
+# 20-120 mm of step, and the strict build had passed motors through the packs and flippers off the body. Zach: "an
+# unrealistic robot in simulation ... cannot give us a workable design ... the system works if the tests can be
+# trusted". The wide run's space and protocol, every design built real (knobs.make(real=True): weighed as its one-piece
+# print, a skin cut back round its tyres, the motors clear of the parts inside, the flippers mounted on the body).
+LOW = RUN == 'capability_low'
+REAL = RUN == 'capability_real'
+if REAL:                                                                  # and G2 read pooled (gauges.STEP_RULE): the rung rule's
+    GG.STEP_RULE = 'pooled'                                               # reading of one design swung 50-150 mm with the seeds
+WIDE = RUN in ('capability_tail', 'capability_low', 'capability_real')
+OUT = os.path.join(config.GAUGES_OUT, RUN)
 SCREENS = os.path.join(OUT, 'screens.jsonl')
-DEADLINE = datetime.datetime(2026, 10, 28, 15, 15)                       # the last refinement round must end by then
+SEED_FROM = os.path.join(config.GAUGES_OUT, 'capability_tail', 'screens.jsonl') if LOW else None
+DEADLINES = {'capability': datetime.datetime(2026, 10, 28, 15, 15), 'capability_strict': datetime.datetime(2026, 10, 29, 0, 30),
+             'capability_tail': datetime.datetime(2026, 10, 31, 6, 30), 'capability_low': datetime.datetime(2026, 10, 31, 12, 0),
+             'capability_real': datetime.datetime(2026, 11, 1, 7, 0)}
+DEADLINE = DEADLINES.get(RUN, DEADLINES['capability_strict'])             # the last round ends by then
+WORKERS = int(os.environ.get('SCORPION_WORKERS', GG.WORKERS))
+LOW_TOP = 160.0                                                           # mm: the 'low' stream's bodies (WIDE)
+
+
+def build(q, why=None):
+    return K.make(q, strict=STRICT, real=REAL, why=why)
+
+
+def t3_ref():
+    """T3 as this run builds it, the reference on its pages and finals: the real build refuses T3 as it is (its motors
+    8-9 mm into the ESCs and packs at track 114), so there T3 at track 130, where they clear"""
+    return build(K.T3) or build(dict(K.T3, track=130.0))
 HEIGHTS_EXT = tuple(range(10, 160, 10)) + tuple(range(175, 301, 25))    # past G2's 150 mm top, for this run only
-HELD_K = K.DEAD + ('tyre_mu',)
-SPACE = [(k, lo, hi) for _, k, lo, hi, _ in K.KNOBS if k not in HELD_K] + [('limb', 0.0, 1.0), ('six', 0.0, 1.0), ('shell', 0.0, 1.0)]
+HELD_K = (() if WIDE else K.DEAD) + ('tyre_mu',) + (('msize',) if STRICT else ()) + (() if WIDE else ('L2', 'rear_up'))   # strict: the stock 37 mm
+# (the wide run frees the dead two, cu and qu, the skin's top: a low, flat body needs its top to move)
+# motors (Zach, 2026-10-28: "hold the drive motors at the stock 37 mm size"; the first run's champions ran motors 1.3-2x it).
+# Gearing still searches. The tail knobs of 2026-10-30 only in the wide run, so the runs before rebuild as they ran.
+# strict: track is the front axle's, track_r the rear's (Zach, 2026-10-28: "two knobs for wheel width")
+SPACE = [(k, lo, hi) for _, k, lo, hi, _ in K.KNOBS if k not in HELD_K] + ([('track_r', 110.0, 180.0)] if STRICT else []) \
+        + [('limb', 0.0, 1.0), ('six', 0.0, 1.0), ('shell', 0.0, 1.0)] \
+        + ([(k, lo, hi) for _, k, lo, hi, _ in K.FLIP_KNOBS] + [('flip', 0.0, 1.0), ('f_tail', 0.0, 1.0), ('f_nose', 0.0, 1.0)] if WIDE else [])
 KEYS = [k for k, _, _ in SPACE]; LO = np.array([a for _, a, _ in SPACE]); HI = np.array([b for _, _, b in SPACE])
 GAUGES = (('up', 1), ('climb', 1), ('turn', -1), ('h_up', 1), ('h_down', 1), ('crest', 1), ('push', 1))
-STREAMS = tuple(g for g, _ in GAUGES) + ('all',)
-N_SCREEN, N_B, POP, ELITE = 6, 1024, 30, 8
+LOW_STREAMS = {'st_0.1': 0.1, 'st_0.25': 0.25, 'st_0.5': 0.5, 'st_1': 1.0, 'turn450': None}   # w; turn450: the most step inside 450 mm
+UP_MIN, TURN_CAP = 0.75, 450.0                                            # G1's floor; turn450's circle (mm)
+STREAMS = tuple(LOW_STREAMS) if LOW else tuple(g for g, _ in GAUGES) + ('all',) + (('low',) if WIDE else ())
+N_SCREEN, N_B, POP, ELITE = 6, 0 if LOW else 2048 if WIDE else 1024, 30, 8
 
 
 def q_of(z):
@@ -58,7 +110,9 @@ def screen(sp, seed, n=N_SCREEN):
     s = S.screen_lean(sp, seed, cut=False); G0 = S.com_all(sp)
     r = dict(up=s['up'], climb=s['climb'], turn=s['turn'], mass=sp['mass'], length=sp['length'], width=sp['width'],
              height=sp['height'], belly=sp['belly'], com_x=float(G0[0]), com_z=float(G0[2]), tail=bool(sp.get('limb')),
-             wheels=len(sp['wheels']), tip_static=H.tip_static(sp))
+             wheels=len(sp['wheels']), tip_static=H.tip_static(sp), grown=sp.get('grown', 0), faired=bool(sp.get('plate_merged')),
+             top=float(max(np.asarray(h)[:, 2].max() for h in sp['hulls'])), elbow=bool(sp.get('limb') and sp['limb'].get('L2')),
+             rear_up=bool(sp.get('limb') and sp['limb'].get('rear_up')), flip=bool(sp.get('flip')))   # top: the body's, without the tail
     poses = (None,) + (K.BRACE if sp.get('limb') else ())
     for down, g in ((False, 'h_up'), (True, 'h_down')):
         by = {th: H.ladder(sp, H.GRIP, down, n, seed, th)[0] for th in poses}
@@ -73,8 +127,12 @@ def job(a):
     tag, z, seed, n = a
     t0 = time.time(); q = q_of(z)
     try:
-        sp = K.make(q)
-        r = None if sp is None else screen(sp, seed, n)
+        why = []; sp = build(q, why)
+        r = None if sp is None else dict(screen(sp, seed, n), **({'print_g': sp['print_g']} if REAL else {}))
+        if sp is None and REAL:                                           # why the real build refused it
+            r = dict(built=False, why=why or ['not built'])
+        elif sp is None and STRICT:                                       # why strict refused it
+            loose = K.make(q); r = dict(built=False, why=K.problems(q, loose) if loose is not None else ['not built'])
     except Exception as e:                                                # one bad design must not stop the run
         return dict(tag=tag, z=list(map(float, z)), seed=seed, err=f'{type(e).__name__}: {e}'[:300])
     return dict(tag=tag, z=list(map(float, z)), seed=seed, q={k: q[k] for k in KEYS}, s=round(time.time() - t0, 1), **(r or dict(built=False)))
@@ -106,12 +164,35 @@ def ranks(rows):
 
 
 def score(r, stream):
+    if stream in LOW_STREAMS:
+        return low_score(r, stream)
     if 'rank' not in r:
         return -1e18
     if stream == 'all':
         return r['rank']['all']
+    if stream == 'low':                                                   # the all-rounder, a body under LOW_TOP first
+        return r['rank']['all'] - (0.0 if r.get('top', 1e9) <= LOW_TOP else 1.0)
     v = val(r, stream)
     return -1e18 if v is None else v + 1e-3 * r['rank']['all']          # ties (the ladder tops) go to the better all-rounder
+
+
+def low_score(r, stream):
+    """a low step-and-turn stream's score (mm): step - w x turn, or for turn450 the step with the turn inside TURN_CAP;
+    a miss (upright under UP_MIN, the body over LOW_TOP, the circle over TURN_CAP for turn450) costs by how far, so the
+    stream steers back toward the bounds"""
+    if val(r, 'up') is None or r.get('climb') is None:
+        return -1e18
+    turn = r['turn'] if r.get('turn') is not None else 3000.0
+    miss = 2000.0 * max(0.0, UP_MIN - r['up']) + 20.0 * max(0.0, r.get('top', 1e3) - LOW_TOP)
+    w = LOW_STREAMS[stream]
+    if w is None:
+        return r['climb'] - miss - 2.0 * max(0.0, turn - TURN_CAP)
+    return r['climb'] - w * turn - miss
+
+
+def feasible(r):
+    """inside the low streams' bounds: upright, low, and spinning"""
+    return val(r, 'up') is not None and r['up'] >= UP_MIN and r.get('top', 1e3) <= LOW_TOP and r.get('turn') is not None
 
 
 def front(rows):
@@ -138,22 +219,29 @@ def run_jobs(pool, J, rows, fh, label):
 
 def best_line(rows):
     ok = ranks(rows); out = []
+    if LOW:                                                               # each stream's best inside the bounds
+        for st in STREAMS:
+            f = [r for r in ok if feasible(r)]; b = max(f, key=lambda r: score(r, st)) if f else None
+            out.append(f"{st} {'-' if b is None else '%d mm/%.0f mm/%.2f' % (b['climb'], b['turn'], b['up'])}")
+        return '  '.join(out) + '  (step/turn/upright, low and upright)'
     for st in STREAMS:
         b = max(ok, key=lambda r: score(r, st))
-        out.append(f"{st} {'%.2f' % b['rank']['all'] if st == 'all' else (b.get(st) if st != 'up' else round(b['up'], 2))}")
+        out.append(f"{st} {'%.2f' % b['rank']['all'] if st == 'all' else ('%.2f/%.0fmm' % (b['rank']['all'], b.get('top', 0)) if st == 'low' else (b.get(st) if st != 'up' else round(b['up'], 2)))}")
     return '  '.join(out)
 
 
 def run():
-    os.makedirs(OUT, exist_ok=True); rows = load(); t_start = time.time()
-    from scipy.stats import qmc
-    Z0 = qmc.Sobol(len(KEYS), scramble=True, seed=53).random_base2(int(math.log2(N_B)))
+    os.makedirs(OUT, exist_ok=True); stamp.check(SCREENS); rows = load(); t_start = time.time()
+    seeds = [json.loads(l) for l in open(SEED_FROM)] if SEED_FROM else []   # the pool's start (LOW), never a champion here
     done = {r['tag'] for r in rows}
-    with open(SCREENS, 'a') as fh, Pool(GG.WORKERS, initializer=_init) as pool:
-        J = [(f'B{i}', z, 40000, N_SCREEN) for i, z in enumerate(Z0) if f'B{i}' not in done]
-        if J:
-            run_jobs(pool, J, rows, fh, 'B')
-        print(f'B done: {len(rows)} screened, {sum(val(r, "up") is not None for r in rows)} built; best: {best_line(rows)}', flush=True)
+    with open(SCREENS, 'a') as fh, Pool(WORKERS, initializer=_init) as pool:
+        if N_B:
+            from scipy.stats import qmc
+            Z0 = qmc.Sobol(len(KEYS), scramble=True, seed=53).random_base2(int(math.log2(N_B)))
+            J = [(f'B{i}', z, 40000, N_SCREEN) for i, z in enumerate(Z0) if f'B{i}' not in done]
+            if J:
+                run_jobs(pool, J, rows, fh, 'B')
+        print(f'B done: {len(rows)} screened, {sum(val(r, "up") is not None for r in rows)} built, {len(seeds)} seeds; best: {best_line(rows + seeds)}', flush=True)
         rng = np.random.default_rng(59); state = {}
         rnd = 1 + max([int(r['tag'].split('|')[1]) for r in rows if r['tag'].startswith('C|')] or [0])
         last = None
@@ -163,7 +251,7 @@ def run():
                 print(f'round {rnd}: would end after {DEADLINE:%H:%M}; refinement stops', flush=True); break
             if now > DEADLINE:
                 break
-            ok = ranks(rows); J = []
+            ok = ranks(rows + seeds); J = []
             for st in STREAMS:
                 el = sorted(ok, key=lambda r: -score(r, st))[:ELITE]; E = np.array([r['z'] for r in el])
                 if st not in state:
@@ -211,12 +299,12 @@ def finals(n_front=4):
         pick.setdefault(r['tag'] + str(r['z'][:3]), (f'front {sum(1 for n, _ in pick.values() if n.startswith("front")) + 1}', r))
     names, specs = [], []
     for nm, r in pick.values():
-        sp = K.make(q_of(r['z'])); sp = dict(sp, name=nm); names.append(nm); specs.append(sp)
-    main, _ = GG.roster(True); specs += [dict(K.make(K.T3), name='T3'), main[0]]; names += ['T3', 'Box']
+        sp = build(q_of(r['z'])); sp = dict(sp, name=nm); names.append(nm); specs.append(sp)
+    main, _ = GG.roster(True); specs += [dict(t3_ref(), name='T3'), main[0]]; names += ['T3', 'Box']
     GG.HEIGHTS = HEIGHTS_EXT
     J = card.jobs(specs, set(names)); t0 = time.time()
     print(f'finals: {len(specs)} designs, {len(J)} jobs', flush=True)
-    with Pool(GG.WORKERS, initializer=_finit, initargs=(specs,)) as pool:
+    with Pool(WORKERS, initializer=_finit, initargs=(specs,)) as pool:
         R = pool.map(card.job, J, chunksize=1)
     out = []
     for i, sp in enumerate(specs):

@@ -29,6 +29,11 @@ LIMB_W, T_RIGHT = 6.0, 10.0              # the tail's servos turn at most 6 rad/
 STALL_N, STALL_MM, NOSE_UP = 60, 15.0, 12.0   # the step reflex: under 15 mm in 60 ticks (0.3 s) is stalled; nose up past 12 degrees, push
 WORKERS = 30
 SP = None
+# G2's reading (2026-10-31). 'rung' (until then): the tallest height passed (>= 0.9 of tries) with every lower one
+# passing. Near a design's limit one unlucky rung caps it: T3 at its one piece's weight read 50, 90 and 150 mm from
+# three seed sets. 'pooled': the height where the pass rate, pooled into a curve that never rises with height, falls
+# to STEP_P (ladder_pooled). The runs before read 'rung', so they read as they ran.
+STEP_RULE, STEP_P = 'rung', 0.9
 
 
 def classify(R):
@@ -48,32 +53,66 @@ class Sim:
         self.nsub = int(round(TICK * 1e-3 / self.m.opt.timestep))
         self.limb = sp.get('limb')
         if self.limb:                                                     # the tail: joint addresses, servo goals (radians)
-            self.lq = [self.m.joint(n).qposadr[0] for n in ('ly', 'lp')]
-            self.lo = np.radians([RB.LIMB_YAW[0], RB.LIMB_PITCH[0]]); self.hi = np.radians([RB.LIMB_YAW[1], RB.LIMB_PITCH[1]])
-            self.stow = np.radians([0.0, self.limb['th_stow']])
+            j, a = ['ly', 'lp'], ['ay', 'ap']; lo, hi = [RB.LIMB_YAW[0], RB.LIMB_PITCH[0]], [RB.LIMB_YAW[1], RB.LIMB_PITCH[1]]
+            self.elbow = bool(self.limb.get('L2'))
+            if self.elbow:                                                # a two-link tail: its elbow (straight when stowed)
+                j.append('le'); a.append('ae'); lo.append(RB.ELBOW[0]); hi.append(RB.ELBOW[1])
+            self.lq = [self.m.joint(n).qposadr[0] for n in j]; self.la = [self.m.actuator(n).id for n in a]
+            self.lo, self.hi = np.radians(lo), np.radians(hi)
+            self.stow = np.radians([0.0, self.limb['th_stow']] + ([0.0] if self.elbow else []))
+        self.flip = sp.get('flip')
+        if self.flip:                                                     # the flippers: one goal for all (radians)
+            n = len(self.flip['pivots'])
+            self.fq = [self.m.joint(f'fj{i}').qposadr[0] for i in range(n)]; self.fa = [self.m.actuator(f'af{i}').id for i in range(n)]
+            self.fstow = math.radians(self.flip['stow'])
 
     def place(self, quat, z_low, x=0.0):
-        """reset, turned by quat, its lowest point z_low (m) over the floor; a tail starts stowed"""
+        """reset, turned by quat, its lowest point z_low (m) over the floor; a tail and flippers start stowed"""
         mj, m, d = self.mj, self.m, self.d
         mj.mj_resetData(m, d); R9 = np.zeros(9); mj.mju_quat2Mat(R9, np.asarray(quat, float)); R = R9.reshape(3, 3)
         d.qpos[:3] = (x, 0.0, z_low - (self.E @ R.T)[:, 2].min()); d.qpos[3:7] = quat
         if self.limb:
-            d.qpos[self.lq] = self.stow; d.ctrl[:] = self.stow; self.goal = self.stow.copy()
+            d.qpos[self.lq] = self.stow; d.ctrl[self.la] = self.stow; self.goal = self.stow.copy()
+        if self.flip:
+            d.qpos[self.fq] = self.fstow; d.ctrl[self.fa] = self.fstow; self.fgoal = self.fstow
         mj.mj_forward(m, d)
 
-    def limb_goal(self, yaw, pitch):
-        """where the tail's servos head (radians, clipped to their ranges); they get there at LIMB_W"""
-        self.goal = np.clip([yaw, pitch], self.lo, self.hi)
+    def limb_goal(self, yaw, pitch, elbow=0.0):
+        """where the tail's servos head (radians, clipped to their ranges); they get there at LIMB_W. A two-link tail's
+        elbow straight unless given, so every reflex written for one link moves it as one link L + L2 long"""
+        self.goal = np.clip([yaw, pitch] + ([elbow] if self.elbow else []), self.lo, self.hi)
+
+    def reach(self, p, up=True):
+        """the tail's (pitch, elbow) putting its foot at p (body frame, metres, in the tail's plane at yaw 0), or as near
+        as it reaches: one link points at it; two by planar IK, the elbow above the line (up) or below"""
+        b = np.asarray(self.limb['base']) * 1e-3; u, v = -(p[0] - b[0]), p[2] - b[2]     # u back along the link at pitch 0
+        if not self.elbow:
+            return math.atan2(v, u), None
+        L1, L2 = self.limb['L'] * 1e-3, self.limb['L2'] * 1e-3; r = min(math.hypot(u, v), L1 + L2 - 1e-6)
+        c = np.clip((r * r - L1 * L1 - L2 * L2) / (2 * L1 * L2), -1.0, 1.0); e = -math.acos(c) if up else math.acos(c)
+        return math.atan2(v, u) - math.atan2(L2 * math.sin(e), L1 + L2 * math.cos(e)), e
+
+    def flip_goal(self, ang):
+        """where the flippers head (radians), at LIMB_W"""
+        self.fgoal = float(np.clip(ang, *np.radians(RB.FLIP_RANGE)))
 
     def limb_pose(self):
         return self.d.qpos[self.lq].copy()
 
+    def foot(self):
+        """the tail's foot (world, metres)"""
+        m, d = self.m, self.d; b = m.body('lelbow' if self.elbow else 'llink').id
+        a = (self.limb['L2'] if self.elbow else self.limb['L']) * 1e-3
+        return d.xpos[b] + d.xmat[b].reshape(3, 3) @ np.array([-a, 0.0, 0.0])
+
     def drive(self, uL, uR):
         """one tick with each side's speed loop holding u (a fraction of no-load speed; None: unpowered), the tail's
-        servos stepping toward their goals"""
+        servos and the flippers stepping toward their goals"""
         d, w = self.d, self.d.qvel[self.jw]; tau = np.zeros(len(self.jw))
         if self.limb:
-            dc = np.clip(self.goal - d.ctrl, -LIMB_W * TICK * 1e-3, LIMB_W * TICK * 1e-3); d.ctrl[:] = d.ctrl + dc
+            c = d.ctrl[self.la]; d.ctrl[self.la] = c + np.clip(self.goal - c, -LIMB_W * TICK * 1e-3, LIMB_W * TICK * 1e-3)
+        if self.flip:
+            c = d.ctrl[self.fa]; d.ctrl[self.fa] = c + np.clip(self.fgoal - c, -LIMB_W * TICK * 1e-3, LIMB_W * TICK * 1e-3)
         for side, u0 in ((self.left, uL), (~self.left, uR)):
             if u0 is None or not side.any():
                 continue
@@ -147,34 +186,147 @@ def lead(sp, back):
     E = RB.extremes(sp); return -E[:, 0].min() if back else E[:, 0].max()
 
 
+FLIP_LIFT, FLIP_HOLD, FLIP_END = 0.3, 1.2, 1.5   # s: the flippers lift over the step, press down till 1.2, stow till 1.5
+FLIP_EASE, FLIP_EASE_END = 1.0, 2.2              # with the tail: press till 1.0, then ease to level (front wheels down on top) till 2.2
+
+
+class Reflex:
+    """the step reflex (climb_try's, shared with crest.py from 2026-10-28), one tick at a time while driving forward.
+    Stalled (under STALL_MM of forward travel in the last 0.3 s): nose up past NOSE_UP, the tail pushes down behind
+    for 0.9 s; level, the tail kicks for 0.3 s. Front flippers (2026-10-28) take the level stall: they lift to their
+    raised angle over the step and press down, lifting the nose; with a tail as well, level stalls alternate flippers
+    and kick. With flippers and no tail, a nose-up stall presses the flippers again. Without flippers, as before.
+    Flippers set to work with the tail (flip['with_tail']) instead press the front up while the tail pushes the back
+    ('both': the push starts as the flippers start pressing), on every stall: a front lift alone rears the robot up.
+    """
+    def __init__(self, sim):
+        self.sim, self.move, self.t_move, self.xs, self.level = sim, None, 0.0, [], 0
+
+    def tick(self, t):
+        sim = self.sim; d = sim.d; self.xs.append(d.xipos[sim.rid][0])
+        if self.move is None and t > 0.45 and len(self.xs) > STALL_N and self.xs[-1] - self.xs[-1 - STALL_N] < STALL_MM * 1e-3:
+            Rm = sim.rot(); up = math.degrees(math.atan2(Rm[2, 0], Rm[2, 2]))   # nose up, degrees
+            if sim.flip and sim.limb and sim.flip.get('with_tail'):
+                self.move = 'both'
+            elif up > NOSE_UP:
+                self.move = 'push' if sim.limb else 'flip'
+            else:
+                self.move = 'flip' if sim.flip and not (sim.limb and self.level % 2) else 'kick'; self.level += 1
+            self.t_move = t
+        if self.move is not None:
+            tp = t - self.t_move
+            if self.move == 'flip':
+                fl = sim.flip; end = FLIP_END
+                sim.flip_goal(math.radians(fl['up'] if tp < FLIP_LIFT else fl['press'] if tp < FLIP_HOLD else fl['stow']))
+            elif self.move == 'both':                                     # pressed, the flippers ease to level so the front
+                fl = sim.flip; end = FLIP_EASE_END + 0.3                  # wheels land on top and drive; the tail pushes on
+                sim.flip_goal(math.radians(fl['up'] if tp < FLIP_LIFT else fl['press'] if tp < FLIP_EASE else 0.0 if tp < FLIP_EASE_END else fl['stow']))
+                sim.limb_goal(0.0, math.radians(sim.sp['limb']['th_push']) if FLIP_LIFT <= tp < FLIP_EASE_END else sim.stow[1])
+            else:
+                hold, end = (0.9, 1.6) if self.move == 'push' else (0.3, 0.6)
+                sim.limb_goal(0.0, math.radians(sim.sp['limb']['th_push']) if tp < hold else sim.stow[1])
+            if tp >= end:
+                self.move, self.xs = None, self.xs[-1:]
+
+
+REAR_PAST, REAR_PRESS, REAR_HOLD = 40.0, 30.0, 1.5   # mm past the edge, mm under the top the foot aims at; s it presses
+WALK_PRESS, WALK_PULL, WALK_BACK = 0.8, 1.2, -40.0   # two links: s pressing, s walking the foot back, mm it ends from the base
+
+
+class RearUp:
+    """the rear-up reflex (2026-10-30, a tail with sp['limb']['rear_up']): climbing tail first, stalled (as Reflex), the
+    tail reaches over the step's edge, aims its foot REAR_PAST beyond it and REAR_PRESS under the top, so it lands on
+    the top and presses down for REAR_HOLD s: pressed on the step ahead, the tail lifts the leading end (the rear) onto
+    it while the wheels drive. Then it stows and looks again. Zach: "better tails allow for more low and flat designs";
+    a tail pressing down behind a robot driving forward lifts the rear, not the nose, so the tail leads. The step's
+    height is given (the robot's camera would see it); a learned policy would replace the script"""
+    def __init__(self, sim, h):
+        self.sim, self.h, self.move, self.t_move, self.xs = sim, h, None, 0.0, []
+        self.base = sim.m.body('lyaw').id
+
+    def aim(self):
+        """the tail's pitch pointing its foot at the step's top: REAR_PAST past the edge, REAR_PRESS under it"""
+        sim = self.sim; b = sim.d.xpos[self.base]
+        p = sim.rot().T @ (np.array([(RB.EDGE_R + REAR_PAST) * 1e-3, b[1], (self.h - REAR_PRESS) * 1e-3]) - b)
+        return math.atan2(p[2], -p[0])
+
+    def tick(self, t):
+        sim = self.sim; self.xs.append(sim.d.xipos[sim.rid][0])
+        if self.move is None and t > 0.45 and len(self.xs) > STALL_N and self.xs[-1] - self.xs[-1 - STALL_N] < STALL_MM * 1e-3:
+            self.move, self.t_move = 'press', t
+        if self.move is None:
+            return
+        tp = t - self.t_move
+        if sim.elbow:                                                     # two links: press, then walk the foot back under the base
+            end = WALK_PRESS + WALK_PULL
+            if tp < end:
+                s = float(np.clip((tp - WALK_PRESS) / WALK_PULL, 0.0, 1.0)); b = sim.d.xpos[self.base]
+                x = b[0] + (1 - s) * ((RB.EDGE_R + REAR_PAST) * 1e-3 - b[0]) + s * WALK_BACK * 1e-3   # world x, the step's way
+                p = sim.rot().T @ (np.array([x, b[1], (self.h - REAR_PRESS) * 1e-3]) - sim.d.xpos[sim.rid])   # the body's frame
+                sim.limb_goal(0.0, *sim.reach(p))
+            else:
+                sim.limb_goal(0.0, sim.stow[1])
+            if tp >= end + 0.5:
+                self.move, self.xs = None, self.xs[-1:]
+            return
+        sim.limb_goal(0.0, self.aim() if tp < REAR_HOLD else sim.stow[1])
+        if tp >= REAR_HOLD + 0.5:
+            self.move, self.xs = None, self.xs[-1:]
+
+
 def climb_try(sim, h, back, rng):
     """one try at a step of h mm, square on +-10 degrees, 0.5 m/s: True when on top and on its wheels. A tail's
     reflex (2026-10-27): stalled is under STALL_MM of forward travel in the last 0.3 s. Stalled nose up (past NOSE_UP,
     riding the face), it pushes down behind for 0.9 s and stows; stalled level (its nose caught on a lip about belly
     high, where a push only tips the nose down into it), it kicks for 0.3 s to free the nose, and looks again. The
     first reflex (a push whenever the CoM's speed stayed under 0.05 m/s for 0.15 s) left gaps in the ladder: at
-    40-50 mm the robot hung without tripping it, at 60-80 mm its push wedged the nose."""
+    40-50 mm the robot hung without tripping it, at 60-80 mm its push wedged the nose. Tail first (back), a tail with
+    rear_up presses on the step (RearUp); without it, as before, the tail does nothing tail first."""
     sp, d = sim.sp, sim.d; R = sp['R'] * 1e-3; sgn = -1.0 if back else 1.0
     yaw = math.radians(rng.uniform(-10, 10)) + (math.pi if back else 0.0)
     sim.place(yaw_quat(yaw), 0.0005, x=-lead(sp, back) * 1e-3 - 0.08)
     d.qvel[0] = V_CLIMB; d.qvel[sim.jw] = sgn * V_CLIMB / R; sim.mj.mj_forward(sim.m, d)
     u0 = sgn * min(V_CLIMB / (sim.w0 * R), 1.0); z0 = d.xipos[sim.rid][2]
-    move, t_move, xs = None, 0.0, []
+    rf = Reflex(sim); ru = RearUp(sim, h) if back and sim.limb and sim.limb.get('rear_up') else None
     for k in range(int(T_CLIMB * 1000 / TICK)):
-        if sim.limb and not back:                                         # a tail at the rear acts when the robot stalls
-            t = k * TICK / 1000; xs.append(d.xipos[sim.rid][0])
-            if move is None and t > 0.45 and len(xs) > STALL_N and xs[-1] - xs[-1 - STALL_N] < STALL_MM * 1e-3:
-                Rm = sim.rot(); up = math.degrees(math.atan2(Rm[2, 0], Rm[2, 2]))   # nose up, degrees
-                move, t_move = ('push' if up > NOSE_UP else 'kick'), t
-            if move is not None:
-                tp = t - t_move; hold, end = (0.9, 1.6) if move == 'push' else (0.3, 0.6)
-                sim.limb_goal(0.0, math.radians(sp['limb']['th_push']) if tp < hold else sim.stow[1])
-                if tp >= end:
-                    move, xs = None, xs[-1:]
+        if (sim.limb or sim.flip) and not back:                           # a tail at the rear, flippers at the front, act on a stall
+            rf.tick(k * TICK / 1000)
+        elif ru is not None:
+            ru.tick(k * TICK / 1000)
         sim.drive(u0, u0)
         if d.xipos[sim.rid][2] - z0 > 0.6 * h * 1e-3 and d.xipos[sim.rid][0] > 0.12:
             return classify(sim.rot()) == 'upright'
     return False
+
+
+def pooled(p):
+    """the least-squares fit to p that never rises (pool adjacent violators: a rise is averaged with what is before it)"""
+    blocks = []                                                          # [sum, count]
+    for v in p:
+        blocks.append([float(v), 1])
+        while len(blocks) > 1 and blocks[-2][0] / blocks[-2][1] < blocks[-1][0] / blocks[-1][1]:
+            s, c = blocks.pop(); blocks[-1][0] += s; blocks[-1][1] += c
+    return np.concatenate([np.full(c, s / c) for s, c in blocks]) if blocks else np.zeros(0)
+
+
+def ladder_pooled(res, n, heights=None, p_min=None):
+    """G2 as STEP_RULE 'pooled': each height's pass rate in the better direction, pooled into a curve that never rises
+    with height, and the height (mm, between rungs by straight line) where it falls to p_min (STEP_P); 0 when the lowest
+    rung is under it. A rung failed by luck between passed ones pools with them; a run of failed rungs (a real hole)
+    pulls the curve down from its first. A height not tried counts as failed"""
+    H = list(HEIGHTS if heights is None else heights); t = STEP_P if p_min is None else p_min
+    f = pooled([max(res.get((h, b), 0) for b in (False, True)) / n for h in H])
+    if not len(f) or f[0] < t:
+        return 0
+    i = int(np.nonzero(f >= t)[0].max())
+    if i == len(H) - 1:
+        return int(H[i])
+    return int(round(H[i] + (H[i + 1] - H[i]) * (f[i] - t) / (f[i] - f[i + 1])))
+
+
+def step_reading(res, n):
+    """G2 by STEP_RULE"""
+    return ladder_pooled(res, n) if STEP_RULE == 'pooled' else ladder(res, n)
 
 
 def ladder(res, n):
@@ -249,7 +401,7 @@ def collect(R, i, n_try, band=BAND, dt=None):
                 tn.append(r)
         n = sum(fc.values()); up = fc.get('upright', 0)
         spin = [t for t in tn if t[0] is not None]
-        out[mu] = dict(upright=up / n, falls=fc, n=n, ci=wilson(up, n), climb=ladder(cl, n_try),
+        out[mu] = dict(upright=up / n, falls=fc, n=n, ci=wilson(up, n), climb=step_reading(cl, n_try),
                        climb_tries={f'{h}|{int(b)}': v for (h, b), v in sorted(cl.items())},
                        turn=max(t[0] for t in tn) if len(spin) == len(tn) else None,
                        turn_s=max(t[1] for t in tn) if len(spin) == len(tn) else None)
@@ -364,8 +516,32 @@ def port():
         print(f'{edge} edge: first tyre contact {edge_normal(sp, edge):.1f} degrees off radial')
 
 
+STEP_CASES = [   # (name, passes of 20 at each height (better direction), the pooled reading it must give, mm)
+    ('a plain edge: 20 of 20 to 100 mm, 18 to 130, 10 at 140', lambda h: 20 if h <= 100 else 18 if h <= 130 else 10 if h == 140 else 0, (130, 130)),
+    ('one unlucky rung: 17 of 20 at 80 mm, 20 elsewhere', lambda h: 17 if h == 80 else 20, (150, 150)),
+    ('control: a real hole, none of 20 at 40-110 mm', lambda h: 0 if 40 <= h <= 110 else 20, (30, 35)),
+    ('control: never climbs 10 mm', lambda h: 0, (0, 0))]
+
+
+def step_check():
+    """G2's pooled reading (2026-10-31), each with its control: one unlucky rung no longer caps the reading (the rung
+    rule must: its control), a real hole still does, a plain edge reads the same both ways. Measured on the full gauges,
+    four designs, three seed sets each: rung 90/90/50, 140/140/130, 100/100/90, 150 x3; pooled 151/151/152, 141/141/137,
+    100/101/95, 150/151/150 (gauges/out/unibody/winners/repeat.json). Exits 1 on a failure"""
+    bad = 0
+    for name, k, (lo, hi) in STEP_CASES:
+        res = {(h, False): k(h) for h in HEIGHTS}; p, r = ladder_pooled(res, 20), ladder(res, 20)
+        ok = lo <= p <= hi; bad += not ok
+        print(('PASS ' if ok else 'FAIL ') + f'{name}: pooled {p} mm (want {lo}-{hi}), the rung rule {r}')
+    r = ladder({(h, False): STEP_CASES[1][1](h) for h in HEIGHTS}, 20); ok = r < 100; bad += not ok
+    print(('PASS ' if ok else 'FAIL ') + f'control: the rung rule caps the unlucky rung ({r} mm)')
+    sys.exit(1 if bad else 0)
+
+
 if __name__ == '__main__':
-    if 'port' in sys.argv[1:]:
+    if 'steps' in sys.argv[1:]:
+        step_check()
+    elif 'port' in sys.argv[1:]:
         port()
     else:
         run(quick='--quick' in sys.argv, cached='--cached' in sys.argv)

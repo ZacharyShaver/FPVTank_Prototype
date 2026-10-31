@@ -12,7 +12,9 @@ import capability as CA, knobs as K, knobs_page as KP, gauges as GG, robots as R
 
 TEMPLATE = os.path.join(HERE, 'capability_page.tmpl.html')
 LABEL = dict(up='G1 upright', climb='G2 step up', turn='G3 turn', h_up='G4 hill up', h_down='G5 hill down', crest='G6 crest',
-             push='G7 push', all='All-rounder')
+             push='G7 push', all='All-rounder', low='Low all-rounder',
+             **{'st_0.1': 'Low: step − 0.1 × turn', 'st_0.25': 'Low: step − 0.25 × turn', 'st_0.5': 'Low: step − 0.5 × turn',
+                'st_1': 'Low: step − turn', 'turn450': 'Low: most step inside a 450 mm turn'})
 G_KEYS = [g for g, _ in CA.GAUGES]
 FINDINGS = [   # the 2026-10-28 run's findings, read off finals.json, summary.json and the screens (gauges/README.md "The capability search")
     '<b>Each gauge’s ceiling</b>, in this sim and this family of robots: upright 1.00 (T3 already has it); step 225 mm '
@@ -49,15 +51,78 @@ FINDINGS = [   # the 2026-10-28 run's findings, read off finals.json, summary.js
     'already reached the hill, crest and push ceilings. Ten rounds of refinement moved the step from 140 to 225 mm and '
     'the turn from 439 to 389 mm.',
 ]
+FINDINGS_TAIL = [   # the wide run's (2026-10-30 night, capability_tail): finals.json, summary.json, the screens and learn.json
+    '<b>A low body is the best all-rounder this time.</b> The all-rounder (the low stream’s best too) tops out at 155 mm '
+    '(T3’s skin: 231), on six 39 mm wheels, with a two-link tail, the rear-up reflex and front flippers. Against T3 on the '
+    'full gauges: upright 0.975 against 1.00, step 100 against 150 mm, turn 568 against 392 mm, hills 60/60 against '
+    '45/45°, crest 45 against 40°, push 6 against 1 kg.',
+    '<b>Low bodies stay upright as well as tall ones and turn tighter, but step less.</b> In the even sample (1,129 built), '
+    'the 75 bodies under 160 mm read median upright 0.50 against 0.43, turn 723 against 841 mm, step 30 against 40 mm, '
+    'crest 10 against 15°. Across all screens the low bodies reached every gauge’s best but the step (150 against 250 mm) '
+    'and the turn (437 against 361 mm).',
+    '<b>T3’s corner is still unmatched.</b> None of 4,145 built designs steps 150 mm, turns inside 450 mm and stays upright '
+    '0.9. The nearest low bodies step 120–140 mm and turn in 500–567 mm at upright 0.87–1.00: six wheels, a two-link '
+    'tail, flippers, no skin.',
+    '<b>The new tail parts buy step, modestly.</b> In the even sample, tails with the rear-up reflex stepped 60 mm on '
+    'average against 52 without, and reached 100 mm twice as often (15 % against 8 %); a second link, 57 against 51 mm '
+    '(13 % against 5 %; only 64 single-link tails to compare). Neither moved another gauge. The step champion (250 mm, '
+    'past the last run’s 225) carries a 445 mm two-link tail on 81 mm wheels, and pushes nothing.',
+    '<b>What each gauge is bought with</b> (rank correlations in the even sample; a random forest agrees): upright, the '
+    'skin, a low ride height, a tail and its torque; step, wheel size and gearing, then six wheels and a tail; turn, six '
+    'wheels cost most (median 1,008 against 745 mm), then big wheels and a long wheelbase; hills, gearing, six wheels '
+    'and small wheels; crest, gearing, small wheels and four wheels; push, small wheels and the wheelbase set back.',
+    '<b>Front flippers pay across the population</b>, unlike on the one flat test bed: with them, median upright 0.50 '
+    'against 0.40 and step 50 against 40 mm.',
+    '<b>A third of the designs fail the strict build</b>, mostly on a motor not fixed to the body (about 400 designs each '
+    'motor) and on a drive too weak for its wheels (412), then on the tail mount (359).',
+    '<b>Measured short, found after the run:</b> the sims read a two-link tail’s reach as its first link alone '
+    '(robots.limb_points, fixed 2026-10-31). Fourteen two-link winners screened again kept every gauge but the turn, '
+    'which grew up to 25 mm, and the hill-down champion’s (a 178 mm second link) 144 mm, to 700 mm. This page shows the '
+    'run as screened.',
+]
+FINDINGS_LOW = [   # the low step-and-turn run's (2026-10-31, capability_low): finals.json, summary.json and the screens with the wide run's
+    '<b>No low body reaches T3’s corner, but the gap is down to about 80 mm of turn.</b> The tightest turn at a 150 mm '
+    'step went from 558 mm in the seeds to 471 mm (T3 392), upright 1.00. Inside a 450 mm turn the best step is 120 mm. '
+    'The step-and-turn champion steps 175 mm, past T3, in a 494 mm turn, upright 1.00, hills 55/55°, push 6 kg; the full '
+    'gauges read it as the screen did.',
+    '<b>Only the body is low: the stowed tail stands up.</b> The winners stow the tail near vertical (85–87°; T3 112°), '
+    'so the champion stands 544 mm tall (T3 421) and the low bodies’ median is 399 mm. Standing the tail up keeps it out '
+    'of the turn circle (height against turn, rank correlation −0.32) while a long tail buys step (+0.42). Robots under '
+    '300 mm overall step 120 mm in 483 mm at best; under 250 mm, 80 mm.',
+    '<b>Every low winner has six wheels.</b> 1,185 of the 1,251 low, upright designs do; the best four-wheeler steps '
+    '80 mm in 500 mm. The six-wheelers’ turn grows with the gap between wheels (0.47), and the winners run the smallest.',
+    '<b>The search was still moving.</b> Four rounds on 16 cores (a daytime run): the step champion appeared in the last '
+    'one, and each round took 5–20 mm off the turn at a 150 mm step.',
+]
+RUN_FINDINGS = {'capability': FINDINGS, 'capability_strict': FINDINGS, 'capability_tail': FINDINGS_TAIL,
+                'capability_low': FINDINGS_LOW}
+RUN_DATE = {'capability': '2026-10-28', 'capability_strict': '2026-10-28', 'capability_tail': '2026-10-30',
+            'capability_low': '2026-10-31', 'capability_real': '2026-10-31'}
+
+
+def packed_mesh(V, T):
+    """a general mesh (a body with its wheel wells) packed as KP.packed packs a hull, not thinned"""
+    import base64
+    used = np.unique(T); idx = -np.ones(len(V), int); idx[used] = np.arange(len(used))
+    v = np.round(V[used]).astype('<i2'); w = 1 if len(used) < 256 else 2; f = idx[T].astype('<u1' if w == 1 else '<u2')
+    b = lambda a: base64.b64encode(a.tobytes()).decode('ascii')
+    return dict(v=b(v), f=b(f), w=w)
 
 
 def model_of(sp):
-    """a design's shape for the page: hulls (thinned and packed, as the knob page's), the tail stowed, wheels"""
+    """a design's shape for the page: hulls (thinned and packed, as the knob page's), the tail stowed, wheels. The
+    strict run draws the body with its wheel wells cut (robots.with_wells)"""
     lm, tail = sp.get('limb'), None
     if lm:
-        p = np.radians(lm['th_stow']); B = np.asarray(lm['base'], float); tip = B + lm['L'] * np.array([-np.cos(p), 0.0, np.sin(p)])
+        p = np.radians(lm['th_stow']); B = np.asarray(lm['base'], float); tip = B + (lm['L'] + lm.get('L2', 0.0)) * np.array([-np.cos(p), 0.0, np.sin(p)])
         tail = dict(base=np.round(B).tolist(), tip=np.round(tip).tolist(), r=RB.LINK_R, foot=lm.get('foot_r', RB.FOOT_R))
-    return dict(hulls=[KP.packed(KP.mesh(np.asarray(h, float))) for h in sp['hulls']], tail=tail,
+    hulls = [KP.packed(KP.mesh(np.asarray(h, float))) for h in sp['hulls']]
+    if CA.STRICT:                                                         # thinned to the page's corners first, as packed()
+        P = np.asarray(sp['hulls'][0], float); pick = [int(np.argmax(P[:, 0]))]; d = np.linalg.norm(P - P[pick[0]], axis=1)
+        while len(pick) < min(KP.N_PAGE, len(P)):
+            i = int(np.argmax(d)); pick.append(i); d = np.minimum(d, np.linalg.norm(P - P[i], axis=1))
+        hulls[0] = packed_mesh(*RB.with_wells(P[pick], sp, tol=2.0))
+    return dict(hulls=hulls, tail=tail,
                 wheels=np.round(sp['wheels']).tolist(), R=round(sp['R'], 1), TW=round(sp['TW'], 1))
 
 
@@ -71,13 +136,14 @@ def main():
     fin_by = {f['name']: f for f in fin}
     designs, models, first = [], {}, {}                                   # first: a design's key -> the first stream that picked it (its finals name)
     def add(id_, label, kind, r=None, sp=None, same=None):
-        sp = sp or K.make(CA.q_of(r['z']))
+        sp = sp or CA.build(CA.q_of(r['z']))
         models[id_] = model_of(sp)
         f = fin_by.get(f'best {same}' if same else label)
         designs.append(dict(id=id_, label=label, kind=kind, same=same, screen=readings(r) if r else None, full=readings(f) if f else None,
                             z=[round(v, 3) for v in r['z']] if r else None, rank=r and round(r['rank']['all'], 3),
                             tail=bool(sp.get('limb')), wheels=len(sp['wheels']), skin=r['q']['shell'] > 0.5 if r else None,
-                            mass=round(sp['mass']), length=round(sp['length']), width=round(sp['width']), height=round(sp['height'])))
+                            mass=round(sp['mass']), length=round(sp['length']), width=round(sp['width']), height=round(sp['height']),
+                            top=round(max(np.asarray(h)[:, 2].max() for h in sp['hulls']))))
     seen = set()
     for st in CA.STREAMS:
         r = max(ok, key=lambda r: CA.score(r, st)); key = r['tag'] + str(r['z'][:3])
@@ -91,7 +157,7 @@ def main():
         if n >= 4:
             break
     main_, _ = GG.roster(True)
-    t3 = K.make(K.T3); add('T3', 'T3', 'reference', sp=t3); add('Box', 'Box', 'reference', sp=main_[0])
+    t3 = CA.t3_ref(); add('T3', 'T3', 'reference', sp=t3); add('Box', 'Box', 'reference', sp=main_[0])
     sc_p = os.path.join(CA.config.GAUGES_OUT, 'dash', 'designs.json')    # the references' readings: the finals', else the scorecard's
     sc = {r['design']: r for r in json.load(open(sc_p))} if os.path.isfile(sc_p) else {}
     for d in designs:
@@ -116,11 +182,15 @@ def main():
     fset = {id(r) for r in F}
     scatter = [[round(r['up'], 3), r['climb'], None if r['turn'] is None else round(r['turn']), r['h_up'], r['h_down'], r['crest'], r['push'],
                 int(bool(r.get('tail'))), r.get('wheels', 4), int(r['q']['shell'] > 0.5), int(id(r) in fset)] for r in ok]
-    knobs = [dict(key=k, lo=lo, hi=hi, what=next((w for _, kk, _, _, w in K.KNOBS if kk == k), {'limb': 'a tail (on above half)', 'six': 'six wheels (on above half)', 'shell': 'a skin (on above half; off: the Trainer body)'}.get(k, '')),
+    knobs = [dict(key=k, lo=lo, hi=hi, what=next((w for _, kk, _, _, w in K.KNOBS + K.FLIP_KNOBS if kk == k), {'limb': 'a tail (on above half)', 'six': 'six wheels (on above half)', 'shell': 'a skin (on above half; off: the Trainer body)',
+                  'flip': 'front flippers (on above half)', 'f_tail': 'the flippers press as the tail pushes (above half)', 'f_nose': 'one flipper on the centre line ahead of the nose, instead of a pair on the front axle (above half)'}.get(k, '')),
                   t3=round((K.T3[k] - lo) / (hi - lo), 3) if k in K.T3 else None) for k, lo, hi in CA.SPACE]
     rounds = sorted({int(r['tag'].split('|')[1]) for r in rows if r['tag'].startswith('C|')})
     data = dict(n=len(rows), built=len(ok), front_n=len(F), rounds=len(rounds), heights=CA.HEIGHTS_EXT, held=list(CA.HELD_K),
-                deadline=f'{CA.DEADLINE:%H:%M}', finals=bool(fin), findings=FINDINGS if fin else None, labels=LABEL, gauges=G_KEYS, designs=designs, knobs=knobs,
+                date=RUN_DATE.get(CA.RUN, ''), n_b=CA.N_B, streams=len(CA.STREAMS),
+                low=dict(top=CA.LOW_TOP, up=CA.UP_MIN, cap=CA.TURN_CAP, seeds=sum(1 for _ in open(CA.SEED_FROM))) if CA.LOW else None,
+                switches=sum(k in CA.KEYS for k in ('limb', 'six', 'shell', 'flip', 'f_tail', 'f_nose')),
+                deadline=f'{CA.DEADLINE:%H:%M}', finals=bool(fin), findings=RUN_FINDINGS.get(CA.RUN) if fin else None, labels=LABEL, gauges=G_KEYS, designs=designs, knobs=knobs,
                 scatter=scatter, models=dict(meshes=meshes, designs=out))
     html = open(TEMPLATE, encoding='utf-8').read().replace('/*DATA*/null', json.dumps(data, separators=(',', ':'), default=float))
     path = os.path.join(CA.OUT, 'capability.html'); open(path, 'w', encoding='utf-8').write(html)

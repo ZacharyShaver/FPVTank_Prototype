@@ -41,8 +41,12 @@ class Rec(G.Sim):
         import mujoco
         self.m = mujoco.MjModel.from_xml_string(visual_xml(sp, mu, step)); self.d = mujoco.MjData(self.m)
         self.jw = np.array([self.m.joint(f'j{i}').dofadr[0] for i in range(len(sp['wheels']))]); self.rid = self.m.body('robot').id
-        if self.limb:
-            self.lq = [self.m.joint(n).qposadr[0] for n in ('ly', 'lp')]
+        if self.limb:                                                     # as gauges.Sim's: a two-link tail's elbow too (2026-10-31)
+            self.lq = [self.m.joint(n).qposadr[0] for n in ('ly', 'lp') + (('le',) if self.elbow else ())]
+            self.la = [self.m.actuator(n).id for n in ('ay', 'ap') + (('ae',) if self.elbow else ())]
+        if self.flip:
+            n = len(self.flip['pivots'])
+            self.fq = [self.m.joint(f'fj{i}').qposadr[0] for i in range(n)]; self.fa = [self.m.actuator(f'af{i}').id for i in range(n)]
         self.log = []
 
     def drive(self, uL, uR):
