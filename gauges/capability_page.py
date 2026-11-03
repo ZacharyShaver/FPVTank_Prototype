@@ -12,7 +12,7 @@ import capability as CA, knobs as K, knobs_page as KP, gauges as GG, robots as R
 
 TEMPLATE = os.path.join(HERE, 'capability_page.tmpl.html')
 LABEL = dict(up='G1 upright', climb='G2 step up', turn='G3 turn', h_up='G4 hill up', h_down='G5 hill down', crest='G6 crest',
-             push='G7 push', all='All-rounder', low='Low all-rounder',
+             push='G7 push', all='All-rounder', low='Low all-rounder', tow='G7 tow', rough='G8 rough',
              **{'st_0.1': 'Low: step − 0.1 × turn', 'st_0.25': 'Low: step − 0.25 × turn', 'st_0.5': 'Low: step − 0.5 × turn',
                 'st_1': 'Low: step − turn', 'turn450': 'Low: most step inside a 450 mm turn'})
 G_KEYS = [g for g, _ in CA.GAUGES]
@@ -94,8 +94,33 @@ FINDINGS_LOW = [   # the low step-and-turn run's (2026-10-31, capability_low): f
     '<b>The search was still moving.</b> Four rounds on 16 cores (a daytime run): the step champion appeared in the last '
     'one, and each round took 5–20 mm off the turn at a 150 mm step.',
 ]
+FINDINGS_REAL = [   # the realistic run's (2026-10-31 night, capability_real): finals.json, the screens against capability_tail's on the
+    # same 2,048 B designs, and Zach's one-click tests of 2026-11-01 (tomorrow/repeat.txt, onepiece.json)
+    '<b>Half the strict run’s designs could not be built.</b> Of the 1,129 the strict build accepted among the same '
+    '2,048 spread designs, the real build accepts 572. Alone, a flipper off the body refused 208, a drive too weak '
+    'for the printed weight 121, a motor into the packs or ESCs 108.',
+    '<b>Realism shrank the space more than it reordered it.</b> On the 572 both builds accept, the robot is 1.4 kg '
+    'heavier (median) and the gauges barely move: step +1 mm, turn +10 mm, hills -5/0, push +0.5 kg; the designs '
+    'rank the same way (rank agreement 0.88-0.94), upright least (0.67). The knob lessons of the earlier runs hold.',
+    '<b>The ceilings hold too</b>, but for the push: step 228 mm (250 strict), turn 361 mm, hills 60/65, crest 45, '
+    'upright 1.00, and push 10 kg (6 strict): the printed weight pushes.',
+    '<b>T3’s corner is still T3’s alone.</b> Built real (its track widened 114 to 130 mm so its motors '
+    'clear the ESCs), T3 reads 1.00 / 151 mm / 448 mm, hills 40/45, push 2 kg. None of 6,298 real designs steps 150 mm, '
+    'turns inside 450 mm and stays upright 0.9.',
+    '<b>Two families, as before.</b> Big-wheel four-wheelers (R 70 mm) with a long two-link tail step 228 mm but turn '
+    'in 750 mm and push nothing. Low six-wheelers (R 43-48, top 150-167 mm) with a tail step 110-120 mm, turn in '
+    '540-570 mm, hold hills 55/60°, crest 35-45° and push 6 kg.',
+    '<b>The tail servo is the binding part.</b> Every top stepper runs its tail at the knob’s 4 N m ceiling (about a '
+    '40 kg cm servo). On 2026-10-31, 19 % more servo torque gave the low winner its lost step back.',
+    '<b>The cheap build now agrees with the one piece.</b> Grown as one printable piece, the best all-rounder read '
+    '0.85 / 92 mm / 613 mm against the real build’s 0.80 / 85 / 631, the best turner 22 / 370 against 22 / 361, '
+    'at weights within 3 %. Before the real build the floating winner and its one piece differed by 75 mm of step.',
+    '<b>The gauges repeat.</b> Read with three seed sets, the step held within 3 mm (151-152, 82-85, 72, 21-22), except '
+    'at the ladder’s top, where rungs are 25 mm apart (192-227); upright moves by up to 0.1 at 0.4-0.8 (the noise of '
+    '200 falls, worst of three floors); turn, hills, crest and push hold.',
+]
 RUN_FINDINGS = {'capability': FINDINGS, 'capability_strict': FINDINGS, 'capability_tail': FINDINGS_TAIL,
-                'capability_low': FINDINGS_LOW}
+                'capability_low': FINDINGS_LOW, 'capability_real': FINDINGS_REAL}
 RUN_DATE = {'capability': '2026-10-28', 'capability_strict': '2026-10-28', 'capability_tail': '2026-10-30',
             'capability_low': '2026-10-31', 'capability_real': '2026-10-31'}
 
@@ -180,8 +205,8 @@ def main():
             hs.append(ids[k])
         out[id_] = dict(m, hulls=hs)
     fset = {id(r) for r in F}
-    scatter = [[round(r['up'], 3), r['climb'], None if r['turn'] is None else round(r['turn']), r['h_up'], r['h_down'], r['crest'], r['push'],
-                int(bool(r.get('tail'))), r.get('wheels', 4), int(r['q']['shell'] > 0.5), int(id(r) in fset)] for r in ok]
+    scatter = [[round(r['up'], 3), r['climb'], None if r['turn'] is None else round(r['turn']), r['h_up'], r['h_down'], r['crest'], r[CA.G7],
+                int(bool(r.get('tail'))), r.get('wheels', 4), int(r['q']['shell'] > 0.5), int(id(r) in fset)] + ([r['rough']] if CA.ROUGH else []) for r in ok]
     knobs = [dict(key=k, lo=lo, hi=hi, what=next((w for _, kk, _, _, w in K.KNOBS + K.FLIP_KNOBS if kk == k), {'limb': 'a tail (on above half)', 'six': 'six wheels (on above half)', 'shell': 'a skin (on above half; off: the Trainer body)',
                   'flip': 'front flippers (on above half)', 'f_tail': 'the flippers press as the tail pushes (above half)', 'f_nose': 'one flipper on the centre line ahead of the nose, instead of a pair on the front axle (above half)'}.get(k, '')),
                   t3=round((K.T3[k] - lo) / (hi - lo), 3) if k in K.T3 else None) for k, lo, hi in CA.SPACE]

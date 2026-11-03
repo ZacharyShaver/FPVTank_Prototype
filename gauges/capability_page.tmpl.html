@@ -170,9 +170,9 @@ figure svg { width: 100%; height: auto; display: block; }
 <script>
 const D = /*DATA*/null;
 const L = D.labels, GK = D.gauges;
-const UNIT = {up: '', climb: ' mm', turn: ' mm', h_up: '°', h_down: '°', crest: '°', push: ' kg'};
-const BETTER = {up: 1, climb: 1, turn: -1, h_up: 1, h_down: 1, crest: 1, push: 1};
-const fmt = (g, v) => v === null || v === undefined ? '–' : g === 'up' ? (+v).toFixed(2) : g === 'push' ? (+v).toFixed(1).replace(/\.0$/, '') + ' kg' : Math.round(v) + UNIT[g];
+const UNIT = {up: '', climb: ' mm', turn: ' mm', h_up: '°', h_down: '°', crest: '°', push: ' kg', tow: ' kg', rough: ' mm'};
+const BETTER = {up: 1, climb: 1, turn: -1, h_up: 1, h_down: 1, crest: 1, push: 1, tow: 1, rough: 1};
+const fmt = (g, v) => v === null || v === undefined ? '–' : g === 'up' ? (+v).toFixed(2) : (g === 'push' || g === 'tow') ? (+v).toFixed(1).replace(/\.0$/, '') + ' kg' : Math.round(v) + UNIT[g];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 const byId = Object.fromEntries(D.designs.map(d => [d.id, d]));
 const T3 = byId.T3, BOX = byId.Box;
@@ -285,7 +285,7 @@ function heat() {
 }
 
 // ---------- clouds ----------
-const S = D.scatter;   // [up, climb, turn, h_up, h_down, crest, push, tail, wheels, skin, front]
+const S = D.scatter;   // [up, climb, turn, h_up, h_down, crest, push, tail, wheels, skin, front, rough (the rough run)]
 function cloud(fig, xi, yi, xl, yl, xr, yr) {
   const W = 340, H = 240, m = {l: 40, r: 10, t: 10, b: 30}, sx = v => m.l + (v - xr[0]) / (xr[1] - xr[0]) * (W - m.l - m.r), sy = v => H - m.b - (v - yr[0]) / (yr[1] - yr[0]) * (H - m.t - m.b);
   const jit = (i, k) => (((i * 9301 + k * 49297) % 233280) / 233280 - 0.5);   // a fixed jitter: the gauges read in steps
@@ -299,7 +299,7 @@ function cloud(fig, xi, yi, xl, yl, xr, yr) {
     s += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(yv)}" y2="${sy(yv)}" stroke="var(--rule)"/><text class="tk" x="${m.l - 5}" y="${sy(yv) + 3}" text-anchor="end">${yr[1] - yr[0] < 5 ? yv.toFixed(1) : Math.round(yv)}</text>`;
   }
   s += pts.map(({p, i}) => `<circle cx="${sx(p[xi] + jit(i, 1) * dx * 3).toFixed(1)}" cy="${sy(p[yi] + jit(i, 2) * dy * 3).toFixed(1)}" r="${p[10] ? 2.6 : 1.7}" fill="${p[10] ? 'var(--frontc)' : p[7] ? 'var(--dot2)' : 'var(--dot)'}" fill-opacity="${p[10] ? 0.95 : 0.45}"/>`).join('');
-  const t3 = read(T3); const t3v = [t3.up, t3.climb, t3.turn, t3.h_up, t3.h_down, t3.crest, t3.push];
+  const t3 = read(T3); const t3v = [t3.up, t3.climb, t3.turn, t3.h_up, t3.h_down, t3.crest, t3[GK[6]]];
   if (t3v[xi] !== undefined && t3v[yi] !== undefined && t3v[xi] !== null && t3v[yi] !== null) s += `<circle cx="${sx(t3v[xi])}" cy="${sy(t3v[yi])}" r="6" fill="none" stroke="var(--ink)" stroke-width="1.6"/><text class="lb" x="${sx(t3v[xi]) + 8}" y="${sy(t3v[yi]) - 6}">T3</text>`;
   s += `<text class="lb" x="${W - m.r}" y="${H - 3}" text-anchor="end">${esc(xl)}</text><text class="lb" x="${m.l}" y="${m.t + 2}" dy="-2">${esc(yl)}</text></svg>`;
   fig.innerHTML = `<figcaption>${esc(yl)} against ${esc(xl)}<small>${pts.length.toLocaleString()} designs, jittered within their reading's step</small></figcaption>` + s;
@@ -310,7 +310,7 @@ function clouds() {
   const mx = (i, d) => Math.max(d, ...S.map(p => p[i]).filter(v => v !== null));
   const specs = [[2, 1, 'turn, mm (smaller is better)', 'step up, mm', [340, Math.min(1100, mx(2, 600))], [0, mx(1, 150)]],
                  [2, 4, 'turn, mm (smaller is better)', 'hill down, degrees', [340, Math.min(1100, mx(2, 600))], [0, mx(4, 50)]],
-                 [1, 6, 'step up, mm', 'push, kg', [0, mx(1, 150)], [0, mx(6, 5)]],
+                 [1, 6, 'step up, mm', GK[6] + ', kg', [0, mx(1, 150)], [0, mx(6, 5)]],
                  [0, 5, 'upright after a fall, share', 'crest, degrees', [0, 1], [0, mx(5, 40)]]];
   for (const [xi, yi, xl, yl, xr, yr] of specs) { const f = document.createElement('figure'); el.appendChild(f); cloud(f, xi, yi, xl, yl, xr, yr); }
 }

@@ -28,7 +28,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, '..', 'tools'))
 import config, stamp
-import gauges as GG, search as S, hills as H, crest as C, push as P, knobs as K
+import gauges as GG, search as S, hills as H, crest as C, push as P, knobs as K, weights as W
 
 # The strict run (SCORPION_CAP=capability_strict, 2026-10-28 evening): Zach, on the first run's shapes, "a lot of
 # floating parts ... some of the shapes are impossible to make", then "it kinda needs to morph towards the wheel base"
@@ -53,18 +53,26 @@ STRICT = RUN != 'capability'
 # unrealistic robot in simulation ... cannot give us a workable design ... the system works if the tests can be
 # trusted". The wide run's space and protocol, every design built real (knobs.make(real=True): weighed as its one-piece
 # print, a skin cut back round its tyres, the motors clear of the parts inside, the flippers mounted on the body).
+# The rough run (SCORPION_CAP=capability_rough, 2026-11-02): Zach, "we need to implement a system of weights for every
+# test add rough terrain". The tow run plus G8 rough ground (rough.py) as an eighth gauge; the all-rounder is weighted
+# by weights.WEIGHTS in every run (equal weights: the worst rank, as before).
 LOW = RUN == 'capability_low'
-REAL = RUN == 'capability_real'
+ROUGH = RUN == 'capability_rough'
+TOW = RUN in ('capability_tow', 'capability_rough')                       # the tow run (2026-11-02): the real run with G7 tow in
+REAL = RUN in ('capability_real', 'capability_tow', 'capability_rough')   # place of push (tow.py); push is still read in the finals
 if REAL:                                                                  # and G2 read pooled (gauges.STEP_RULE): the rung rule's
     GG.STEP_RULE = 'pooled'                                               # reading of one design swung 50-150 mm with the seeds
-WIDE = RUN in ('capability_tail', 'capability_low', 'capability_real')
+WIDE = RUN in ('capability_tail', 'capability_low', 'capability_real', 'capability_tow', 'capability_rough')
 OUT = os.path.join(config.GAUGES_OUT, RUN)
 SCREENS = os.path.join(OUT, 'screens.jsonl')
 SEED_FROM = os.path.join(config.GAUGES_OUT, 'capability_tail', 'screens.jsonl') if LOW else None
 DEADLINES = {'capability': datetime.datetime(2026, 10, 28, 15, 15), 'capability_strict': datetime.datetime(2026, 10, 29, 0, 30),
              'capability_tail': datetime.datetime(2026, 10, 31, 6, 30), 'capability_low': datetime.datetime(2026, 10, 31, 12, 0),
-             'capability_real': datetime.datetime(2026, 11, 1, 7, 0)}
+             'capability_real': datetime.datetime(2026, 11, 1, 7, 0),
+             'capability_tow': datetime.datetime(2026, 11, 2, 16, 10)}
 DEADLINE = DEADLINES.get(RUN, DEADLINES['capability_strict'])             # the last round ends by then
+if os.environ.get('SCORPION_UNTIL'):                                      # or by then ('2026-11-03 07:00')
+    DEADLINE = datetime.datetime.fromisoformat(os.environ['SCORPION_UNTIL'])
 WORKERS = int(os.environ.get('SCORPION_WORKERS', GG.WORKERS))
 LOW_TOP = 160.0                                                           # mm: the 'low' stream's bodies (WIDE)
 
@@ -87,10 +95,13 @@ SPACE = [(k, lo, hi) for _, k, lo, hi, _ in K.KNOBS if k not in HELD_K] + ([('tr
         + [('limb', 0.0, 1.0), ('six', 0.0, 1.0), ('shell', 0.0, 1.0)] \
         + ([(k, lo, hi) for _, k, lo, hi, _ in K.FLIP_KNOBS] + [('flip', 0.0, 1.0), ('f_tail', 0.0, 1.0), ('f_nose', 0.0, 1.0)] if WIDE else [])
 KEYS = [k for k, _, _ in SPACE]; LO = np.array([a for _, a, _ in SPACE]); HI = np.array([b for _, _, b in SPACE])
-GAUGES = (('up', 1), ('climb', 1), ('turn', -1), ('h_up', 1), ('h_down', 1), ('crest', 1), ('push', 1))
+GAUGES = (('up', 1), ('climb', 1), ('turn', -1), ('h_up', 1), ('h_down', 1), ('crest', 1), (('tow', 1) if TOW else ('push', 1))) \
+         + ((('rough', 1),) if ROUGH else ())
+G7 = GAUGES[6][0]                                                         # push, or tow in the tow run
+COUNT = W.counted([g for g, _ in GAUGES])                                 # the gauges weighted above 0
 LOW_STREAMS = {'st_0.1': 0.1, 'st_0.25': 0.25, 'st_0.5': 0.5, 'st_1': 1.0, 'turn450': None}   # w; turn450: the most step inside 450 mm
 UP_MIN, TURN_CAP = 0.75, 450.0                                            # G1's floor; turn450's circle (mm)
-STREAMS = tuple(LOW_STREAMS) if LOW else tuple(g for g, _ in GAUGES) + ('all',) + (('low',) if WIDE else ())
+STREAMS = tuple(LOW_STREAMS) if LOW else tuple(COUNT) + ('all',) + (('low',) if WIDE else ())
 N_SCREEN, N_B, POP, ELITE = 6, 0 if LOW else 2048 if WIDE else 1024, 30, 8
 
 
@@ -118,8 +129,16 @@ def screen(sp, seed, n=N_SCREEN):
         by = {th: H.ladder(sp, H.GRIP, down, n, seed, th)[0] for th in poses}
         r[g] = max(by.values()); r[g + '_stowed'] = by[None]
     r['crest'] = C.ladder(sp, C.GRIP, n, seed)[0]
-    pu = {mu: P.ladder(sp, mu, n, seed)[0] for mu in GG.BAND}
-    r['push'] = min(pu.values()); r['push_by_mu'] = {str(m): v for m, v in pu.items()}
+    if TOW:
+        import tow as T
+        tw = {mu: T.ladder(sp, mu, n, seed)[0] for mu in GG.BAND}
+        r['tow'] = min(tw.values()); r['tow_by_mu'] = {str(m): v for m, v in tw.items()}
+    else:
+        pu = {mu: P.ladder(sp, mu, n, seed)[0] for mu in GG.BAND}
+        r['push'] = min(pu.values()); r['push_by_mu'] = {str(m): v for m, v in pu.items()}
+    if ROUGH:
+        import rough as RG
+        r['rough'] = RG.ladder(sp, RG.GRIP, n, seed)[0]
     return r
 
 
@@ -149,7 +168,7 @@ def val(r, g):
 
 def ranks(rows):
     """each design's percentile rank on each gauge among all built designs (0 worst, 1 best; ties share the mean), and
-    the all-rounder rank: the worst of its seven"""
+    the all-rounder rank: the worst of them, weighted (weights.allround)"""
     ok = [r for r in rows if val(r, 'up') is not None]
     R = {}
     for g, _ in GAUGES:
@@ -159,7 +178,7 @@ def ranks(rows):
             m = v == u; rk[m] = rk[m].mean()
         R[g] = rk / max(1, len(v) - 1)
     for i, r in enumerate(ok):
-        r['rank'] = {g: float(R[g][i]) for g, _ in GAUGES}; r['rank']['all'] = min(r['rank'].values())
+        r['rank'] = {g: float(R[g][i]) for g, _ in GAUGES}; r['rank']['all'] = W.allround(r['rank'], COUNT)
     return ok
 
 
@@ -196,9 +215,9 @@ def feasible(r):
 
 
 def front(rows):
-    """the designs no other beats on all seven gauges at once (each at least as good, one better)"""
-    ok = [r for r in rows if all(val(r, g) is not None for g, _ in GAUGES)]
-    V = np.array([[val(r, g) for g, _ in GAUGES] for r in ok])
+    """the designs no other beats on every gauge that counts at once (each at least as good, one better)"""
+    ok = [r for r in rows if all(val(r, g) is not None for g in COUNT)]
+    V = np.array([[val(r, g) for g in COUNT] for r in ok])
     keep = [i for i in range(len(ok)) if not np.any(np.all(V >= V[i], axis=1) & np.any(V > V[i], axis=1))]
     return [ok[i] for i in keep]
 
@@ -276,7 +295,7 @@ def summarise(rows):
     print(f'{len(rows)} screened, {len(ok)} built; the seven-way front holds {len(F)}', flush=True)
     for st, r in champs.items():
         print(f"  best {st:6s}: up {r['up']:.2f} step {r['climb']} turn {r['turn'] and round(r['turn'])} hills {r['h_up']}/{r['h_down']} "
-              f"crest {r['crest']} push {r['push']} | all-rank {r['rank']['all']:.2f} | tail {r['tail']} wheels {r['wheels']} {r['mass']:.0f} g", flush=True)
+              f"crest {r['crest']} {G7} {r[G7]}{(' rough ' + str(r['rough'])) if ROUGH else ''} | all-rank {r['rank']['all']:.2f} | tail {r['tail']} wheels {r['wheels']} {r['mass']:.0f} g", flush=True)
 
 
 # ---------- the finals ----------
@@ -302,7 +321,7 @@ def finals(n_front=4):
         sp = build(q_of(r['z'])); sp = dict(sp, name=nm); names.append(nm); specs.append(sp)
     main, _ = GG.roster(True); specs += [dict(t3_ref(), name='T3'), main[0]]; names += ['T3', 'Box']
     GG.HEIGHTS = HEIGHTS_EXT
-    J = card.jobs(specs, set(names)); t0 = time.time()
+    card.TOW = TOW; card.ROUGH = ROUGH; J = card.jobs(specs, set(names)); t0 = time.time()
     print(f'finals: {len(specs)} designs, {len(J)} jobs', flush=True)
     with Pool(WORKERS, initializer=_finit, initargs=(specs,)) as pool:
         R = pool.map(card.job, J, chunksize=1)
@@ -313,12 +332,12 @@ def finals(n_front=4):
         src = next((rr for nm, rr in pick.values() if nm == sp['name']), None)
         out.append(dict(name=sp['name'], up=w['upright'], climb=w['climb'], turn=w['turn'], h_up=r['up'], h_down=r['down'],
                         hill_pose=[r['up_pose'], r['down_pose']], h_up_stowed=r['up_stowed'], h_down_stowed=r['down_stowed'],
-                        crest=r['crest'], push=r['push'], push_by_mu=r['push_by_mu'], by_mu=g['by_mu'], tip_static=r['tip_static'],
+                        crest=r['crest'], push=r['push'], push_by_mu=r['push_by_mu'], **({'tow': r['tow'], 'tow_by_mu': r['tow_by_mu']} if TOW else {}), **({'rough': r['rough'], 'rough_seen': r['rough_seen']} if ROUGH else {}), by_mu=g['by_mu'], tip_static=r['tip_static'],
                         mass=sp['mass'], length=sp['length'], width=sp['width'], height=sp['height'], belly=sp['belly'],
                         tail=bool(sp.get('limb')), wheels=len(sp['wheels']), notes=sp['notes'],
                         q=src and src['q'], z=src and src['z'], screen=src and {k: src.get(k) for k, _ in GAUGES}))
         print(f"{sp['name']:12s} up {w['upright']:.3f} step {w['climb']} turn {w['turn'] and round(w['turn'])} hills {r['up']}/{r['down']} "
-              f"crest {r['crest']} push {r['push']} | {sp['mass']:.0f} g, tail {bool(sp.get('limb'))}, {len(sp['wheels'])} wheels", flush=True)
+              f"crest {r['crest']} push {r['push']}{(' tow ' + str(r['tow'])) if TOW else ''}{(' rough ' + str(r['rough'])) if ROUGH else ''} | {sp['mass']:.0f} g, tail {bool(sp.get('limb'))}, {len(sp['wheels'])} wheels", flush=True)
     json.dump(dict(wall_s=round(time.time() - t0), heights=HEIGHTS_EXT, finals=out), open(os.path.join(OUT, 'finals.json'), 'w'), indent=1, default=float)
 
 
@@ -329,7 +348,7 @@ def smoke():
     t0 = time.time()
     with Pool(2, initializer=_init) as pool:
         for r in pool.imap_unordered(job, J):
-            print(json.dumps({k: r.get(k) for k in ('tag', 'up', 'climb', 'turn', 'h_up', 'h_down', 'crest', 'push', 'tail', 'wheels', 'mass', 's', 'err', 'built')}, default=float), flush=True)
+            print(json.dumps({k: r.get(k) for k in ('tag', 'up', 'climb', 'turn', 'h_up', 'h_down', 'crest', G7, 'rough', 'tail', 'wheels', 'mass', 's', 'err', 'built')}, default=float), flush=True)
     print(f'{time.time() - t0:.0f} s; {len(KEYS)} knobs: {KEYS}')
 
 

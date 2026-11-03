@@ -39,10 +39,10 @@ GRIP = 2.5
 N_TRY = 20
 
 
-def ridge(deg):
-    """extra XML for robots.xml: the ridge, its near foot at X 0"""
+def ridge(deg, x0=0.0):
+    """extra XML for robots.xml: the ridge, its near foot at X x0 (m; course.py's is down the course); and its far foot's X"""
     a = math.radians(deg); H = CREST_MM * 1e-3; r = RB.EDGE_R * 1e-3; t = 0.05
-    xp = H / math.tan(a)                                                  # the peak's X
+    xp = x0 + H / math.tan(a)                                             # the peak's X
     d = r / math.cos(a); C = (xp, H - d)                                  # the rounding's centre, tangent to both faces
     Tu = (xp - r * math.sin(a), H - d + r * math.cos(a))                  # where it meets each face
     def plank(x0, z0, x1, z1, sg):                                        # a slab whose top face runs (x0, z0) -> (x1, z1)
@@ -51,12 +51,12 @@ def ridge(deg):
         return cx, cz, L, (math.cos(ph / 2), 0.0, math.sin(ph / 2), 0.0)
     def xml(f, ca):
         s = ''
-        for x0, z0, x1, z1, sg in ((0.0, 0.0, Tu[0], Tu[1], 1), (2 * xp - Tu[0], Tu[1], 2 * xp, 0.0, -1)):
-            cx, cz, L, q = plank(x0, z0, x1, z1, sg)
+        for xa, za, xb, zb, sg in ((x0, 0.0, Tu[0], Tu[1], 1), (2 * xp - Tu[0], Tu[1], 2 * xp - x0, 0.0, -1)):
+            cx, cz, L, q = plank(xa, za, xb, zb, sg)
             s += (f'<geom name="plank{sg:+d}" type="box" size="{L / 2:.5f} 2 {t / 2:.5f}" pos="{cx:.5f} 0 {cz:.5f}" '
                   f'quat="{q[0]:.6f} {q[1]:.6f} {q[2]:.6f} {q[3]:.6f}" friction="{f["floor"]}"{ca}/>')
         return s + f'<geom name="peak" type="capsule" fromto="{C[0]:.5f} -2 {C[1]:.5f} {C[0]:.5f} 2 {C[1]:.5f}" size="{r:.5f}" friction="{f["floor"]}"{ca}/>'
-    return xml, 2 * xp
+    return xml, 2 * xp - x0
 
 
 def crest_try(sim, deg, back, rng, far):

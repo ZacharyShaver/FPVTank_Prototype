@@ -19,9 +19,9 @@ import numpy as np
 import capability as CP, knobs as K, gauges as GG, robots as RB
 
 OUT = os.path.join(CP.OUT, 'tomorrow')
-PICKS = ('all', 'low', 'climb', 'turn', 'up', 'push')                    # the streams whose best are read, in this order
+PICKS = ('all', 'low', 'climb', 'turn', 'up', CP.G7)                    # the streams whose best are read, in this order
 QUICK = '--quick' in sys.argv
-LINE = ('up {up:.2f}  step {climb}  turn {turn}  hills {h_up}/{h_down}  crest {crest}  push {push}')
+LINE = 'up {up:.2f}  step {climb}  turn {turn}  hills {h_up}/{h_down}  crest {crest}  ' + CP.G7 + ' {' + CP.G7 + '}'
 
 
 def show(p):
@@ -77,7 +77,7 @@ def read_all(specs):
     out = {}
     for i, sp in enumerate(specs):
         g = GG.collect([x for x in R if x[0][0] in ('fall', 'climb', 'turn')], i, card.N_TRY); w = g['worst']; r = card.row(R, i, sp)
-        out[sp['name']] = dict(up=w['upright'], climb=w['climb'], turn=w['turn'], h_up=r['up'], h_down=r['down'], crest=r['crest'], push=r['push'], mass=sp['mass'])
+        out[sp['name']] = dict(up=w['upright'], climb=w['climb'], turn=w['turn'], h_up=r['up'], h_down=r['down'], crest=r['crest'], mass=sp['mass'], **{CP.G7: r[CP.G7]})
     print(f'read in {(time.time() - t0) / 60:.0f} min', flush=True)
     return out
 
@@ -130,7 +130,7 @@ def repeat():
     for nm in dict.fromkeys(s['name'].split(' | ')[0] for s in specs):
         rs = [G[k] for k in G if k.startswith(nm + ' | ')]
         lines.append(f'{nm}:')
-        for g in ('up', 'climb', 'turn', 'h_up', 'h_down', 'crest', 'push'):
+        for g in [k for k, _ in CP.GAUGES]:
             v = [r[g] for r in rs]; ok = all(x is not None for x in v)
             spread = (max(v) - min(v)) if ok else None
             flag = '' if spread is None or spread <= {'up': 0.05, 'climb': 15, 'turn': 15}.get(g, 5) else '   <- moves with luck'

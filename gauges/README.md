@@ -189,6 +189,90 @@ Zach picked it from the same list: moving boxes is in the purpose, and nothing e
 - **Repeatable:** read again with fresh seeds (2026-10-28, `card.py`), every design and control read the same.
 - **Trust:** none yet.
 
+## G7 Tow (2026-11-02, in place of the push from the tow run on)
+
+Zach: step and push conflict, because a climbing nose rides up the box. `tow.py` (`python gauges/tow.py check`).
+- **Reads:** the heaviest sled (kg) it drags 0.5 m on a rope from a hitch at its rear, axle high; the worst over the band.
+- **Found (the tow run, 2,416 designs):** step no longer costs it (rank correlation +0.15; 0.01 at fixed weight), but it
+  reads weight: r 0.88, about 1.16 kg towed per kg of robot, because the sled's friction moves with the floor's.
+- **Trust:** none yet.
+
+## G8 Rough ground (2026-11-02)
+
+Zach: "add rough terrain"; asked, he picked rocky ground. `rough.py` (`python gauges/rough.py check`).
+- **Lever:** crossing rubble without beaching or rolling.
+- **Reads:** the rock size (mm) it drives 2 m across, the step's pooled rule at 0.9 of tries, at x2.5 grip.
+- **Test:** a heightfield of half-ellipsoid rocks, bases 50-150 mm in radius, 0.4-1x the rung tall, over 0.3 of the
+  ground. A try's field comes from the seed and the try, so a taller rung is the same field raised and every design
+  meets the same fields. 0.4 m/s, holding its heading; it fails past 85° or under 20 mm of progress in 3 s.
+- **Controls:** rays land on the drawn rocks to 0.00 mm (the field mirrored in Y misses). On a flat field the box and T3
+  drive 2 m every time. The box with its belly 15 mm lower reads below the box (13 against 33 mm).
+- **Readings (6 tries a rung):** box 33 mm, T3 46 mm (real build, track 130). T3 beaches: its belly is 25 mm.
+- **Trust:** the obstacle course (below) calls it fair: of the tries that reached its 40 mm rocks, 6% stopped there where
+  G8 says the design clears 40 mm, 23% where it says it doesn't (the gauge needs 9 in 10, the course one pass). Filmed on
+  the gauge films page (`test_films.py --tests rough`) on the same eight designs as the rest.
+
+## Weights (2026-11-02)
+
+`weights.py`: one importance weight a gauge (`WEIGHTS`, all 1 to start). The all-rounder is the weighted worst rank:
+1 minus the largest shortfall from the top rank, each scaled by its weight over the largest. Equal weights give the
+worst rank, so the runs before re-rank exactly as they ran (checked on the tow run: the same front and champions). 0
+drops a gauge from the score, the front and the streams. `python gauges/weights.py check`.
+
+## The obstacle course and its weight vector (2026-11-02)
+
+Zach, on the weights: "it gives us a way to tell the simulator what you want as a result ... you can score a weight
+vector for how well it goes say around a obstacle course. multiple factors and their interplay needs a descriptor".
+
+`course.py`: rocks up to 40 mm (G8's), the crest's ridge at 20 degrees a side (G6's), a 50 mm step onto a plateau (G2's
+rounded edge), and a dead end 750 mm wide to turn round in and drive out of (G3). Each is about that gauge's median in
+the tow run. One driver: 0.3 m/s, steering for the centre line, the step's reflex on a stall, a spin in place at the
+end. The score is the share of the path covered, the mean of 8 tries (each its own rocks and start, the same for every
+design). Controls (`python gauges/course.py check`): the box and T3 finish the clear course every try; each obstacle
+alone, too big for the box, stops it there. T3 finishes the real course 4 in 4; the box stops at the rocks or the
+ridge.
+
+`weights.fit` finds the vector whose all-rounder ranks designs as the course does (Spearman); `weights.cv` reads it on
+designs it wasn't fitted on. Its controls: a made-up test scored by known weights fits them back (held-out 0.98);
+shuffled scores read 0.08.
+
+**Reversing up the step (current).** Zach, after the first run: "backwards is fine ... knowing when to turn is something
+we need to build ... lets allow it". Stalled nose first at the step for 3 s, the driver backs off, turns round, reverses
+up (the rear-up reflex if the design has one, as G2 tail first) and turns to face forward on top (`course.REVERSE`; the
+plateau before the corridor lengthened 0.5 -> 1.0 m to turn on). It is a hand-written rule standing in for a learned
+one. Controls: T3 climbs nose first and never turns; a design that climbs 50 mm only tail first gets up 4 in 4 with the
+rule and 0 in 4 without; the box still stops at a 200 mm step. Known fault: one design (of 320, a long low six-wheeler)
+comes off its turn on top out of line and catches a corner on the corridor's mouth every try: the rule's, not the design's.
+
+On 320 of the tow run's designs (`course.py run`, then `fit`; out/course/fit.json, descriptor.png; G8 as the first run
+read it):
+
+| Predicting the course, held out | reversing allowed | nose first only (superseded) |
+|---|---|---|
+| fitted, weighted mean | 0.78 | 0.67 |
+| fitted, weakest test (as the search scores) | 0.71 | 0.57 |
+| the best single gauge | 0.46 | 0.48 |
+| from the course's own numbers (each obstacle 1 / (1 - share of designs short of it)) | 0.38 | 0.34 |
+| equal weights (every run so far) | 0.40 | 0.28 |
+| control: course scores shuffled | -0.11 | 0.03 |
+
+The fitted vector, weighted mean: step 1, crest 1, rough 0.6, the rest 0 to 0.05. Weakest test: crest 1, step 0.99,
+rough 0.82, upright 0.5, tow 0.27, turn and both hills 0. Finished: 53% of tries (nose first only: 34%).
+
+What the course found about the gauges:
+- **G2 step reads the better direction, at a rolling 0.5 m/s.** Nose first only, 39% of the tries the gauge says should
+  climb the step stopped at it. Of those 53 designs, alone on the step at 0.3 m/s 2% of tries got up, so it isn't the
+  obstacles before. 35 climb it only tail first (the gauge's own try at 50 mm, x1: nose first 3%, tail first 100%; 12
+  of them have tails); the other 18 need the gauge's 0.5 m/s. Their controls (78 designs that climbed the course's step
+  every time) climb it alone every time. Reversing allowed, the gauge calls the step: 6% stopped where it says clear,
+  44% where it says fail. The 18 that need speed remain.
+- **G3 reads the open floor's swept circle, drift and all; a dead end's walls stop the drift.** The gauge puts 63% of
+  designs over 750 mm, yet about 1% of their tries stuck turning, unless the body's diagonal itself is over 750 mm (18
+  of 68 tries stuck). It gets weight 0 in every fit, which is why the course's own numbers predict it worst.
+
+Films: out/course/course_T3_Box.mp4 and course_n1_n14.mp4 (nose first only, now in out/course/nose_first/: a
+tail-first-only climber stalling, beside one that finishes); course_n298.mp4 (the corridor-mouth fault).
+
 ## Costs (read every time, no target)
 
 Mass, length, width, height, belly clearance.

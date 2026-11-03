@@ -25,6 +25,8 @@ import config
 import gauges as GG, robots as RB, hills as H, crest as C, push as P
 
 OUT = os.path.join(config.GAUGES_OUT, 'card')
+TOW = False                               # also read G7 tow (tow.py; the tow run sets it, 2026-11-02)
+ROUGH = False                             # also read G8 rough ground (rough.py; the rough run sets it, 2026-11-02)
 MOUNT_FIX = 170.0                         # mm: the tail mount the knob log found pushes 4 kg (README, G7)
 N_TRY = 20                                # every gauge's tries, as its card
 
@@ -65,6 +67,12 @@ def job(a):
         return a, H.ladder(sp, H.GRIP, down, N_TRY, seed, th)
     if kind == 'crest':
         return a, C.ladder(sp, C.GRIP, N_TRY, seed)
+    if kind == 'tow':
+        import tow as T
+        return a, T.ladder(sp, arg, N_TRY, seed)
+    if kind == 'rough':
+        import rough as RG
+        return a, RG.ladder(sp, RG.GRIP, N_TRY, seed)
     return a, P.ladder(sp, arg, N_TRY, seed)
 
 
@@ -80,9 +88,11 @@ def jobs(allsp, full):
         J += [('hill', i, (down, th), s) for down in (False, True) for th in poses]
         J += [('crest', i, None, s + 1)]
         J += [('push', i, mu, s + 2) for mu in GG.BAND]
+        J += [('tow', i, mu, s + 3) for mu in GG.BAND] if TOW else []
+        J += [('rough', i, None, s + 4)] if ROUGH else []
         if sp['name'] in full:
             J += GG.jobs_for(i, GG.N_DROP, GG.N_TRY, seed=31)
-    J.sort(key=lambda a: a[0] not in ('climb', 'crest', 'hill'))             # the long ladders first
+    J.sort(key=lambda a: a[0] not in ('climb', 'crest', 'hill', 'rough'))    # the long ladders first
     return J
 
 
@@ -99,6 +109,14 @@ def row(R, i, sp):
     pu = {a[2]: r for a, r in R if a[0] == 'push' and a[1] == i}
     w = min(pu, key=lambda mu: pu[mu][0])
     out.update(push=pu[w][0], push_worst_mu=w, push_by_mu={str(mu): v[0] for mu, v in pu.items()}, push_why=pu[w][1].get(P.nxt(pu[w][0])))
+    tw = {a[2]: r for a, r in R if a[0] == 'tow' and a[1] == i}
+    if tw:
+        import tow as T
+        w = min(tw, key=lambda mu: tw[mu][0])
+        out.update(tow=tw[w][0], tow_worst_mu=w, tow_by_mu={str(mu): v[0] for mu, v in tw.items()}, tow_why=tw[w][1].get(T.nxt(tw[w][0])))
+    rg = next((r for a, r in R if a[0] == 'rough' and a[1] == i), None)
+    if rg:
+        out.update(rough=rg[0], rough_seen={str(k): v for k, v in rg[1].items()})
     return out
 
 

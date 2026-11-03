@@ -240,14 +240,14 @@ class RearUp:
     it while the wheels drive. Then it stows and looks again. Zach: "better tails allow for more low and flat designs";
     a tail pressing down behind a robot driving forward lifts the rear, not the nose, so the tail leads. The step's
     height is given (the robot's camera would see it); a learned policy would replace the script"""
-    def __init__(self, sim, h):
+    def __init__(self, sim, h, x0=0.0):
         self.sim, self.h, self.move, self.t_move, self.xs = sim, h, None, 0.0, []
-        self.base = sim.m.body('lyaw').id
+        self.base = sim.m.body('lyaw').id; self.edge = x0 + (RB.EDGE_R + REAR_PAST) * 1e-3   # x0: the step's face (course.py's is down the course)
 
     def aim(self):
         """the tail's pitch pointing its foot at the step's top: REAR_PAST past the edge, REAR_PRESS under it"""
         sim = self.sim; b = sim.d.xpos[self.base]
-        p = sim.rot().T @ (np.array([(RB.EDGE_R + REAR_PAST) * 1e-3, b[1], (self.h - REAR_PRESS) * 1e-3]) - b)
+        p = sim.rot().T @ (np.array([self.edge, b[1], (self.h - REAR_PRESS) * 1e-3]) - b)
         return math.atan2(p[2], -p[0])
 
     def tick(self, t):
@@ -261,7 +261,7 @@ class RearUp:
             end = WALK_PRESS + WALK_PULL
             if tp < end:
                 s = float(np.clip((tp - WALK_PRESS) / WALK_PULL, 0.0, 1.0)); b = sim.d.xpos[self.base]
-                x = b[0] + (1 - s) * ((RB.EDGE_R + REAR_PAST) * 1e-3 - b[0]) + s * WALK_BACK * 1e-3   # world x, the step's way
+                x = b[0] + (1 - s) * (self.edge - b[0]) + s * WALK_BACK * 1e-3   # world x, the step's way
                 p = sim.rot().T @ (np.array([x, b[1], (self.h - REAR_PRESS) * 1e-3]) - sim.d.xpos[sim.rid])   # the body's frame
                 sim.limb_goal(0.0, *sim.reach(p))
             else:
