@@ -42,6 +42,11 @@ TUMBLE = os.path.join(REPO, 'research', 'tumble')
 GAUGES_CURRENT = os.path.join(GAUGES_OUT, 'search_shape')
 
 
+# The real twin (2026-11-03): printed parts that test the sim's numbers against the real robot. TWIN_OUT is untracked.
+TWIN = os.path.join(REPO, 'twin')
+TWIN_OUT = os.path.join(TWIN, 'out')
+
+
 # Zach's Creality K2 Pro: its stock Moonraker (Klipper's HTTP API), on his LAN, no login. tools/k2.py
 # drives it. The address is what Creality Print found (deviceInfo.json); a DHCP change moves it. It is not
 # committed: write PRINTER = 'http://<printer-ip>:7125' in tools/config_local.py (untracked; copy

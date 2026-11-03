@@ -80,3 +80,11 @@ macros. Cancelling can't be undone: confirm it with him first unless he said "ca
   one. Slice them with `--set raft_layers=3` (about +2 min on that plate).
 - `cancel` can take longer than 10 s to answer while CANCEL_PRINT runs; `k2.py` now waits 60 s. Read
   `status` after it either way.
+
+## Things learned (2026-11-03)
+
+- **Leveling before a print** (when Zach asks for calibration): run the printer's own macro through Moonraker's
+  `/printer/gcode/script` with `BED_MESH_CALIBRATE_START_PRINT BED_TEMP=50 EXTRUDER_TEMP=220`, then `start`. It
+  heats, homes, cleans the nozzle and probes a 9 x 9 mesh in about 6 min. It also sets `START_PRINT`'s `prepare`
+  to 1, so the print keeps that mesh and skips re-homing. Flow calibration (`PRINT_CALIBRATION`) is Creality's
+  closed code and hasn't been run from here.
