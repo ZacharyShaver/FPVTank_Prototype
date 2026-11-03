@@ -23,6 +23,7 @@ t the share of designs whose gauge reading falls short of it (the weighted worst
 that clear every obstacle); a gauge with nothing on the course, 0.
 
     python gauges/course.py check   # the controls (exits 1 on a failure)
+    python gauges/course.py grip    # just the tyres' grip on the rocks and the ridge, and its control
     python gauges/course.py run     # the course on a sample of the tow run's screens -> gauges/out/course/runs.jsonl
     python gauges/course.py fit     # its descriptor, fitted and designed -> gauges/out/course/fit.json, descriptor.png
 """
@@ -56,12 +57,20 @@ def layout(cs):
                 turn_x=end - w / 2, finish_x=c0 - 0.1, plateau=(xs, end + 0.6))
 
 
+TERRAIN = ('rocks', 'plank+1', 'plank-1', 'peak')       # the geoms on GRIP (rough.Rig's and crest.ridge's names)
+
+
 class Rig(GG.Sim):
-    """gauges.Sim on the course cs (COURSE's keys; rock 0, crest None, step 0 leave that obstacle out)"""
-    def __init__(self, sp, cs=COURSE, mu=1.0):
+    """gauges.Sim on the course cs (COURSE's keys; rock 0, crest None, step 0 leave that obstacle out).
+
+    The rocks and the ridge meet the robot as on G8 and G6, where the whole sim runs at GRIP: the terrain at the floor's
+    friction x GRIP, and the tyres, tail and flippers each at their own x GRIP, through explicit contact pairs. A
+    tyre's contact priority makes its own friction win over any terrain's, so until 2026-11-03 (pairs=False, the
+    control) the tyres met the rocks and the ridge at x1: 0.9, not G8's 2.25"""
+    def __init__(self, sp, cs=COURSE, mu=1.0, pairs=True):
         super().__init__(sp, mu)
         self.cs, self.L = cs, layout(cs); L = self.L; h = cs['step'] * 1e-3; r = RB.EDGE_R * 1e-3
-        tf = '%.4f 0.005 0.0005' % (RB.FRICTION['tyre'] * GRIP)          # terrain: a tyre on it meets x2.5, as on G6 and G8
+        tf = '%.4f 0.005 0.0005' % (RB.FRICTION['floor'] * GRIP if pairs else RB.FRICTION['tyre'] * GRIP)   # the terrain
         self.nx = int(round((L['fx'][1] - L['fx'][0]) / RG.CELL)) + 1; self.ny = int(round(2 * L['fy'] / RG.CELL)) + 1
         self.top = max(cs['rock'], 1) * 1e-3
         def extra(f, ca):
@@ -89,6 +98,15 @@ class Rig(GG.Sim):
             x = x.replace('<asset>', f'<asset><hfield name="rocks" nrow="{self.ny}" ncol="{self.nx}" '
                           f'size="{(L["fx"][1] - L["fx"][0]) / 2:.4f} {L["fy"]:.4f} {self.top:.5f} 0.01"/>', 1)
         self.m = self.mj.MjModel.from_xml_string(x); self.d = self.mj.MjData(self.m)   # the same bodies, joints and actuators
+        if pairs:
+            names = [self.m.geom(i).name for i in range(self.m.ngeom)]; ter = [g for g in TERRAIN if g in names]
+            grip = {n: RB.FRICTION['tyre'] * GRIP * (sp.get('tyre_mu', 1.0) if n.startswith('tyre') else 1.0)
+                    for n in names if n.startswith(('tyre', 'tail_', 'flip'))}
+            pr = ''.join(f'<pair geom1="{g}" geom2="{n}" condim="3" friction="{v:.4f} {v:.4f} 0.005 0.0005 0.0005"/>'
+                         for g in ter for n, v in grip.items())
+            if pr:
+                x = x[:x.rindex('</mujoco>')] + f'<contact>{pr}</contact></mujoco>'
+                self.m = self.mj.MjModel.from_xml_string(x); self.d = self.mj.MjData(self.m)
         self.wc = np.mean([[x, y, 0.0] for x, y in sp['wheels']], 0) * 1e-3
         self.r_body = float(np.linalg.norm(self.E[:, :2] - self.wc[:2], axis=1).max())    # m from the wheels' centre: the body,
         self.r_wheel = float(np.linalg.norm(np.array(sp['wheels']) * 1e-3 - self.wc[:2], axis=1).max()) + sp['R'] * 1e-3 + 0.03   # a tyre
@@ -226,6 +244,8 @@ def run():
     if os.path.exists(p0):
         rg = {tuple(x['z']): x.get('rough') for x in map(json.loads, open(p0))}; J = [dict(r, rough=rg.get(tuple(r['z']))) for r in J]
     path = os.path.join(OUT, 'runs.jsonl'); done = set()                 # a design is its z (a stream's tag repeats each round)
+    import capability, stamp                                             # (the workers' modules loaded, for the stamp)
+    stamp.check(path)                                                    # only rows made by this code (2026-11-03: none was kept)
     if os.path.exists(path):
         done = {tuple(json.loads(l).get('z') or ()) for l in open(path)}
     J = [r for r in J if tuple(r['z']) not in done]; t0 = time.time()
@@ -290,13 +310,35 @@ def fit():
     return res, rows, M, y
 
 
+def grip_check(sp):
+    """sp's tyres meet the rocks and the ridge at G8's and G6's grip (the tyre's x GRIP); the control, the course
+    without its contact pairs (as before 2026-11-03), at x1. The number of failures"""
+    clear = dict(rock=0, crest=None, step=0, width=2000); want = RB.FRICTION['tyre'] * GRIP; bad = 0
+    for what, cs in (('rocks', dict(clear, rock=COURSE['rock'])), ('ridge', dict(clear, crest=COURSE['crest']))):
+        for pairs in (True, False):
+            sim = Rig(sp, cs, pairs=pairs); sim.ground(np.random.default_rng([1, 0])); seen = {}
+            sim.place(GG.yaw_quat(0.0), 0.0005, x=-0.1 if cs['rock'] else sim.L['ridge'] - 0.4)
+            for _ in range(800):
+                sim.drive(0.3, 0.3)
+                for c in sim.d.contact[:sim.d.ncon]:
+                    a, b = sim.m.geom(c.geom1).name, sim.m.geom(c.geom2).name
+                    if (a in TERRAIN or b in TERRAIN) and (a.startswith('tyre') or b.startswith('tyre')):
+                        f = round(float(c.friction[0]), 3); seen[f] = seen.get(f, 0) + 1
+            ok = bool(seen) and all((abs(f - want) < 1e-3) == pairs for f in seen); bad += not ok
+            print(('PASS ' if ok else 'FAIL ') + ('' if pairs else 'control (no pairs, as before 2026-11-03): ') +
+                  f"the tyres on the {what} meet friction {sorted(seen)} ({sum(seen.values())} contacts; G8's and G6's {want:.2f})")
+    return bad
+
+
 def check(n=4):
-    """the controls: on the course with nothing on it (no rocks, ridge or step, the corridor 2 m wide) the box and T3
-    finish every try; each obstacle on its own, too big for the box, stops the box in that obstacle's section (each
-    section binds, and is named right). Exits 1 on a failure"""
+    """the controls: the tyres meet the terrain at the terrain gauges' grip (grip_check); on the course with nothing on
+    it (no rocks, ridge or step, the corridor 2 m wide) the box and T3 finish every try; each obstacle on its own, too
+    big for the box, stops the box in that obstacle's section (each section binds, and is named right). Exits 1 on a
+    failure"""
     import knobs as K
     bad = 0; bx = GG.roster(True)[0][0]; t3 = K.make(dict(K.T3, track=130.0), real=True)
     clear = dict(rock=0, crest=None, step=0, width=2000)
+    bad += grip_check(t3)
     for nm, sp in (('Box', bx), ('T3', t3)):
         tr = tries(sp, n, 1, clear); ok = all(o == 'ok' for o, *_ in tr); bad += not ok
         print(('PASS ' if ok else 'FAIL ') + f'control: {nm} on the clear course finishes every try: {[(o, w, round(p, 2), round(t, 1)) for o, w, p, t in tr]}')
@@ -329,6 +371,9 @@ if __name__ == '__main__':
     a = sys.argv[1:2]
     if a == ['check']:
         check()
+    elif a == ['grip']:
+        import knobs as K
+        sys.exit(1 if grip_check(K.make(dict(K.T3, track=130.0), real=True)) else 0)
     elif a == ['run']:
         run()
     elif a == ['fit']:

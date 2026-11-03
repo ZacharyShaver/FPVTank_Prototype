@@ -55,9 +55,9 @@ class Rig:
             self.body_geoms = {g for g in range(m.ngeom) if m.geom_bodyid[g] == self.rid}
             self.floor = {g for g in range(m.ngeom) if m.geom_bodyid[g] == 0}
             if bumper_k:                                                  # TPU bumpers (2026-10-29): the body meets the floor on a
-                k = bumper_k * 1e3; b = 2 * TYRE_ZETA * math.sqrt(k * sp['mass'] * 1e-3)   # spring, as the tyres do (N/mm)*
+                k, b = RB.spring_solref(bumper_k, TYRE_ZETA, sp['mass'] * 1e-3)   # spring, as the tyres do (N/mm)*, on the robot's mass
                 for g in self.body_geoms:
-                    m.geom_solref[g] = (-k, -b); m.geom_priority[g] = 1
+                    m.geom_solref[g] = (k, b); m.geom_priority[g] = 1
         self.hub = [np.array([x, y, sp['R']]) for x, y in sp['wheels']]
         self.seats = []                                                   # each wheel's motor seat (wheels in sp's order)
         for x, y in sp['wheels']:

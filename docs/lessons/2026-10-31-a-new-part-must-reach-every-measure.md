@@ -23,3 +23,9 @@ film of a two-link tail crashed. Readers of a part's joints count as readers of 
 **And a third time.** `unibody.make` re-attached a given tail with `add_limb(L, tq, ...)` alone, so a two-link tail
 came out one link, without its rear-up or its foot; the search's winners were gauged in one piece that way until it
 was fixed the same evening.
+
+**A fourth (found 2026-11-03).** The second link's servo and link (91-107 g) never reached the robot's mass
+(`robots.dims`), its CoM (`search.com_all`: the static upright share, the CoM margin, the hills' static tip) or
+`unibody`'s drop mass. The sims' bodies carried them, so the gauges were right; the numbers read off the spec weren't.
+T3 with a 120 mm second link: 4651 g reported, 4758 g real, CoM 8 mm higher. Readers of a part's mass count as
+readers of its size. `robots.limb_mass` is now the one sum.

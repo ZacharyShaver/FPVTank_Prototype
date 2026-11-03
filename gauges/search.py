@@ -184,9 +184,12 @@ def com_all(sp):
     """the whole robot's centre of mass, ground frame: body, wheels and the tail stowed (its servos at its base, link
     and foot along it)"""
     G = sp['M'] * sp['com'] + sum(sp['m_w'] * np.array([x, y, sp['R']]) for x, y in sp['wheels']); lm = sp.get('limb')
-    if lm:
+    if lm:                                                               # a two-link tail's elbow and second link too (2026-11-03)
         pts = RB.limb_points(lm, 0.0, lm['th_stow']); B, tip = np.asarray(lm['base']), pts[7]
-        G = G + lm['m_base'] * B + lm['m_link'] * (B + tip) / 2 + lm['m_foot'] * tip
+        L1, L2 = lm['L'], lm.get('L2', 0.0); at = lambda s: B + (tip - B) * s / (L1 + L2)   # s mm out along the straight tail
+        G = G + lm['m_base'] * B + lm['m_link'] * at(L1 / 2) + lm['m_foot'] * tip
+        if L2:
+            G = G + lm['m_elbow'] * at(L1) + lm['m_link2'] * at(L1 + L2 / 2)
     return G / sp['mass']
 
 
@@ -421,7 +424,7 @@ def search_limb(n_b=1500, gens=8, pop=40):
             allr += new; el = sorted(el + new, key=lambda r: -score(r, w))[:8]
             Eg = np.array([r['x'] for r in el]); mu = 0.6 * Eg.mean(0) + 0.4 * mu; sd = np.maximum(0.6 * Eg.std(0) + 0.4 * sd * 0.8, 0.01 * span)
             b = el[0]
-            print(f'{tag} w={w}: gen {g} best climb {b["climb"]} turn {b["turn"] and round(b["turn"])} up {b["up"]:.2f} tail {b["x"][18] > LIMB_ON}; '
+            print(f'C w={w}: gen {g} best climb {b["climb"]} turn {b["turn"] and round(b["turn"])} up {b["up"]:.2f} tail {b["x"][18] > LIMB_ON}; '
                   f'{sum(score(r, w) > -1e8 for r in new)} of {len(new)} feasible; {time.time() - t0:.0f} s', flush=True)
     F = sorted(front(allr), key=lambda r: r['climb'])
     json.dump(dict(wall_s=round(time.time() - t0), n=len(allr), front=F), open(os.path.join(OUT, 'front.json'), 'w'), indent=1, default=float)

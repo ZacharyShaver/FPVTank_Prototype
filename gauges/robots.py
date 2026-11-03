@@ -96,10 +96,26 @@ def extremes(sp, n=16):
     return np.vstack(pts)
 
 
+def limb_mass(lm):
+    """the tail's mass (g): its base's servos, link and foot, and a two-link tail's elbow servo and second link (left out
+    of the robot's mass and CoM until 2026-11-03, about 90 g light; the sims' bodies always carried them)"""
+    return lm['m_base'] + lm['m_link'] + lm['m_foot'] + (lm['m_elbow'] + lm['m_link2'] if lm.get('L2') else 0.0)
+
+
+def spring_solref(k, zeta, m_kg):
+    """MuJoCo's direct solref (-stiffness, -damping) for a contact that acts as a spring of k N/mm with damping ratio
+    zeta on the m_kg it carries. MuJoCo's direct values are per unit mass (a contact's depth under a load doesn't depend
+    on the mass on it), so a physical spring is k / m and c / m. Until 2026-11-03 k went in as it was, a spring of
+    k x m: a tyre carrying a quarter of a 2 kg robot was 15 N/mm, not 30 (its landings' peak about 30 % low), and the
+    bumpers came out stiffer than labelled"""
+    kk = k * 1e3 / m_kg
+    return -kk, -2 * zeta * np.sqrt(kk)
+
+
 def dims(sp):
     E = extremes(sp); lo, hi = E.min(0), E.max(0); lm = sp.get('limb'); fl = sp.get('flip')
     sp.update(length=float(hi[0] - lo[0]), width=float(hi[1] - lo[1]), height=float(hi[2] - lo[2]),
-              mass=float(sp['M'] + len(sp['wheels']) * sp['m_w'] + (lm['m_base'] + lm['m_link'] + lm['m_foot'] if lm else 0.0)
+              mass=float(sp['M'] + len(sp['wheels']) * sp['m_w'] + (limb_mass(lm) if lm else 0.0)
                          + (len(fl['pivots']) * (fl['m_link'] + fl['m_tip']) if fl else 0.0)),
               belly=float(min(h[:, 2].min() for h in sp['hulls'])))
     return sp
@@ -287,11 +303,11 @@ def xml(sp, mu=1.0, step=None, dt=None, edge='round', extra=None):
     sc = ' conaffinity="3"' if sp.get('solid_tail') else ''              # strict (2026-10-28): body and tyres stop the tail (contype 2)
     ts = ''                                                               # a tyre's own spring (sp['tyre_k'], N/mm; snap.py, 2026-10-28):
     if sp.get('tyre_k'):                                                  # its priority makes its solref govern its contacts
-        k = sp["tyre_k"] * 1e3; b = 2 * sp.get("tyre_zeta", 0.3) * np.sqrt(k * sp["mass"] * 1e-3 / len(sp["wheels"]))
-        ts = f' solref="{-k:.1f} {-b:.2f}"'
+        k, b = spring_solref(sp['tyre_k'], sp.get('tyre_zeta', 0.3), sp['mass'] * 1e-3 / len(sp['wheels']))   # each carries its share
+        ts = f' solref="{k:.1f} {b:.2f}"'
     wb = ''.join(f'<body name="w{i}" pos="{x * S:.4f} {y * S:.4f} {R * S:.4f}"><joint name="j{i}" type="hinge" axis="0 1 0" armature="{arm:.6g}"/>'
                  f'<inertial pos="0 0 0" mass="{mk:.4f}" diaginertia="{It:.6g} {Ie:.6g} {It:.6g}"/>'
-                 f'<geom type="cylinder" size="{R * S:.4f} {sp["TW"] / 2 * S:.4f}" euler="90 0 0" friction="{f["tyre"]}" priority="1"{sc}{ts}/></body>'
+                 f'<geom type="cylinder" name="tyre{i}" size="{R * S:.4f} {sp["TW"] / 2 * S:.4f}" euler="90 0 0" friction="{f["tyre"]}" priority="1"{sc}{ts}/></body>'
                  for i, (x, y) in enumerate(sp['wheels']))
     lm, fl = sp.get('limb'), sp.get('flip'); ca = ' conaffinity="3"' if lm or fl else ''   # the floor also meets the tail and flippers (contype 2)
     floor = f'<geom type="plane" size="8 8 0.1" friction="{f["floor"]}"{ca}/>'
@@ -303,14 +319,14 @@ def xml(sp, mu=1.0, step=None, dt=None, edge='round', extra=None):
     tail, act = '', ''
     if lm:                                                                # the tail meets the floor only, never the robot
         B = np.asarray(lm['base']) * S; L = lm['L'] * S; mb = lm['m_base'] * 1e-3; foot = lm.get('foot_r', FOOT_R) * S
-        cap = lambda a: (f'<geom type="capsule" fromto="0 0 0 {-a:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
-                         f'<geom type="sphere" pos="{-a:.5f} 0 0" size="{foot:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>')
+        cap = lambda a: (f'<geom type="capsule" name="tail_link" fromto="0 0 0 {-a:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
+                         f'<geom type="sphere" name="tail_foot" pos="{-a:.5f} 0 0" size="{foot:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>')
         def rod(m_rod, m_end, a):                                       # a link's mass, centre and pitch inertia: rod plus a point at its end
             m = (m_rod + m_end) * 1e-3; c = -(m_rod * a / 2 + m_end * a) * 1e-3 / m
             return m, c, max((m_rod * a * a / 3 + m_end * a * a) * 1e-3 - m * c * c, 1e-6)
         if lm.get('L2'):                                                # two links (2026-10-30): the elbow's servo at the first link's end
             L2 = lm['L2'] * S; ml, cx, Iy = rod(lm['m_link'], lm['m_elbow'], L); m2, c2, I2 = rod(lm['m_link2'], lm['m_foot'], L2)
-            end = (f'<geom type="capsule" fromto="0 0 0 {-L:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
+            end = (f'<geom type="capsule" name="tail_link0" fromto="0 0 0 {-L:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
                    f'<body name="lelbow" pos="{-L:.5f} 0 0"><joint name="le" type="hinge" axis="0 1 0" range="{ELBOW[0]} {ELBOW[1]}" damping="{LIMB_DAMP}" armature="{LIMB_ARM}"/>'
                    f'<inertial pos="{c2:.5f} 0 0" mass="{m2:.4f}" diaginertia="2e-6 {I2:.6g} {I2:.6g}"/>{cap(L2)}</body>')
         else:
@@ -330,15 +346,15 @@ def xml(sp, mu=1.0, step=None, dt=None, edge='round', extra=None):
             P = np.asarray(P) * S
             tail += (f'<body name="f{i}" pos="{P[0]:.5f} {P[1]:.5f} {P[2]:.5f}"><joint name="fj{i}" type="hinge" axis="0 -1 0" range="{FLIP_RANGE[0]} {FLIP_RANGE[1]}" '
                      f'damping="{LIMB_DAMP}" armature="{LIMB_ARM}"/><inertial pos="{cx:.5f} 0 0" mass="{ml:.4f}" diaginertia="2e-6 {Iy:.6g} {Iy:.6g}"/>'
-                     f'<geom type="capsule" fromto="0 0 0 {L:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
-                     f'<geom type="sphere" pos="{L:.5f} 0 0" size="{FLIP_TIP * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/></body>')
+                     f'<geom type="capsule" name="flip{i}_link" fromto="0 0 0 {L:.5f} 0 0" size="{LINK_R * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/>'
+                     f'<geom type="sphere" name="flip{i}_tip" pos="{L:.5f} 0 0" size="{FLIP_TIP * S:.4f}" contype="2" conaffinity="0" friction="{f["foot"]}"/></body>')
             act += f'<position name="af{i}" joint="fj{i}" kp="{LIMB_KP}" forcelimited="true" forcerange="{-fl["tq"]:.3f} {fl["tq"]:.3f}"/>'
     act = f'<actuator>{act}</actuator>' if act else ''
     meshes = ''.join(f'<mesh name="h{i}" vertex="{" ".join("%.5f" % v for v in (P * S).ravel())}"/>' for i, P in enumerate(sp['hulls']))
     geoms = ''.join(f'<geom type="mesh" mesh="h{i}" friction="{f["body"]}"{sc}/>' for i in range(len(sp['hulls'])))
     geoms += ''.join(f'<geom name="strut{i}" type="capsule" fromto="{" ".join("%.5f" % (v * S) for v in (*p0, *p1))}" size="{r * S:.5f}" friction="{f["body"]}"{sc}/>'
                      for i, (p0, p1, r) in enumerate(sp.get('struts', ())))   # printed supports (2026-10-28, body_tree); none before
-    return f"""<mujoco><option timestep="{dt}"/><default><geom solref="{CONTACT['tc']} {CONTACT['dr']}"/></default>
+    return f"""<mujoco><option timestep="{dt}"/><default><geom solref="{CONTACT['tc']} {CONTACT['dr']}"/><pair solref="{CONTACT['tc']} {CONTACT['dr']}"/></default>
       <asset>{meshes}</asset><worldbody>{floor}
       <body name="robot" pos="0 0 0.5"><freejoint/>
         <inertial pos="{G[0] * S:.5f} {G[1] * S:.5f} {G[2] * S:.5f}" mass="{M * 1e-3:.4f}" fullinertia="{full}"/>
@@ -425,7 +441,38 @@ def roster():
     return [box(t), t, step_layout(), six_wheel(), e4()]
 
 
+def spring_check():
+    """spring_solref: a ball dropped 300 mm onto a 30 N/mm contact (undamped) stays on it half a spring's period,
+    pi sqrt(m / k), whatever it weighs; the control, k fed to MuJoCo as it is (the conversion before 2026-11-03), gives
+    one time for every mass. A two-link tail counts in the robot's mass (limb_mass); the control, one link, weighs less
+    by the elbow and the second link. Exits 1 on a failure"""
+    import math, mujoco
+    bad = 0
+    def stay(m_kg, ref):
+        x = (f'<mujoco><option timestep="0.0001"/><worldbody><geom type="plane" size="1 1 .1"/><body pos="0 0 0.32"><freejoint/>'
+             f'<geom type="sphere" size="0.02" mass="{m_kg}" priority="1" solref="{ref[0]:.3f} {ref[1]:.3f}"/></body></worldbody></mujoco>')
+        M = mujoco.MjModel.from_xml_string(x); d = mujoco.MjData(M); t0 = None
+        while d.time < 1.0:
+            mujoco.mj_step(M, d)
+            if d.ncon and t0 is None:
+                t0 = d.time
+            elif t0 is not None and not d.ncon:
+                return d.time - t0
+    for m_kg in (0.5, 2.0):
+        th = math.pi * math.sqrt(m_kg / 30e3); new = stay(m_kg, spring_solref(30.0, 0.0, m_kg)); old = stay(m_kg, (-30e3, 0.0))
+        ok = abs(new / th - 1) < 0.05 and abs(old / th - 1) > 0.25; bad += not ok
+        print(('PASS ' if ok else 'FAIL ') + f'{m_kg} kg on 30 N/mm: on it {new * 1e3:.2f} ms (a spring: {th * 1e3:.2f}); '
+              f'control, k as it is: {old * 1e3:.2f} ms')
+    one = dict(base=[0.0, 0.0, 0.0], L=100.0, m_base=100.0, m_link=30.0, m_foot=15.0)
+    two = dict(one, L2=100.0, m_elbow=61.0, m_link2=30.0)
+    ok = limb_mass(two) - limb_mass(one) == 91.0; bad += not ok
+    print(('PASS ' if ok else 'FAIL ') + f'a two-link tail weighs {limb_mass(two):.0f} g, one link {limb_mass(one):.0f} g (the elbow and link: 91)')
+    sys.exit(1 if bad else 0)
+
+
 if __name__ == '__main__':
+    if 'spring' in sys.argv[1:]:
+        spring_check()
     for sp in roster():
         print(f"{sp['name']:12s} {sp['mass']:6.0f} g  {sp['length']:4.0f} x {sp['width']:4.0f} x {sp['height']:4.0f} mm  "
               f"belly {sp['belly']:5.1f}  {len(sp['wheels'])} wheels R {sp['R']:.0f}  CoM z {sp['com'][2]:.1f}  {sp['notes']}")

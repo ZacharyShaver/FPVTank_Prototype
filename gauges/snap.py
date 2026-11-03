@@ -13,6 +13,8 @@ The loads come from G1's falls: n drops from 300 mm in random orientations and s
 0.2 ms step, as a 5 ms running mean (MuJoCo's hard contact rings for a step or two), solved every 1 ms. The tyres get a
 spring for these drops (TYRE_K*): the gauges' contact (2 ms, the printed ball's bounce) puts 64 times the robot's
 weight on one wheel in a flat landing, where rubber squashes; 30 N/mm makes it 7. Legs and tubes still land as PLA.
+(That 7 was read with 30 handed to MuJoCo as it was, which MuJoCo takes per unit mass: about 15 N/mm on a 2 kg
+robot's tyre. Since 2026-11-03 robots.spring_solref makes it a physical 30 N/mm, so the same landings read harder.)
 
 Sizing: every segment to SIGMA_ULT / SF, never under R_FLOOR (fully stressed: each radius scaled by the cube root of its
 stress over the allowed, the frame solved again, until it settles), the worst load cases kept; then the design is

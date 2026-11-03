@@ -1122,7 +1122,7 @@ def old_landing(sp):
     for (x, y), tb in zip(sp['wheels'], pt['tubes']):
         sg = np.sign(y); mos.append(dict(x=x, z=sp['R'], yc=sg * (abs(y) + sp['TW'] / 2 - B.MOTOR['rim_in'] - B.MOTOR['half'][1]), y=y,
                                          y_out=tb['y1'] if sg > 0 else tb['y0']))
-    ms, _, _, Fr = mass_of(F, ax); lm = sp.get('limb'); m_tail = lm['m_base'] + lm['m_link'] + lm['m_foot'] if lm else 0.0
+    ms, _, _, Fr = mass_of(F, ax); lm = sp.get('limb'); m_tail = RB.limb_mass(lm) if lm else 0.0
     mass = sum(m for _, m, _ in B.parts()[1]) + len(mos) * (B.MOTOR['m'] + sp['m_w']) + ms + m_tail
     L = landing(Fr, ax, mos, bay, mass)
     import drops as DR                                                  # and G1's falls, in body_tree's own sim shapes
