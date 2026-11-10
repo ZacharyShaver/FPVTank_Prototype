@@ -32,6 +32,12 @@
       "port": 8770
     },
     {
+      "name": "twin-out",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8771", "--directory", "twin/out"],
+      "port": 8771
+    },
+    {
       "name": "site-out",
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8769", "--directory", "site/out"],

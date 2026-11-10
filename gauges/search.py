@@ -39,6 +39,12 @@ HI = np.array([95.0, 200.0, -40.0, 90.0, 80.0, 15.0, 1.0, 1.0, 60.0, 320.0, 320.
 NO_LIMB = [0.0, 200.0, 1.0, -60.0, 150.0, 1.0, 131.0, 1.0, 1.0]           # knobs 18 on, for shorter vectors: no tail, the Trainer's drive
 TRACK0 = 131.0                                                            # chassis3.Y_W: the wheels' centre planes from the centre line
 TRACK_R = None                                                            # the rear axle's own track (mm; knobs.make sets it): None, as front
+# The head out of the body (Zach, 2026-11-07: "Theres a good chance that is going to be blocked in some way for most
+# bodies. We would want the flexibility to be able to move that somewhere else"). knobs.make sets HEAD_OUT for a design
+# with a head_f knob: the skin, or the Trainer's hull, leaves out the head's parts, and knobs._place_head seats the head
+# on the body's top. The runs before have no head_f, so they build as they ran.
+HEAD = ('base', 'drum', 'cradle', 'ball')
+HEAD_OUT = False
 LIMB_ON = 0.3                                                             # limb > 0.3: a tail (seven designs in ten)
 BASE = dict(R=55.0, xf=91.0, xr=-93.0, clr=32.4, dxp=0.0, dzp=0.0, six=0.0, shell=0.0, xc=0.0, af=200.0, ar=200.0, b=200.0,
             zc=100.0, cu=200.0, cd=150.0, p=2.0, qu=2.0, qd=2.0, **dict(zip(KEYS[18:], NO_LIMB)))   # chassis3's Trainer stand-in
@@ -85,7 +91,8 @@ def shell_mass(Q, z0=None):
 
 # The shell is the body (Zach, 2026-10-26: "why have a shell and a body?"). With a shell, the Trainer's walls and trim
 # come out, mass and outline (about 416 g: tub, carapace, bed, deck, claws and their lights, corners, seals, intake),
-# and one closed 1.5 mm skin wraps the searched shape and every part inside: the head (inside, for now: Zach), the Pi
+# and one closed 1.5 mm skin wraps the searched shape and every part inside: the head (inside, for now: Zach; superseded
+# 2026-11-07 for new runs, the head sits on top: HEAD_OUT below), the Pi
 # stack, packs, ESCs, UBECs and the rest, and a box round each motor out to its tyre. Without a shell, the design is
 # the Trainer's own body, as before. The first shape search ("search", 2026-10-26) laid the shell over the whole body
 # instead, counting the walls twice: superseded.
@@ -105,6 +112,19 @@ def components():
             P = np.asarray(v, float) - [0, 0, C3.G0]
             _COMP[k] = P[ConvexHull(P).vertices] if len(P) > 8 else P
     return _COMP
+
+
+_BNH = None
+
+
+def _base_no_head():
+    """chassis3.base()'s hull without the head's parts (HEAD_OUT), ground frame at the base clearance"""
+    global _BNH
+    if _BNH is None:
+        import chassis3 as C3, pose3 as P3
+        c = P3.C()['pts']; skip = C3.MOD + ('armbase_', 'rest_peg') + HEAD
+        P = np.vstack([v for k, v in c.items() if not k.startswith(skip)]); _BNH = P[ConvexHull(P).vertices] - [0, 0, C3.G0]
+    return _BNH
 
 
 def build_x(x):
@@ -137,10 +157,15 @@ def build(x, name='gen'):
                  for n, m, q in items]                                    # each motor scales its mass and rides with its wheel
         if tr < TRACK0:                                                   # the Trainer's pods just fit at 131
             notes.append(f'motor {TRACK0 - tr:.0f} mm into the hull: repack')
-    body = D['pts']; z0 = float(body[:, 2].min()); hulls = [body]
+    body = D['pts']; z0 = float(body[:, 2].min())
+    if HEAD_OUT and p['shell'] <= 0.5:                                    # the Trainer's hull without its head
+        body = _base_no_head() + [0.0, 0.0, p['clr'] - C3.base()['clr0']]
+    hulls = [body]
     if p['shell'] > 0.5:                                                  # the skin replaces the walls
         dz = p['clr'] - C3.base()['clr0']; pts = []
         for k, P in components().items():
+            if HEAD_OUT and k in HEAD:
+                continue
             pts.append(P + [p['dxp'] if k.startswith('pack') else 0.0, 0.0, dz + (p['dzp'] if k.startswith('pack') else 0.0)])
         for xa, ya in axles:                                              # each motor, out to its tyre's inner face
             sg = np.sign(ya); yi = abs(ya) - 23.0

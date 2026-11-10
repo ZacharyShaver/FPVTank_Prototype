@@ -81,9 +81,30 @@ macros. Cancelling can't be undone: confirm it with him first unless he said "ca
 - `cancel` can take longer than 10 s to answer while CANCEL_PRINT runs; `k2.py` now waits 60 s. Read
   `status` after it either way.
 
+## Things learned (2026-11-09)
+
+- **Rafts and Orca's arrange:** arrange ignores the raft, so small parts can come out too close: "gcode path conflicts found". Lay them out in one STL with room between them (`bodies=5` then reads as expected in the mesh report), and slice that.
+
+## No calibration from here (2026-11-04)
+
+Zach: "no more mucking with calibration for claude." Send no leveling, calibration, self-test, homing or other raw
+G-code through `/printer/gcode/script`. If a print needs leveling, say so and he runs it from the printer's screen.
+For printer trouble, read only: `/server/gcode_store?count=400` (the console), and `/server/files/logs/klippy.log` and
+`moonraker.log` (which client sent what). On 2026-11-04 those showed a Y-axis fault starting at the first filament
+cut after the tub print, not at the leveling run before it. The cause (Zach, 2026-11-07): the printer had been moved
+onto an uneven floor and rocked, which knocked the magnetic hotend cover partly off. The frame's push rod then jammed
+into the cover instead of reaching the cutter. Reseating the cover fixed it; a factory reset hadn't. **If a cut
+throws key789, first check that the cover is seated and the printer stands level.**
+
+Reading a cut: an unload drives the head left at 500 mm/s into the frame-mounted push rod to fire the cutter, so
+the bang is normal. A clean cut logs `[box] cut sensor detected`, then `cut to return OK`, then `cut sensor detected`
+again, and `motor_control` reports `cut.state: true` at rest, so none of those mean a stuck cutter. The fault was
+`key789` ("position tracking error too large", 位置跟踪误差过大) within seconds of the cut, then a force stop.
+
 ## Things learned (2026-11-03)
 
-- **Leveling before a print** (when Zach asks for calibration): run the printer's own macro through Moonraker's
+- **SUPERSEDED 2026-11-04 by the section above; kept for the record.**
+  **Leveling before a print** (when Zach asks for calibration): run the printer's own macro through Moonraker's
   `/printer/gcode/script` with `BED_MESH_CALIBRATE_START_PRINT BED_TEMP=50 EXTRUDER_TEMP=220`, then `start`. It
   heats, homes, cleans the nozzle and probes a 9 x 9 mesh in about 6 min. It also sets `START_PRINT`'s `prepare`
   to 1, so the print keeps that mesh and skips re-homing. Flow calibration (`PRINT_CALIBRATION`) is Creality's

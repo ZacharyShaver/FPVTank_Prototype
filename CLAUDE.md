@@ -71,6 +71,29 @@ output (`**/out/`, `reference/downloads/`) stays untracked. Layout and commands:
 - Run the mesh report (`export.health`) on every export. Run the needle repair (`export.tidy`) when
   his Fusion export carries degenerate triangles.
 
+## Working rules
+
+From the 2026-11-08 audit of `docs/decisions.md`. Zach: the sim "ran away way too far vs what we can test".
+
+- **The sim stays within reach of a test.** Before a new search, gauge or knob, name the real test that will
+  check it. If nothing owned or on order can run that test, park the work. A search needs one real reading on
+  each gauge it ranks by. By 2026-11-08 the runs had screened about 23,000 designs with no gauge read on a
+  full-size robot.
+- **No winner without a spread.** Read a design with at least two seed sets and run `gauges/noisy.py` before
+  reporting it, and give the spread with the number. T3 read 50, 90 or 150 mm on the same step.
+- **Three sets on one subsystem means stop patching.** Redraw from the requirement and ask what forces the route.
+  Don't reject an option because of something that option would remove. The wire lane ran six sets.
+- **Requirement before part.** Before a subsystem's first print, write what the robot needs from it, why, and
+  what would kill it. The head had 11 print sets before the roll question was asked.
+- **A rule carries what it was tested on.** Past that range it's a guess: small test piece first, and glasses on
+  for press fits. A zero-offset horn pocket threw the horn into his eye.
+- **Answer his plain questions before showing a design:** how does it get in, why does it go this way, what
+  happens upside down, what holds it? They caught what the checks missed.
+- **Ask for the goal first, and bring at most three calls at once.** Of 11 picks approved together, 8 changed
+  within a day.
+- **Keep the log current.** At the end of a session, log his calls, mark the old entry and any test that no longer
+  covers the design, and ask whether to commit.
+
 ## Deliverables
 
 Every hand-off has:

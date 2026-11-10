@@ -1,0 +1,265 @@
+<meta charset="utf-8">
+<title>Trainer Tub Fit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one workbench screen. The 3D stage takes the room; a narrow spec panel sits beside it (below it on a phone). */
+:root{
+  --bg:#eceff3; --panel:#ffffff; --stage:#dde3ea; --fg:#1b2330; --muted:#5a6575; --line:#d3dae3;
+  --accent:#2c64a8; --accent-ink:#ffffff; --chip:#eef2f7; --warn:#b8402f;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151c; --panel:#171e28; --stage:#0b1016; --fg:#e4e9f0; --muted:#94a1b2; --line:#283240;
+  --accent:#6ea6e6; --accent-ink:#0b1016; --chip:#1f2835; --warn:#ef7a66; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151c; --panel:#171e28; --stage:#0b1016; --fg:#e4e9f0; --muted:#94a1b2; --line:#283240;
+  --accent:#6ea6e6; --accent-ink:#0b1016; --chip:#1f2835; --warn:#ef7a66; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--f-body);margin:0}
+.wrap{display:flex;flex-direction:column;gap:12px;min-height:100%;box-sizing:border-box;
+  padding-block:14px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+h1{font:600 26px/1.1 var(--f-display);letter-spacing:.01em;margin:0;text-wrap:balance}
+header p{margin:0;color:var(--muted);max-width:68ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+.stage{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  height:max(420px,calc(100vh - 120px))}
+aside{max-height:max(420px,calc(100vh - 120px));overflow-y:auto}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.views{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+.hint{position:absolute;left:10px;bottom:8px;font:12px var(--f-mono);color:var(--muted);pointer-events:none}
+button,.btn{font:500 13px var(--f-body);color:var(--fg);background:var(--panel);border:1px solid var(--line);
+  border-radius:7px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0}
+.blk{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.blk h2{font:600 15px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase;margin:0;color:var(--muted)}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.pan{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.pan[hidden]{display:none}
+.pan output{font:500 13px var(--f-mono);min-width:4.5ch;text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.sel .name{font:600 17px/1.25 var(--f-display);margin:0}
+.sel p{margin:0}
+.sel .none{color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:2px}
+.grp{font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.row{display:grid;grid-template-columns:auto 12px 1fr;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer}
+.row:hover{background:var(--chip)}
+.row.on{background:var(--chip)}
+.row input{margin:0}
+.sw{width:12px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.25)}
+.row .nm{all:unset;cursor:pointer;min-width:0}
+.row .nm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.found{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.stage{height:58vh;min-height:320px}aside{max-height:none;overflow:visible}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Trainer Tub Fit</h1>
+    <p>Print 1 with your parts where the sim puts them, the head left out: it becomes its own module. Drag to turn, right-drag to move, scroll to zoom, click a part to read about it.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="views" role="group" aria-label="Views">
+        <button data-view="iso">3/4</button><button data-view="top">Top</button><button data-view="side">Side</button>
+        <button data-view="front">Nose</button><button data-view="back">Back</button>
+      </div>
+      <div class="hint">mm · floor at 0 · nose to +x</div>
+    </div>
+    <aside>
+      <section class="blk" aria-labelledby="h-show">
+        <h2 id="h-show">Show</h2>
+        <div class="toggles">
+          <button id="t-ghost" aria-pressed="false">See-through tub</button>
+          <button id="t-lift" aria-pressed="false">Lift parts out</button>
+          <button id="t-cut" aria-pressed="false">Cut down the middle</button>
+          <button id="t-wheels" aria-pressed="false">Wheels</button>
+          <button id="t-cap" aria-pressed="true">250 mm line</button>
+        </div>
+        <div class="pan" id="panrow" hidden><label for="pan">Head pan</label><input id="pan" type="range" min="-90" max="90" step="1" value="0"><output id="panv" for="pan">0°</output></div>
+      </section>
+      <section class="blk sel" aria-live="polite" id="sel"><p class="none">Click a part, in the view or in the list.</p></section>
+      <section class="blk" aria-labelledby="h-parts">
+        <h2 id="h-parts">Parts</h2>
+        <div class="list" id="list"></div>
+      </section>
+      <section class="blk" aria-labelledby="h-found">
+        <h2 id="h-found">What you found</h2>
+        <ul class="found">
+          <li>Everything goes in. Nothing is tight.</li>
+          <li>Packs and ESCs fit with a bit of extra room.</li>
+          <li>Nothing holds anything yet.</li>
+          <li>The back is pretty much empty: that's where the parts not bought yet go.</li>
+          <li>The tub is longer than it needs to be.</li>
+          <li>The head comes out of the box: most bodies would block it, so it becomes its own module that can move.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+(function(){
+if(!window.TUB){document.getElementById('stage').textContent='This is the page\'s template, with no model in it. Open twin/out/tub_view.html (python twin/tub_view.py writes it).';return;}
+const COL={tub:0xd9c39e,pack_L:0x2f5fae,pack_R:0x2f5fae,esc_L:0x2b2d31,esc_R:0x2b2d31,pi:0x2f8a58,hat:0x3fa36f,hailo:0x1d6b45,
+  pca:0x6c52a3,base:0xc59d73,drum:0xb3875a,cradle:0xd4b48a,ball:0xcbb497};
+const UNB=['arm_ubec','ubec','ina219','wifi','alarm','pi_switch'];
+UNB.forEach(k=>COL[k]=0xd0453a);
+const NOTE={
+ tub:'Printed 2026-11-03: <span class="num">10 h 23 min</span>, <span class="num">236 g</span> of PLA, <span class="num">276 × 140 × 50</span>. Nothing in it holds a part yet. Four posts in the nose locate the head base; a pad on each corner takes a wheel pod.',
+ pack:'Zeee 2S 5200, <span class="num">141 × 46 × 26</span>, stood on edge in a bay along the wall. Sim: <span class="num">0.5</span> to the wall and <span class="num">1.0</span> to the tunnel. You: fits well enough, with a bit of extra room. Nothing holds it down.',
+ esc:'Your caliper size, <span class="num">45 × 24 × 34</span>. <span class="num">3 mm</span> spare across the <span class="num">26.5</span> bay and <span class="num">0.5</span> between its two stops. It sits end to end with its pack behind a <span class="num">1.5 mm</span> stop, so the sim leaves no room there for the T-plug.',
+ pi:'Pi 5 with its cooler, the M.2 HAT+ and the Hailo-8L. It sits loose on the tunnel roof: no mounts yet. The stack stands <span class="num">5.3 mm</span> over the tub\'s top. This model stops at the HAT. Your caliper: <span class="num">25</span> from the bottom of the board to the top of the HAT, <span class="num">55</span> from the standoff screw to the top of the Dupont plugs.',
+ pca:'Loose on the tunnel roof, no mounts.',
+ base:'Its own module now, out of the box (your call): shown where the sim has it. In print 1 it sits on the nose floor between four 7 mm posts, <span class="num">0.8–0.9 mm</span> clear of each, <span class="num">0.6 mm</span> from the nose wall. Nothing holds it down.',
+ head:'Its own module now, out of the box. Try the pan slider: the cradle starts <span class="num">12 mm</span> above the rim, so its <span class="num">44 mm</span> sweep clears print 1.',
+ unbought:'The sim\'s guess for a part that isn\'t bought yet. These fill the back of the tub, the part you found empty.',
+ wheels:'Wheels and motor pods as the sim has them (<span class="num">110 × 46</span> tyres). Each pod bolts to a pad on the tub\'s corner.',
+ cap:'<span class="num">250 mm</span> from the back of the tub. With the head out, every other part ends before it: the packs stop at <span class="num">100</span>, so a 250 mm box holds them all as laid out, with about <span class="num">5 mm</span> to spare inside its front wall. The parts span <span class="num">239 mm</span> (<span class="num">270</span> with the head).'};
+const ENTRIES=[
+ ['Tub',[['tub','Tub, print 1',['tub'],'tub']]],
+ ['Power',[['pack_L','Pack, left',['pack_L'],'pack'],['pack_R','Pack, right',['pack_R'],'pack'],
+           ['esc_L','ESC, left',['esc_L'],'esc'],['esc_R','ESC, right',['esc_R'],'esc']]],
+ ['Brain',[['pi','Pi 5 + HAT + Hailo',['pi','hat','hailo'],'pi'],['pca','PCA9685 servo board',['pca'],'pca']]],
+ ['Head: its own module',[['base','Head base',['base'],'base'],['drum','Drum',['drum'],'head'],['cradle','Cradle',['cradle'],'head'],['ball','Ball',['ball'],'head']]],
+ ['Not bought yet',UNB.map(k=>[k,TUB[k].label,[k],'unbought'])],
+ ['Wheels',[['wheels','Wheels and pods',Object.keys(TUB).filter(k=>TUB[k].group==='wheels'),'wheels']]]];
+const byKey={};ENTRIES.forEach(([,es])=>es.forEach(e=>e[2].forEach(k=>byKey[k]=e)));
+
+const stage=document.getElementById('stage');
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.localClippingEnabled=true;stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(35,1,10,4000);cam.up.set(0,0,1);   // near 10: depth precision, so touching faces don't flicker
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=80;ctl.maxDistance=2500;
+scene.add(new THREE.HemisphereLight(0xffffff,0x6b6355,.75));
+const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(180,-260,420);scene.add(sun);
+const fill=new THREE.DirectionalLight(0xffffff,.3);fill.position.set(-300,240,160);scene.add(fill);
+const grid=new THREE.GridHelper(400,16,0x8a94a3,0x8a94a3);grid.rotation.x=Math.PI/2;grid.position.z=META.ground;
+grid.material.transparent=true;grid.material.opacity=.25;scene.add(grid);
+
+function dec(b64,T){const s=atob(b64),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new T(u.buffer);}
+// Smooth the normals only across shallow edges: flat faces stay flat and curves stay round, no blotches at hard corners.
+function creased(g,deg){const src=g.index?g.toNonIndexed():g,p=src.attributes.position.array,tris=p.length/9,cos=Math.cos(deg*Math.PI/180);
+  const fn=new Float32Array(tris*3),n=new Float32Array(p.length),map=new Map();
+  const key=i=>Math.round(p[i]*100)+'_'+Math.round(p[i+1]*100)+'_'+Math.round(p[i+2]*100);
+  for(let t=0;t<tris;t++){const a=t*9,ux=p[a+3]-p[a],uy=p[a+4]-p[a+1],uz=p[a+5]-p[a+2],vx=p[a+6]-p[a],vy=p[a+7]-p[a+1],vz=p[a+8]-p[a+2];
+    const x=uy*vz-uz*vy,y=uz*vx-ux*vz,z=ux*vy-uy*vx,l=Math.hypot(x,y,z)||1;fn[t*3]=x/l;fn[t*3+1]=y/l;fn[t*3+2]=z/l;
+    for(let c=0;c<3;c++){const k=key(a+c*3);let s=map.get(k);if(!s)map.set(k,s=[]);s.push(t);}}
+  for(let t=0;t<tris;t++)for(let c=0;c<3;c++){const i=t*9+c*3;let x=0,y=0,z=0;
+    for(const o of map.get(key(i))){if(fn[t*3]*fn[o*3]+fn[t*3+1]*fn[o*3+1]+fn[t*3+2]*fn[o*3+2]>=cos){x+=fn[o*3];y+=fn[o*3+1];z+=fn[o*3+2];}}
+    const l=Math.hypot(x,y,z)||1;n[i]=x/l;n[i+1]=y/l;n[i+2]=z/l;}
+  src.setAttribute('normal',new THREE.BufferAttribute(n,3));return src;}
+const cut=new THREE.Plane(new THREE.Vector3(0,1,0),-3.75);
+const meshes={};
+const P=META.pan, headGroup=new THREE.Group();headGroup.position.set(P[0],P[1],0);
+const lifters=new THREE.Group();scene.add(lifters);lifters.add(headGroup);
+const edgeMats=[];
+for(const k in TUB){const d=TUB[k],raw=new THREE.BufferGeometry();
+  raw.setAttribute('position',new THREE.BufferAttribute(dec(d.v,Float32Array),3));raw.setIndex(new THREE.BufferAttribute(dec(d.f,Uint32Array),1));
+  const g=creased(raw,30);
+  const isW=d.group==='wheels',unb=d.group==='unbought';
+  const c=COL[k]??(k.startsWith('tire')?0x2e2f33:k.startsWith('rim')?0x9aa1ab:k.startsWith('motor')?0x6d7480:0xd9c39e);
+  const m=new THREE.MeshStandardMaterial({color:c,roughness:k==='tub'?.8:.55,metalness:k.startsWith('motor')?.3:0,side:THREE.DoubleSide,
+    transparent:unb,opacity:unb?.55:1,depthWrite:!unb});
+  const me=new THREE.Mesh(g,m);me.userData.key=k;meshes[k]=me;
+  if(['drum','cradle','ball'].includes(k)){g.translate(-P[0],-P[1],0);headGroup.add(me);}
+  else if(k==='tub'||isW)scene.add(me); else lifters.add(me);
+  const em=new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:.3});edgeMats.push(em);
+  me.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,30),em));   // hard edges, so a part reads as a shape
+  if(isW||d.group==='head')me.visible=false;}
+// the 250 mm line
+const capMat=new THREE.MeshBasicMaterial({color:0xd0453a,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false});
+const cap=new THREE.Mesh(new THREE.PlaneGeometry(170,90),capMat);cap.rotation.y=Math.PI/2;cap.position.set(META.cap_x,3.75,45);
+const capEdge=new THREE.LineSegments(new THREE.EdgesGeometry(cap.geometry),new THREE.LineBasicMaterial({color:0xd0453a}));cap.add(capEdge);
+cap.userData.key='cap';scene.add(cap);
+
+// views
+const ctr=new THREE.Vector3(-4,3.75,28);
+const VIEWS={iso:[[.55,-.75,.62],185],top:[[0,-.001,1],160],side:[[0,-1,.08],160],front:[[1,0,.18],110],back:[[-1,0,.25],110]};
+let curView='iso',moved=false;
+ctl.addEventListener('start',()=>{moved=true;});
+function view(n){curView=n;moved=false;const [d,r]=VIEWS[n];const v=Math.PI*cam.fov/360,h=Math.atan(Math.tan(v)*cam.aspect);
+  const dist=r/Math.tan(Math.min(v,h))*1.08;   // r: the radius to fit, mm
+  cam.position.copy(ctr).add(new THREE.Vector3(...d).normalize().multiplyScalar(dist));ctl.target.copy(ctr);ctl.update();}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>view(b.dataset.view)));
+
+// toggles
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lift=0,liftTo=0;
+function press(id,on){document.getElementById(id).setAttribute('aria-pressed',on);}
+function tog(id,fn){const b=document.getElementById(id);b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';press(id,on);fn(on);});}
+tog('t-ghost',on=>{const m=meshes.tub.material;m.transparent=on;m.opacity=on?.28:1;m.depthWrite=!on;m.needsUpdate=true;});
+tog('t-lift',on=>{liftTo=on?95:0;});
+tog('t-cut',on=>{Object.values(meshes).forEach(me=>{me.material.clippingPlanes=on?[cut]:[];});edgeMats.forEach(m=>{m.clippingPlanes=on?[cut]:[];});if(on)view('side');});
+tog('t-wheels',on=>{byKeyGroup('wheels').forEach(k=>{meshes[k].visible=on;});syncList();});
+tog('t-cap',on=>{cap.visible=on;if(on)pick('cap');});
+function byKeyGroup(g){return Object.keys(TUB).filter(k=>TUB[k].group===g);}
+const pan=document.getElementById('pan'),panv=document.getElementById('panv');
+pan.addEventListener('input',()=>{const a=+pan.value;headGroup.rotation.z=a*Math.PI/180;panv.textContent=(a>0?'+':'')+a+'°';});
+
+// list
+const list=document.getElementById('list');const rows={};
+function hex(c){return '#'+c.toString(16).padStart(6,'0');}
+ENTRIES.forEach(([g,es])=>{const h=document.createElement('div');h.className='grp';h.textContent=g;list.appendChild(h);
+  // The checkbox shows and hides; the name selects. Not a <label>: clicking a label's text would also flip its checkbox.
+  es.forEach(([id,label,keys,note])=>{const r=document.createElement('div');r.className='row';
+    const c=COL[keys[0]]??0x2e2f33;
+    r.innerHTML='<input type="checkbox" id="p-'+id+'" aria-label="Show '+label+'"><span class="sw" style="background:'+hex(c)+'"></span><button type="button" class="nm">'+label+'</button>';
+    const cb=r.querySelector('input');cb.checked=keys.some(k=>meshes[k].visible);
+    cb.addEventListener('change',()=>{keys.forEach(k=>meshes[k].visible=cb.checked);syncList();});
+    r.addEventListener('click',e=>{if(e.target!==cb)pick(keys[0]);});
+    list.appendChild(r);rows[id]=r;});});
+const panrow=document.getElementById('panrow');
+function syncList(){ENTRIES.forEach(([,es])=>es.forEach(([id,,keys])=>{rows[id].querySelector('input').checked=keys.some(k=>meshes[k].visible);}));
+  press('t-wheels',byKeyGroup('wheels').some(k=>meshes[k].visible));
+  panrow.hidden=!['drum','cradle','ball'].some(k=>meshes[k].visible);}   // the slider only turns the head, so it shows with the head
+
+// selection
+const sel=document.getElementById('sel');let lit=[];
+function glow(keys){lit.forEach(k=>meshes[k]&&meshes[k].material.emissive.setHex(0));lit=keys;keys.forEach(k=>meshes[k]&&meshes[k].material.emissive.setHex(0x5a3a00));}
+function pick(k){Object.values(rows).forEach(r=>r.classList.remove('on'));
+  if(k==='cap'){glow([]);sel.innerHTML='<p class="name">250 mm line</p><p>'+NOTE.cap+'</p>';return;}
+  const e=byKey[k];if(!e){glow([]);sel.innerHTML='<p class="none">Click a part, in the view or in the list.</p>';return;}
+  if(!e[2].some(x=>meshes[x].visible)){e[2].forEach(x=>{meshes[x].visible=true;});syncList();}   // reading about a hidden part shows it
+  glow(e[2]);rows[e[0]].classList.add('on');
+  const lab=e[0]==='wheels'?'Wheels and pods':TUB[k].label;
+  sel.innerHTML='<p class="name">'+lab+'</p><p>'+NOTE[e[3]]+'</p>';}
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(e.button!==0||!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
+  const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+  ray.setFromCamera(ptr,cam);const objs=Object.values(meshes).filter(m=>m.visible).concat(cap.visible?[cap]:[]);
+  const cutOn=document.getElementById('t-cut').getAttribute('aria-pressed')==='true';
+  const hits=ray.intersectObjects(objs,false).filter(h=>!cutOn||cut.distanceToPoint(h.point)>=0||h.object===cap);
+  // You can see through the 250 mm line and the see-through tub, so a click goes through them to the part behind.
+  const ghostOn=document.getElementById('t-ghost').getAttribute('aria-pressed')==='true';
+  const hit=hits.find(h=>h.object!==cap&&!(ghostOn&&h.object===meshes.tub))||hits[0];
+  pick(hit?hit.object.userData.key:null);});
+
+// theme
+function bg(){const c=getComputedStyle(document.documentElement).getPropertyValue('--stage').trim()||'#dde3ea';renderer.setClearColor(new THREE.Color(c));}
+bg();window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',bg);
+new MutationObserver(bg).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+
+let fitted=false;
+function size(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+  if(!fitted||!moved){fitted=true;view(curView);}}   // refit to the pane until you've moved the camera yourself
+new ResizeObserver(size).observe(stage);size();
+(function loop(){requestAnimationFrame(loop);lift+=reduce?(liftTo-lift):(liftTo-lift)*.14;lifters.position.z=lift;ctl.update();renderer.render(scene,cam);})();
+})();
+</script>

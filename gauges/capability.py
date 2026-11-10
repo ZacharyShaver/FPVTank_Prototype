@@ -56,13 +56,21 @@ STRICT = RUN != 'capability'
 # The rough run (SCORPION_CAP=capability_rough, 2026-11-02): Zach, "we need to implement a system of weights for every
 # test add rough terrain". The tow run plus G8 rough ground (rough.py) as an eighth gauge; the all-rounder is weighted
 # by weights.WEIGHTS in every run (equal weights: the worst rank, as before).
+# The 250 mm run (SCORPION_CAP=capability_250, 2026-11-07): Zach capped the body and wheels at 250 mm ("Longer prints
+# are easy on pla, if we want better materials it gets more risky depending on how long it prints for"; the claws and
+# tail don't count) and took the head out of the body ("We would want the flexibility to be able to move that somewhere
+# else"). The rough run's protocol; the head sits on the body's top at a new knob (knobs.HEAD_KNOBS); a design whose
+# body print is over CAP_MM on any side is refused (knobs.cap_problems); every body is a skin (the Trainer's own tub is
+# 276 mm long); the skin's size knobs span what the cap allows (CAP_RANGES).
+CAP = RUN == 'capability_250'
+CAP_MM = 250.0 if CAP else None
 LOW = RUN == 'capability_low'
-ROUGH = RUN == 'capability_rough'
-TOW = RUN in ('capability_tow', 'capability_rough')                       # the tow run (2026-11-02): the real run with G7 tow in
-REAL = RUN in ('capability_real', 'capability_tow', 'capability_rough')   # place of push (tow.py); push is still read in the finals
+ROUGH = RUN in ('capability_rough', 'capability_250')
+TOW = RUN in ('capability_tow', 'capability_rough', 'capability_250')     # the tow run (2026-11-02): the real run with G7 tow in
+REAL = RUN in ('capability_real', 'capability_tow', 'capability_rough', 'capability_250')   # place of push (tow.py); push is still read in the finals
 if REAL:                                                                  # and G2 read pooled (gauges.STEP_RULE): the rung rule's
     GG.STEP_RULE = 'pooled'                                               # reading of one design swung 50-150 mm with the seeds
-WIDE = RUN in ('capability_tail', 'capability_low', 'capability_real', 'capability_tow', 'capability_rough')
+WIDE = RUN in ('capability_tail', 'capability_low', 'capability_real', 'capability_tow', 'capability_rough', 'capability_250')
 OUT = os.path.join(config.GAUGES_OUT, RUN)
 SCREENS = os.path.join(OUT, 'screens.jsonl')
 SEED_FROM = os.path.join(config.GAUGES_OUT, 'capability_tail', 'screens.jsonl') if LOW else None
@@ -78,12 +86,15 @@ LOW_TOP = 160.0                                                           # mm: 
 
 
 def build(q, why=None):
-    return K.make(q, strict=STRICT, real=REAL, why=why)
+    return K.make(q, strict=STRICT, real=REAL, why=why, cap=CAP_MM)
 
 
 def t3_ref():
     """T3 as this run builds it, the reference on its pages and finals: the real build refuses T3 as it is (its motors
-    8-9 mm into the ESCs and packs at track 114), so there T3 at track 130, where they clear"""
+    8-9 mm into the ESCs and packs at track 114), so there T3 at track 130, where they clear. The 250 mm run: T3's
+    head on its top (T3_HEAD_F), not held to the cap (its skin is 323 mm long)"""
+    if CAP:
+        return K.make(dict(K.T3, track=130.0, head_f=T3_HEAD_F), strict=STRICT, real=REAL)
     return build(K.T3) or build(dict(K.T3, track=130.0))
 HEIGHTS_EXT = tuple(range(10, 160, 10)) + tuple(range(175, 301, 25))    # past G2's 150 mm top, for this run only
 HELD_K = (() if WIDE else K.DEAD) + ('tyre_mu',) + (('msize',) if STRICT else ()) + (() if WIDE else ('L2', 'rear_up'))   # strict: the stock 37 mm
@@ -94,6 +105,16 @@ HELD_K = (() if WIDE else K.DEAD) + ('tyre_mu',) + (('msize',) if STRICT else ()
 SPACE = [(k, lo, hi) for _, k, lo, hi, _ in K.KNOBS if k not in HELD_K] + ([('track_r', 110.0, 180.0)] if STRICT else []) \
         + [('limb', 0.0, 1.0), ('six', 0.0, 1.0), ('shell', 0.0, 1.0)] \
         + ([(k, lo, hi) for _, k, lo, hi, _ in K.FLIP_KNOBS] + [('flip', 0.0, 1.0), ('f_tail', 0.0, 1.0), ('f_nose', 0.0, 1.0)] if WIDE else [])
+# The 250 mm run's ranges for the knobs that set the body's size: the old ones reached a 520 mm skin, a 400 mm width and
+# a 340 mm wheelbase, and not one of 480 samples passed the cap. The parts inside span 239 mm, so the skin's reach
+# fore and aft can only shape it inside that; the width keeps the skin and the motor pods under 250; the axles stay
+# under the body. Picked so about half the samples pass (gauges/README.md, "The 250 mm run").
+CAP_RANGES = dict(af=(40.0, 110.0), ar=(40.0, 110.0), xc=(-15.0, 10.0), b=(60.0, 125.0), zc=(30.0, 160.0), cu=(20.0, 150.0),
+                  cd=(20.0, 120.0), dxp=(-80.0, 10.0), R=(35.0, 70.0), gap=(15.0, 80.0), xw=(-25.0, 15.0),
+                  track=(126.0, 142.0), track_r=(126.0, 142.0))
+T3_HEAD_F = 1.0
+if CAP:                                                                   # every body a skin; the head's place a knob
+    SPACE = [(k,) + CAP_RANGES.get(k, (lo, hi)) for k, lo, hi in SPACE if k != 'shell'] + [(k, lo, hi) for _, k, lo, hi, _ in K.HEAD_KNOBS]
 KEYS = [k for k, _, _ in SPACE]; LO = np.array([a for _, a, _ in SPACE]); HI = np.array([b for _, _, b in SPACE])
 GAUGES = (('up', 1), ('climb', 1), ('turn', -1), ('h_up', 1), ('h_down', 1), ('crest', 1), (('tow', 1) if TOW else ('push', 1))) \
          + ((('rough', 1),) if ROUGH else ())
@@ -102,7 +123,7 @@ COUNT = W.counted([g for g, _ in GAUGES])                                 # the 
 LOW_STREAMS = {'st_0.1': 0.1, 'st_0.25': 0.25, 'st_0.5': 0.5, 'st_1': 1.0, 'turn450': None}   # w; turn450: the most step inside 450 mm
 UP_MIN, TURN_CAP = 0.75, 450.0                                            # G1's floor; turn450's circle (mm)
 STREAMS = tuple(LOW_STREAMS) if LOW else tuple(COUNT) + ('all',) + (('low',) if WIDE else ())
-N_SCREEN, N_B, POP, ELITE = 6, 0 if LOW else 2048 if WIDE else 1024, 30, 8
+N_SCREEN, N_B, POP, ELITE = 6, 0 if LOW else 4096 if CAP else 2048 if WIDE else 1024, 30, 8   # CAP: ~15 % build (refusals cost ~1 s)
 
 
 def q_of(z):
@@ -122,8 +143,11 @@ def screen(sp, seed, n=N_SCREEN):
     r = dict(up=s['up'], climb=s['climb'], turn=s['turn'], mass=sp['mass'], length=sp['length'], width=sp['width'],
              height=sp['height'], belly=sp['belly'], com_x=float(G0[0]), com_z=float(G0[2]), tail=bool(sp.get('limb')),
              wheels=len(sp['wheels']), tip_static=H.tip_static(sp), grown=sp.get('grown', 0), faired=bool(sp.get('plate_merged')),
-             top=float(max(np.asarray(h)[:, 2].max() for h in sp['hulls'])), elbow=bool(sp.get('limb') and sp['limb'].get('L2')),
-             rear_up=bool(sp.get('limb') and sp['limb'].get('rear_up')), flip=bool(sp.get('flip')))   # top: the body's, without the tail
+             top=float(max(np.asarray(h)[:, 2].max() for h in sp['hulls'][:len(sp['hulls']) - sp.get('head_n', 0)])),
+             elbow=bool(sp.get('limb') and sp['limb'].get('L2')),
+             rear_up=bool(sp.get('limb') and sp['limb'].get('rear_up')), flip=bool(sp.get('flip')))   # top: the body's, without the tail or head
+    if sp.get('head'):                                                    # the 250 mm run: the head on top, the body's print
+        r.update(head=sp['head'], print_size=K.body_print_size(sp), head_top=float(max(np.asarray(h)[:, 2].max() for h in K.head_hulls(sp))))
     poses = (None,) + (K.BRACE if sp.get('limb') else ())
     for down, g in ((False, 'h_up'), (True, 'h_down')):
         by = {th: H.ladder(sp, H.GRIP, down, n, seed, th)[0] for th in poses}

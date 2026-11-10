@@ -52,18 +52,21 @@ TWIN_OUT = os.path.join(TWIN, 'out')
 # committed: write PRINTER = 'http://<printer-ip>:7125' in tools/config_local.py (untracked; copy
 # config_local.example.py), or set FPVTANK_PRINTER. Loaded by path from this folder, since scripts import
 # config in different ways. None when neither is set; tools/k2.py then says so.
-def _local_printer():
+def _local(name):
     path = os.path.join(TOOLS, 'config_local.py')
     if os.path.isfile(path):
         import importlib.util
         spec = importlib.util.spec_from_file_location('config_local', path)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        return getattr(mod, 'PRINTER', None)
+        return getattr(mod, name, None)
     return None
 
 
-PRINTER = _local_printer() or os.environ.get('FPVTANK_PRINTER')
+PRINTER = _local('PRINTER') or os.environ.get('FPVTANK_PRINTER')
+# The robot's Pi over ssh, as user@address, for twin/wifi_test.py. Not committed either: PI_SSH in config_local.py,
+# or FPVTANK_PI_SSH. None when neither is set.
+PI_SSH = _local('PI_SSH') or os.environ.get('FPVTANK_PI_SSH')
 
 
 def zach(name):

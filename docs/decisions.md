@@ -3,6 +3,260 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-11-09: The box prints on the bench; rigid fits sit inside the printer's noise
+
+Printed so far: `stack_test`, `rest1_esc_esp`, `rest5_small`, `rest4_pi_sleeve`. `rest3_floor` and `rest2_packs` are uploaded and **on hold**: they carry the joints that failed. Zach's bench findings:
+
+- **ESC tops:** "the height is a tax too tight, one fits perfect the other the esc is just barely too tall". The top's pad was drawn 0.3 over his 34.0 caliper. The box prints upside down, so the bottom's inside face is a bridge, and any sag comes off that 0.3. Whether the tight one follows the ESC or the box isn't known yet.
+- **ESP32 box:** "open and not a good part ... it can fly around in there and eventually out nothing holds it in". It was drawn round a typical board, not his. Needs a redraw from his own board or case.
+- **Pegs and holes:** "the pla inside of the connection holes and stubs can warp or have defects rendering it impossible to assemble".
+- **His proposal:** carry the noisy-copies idea (`gauges/noisy.py`, from ST5) over to prints: "simulating these objects and attempting to assemble them might help us avoid this in the future potentially. that or we design around that. lets try screening them or discussing a solution".
+
+**The screen** (`twin/print_noise.py`, geometry and dice, no physics): each printed peg and hole is moved and resized by a random error of sd s, and the box hunts for its best seat. With friction pegs in 5.1 holes and a guessed 0.05 of hand press, at s 0.05 a 4-peg joint goes together 10 % of the time, 6 pegs 1 %, 8 and 10 pegs never; at s 0.02 the 10-peg pack box still only 30 %. Opening the holes to 5.4 helps less than cutting the count: at s 0.10 two loose pegs seat 82 %, ten loose pegs never. s isn't measured on his printer, and the press limit is a guess, so the table isn't placed yet; his count of which joints went together is the reading that places it.
+
+**What it says about the design:** every hold drawn so far is rigid on rigid with a window of about 0.1 mm (his bench: 5.1 snaps, 5.3 falls out), which is the size of the printer's noise, and every extra peg is another chance to jam. Proposed, not decided: locate each box on two pegs, let the rest clear, and get the hold from something that flexes further than the noise. The pegs are 2.4 long, too short to flex themselves. Not drawn yet.
+
+**His call, same day:** "yes draw it no boxes dont have to hold without a lid". So the lid is the hold, and a box with the lid off only has to sit there. This **replaces** "it stays in flipped and shaken with no lid" as the test of a holder.
+
+**Drawn** (`twin/spring_stack.py`, artifact "Spring Stack"), on one stack, ESC + PCA, on the patch he has. Nothing printed.
+- **Locate:** two 4.6 pegs on one diagonal in the 5.1 holes (0.25 a side); the other pegs are 4.0 and stand 0.55 clear. Picked on the screen: at 0.10 of error the ESC box goes together 94 % of the time, against 0 % for six friction pegs. A first pick of 4.7 and 4.4 read 60 %.
+- **Hold:** a soft clip in TPU, two blades at 45 degrees over a solid body, plugged into two holes. One on the stack, squeezed 0.75 by a flat lid; the same clip under the ESC's top, in place of the rigid pad. Travel 1.5, then the body is the stop; the pegs' straight part is 2.0.
+- **Test:** a hoop round the patch stands in for the lid. A strip of six clips, blades 0.8, 1.2 and 1.6, for a kitchen scale.
+- **Guessed:** every clip number. Force about 4 N as drawn on a guessed 40 MPa for printed 95A; half to double. TPU hasn't been printed on the K2 from here.
+- **Would supersede, if he takes it:** `partbox_esc_box`, `partbox_esc_top`, `partbox_pca_box`. `partbox_pca_top` and his case are reused. The pack, Pi and ESP32 boxes wait for this stack's bench test. The lid's own fastening isn't designed: it needs his screw list.
+- **Lid screws, his answer:** "screws m3 probably m2 also works". So M3 for the lid, M2 where space is tight. Lengths, and whether they go into nuts, inserts or bare plastic, are still to ask. Nothing drawn.
+
+## 2026-11-08 (later): One pack for the motors, one for the Pi
+
+Zach: "For now lets stick with using one for the motors one for the pi. This is probably subject to change in the future. We
+really just need a working robot for pitching the sim vs reality not something fully optimized yet." This takes the robot off
+the wall and **supersedes** C1's two packs with the Pi tethered (2026-11-07), and, for now, the three-pack plan of 2026-10-11.
+FPVTank_Control's `HARDWARE.md` still shows that plan.
+- **Drive:** one Zeee 2S 5200 runs both ESCs through the T-plug Y-harness. No selector. The BEC and servo wiring don't change.
+- **C2, the kill: a button on the OE gate** (Zach: "shouldnt that physical button be something the pi can control?", then "Button
+  on the gate"). This **supersedes** C2's selector as the e-stop, and brings back the sims' separate button. A latching, normally
+  closed button goes in the wire from GPIO 17 to the PCA's OE, so motors run only if the Pi drives the line low and the button
+  is out; the existing 1 kΩ pull-up locks the outputs otherwise, including on a broken wire. GPIO 27 (pin 13) reads the OE line
+  through 1 kΩ\*, so the Pi can see a press. It has to: the ESC resumes as soon as signal returns, so on a press the Pi runs the
+  full-off latch, and nothing moves until the control program restarts. If the Pi is hung, stop the program before releasing the
+  button. The ESCs' switches stay as the hard power cut. The button needs a recessed collar, so a roll can't press it. Still to do:
+  the code in Control, and a wheels-up test that it stops the new motors.
+- **Pi:** the other 5200 through the Pololu D36V50F5, 5 V, into the header: physical pins 2 and 4 for +5 V, 6 and 14 for ground,
+  all free (the PCA uses 1, 3, 5, 9, 11 and 17). A second pin each way shares the 2.5 A across the Dupont contacts.
+- **Low end:** Pololu's graph, read by eye, gives about 0.9 V of dropout at 2.5 A, so it holds 5 V down to about 5.9 V in. The
+  alarm goes at 7.0 V (3.5 V a cell), well before that.
+- **Off switch:** a small switch from the Pololu's EN pin to ground puts it to sleep, in place of a switch carrying the Pi's
+  current. EN needs testing on the bench: Pololu says the board is on by default but not what a floating EN does. A sleeping
+  board still draws a little, so unplug the pack to store it.
+- **C4, the tail's servo power:** confirmed (Zach: "Yes, keep the slot"). Nothing is bought now. A 48 x 30 x 15\* slot, the sims'
+  size for an 8 A BEC, stays open at the back of the box, and the real BEC comes with the tail's servos.
+- **C5, the IMU: buy it now, on its own serial wire** (Zach: "Serial, own wire"). This narrows the 2026-11-07 "yes". Adafruit lists
+  the BNO085 as troublesome on I2C. If it hung the PCA's bus, the PCA would keep sending its last throttle, the Pi couldn't change
+  it, and the software kill would go too; only OE or the stop button would still work. So it runs in UART-RVC, a one-way stream of
+  yaw, pitch, roll and acceleration, with no raw gyro. SDA to Pi pin 10, ground to pin 20, VIN off the Pololu's 5 V, P0 to the
+  board's own 3 V (Adafruit ties it to the Pi's 3 V, so bench-check it). Also from memory, to check on the bench: about 100 Hz, and
+  the Pi 5 needing `dtparam=uart0`. Besides the tail, it lets a real run log pitch, roll and heading beside the sim's.
+- **C6, the INA219: buy it now** (Zach: "Buy it now"). This **supersedes** "the INA219 waits" from earlier the same day, which was
+  left over from when the Pi was tethered. It's how the Pi sees its own pack: the Pololu has no cutoff and the alarm only beeps.
+  Solder A0 to move it to 0x41, clear of the PCA's 0x40. Its power and I2C come off the PCA's far header, and pack + runs through
+  it to the Pololu's VIN (`twin/brain_box_review.html`, "What the INA219 is"). Wire it and write the shutdown program once the robot
+  drives; until then the alarm is the only protection. Its 0.1 ohm resistor costs about 0.2 V at 2 A, so the Pololu holds 5 V down to
+  about 6.1 V in.
+- **C7, no WiFi dongle, now measured** (Zach: "Test it first"; `twin/wifi_test.py`, `twin/README.md`). The 2026-11-07 call stands, with
+  numbers behind it. July measured about 2.6 Mbps inside the old chassis, and off the wall WiFi is the only link. Now: 180-188 Mbps
+  on 5 GHz and 41-45 on 2.4 GHz in the open, and 47-48 on 2.4 GHz inside PLA, against a bar of 6. Not tested: a pack each side, and
+  the far end of the driving area. Run the test again there on the first drive; an MT7612U dongle is the fallback. The box keeps a
+  USB port reachable.
+- **C8, the IR camera and its lights go on the tail** (Zach: "the ir camera and the lights should just be on the tail with its camera
+  for now well keep this very simple"). This **supersedes** C8's pods in the nose (2026-11-07) and the fixed headlights of 2026-09-14.
+  The pods aren't assembled yet. The tail comes later, so the first robot has no IR.
+- **The nose camera is the IMX219 8MP 120-degree module he owns** (Zach: "matches it exactly on google images"), so the M12 pinhole lens
+  is off the list. The listings are Waveshare's Pi5-IMX219-120: board 25 x 24, lens 6.5 x 6.5, 1.79 mm focal length, F2.0, 200 mm
+  Pi 5 cable, and mounting holes that carry 3.3 V. None of this is calipered. The focal length works out to about 92 x 75 degrees
+  before distortion, so 120 is probably the diagonal.
+  - **A lens that wide can't sit behind a true pinhole.** A round opening has to be 6.5 + 3.46 x the set-back to clear 120 degrees:
+    about 10 mm at 1 mm back, 13.5 at 2, 17 at 3. So the nose gets a small funnel, not a pinhole. Pick when the nose is designed.
+  - **The Pi is set up for the old camera:** its config has `dtoverlay=ov5647` and `camera_auto_detect=0`, so this one won't show up
+    until that changes.
+- **The HC-SR04 stays off the robot** (Zach: "Keep it off"). It gives one distance reading, not a depth image, and it would put two
+  exposed cans in the nose. Idea, not tried: on a stand at the end of a test lane it could read the body's real speed, which encoders
+  can't when the wheels slip.
+- **C9, plain vents** (Zach: "Plain vents"). This **supersedes** the filtered vent of 2026-11-07. Slots in and out, past the Pi box's
+  own lid vents, with the lid's TPU pads clear of them; a filter only if dust becomes a problem. By a rough sum, 15 W in a sealed
+  250 x 140 x 50 box sits 20-25 C over the room, with PLA softening near 55-60 C. To do once box v2 is printed: five minutes of full
+  load with the lid on, watching temperature and throttling. At idle the Pi read 47.7 C with its fan off, which says little.
+- **The Pi dying while the drive runs:** this case comes back with the Pi's own pack (HARDWARE.md, "Shutdown ORDER"). From the
+  wiring, not tested: the PCA's logic and OE's pull-up run off the Pi's 3.3 V, so a Pi that loses power takes the PCA with it, the
+  signal stops and the ESCs cut within 0.1 s. A crashed Pi with its rails still up leaves the PCA on its last throttle, and only
+  the button stops it. To do: with the wheels up and a motor running, pull the Pi's pack; the motor must stop.
+- **Why the third pack went:** the plan was made for 540 crawler motors. The gearmotors stall at about 2 A each (listing), so
+  they should barely dip a 50C pack. A third 5200 doesn't fit either: 141 mm against 126 across the back.
+- **Later, by Zach's note:** "a battery that can actually fit the voltage that the motors need". 2S runs the 12 V motors at
+  about 0.62 of rated speed. Series was ruled out for now: the ESCs are probably 2-3S.
+
+## 2026-11-08 (later still): Holders first; "the lid holds it" withdrawn
+
+Zach: "the design is getting away from us floor pegboard and we need to finish the rest of the fits for the parts the esc already can fall out
+in all those designs. the holding components are not set it yet". **Layouts A to D are on hold.** A holder is done when the part fits, stays in
+when flipped and shaken with no lid, and the holder stays in the floor. That's a bench test, so it needs no new sim.
+
+**"The lid holds it" (`retention.py frames`) is withdrawn; it isn't a result.** Every frame is welded to the floor, so peg pull-out was never in
+it. The lid presses through solid TPU columns counted at 1 g each: about 109 g if solid, at the sim's lid height of 56.5. Over a Pi on a flat floor
+(lid about 75), the ESC's column would be about 39 mm tall and the PCA's about 60. C10 stays open, and that evidence no longer backs one lid.
+
+Then Zach: "generate one for each please i want to inspect them ... we may need to cap these some how. for them to truly be held on all sides there
+has to be some kind of ceiling. maybe we set a block height. all parts must be able to be printed with a lid part that snaps into another lid maybe? im
+iffy because some parts can actually be securely enclosed like the pi". Built as `twin/holders.py` for inspecting, **not decided and not printed**:
+a tray and snap cap for the ESC, pack, Pi, PCA and ESP32, block height 48 (set by the pack), and the Pi's box left as it is with straps holding it down.
+Open: what "snaps into another lid" means for the main lid. I read it as each cap's top meeting one ceiling, and that's what I asked him.
+
+**Then he replaced the caps** (**supersedes** `holders.py`, nothing printed): "set the section heigh much smaller the battery should be multiple boxes high. they
+should be peg boards on the top of these to allow stacking. the top should not be a plat with legs but a few blocks on top of things. think like a lego block
+kinda. there can be spacer legos placed on top essentially". Built as `twin/bricks.py`, **not decided and not printed**: one section of 12 mm (my pick, for him to OK), trays,
+spacers and top blocks, all on one peg joint. I read "multiple boxes high" as a one-section tray plus tall spacers, not four full-walled rings, and asked him.
+
+**Then he looked at them:** "this mostly works although its kinda flimsy looking ... look into gridfinity more most o the boxes fit the whole part that snaps in and it usually has a flat
+bottom to allow for more pegs to be placed on it for stability or one larger peg. potentially pegs are too small. run the sim if its nessesary but eyeballing this it looks very thin", and
+"the spacers on the pca are way too tall too". Built as `twin/part_boxes.py` (**supersedes** `bricks.py`, nothing printed, **not decided**): whole-part boxes, flat bottoms, walls 2.0, pegboard lids,
+the boards one section tall with no spacers, and the Pi's box in a sleeve. **The drop sim wasn't run:** it holds holders rigid and read 0 of 80 on the thin version, so it can't see flimsy. Its loads sized the pegs.
+This is the fourth holder shape (frame, caps, bricks, boxes) with only the frame printed, so the working rule's stop applies: print one and test it before a fifth drawing.
+
+**Then, on how they stack:** "notice how gridfinity bins stack. thats the concept we are missing. some bins can be as tall as two seperate ones stacked, but each one has a piece on top to stack another like a lego brick. the pi
+one does not stack neither does the pac9865. also you could reuse our pac9865 holder". `part_boxes.py` redrawn in place, still **not printed and not decided**: heights in 7 mm units (ESC 6, Pi 6, pack 8, PCA 5, ESP32 5; 11 units is where the stacks meet), a top with the floor's holes on every box, the Pi's box in a tube with a pegboard top, and his PCA case unchanged inside a box. Checked against the Adafruit model: only a 0.1 mm clamp at his lid's corner blocks.
+I kept 5 mm pegs, my pick; he hasn't chosen between those and 8 mm. Whether `PCA9685_Simple_Case` is the holder he meant is unconfirmed.
+
+**Then:** "alright show a fully assembled brain box now". `twin/brain_box.py`, the "Brain Box" artifact: one layout, **not decided**, to react to. It fits a 250 x 139.5 x 82 body with no overlaps. Pack, Pi, pack in one row can't land on the 15 mm grid in that width, so the Pi goes crosswise at the back. The camera's 200 mm cable comes up 26 short on the drawn route; the robot's centre moves about 4.4 mm back. This layout **supersedes** A to D as the working sketch, since those predate the boxes.
+
+**Checked against the sims** (Zach: "see how the size and height fit designs"; balance later, "the parts can be moved"): `twin/sim_fit.py`, geometry only. Height is no limit. The contents fit 24 of 25 realistic and tow finalists, but those bodies are all over the 250 mm cap. Of 394 random capped bodies, 3 hold them; the median miss is 14 mm, on length. I read that as a layout problem, and sent the print, because the ESC and PCA boxes don't depend on the layout.
+
+**The first box plate printed** (2026-11-09): `stack_test`, Zach: "it went well". He'd allowed watching it and cancelling if it went wrong; his interrupt came before I saw anything, so I didn't watch it. He then asked to "queue up the remaining parts": five plates uploaded, none started, since the bed can't be seen. The five small boxes are held until their parts arrive. All of it is ahead of the bench test on the first plate, at his call.
+What a holder has to do: stay in the floor and keep its part in when flipped and shaken, let the wires and air out, let a pack swap by hand, and make a fit change a small reprint.
+
+## 2026-11-08 (later): The modular floor's first test print
+
+`twin/peg_test.py` printed on draft settings in black PLA, on a 2.6 mm floor with holes 5.1 to 5.4 for a 5 mm peg. The floor itself isn't
+decided yet (`twin/README.md`, "A modular floor"). Zach:
+- **The hole is 5.1, 0.05 a side:** "it fits best in 5.1. I like it slightly tight ... Tight enough to give a little snap". 5.2 "works as
+  well although a bit loser"; 5.3 and 5.4 "will fall out when tipped". This **supersedes** my pick of 5.3, his 0.15 a side slide rule, for
+  these pegs. It doesn't change the lid: the drop test still has the lid doing the holding.
+- **ESC frame:** "works pretty well", but "a bit of a pressure fit on the length side", with "a bit shorter height on the box maybe". It has
+  "a tiny bit of room to rock", so "we should hold it in place from the other side". Frame v2 takes the length to zero clearance and the walls
+  from 17 to 12\*. I read "the other side" as from the top, the lid's TPU pad.
+- **Blocks:** "will not break from my thumb whatsoever". The sim's worst case is about 22 kg sideways, so this isn't a verdict yet.
+- **Frame v2:** "this fits fine enough ... This is good". Open, with no lid, it holds partly because "a corner of one of the wires" is "being
+  smashed into the side portion"; "theres ways you can place the wires in it that actually make this a pretty tight fit". I hadn't sized for
+  that: the slot is his 24 plus 0.25 a side, with no wires modelled. Which part of the ESC sets his 24 is still unmeasured, a question I noted on
+  2026-10-11 and never asked.
+- **The sim can't see this**, as he said: its ESC is a bare box. Its no-lid ESC count (33 and 31 of 80 out of place) is for a part with no wires,
+  and the lid's result doesn't depend on them. No wire model: a real shake and drop with the leads on is the test.
+- **Wire lengths set how far apart parts can sit** (Zach): "Boxes have a length they can sit from another box. Wire length, determines that."
+  ESC red and black about 90, yellow and blue 105, the Zeee pack's lead 120, Duponts as long as needed. `grid_layouts.py` now checks them. Nothing
+  is out of reach, but I'd drawn the packs' lead ends about 3 mm from the ESCs. So A's ESCs moved 19.5 back, B's and C's packs 20 forward, and C's deck
+  came off its ESCs. This **supersedes** B at 197 long (now 217) and C at 201 (now 249). A has 62 to 139 mm a battery run to tuck away, D almost none.
+
+## 2026-11-08: The Pi's box is the one from the last robot
+
+Zach, on the friction box he used before: "take that body and the top from the updated one to keep the slot for the gpio
+pins to go through". He found the source, the Printables `rpi5 base` and `rpi5 lid` (link not recorded). His printed
+version is in the G-code `robot_top_plate_and_pi_case` (the same box merged onto a top plate) and `raspberry_pi_top` (the
+lid). His Fusion body carries a compartment with the same 91 mm opening at the back. `twin/pi_box.py` builds it.
+- **Body:** `rpi5 base`, as downloaded but for its rings (below). 98.5 x 65.6 x 36.5 outside, 91.5 x 59.6 inside. It fits the 71.3 mm bay between the
+  ridge walls with 2.85 a side.
+- **Top:** only his updated lid's G-code survives, so the lid is the download plus a 56 x 9.6 notch through one long edge,
+  with the vents it reaches stopped at 14.6, read off the toolpaths. 0.0% of the printed wall misses the rebuild; 6.3% misses
+  the bare download (the control).
+- **The notch goes over the pins (Zach: "notch over the pins"):** with the clips latched, the printed notch runs 33.0 to 89.0
+  along the box and the header 14.1 to 64.9, so the printed lid covers pins 1 to 16. `pi_box_lid_over_header.stl` moves the same
+  56 mm notch to 11.5 to 67.5, 2.6 past the header at each end (plugs overlap the lid 279 mm3 as printed, 0 moved). The header's
+  place is read off his Pi model, seated by its holes on the box's rings (within 0.06 mm; turned round reads 20 mm).
+- **Superseded the same morning:** a notch mirrored end for end, 10.5 to 66.5 (`twin/out/pi-box-superseded/`), built on Zach's
+  comment "flip it", which he then took back. It left only 1.6 at the USB end.
+- **Snap-ins:** Zach recalled the lid he'd been printing having its snap-ins cut off. Both G-code lids still carry all three
+  clips (`raspberry_pi_top` matches the download's clips layer for layer), so any cut isn't in these files. The new lid keeps them.
+- **The rings get bored (Zach: the board sits "slightly too tall"):** the download's rings have 3 mm holes, for a longer screw
+  coming in from outside the box. The HAT kit's screws stay in the Pi, so their heads, about 4.25 wide and 3 tall, sit on the
+  rings; he reads the board about 2 mm high (rough). `pi_box_base_bored.stl` bores the rings through to 4.75 (0.25\* a side) and
+  grows them from 5.8 to 6.75 (1.0\* of wall), so the board rests on the rings as the download meant and its ports line up with
+  the windows. Heads clear by 0.25; the download reads -0.65 (the control). The vertices are moved, not cut: the download's 54
+  four-face edges at z 28.5 make it an invalid exact solid. `pi_box_ring_test.stl` is the bottom 9 mm, to test the seat: 33 min,
+  17 g, no supports, a 5 mm brim. **Printed 2026-11-08. Zach: "perfect fit, the little button to reset it even matches right on
+  the tab to press it".** A 3 mm head that lifts only 2 doesn't add up; a domed head dipping into the 3 mm hole would explain it. The
+  bores go right through, so either way it fits.
+- **Heights, from his caliper:** 25 from the bottom of the board to the top of the HAT, 55 from the screw head to the top of
+  the Dupont plugs, 23 for the whole HAT post, bottom screw to top screw. With the rings bored the HAT clears the lid by 3.0, the
+  post tops are 8.0 under it, and the plugs stand 21 above it. (With the heads on the rings at a 2 mm\* guess it was 1.0 and 24:
+  superseded.)
+- **What it changes:** with 15 mm\* for the wires to bend, the stack needs 72.5 from the box's underside, or 73.5 if the head is
+  really 2. On the tunnel ridge that's 95.7 from the tub's underside, against 56.5 for the brain box lid in
+  `twin/retention.py`. On the tub's floor it's 75.1. Not settled.
+
+\* = a guess.
+
+## 2026-11-07 (evening): What goes in the brain box
+
+The parts review (`twin/brain_box_review.html`, the "Brain Box Parts Review" page) found 11 conflicts between what Zach
+owns (FPVTank_Control `HARDWARE.md`), the power plan of 2026-10-11 and the sims' parts. Zach, on the picks: "good picks
+on those for the conflicts it looks sensible and what id do for now". So:
+- **C1, packs:** three if the Pi comes off the wall supply now (two drive on the selector, pack C for the Pi); two and
+  tethered if not. The pick was conditional: still to say which.
+- **C2:** the Carling selector's centre-off is the e-stop, outside the box within reach; no separate button; the ESCs'
+  own switches stay on, inside.
+- **C3:** the Pololu D36V50F5 for the Pi, plus a small inline switch.
+- **C4:** a slot for a separate servo BEC, bought with the tail's servos.
+- **C5:** buy an IMU (the sims' BNO085) before the tail; check its I2C address against the PCA9685's 0x40.
+- **C6:** an INA219 with address jumpers, moved off 0x40.
+- **C7:** no WiFi dongle for now; a USB port reachable, the lid radio-clear over the Pi.
+- **C8:** the IR LED pods either side of the pinhole in the nose. **Superseded** 2026-11-08 (above): on the tail, with the IR camera.
+- **C9:** a filtered vent across the Pi's cooler; the box closed to parts, not to air. **Superseded** 2026-11-08 (above): plain vents.
+- **C10:** a battery door over the pack bays, apart from the electronics lid.
+- **C11:** encoders decided when the motor arrives; room for a Pico beside the PCA. **Superseded** the same evening (below):
+  his ESP32 reads them, so no Pico.
+
+The sims' separate e-stop, Pi switch, 45 mm UBEC and WiFi dongle are superseded by these. HARDWARE.md (Control) still has
+the 2026-10-11 plan without the inline Pi switch or the IMU.
+
+**Later that evening, Zach:** "battery unification is not really necessary yet". So **C1: two packs, one per ESC, as built;
+the Pi stays tethered.** The selector (and with it C2's e-stop), the Y-harness, the Pololu, the alarm, the INA219 and the
+Pi's switch wait for the Pi's own pack. Until then the e-stop stays as built: the software kill, the OE failsafe and
+the ESCs' power switches. The ESP32 he owns reads the encoders (C11). The drive: four JGB37-520s, two a side in parallel
+on the two ESCs (`gauges/SHOPPING.md`, "Driving four motors with two ESCs").
+
+**Drive, confirmed** (Zach: "lets just do A for now. as time goes on we can do more with looking into that"): plan A,
+two motors a side in parallel on each ESC; the Pi through the PCA9685 as now. His ESP32 is an ESP32-WROOM-32 dev board
+with factory headers (an original ESP32: 8 hardware pulse counters), and it reads the four encoders. Per-wheel drivers
+(plan B, 2 x Cytron MDD3A) stay the upgrade.
+
+**The Pi is held by a friction-fit box, not standoffs** (Zach: "a friction box is what i used on the last robot. the box
+held pretty well. the standoffs cause the holes to be taken up that are needed by the hat standoffs"). The Pi stack
+and the PCA sit in pockets 0.3 mm bigger than each board, on TPU pads, and the lid's TPU pads press them down. In the
+drop test (`twin/retention.py pibox`, 80 drops) the Pi moved at most 0.5 mm and the PCA 0.7 mm. The pocket's height takes
+the header extensions, the Dupont plugs on them and the wires' bend. (The HAT's holes could be shared, with M2.5
+male-female standoffs in place of the HAT kit's bottom screws, but they aren't needed.)
+
+## 2026-11-07 (later): A pinhole camera in the nose; a tail camera later
+
+After the head options page (`gauges/head_options.py`: only roll hoops or a fixed camera keep the head from landing
+first in a roll), Zach: "we might just have to keep it as a pin hole in the front. later on a tail camera is going to be
+a must."
+- **The front camera is a fixed pinhole in the nose** (his "might": leaning, not final). The pan-tilt head comes off the
+  body; head-v2 is shelved, not deleted.
+- **A camera on the tail is a must, later.** The tail will carry a camera's mass at or near its tip and its cable
+  through the turntable.
+- The 250 mm run still seats the head on top (`head_f`); it isn't run yet, so it changes before it runs.
+
+## 2026-11-07: Bodies capped at 250 mm; the head is its own module
+
+- **The cap** (Zach): the body and wheels are at most 250 mm; the claws and the tail don't count. He first said 300 (the
+  K2's bed), then lowered it: "Longer prints are easy on pla, if we want better materials it gets more risky depending
+  on how long it prints for. TPU and PETG can be a bitch to print large things." Kept simple: one piece, no splitting.
+- **The head comes out of the body box** (Zach: "Theres a good chance that is going to be blocked in some way for most
+  bodies. We would want the flexibility to be able to move that somewhere else"). This supersedes the head inside the
+  skin ("inside, for now", `gauges/search.py`, 2026-10-26). Without it the inside parts span 239 mm, not 270, so a
+  250 mm body holds them as laid out. The runs before keep the head inside their skins.
+- **The 250 mm run** (Zach: "Yes, do it"): the head sits on the body's top at a new knob, `head_f`; the cap refuses a
+  body print over 250 mm; every body is a skin; the size knobs are narrowed to what 250 mm holds
+  (`gauges/README.md`, "The 250 mm run"). Wired and smoke-tested, not run.
+
 ## 2026-10-30: The drive motor is the JGB37-520; one-piece bodies capped and on bumpers
 
 - **The drive motor** (Zach: "put JGB37-520"): the cheaper of chassis-v2's two 37 mm gearmotors, 12 V 333 rpm with an

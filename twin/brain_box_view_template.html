@@ -1,0 +1,321 @@
+<meta charset="utf-8">
+<title>Brain Box</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The same workbench as the Part Holders page: the 3D stage takes the room, what you'd want to read sits beside it (below it on a phone). */
+:root{
+  --bg:#eceff3; --panel:#ffffff; --stage:#dde3ea; --fg:#1b2330; --muted:#5a6575; --line:#d3dae3;
+  --accent:#2c64a8; --accent-ink:#ffffff; --chip:#eef2f7; --bad:#b8402f; --good:#2e7d4f;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151c; --panel:#171e28; --stage:#0b1016; --fg:#e4e9f0; --muted:#94a1b2; --line:#283240;
+  --accent:#6ea6e6; --accent-ink:#0b1016; --chip:#1f2835; --bad:#ef7a66; --good:#5fbf86; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151c; --panel:#171e28; --stage:#0b1016; --fg:#e4e9f0; --muted:#94a1b2; --line:#283240;
+  --accent:#6ea6e6; --accent-ink:#0b1016; --chip:#1f2835; --bad:#ef7a66; --good:#5fbf86; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--f-body);margin:0}
+.wrap{display:flex;flex-direction:column;gap:12px;min-height:100%;box-sizing:border-box;
+  padding-block:14px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+h1{font:600 26px/1.1 var(--f-display);letter-spacing:.01em;margin:0}
+header p{margin:0;color:var(--muted);max-width:80ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px;align-items:start}
+.stage{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:max(420px,calc(100vh - 120px))}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0;max-height:max(420px,calc(100vh - 120px));overflow-y:auto}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.views{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+.hint{position:absolute;left:10px;bottom:8px;font:12px var(--f-mono);color:var(--muted);pointer-events:none}
+button{font:500 13px var(--f-body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.blk{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.blk h2{font:600 15px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase;margin:0;color:var(--muted)}
+.blk p{margin:0}
+.ask{border-left:3px solid var(--accent)}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.sel .name{font:600 17px/1.25 var(--f-display)}
+.sel .none{color:var(--muted)}
+.qa{display:flex;flex-direction:column;gap:8px;margin:0}
+.qa dt{font-weight:600}
+.qa dd{margin:0}
+.g{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.g b{font-weight:600}
+.g .num{font-family:var(--f-mono)}
+.g span.why{color:var(--muted);display:block}
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:grid;grid-template-columns:auto 12px 1fr;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer}
+.row:hover,.row.on{background:var(--chip)}
+.row input{margin:0}
+.sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--line)}
+.row .nm{all:unset;cursor:pointer;min-width:0}
+.row .nm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.m{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.cutrow{display:flex;align-items:center;gap:8px}
+.cutrow input{flex:1;min-width:0}
+.steptext{min-height:3em}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:3px 6px 3px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+td.m,th.m{text-align:right;padding-right:6px}
+.short{color:var(--bad);font-weight:600}
+.fine{color:var(--good)}
+summary{cursor:pointer;font-weight:500}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.stage{height:58vh;min-height:320px}aside{max-height:none;overflow:visible}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Brain Box</h1>
+    <p>Everything in place, in one layout to react to. Nothing is printed and nothing is decided. Amber is a box, green is its stacking top, purple is a spacer, and the rest is your parts and wires. Drag to turn, right-drag to move, scroll to zoom, click a piece to read about it.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="views" role="group" aria-label="Views">
+        <button data-view="iso">3/4</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="end">End</button>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+    <aside>
+      <section class="blk" aria-labelledby="h-build">
+        <h2 id="h-build">Build it</h2>
+        <div class="cutrow"><input type="range" id="step" min="1" max="10" step="1" value="10" aria-label="Build step"><span class="m" id="step-val"></span></div>
+        <p class="steptext" id="step-text"></p>
+        <div class="toggles"><button id="t-explode" aria-pressed="false">Pull apart</button></div>
+      </section>
+      <section class="blk" aria-labelledby="h-show">
+        <h2 id="h-show">Show</h2>
+        <div class="toggles">
+          <button id="t-solid" aria-pressed="false">Solid body</button>
+          <button id="t-walls" aria-pressed="false">Hide walls</button>
+          <button id="t-lid" aria-pressed="false">Hide lid</button>
+          <button id="t-tops" aria-pressed="false">Hide tops</button>
+          <button id="t-wires" aria-pressed="false">Hide wires</button>
+          <button id="t-ghost" aria-pressed="false">See-through boxes</button>
+          <button id="t-flip" aria-pressed="false">Upside down</button>
+        </div>
+        <div class="toggles" role="group" aria-label="Cut through">
+          <button id="x-off" aria-pressed="true">No cut</button>
+          <button id="x-along" aria-pressed="false">Cut along</button>
+          <button id="x-across" aria-pressed="false">Cut across</button>
+        </div>
+        <div class="cutrow"><label for="cut-pos" class="m">at</label><input type="range" id="cut-pos" min="-125" max="125" step="1" value="0" disabled><span class="m" id="cut-val">0</span></div>
+      </section>
+      <section class="blk sel" aria-live="polite" id="sel"><p class="none">Click a piece or a wire, in the view or in the list.</p></section>
+      <section class="blk ask" aria-labelledby="h-ans">
+        <h2 id="h-ans">How it works</h2>
+        <dl class="qa">
+          <dt>What goes where?</dt><dd>The Pi crosswise at the back, with its header facing the middle. A pack along each wall. The two ESCs down the middle, with the PCA on one and the ESP32 on the other. The IMU between them, and the small boards on the Pi's top and the packs' tops.</dd>
+          <dt>Why this way?</dt><dd id="a-why"></dd>
+          <dt>What holds it upside down?</dt><dd>The lid. Every stack reaches it, so it presses straight down through the boxes' walls to the floor, and the pegs only stop things sliding. Turn on Upside down to look. With the lid off, the ridges hold each part in, and that's untested.</dd>
+          <dt>How do you swap a pack?</dt><dd>Lid off. Pull that pack's top, which brings its spacer and the small box on it. Lift the pack past the ridges. The lead comes out the back end, into the lane behind the packs.</dd>
+          <dt>How do you get at the Pi?</dt><dd>Lid off, pull its two stops, and your box slides out toward +y. The wall is in the way as drawn, so it has to lift out with its sleeve. That's a problem to look at.</dd>
+        </dl>
+      </section>
+      <section class="blk" aria-labelledby="h-find">
+        <h2 id="h-find">What this showed</h2>
+        <ul class="g" id="finds"></ul>
+      </section>
+      <section class="blk" aria-labelledby="h-wires">
+        <h2 id="h-wires">Wires at your lengths</h2>
+        <div id="wire-table"></div>
+      </section>
+      <section class="blk" aria-labelledby="h-bal">
+        <h2 id="h-bal">Size and balance</h2>
+        <div id="bal"></div>
+      </section>
+      <section class="blk" aria-labelledby="h-print">
+        <h2 id="h-print">To print</h2>
+        <details><summary id="print-sum"></summary><div id="print-text"></div></details>
+      </section>
+      <section class="blk" aria-labelledby="h-guess">
+        <h2 id="h-guess">Guessed numbers: OK or measure</h2>
+        <ul class="g" id="guesses"></ul>
+      </section>
+      <section class="blk" aria-labelledby="h-parts">
+        <h2 id="h-parts">Pieces</h2>
+        <details><summary>Show or hide any piece</summary><div class="list" id="list"></div></details>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+(function(){
+const stage=document.getElementById('stage');
+if(!window.PARTS){stage.textContent='This is the page\'s template, with no model in it. Open twin/out/brain_box_view.html (python twin/brain_box.py writes it).';return;}
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.localClippingEnabled=true;stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(32,1,5,3000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=30;ctl.maxDistance=1400;
+scene.add(new THREE.HemisphereLight(0xffffff,0x6b6355,.75));
+const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(120,-200,300);scene.add(sun);
+const fillLight=new THREE.DirectionalLight(0xffffff,.3);fillLight.position.set(-200,160,120);scene.add(fillLight);
+const btn=id=>document.getElementById(id);
+
+function dec(b64,T){const s=atob(b64),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new T(u.buffer);}
+// Smooth the normals only across shallow edges: flat faces stay flat and curves stay round.
+function creased(g,deg){const src=g.index?g.toNonIndexed():g,p=src.attributes.position.array,tris=p.length/9,cos=Math.cos(deg*Math.PI/180);
+  const fn=new Float32Array(tris*3),n=new Float32Array(p.length),map=new Map();
+  const key=i=>Math.round(p[i]*100)+'_'+Math.round(p[i+1]*100)+'_'+Math.round(p[i+2]*100);
+  for(let t=0;t<tris;t++){const a=t*9,ux=p[a+3]-p[a],uy=p[a+4]-p[a+1],uz=p[a+5]-p[a+2],vx=p[a+6]-p[a],vy=p[a+7]-p[a+1],vz=p[a+8]-p[a+2];
+    const x=uy*vz-uz*vy,y=uz*vx-ux*vz,z=ux*vy-uy*vx,l=Math.hypot(x,y,z)||1;fn[t*3]=x/l;fn[t*3+1]=y/l;fn[t*3+2]=z/l;
+    for(let c=0;c<3;c++){const k=key(a+c*3);let s=map.get(k);if(!s)map.set(k,s=[]);s.push(t);}}
+  for(let t=0;t<tris;t++)for(let c=0;c<3;c++){const i=t*9+c*3;let x=0,y=0,z=0;
+    for(const o of map.get(key(i))){if(fn[t*3]*fn[o*3]+fn[t*3+1]*fn[o*3+1]+fn[t*3+2]*fn[o*3+2]>=cos){x+=fn[o*3];y+=fn[o*3+1];z+=fn[o*3+2];}}
+    const l=Math.hypot(x,y,z)||1;n[i]=x/l;n[i+1]=y/l;n[i+2]=z/l;}
+  src.setAttribute('normal',new THREE.BufferAttribute(n,3));return src;}
+
+// The flip turns everything about the box's centre: pivot sits on that centre, world holds the model
+const C=META.center;
+const pivot=new THREE.Group(),world=new THREE.Group();pivot.add(world);scene.add(pivot);pivot.position.set(C[0],C[1],C[2]);world.position.set(-C[0],-C[1],-C[2]);
+const meshes={},edgeMats=[],hidden={};
+for(const k in PARTS){const d=PARTS[k],raw=new THREE.BufferGeometry();
+  raw.setAttribute('position',new THREE.BufferAttribute(dec(d.v,Float32Array),3));raw.setIndex(new THREE.BufferAttribute(dec(d.f,Uint32Array),1));
+  const g=creased(raw,30);
+  const m=new THREE.MeshStandardMaterial({color:d.color,roughness:.7,metalness:0,side:THREE.DoubleSide});
+  const me=new THREE.Mesh(g,m);me.userData.key=k;meshes[k]=me;world.add(me);
+  const em=new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:.3});edgeMats.push(em);me.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,30),em));}
+// the wires
+const wireMeshes=[];
+META.wires.forEach((w,i)=>{const pts=w.pts.map(p=>new THREE.Vector3(p[0],p[1],p[2]));
+  const curve=new THREE.CatmullRomCurve3(pts,false,'catmullrom',.12);
+  const me=new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(24,pts.length*14),w.r,8,false),new THREE.MeshStandardMaterial({color:w.color,roughness:.55,metalness:0}));
+  me.userData.wire=i;world.add(me);wireMeshes.push(me);});
+
+let stepNow=META.steps.length,ghost=false,solid=false,cutAxis='off',lit=null,litWire=null;
+function press(id,on){btn(id).setAttribute('aria-pressed',on);}
+function isPressed(id){return btn(id).getAttribute('aria-pressed')==='true';}
+
+// views
+const VIEWS={iso:[.42,-.72,.58],top:[0,-.001,1],side:[0,-1,.04],end:[1,0,.04]};
+let curView='iso',moved=false;ctl.addEventListener('start',()=>{moved=true;});
+function view(n){curView=n;moved=false;const d=VIEWS[n],t=new THREE.Vector3(C[0],C[1],C[2]),v=Math.PI*cam.fov/360,h=Math.atan(Math.tan(v)*cam.aspect),r=n==='end'?90:n==='top'?140:150;
+  cam.position.copy(t).add(new THREE.Vector3(...d).normalize().multiplyScalar(r/Math.tan(Math.min(v,h))*1.08));ctl.target.copy(t);ctl.update();}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>view(b.dataset.view)));
+
+// what's showing
+function applyVis(){
+  for(const k in PARTS){const d=PARTS[k];let on=!hidden[k]&&d.layer<=stepNow;
+    if(d.role==='shell')on=on&&!isPressed('t-walls');
+    if(d.role==='lid')on=on&&!isPressed('t-lid');
+    if(d.role==='top')on=on&&!isPressed('t-tops');
+    meshes[k].visible=on;}
+  wireMeshes.forEach(m=>{m.visible=stepNow>=8&&!isPressed('t-wires')&&apartTo===0;});
+  syncList();}
+function setBody(){['shell','lid'].forEach(k=>{const m=meshes[k].material;m.transparent=!solid;m.opacity=solid?1:(k==='lid'?.12:.16);m.depthWrite=solid;m.needsUpdate=true;});}
+function setGhost(on){ghost=on;for(const k in PARTS){const r=PARTS[k].role;if(r==='box'||r==='top'||r==='spacer'){const m=meshes[k].material;m.transparent=on;m.opacity=on?.28:1;m.depthWrite=!on;m.needsUpdate=true;}}}
+
+// the build slider
+const stepEl=btn('step');stepEl.max=META.steps.length;
+function setStep(n){stepNow=n;stepEl.value=n;btn('step-val').textContent=n+' of '+META.steps.length;btn('step-text').textContent=META.steps[n-1]||'';applyVis();}
+stepEl.addEventListener('input',()=>setStep(parseInt(stepEl.value,10)));
+
+// the cut
+const cut=new THREE.Plane(new THREE.Vector3(0,1,0),0),cutPos=btn('cut-pos');
+function setCutPlane(){const p=parseFloat(cutPos.value);btn('cut-val').textContent=p.toFixed(0);
+  if(cutAxis==='along'){cut.normal.set(0,1,0);cut.constant=-(C[1]+p);}
+  if(cutAxis==='across'){cut.normal.set(-1,0,0);cut.constant=C[0]+p;}}
+function setCut(a){cutAxis=a;['off','along','across'].forEach(n=>press('x-'+n,n===a));cutPos.disabled=a==='off';
+  const on=a!=='off';
+  Object.values(meshes).forEach(me=>{me.material.clippingPlanes=on?[cut]:[];me.material.needsUpdate=true;});edgeMats.forEach(m=>{m.clippingPlanes=on?[cut]:[];m.needsUpdate=true;});
+  wireMeshes.forEach(me=>{me.material.clippingPlanes=on?[cut]:[];me.material.needsUpdate=true;});
+  setCutPlane();if(on)view(a==='along'?'side':'end');}
+cutPos.addEventListener('input',setCutPlane);
+btn('x-off').addEventListener('click',()=>{setCut('off');view('iso');});
+btn('x-along').addEventListener('click',()=>setCut('along'));
+btn('x-across').addEventListener('click',()=>setCut('across'));
+
+// toggles
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let apart=0,apartTo=0,turn=0,turnTo=0;
+function tog(id,fn){btn(id).addEventListener('click',()=>{const on=!isPressed(id);press(id,on);fn(on);});}
+tog('t-explode',on=>{apartTo=on?1:0;applyVis();});
+tog('t-solid',on=>{solid=on;setBody();});
+tog('t-walls',()=>applyVis());tog('t-lid',()=>applyVis());tog('t-tops',()=>applyVis());tog('t-wires',()=>applyVis());
+tog('t-ghost',on=>setGhost(on));
+tog('t-flip',on=>{turnTo=on?Math.PI:0;});
+
+// the panels
+function mins(t){if(!t)return 0;const h=/(\d+)h/.exec(t),m=/(\d+)m/.exec(t),s=/(\d+)s/.exec(t);return (h?+h[1]*60:0)+(m?+m[1]:0)+(s?+s[1]/60:0);}
+function hm(x){x=Math.round(x);return x>=60?Math.floor(x/60)+' h '+String(x%60).padStart(2,'0'):x+' min';}
+(function(){
+  const B=META.bal,S=META.size,W=META.wires;
+  btn('hint').textContent='mm · holes every 15 · one height unit '+META.unit.toFixed(0)+' · body '+S[0].toFixed(0)+' x '+S[1].toFixed(1)+' x '+S[2].toFixed(1);
+  btn('a-why').textContent='Packs on the walls keep their weight low and leave a lane each side of the middle for wires. Your Pi only fits crosswise, because a pack, the Pi and a pack in one row don\'t land on the 15 mm holes in a '+S[1].toFixed(1)+' wide body. Stacking the boards on the ESCs takes them off the floor and keeps their signal wires short.';
+  const rib=W.find(w=>w.name==='Camera ribbon'),m2=W.find(w=>w.name==='ESC 2 red and black'),m=B.move;
+  const finds=[
+    {name:'It fits',value:'no overlaps',why:'Every piece was checked against every other, the walls, the lid and the floor\'s holes. The real wires aren\'t in that check.'},
+    {name:'Camera ribbon',value:(rib.len-rib.budget).toFixed(0)+' short',why:'Your IMX219\'s 200 mm cable comes up short on this route, with my guess for the run inside your Pi box. Your '+META.ribbon_long.toFixed(0)+' mm ribbon would reach, if it suits that camera.'},
+    {name:'Balance',value:Math.abs(m[0]).toFixed(1)+(m[0]<0?' back':' forward'),why:'Against the sim\'s layout, the robot\'s center of mass moves this much, and '+Math.abs(m[2]).toFixed(1)+' '+(m[2]>0?'up':'down')+'. That\'s mostly the Pi moving to the back, and the boxes add '+B.added.toFixed(0)+' g. T3 read fine at 5 mm back in the sim\'s earlier run: step still 150, upright still 1.00, turn 432 against 448. It\'s 5 mm forward that hurts, with the step down to 57. That\'s one design, and this layout hasn\'t been simulated.'},
+    {name:'Getting the Pi out',value:'lift the sleeve',why:'The SD end faces the side wall, so your box can\'t slide out while the sleeve is in the floor. It would pull out with its sleeve.'},
+    {name:'Stacks top the lid',value:'wires tight',why:'At 77, the PCA and ESP32 tops are at the lid, so their wires can only leave by the side windows, into the lanes.'}];
+  btn('finds').innerHTML=finds.map(g=>'<li><b>'+g.name+'</b> <span class="num">'+g.value+'</span><span class="why">'+g.why+'</span></li>').join('');
+  btn('wire-table').innerHTML='<table><thead><tr><th>Wire</th><th class="m">Run</th><th class="m">Has</th></tr></thead><tbody>'+W.filter(w=>w.budget).map(w=>'<tr><td>'+w.name+'</td><td class="m">'+w.len.toFixed(0)+'</td><td class="m '+(w.bad?'short':'fine')+'">'+w.budget.toFixed(0)+'</td></tr>').join('')+'</tbody></table><p>In mm, along the drawn route, not counting plugs or bends. ESC 2\'s red and black and the pack lead meet at the Y-harness, whose own length adds more. Each ESC\'s yellow and blue ends at a splice for its two motors. The rest of each run is spare wire or Dupont, as long as needed.</p>';
+  btn('bal').innerHTML='<table><tbody><tr><td>Body, outside</td><td class="m">'+S.map(x=>x.toFixed(0)).join(' x ')+'</td></tr><tr><td>Insides, with bricks</td><td class="m">'+B.grams.toFixed(0)+' g</td></tr><tr><td>The same parts in the sim</td><td class="m">'+B.ref_grams.toFixed(0)+' g</td></tr><tr><td>Center of the insides</td><td class="m">x '+B.centre[0].toFixed(0)+', y '+B.centre[1].toFixed(1)+', z '+B.centre[2].toFixed(0)+'</td></tr><tr><td>Sim\'s layout</td><td class="m">x '+B.ref_centre[0].toFixed(0)+', y '+B.ref_centre[1].toFixed(1)+', z '+B.ref_centre[2].toFixed(0)+'</td></tr><tr><td>Robot\'s center moves</td><td class="m">x '+m[0].toFixed(1)+', y '+m[1].toFixed(1)+', z '+m[2].toFixed(1)+'</td></tr></tbody></table><p>x is toward the nose. The floor, walls, lid and wires aren\'t counted. The robot\'s mass is the sim\'s T3 plus the bricks.</p>';
+  let g=0,t=0;META.set.forEach(r=>{g+=r.qty*r.g;t+=r.qty*mins(r.time);});
+  btn('print-sum').textContent='All of it: '+g.toFixed(0)+' g, '+hm(t)+' one piece at a time';
+  btn('print-text').innerHTML='<table><thead><tr><th>Piece</th><th class="m">How many</th><th class="m">Each</th><th class="m">g each</th></tr></thead><tbody>'+META.set.map(r=>'<tr><td>'+r.name+'</td><td class="m">'+r.qty+'</td><td class="m">'+(r.time||'-')+'</td><td class="m">'+r.g.toFixed(1)+'</td></tr>').join('')+'</tbody></table><p>From the slicer, on draft settings. Plates would save time. Not sent to the printer. The body isn\'t counted.</p>';
+  btn('guesses').innerHTML=META.guesses.map(g=>'<li><b>'+g.name+'</b> <span class="num">'+g.value+'</span><span class="why">'+g.why+'</span></li>').join('');
+})();
+
+// list: the checkbox shows and hides, the name selects
+const list=btn('list'),rowsEl={};
+function hex(c){return '#'+c.toString(16).padStart(6,'0');}
+Object.keys(PARTS).forEach(k=>{const r=document.createElement('div');r.className='row';
+  r.innerHTML='<input type="checkbox" id="p-'+k+'" aria-label="Show '+PARTS[k].label+'" checked><span class="sw" style="background:'+hex(PARTS[k].color)+'"></span><button type="button" class="nm">'+PARTS[k].label+'</button>';
+  const cb=r.querySelector('input');cb.addEventListener('change',()=>{hidden[k]=!cb.checked;applyVis();});
+  r.addEventListener('click',e=>{if(e.target!==cb)pick(k);});list.appendChild(r);rowsEl[k]=r;});
+function syncList(){Object.keys(rowsEl).forEach(k=>{rowsEl[k].querySelector('input').checked=!hidden[k];});}
+
+// selection
+const sel=btn('sel');
+function pick(k,w){Object.values(rowsEl).forEach(r=>r.classList.remove('on'));
+  if(lit)meshes[lit].material.emissive.setHex(0);lit=null;
+  if(litWire!==null)wireMeshes[litWire].material.emissive.setHex(0);litWire=null;
+  if(w!==undefined&&w!==null){litWire=w;wireMeshes[w].material.emissive.setHex(0x5a3a00);const W=META.wires[w];
+    sel.innerHTML='<p class="name">'+W.name+'</p><p>'+W.group+' wire. This run is <b class="m">'+W.len.toFixed(0)+' mm</b> as drawn'+(W.budget?', and it has <b class="m">'+W.budget.toFixed(0)+'</b>'+(W.bad?': <span class="short">short by '+(W.len-W.budget).toFixed(0)+'</span>.':'.'):', and it can be as long as needed.')+'</p>';return;}
+  if(!k){sel.innerHTML='<p class="none">Click a piece or a wire, in the view or in the list.</p>';return;}
+  lit=k;meshes[k].material.emissive.setHex(0x5a3a00);rowsEl[k].classList.add('on');
+  sel.innerHTML='<p class="name">'+PARTS[k].label+'</p><p>'+PARTS[k].note+'</p>';}
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(e.button!==0||!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
+  const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+  ray.setFromCamera(ptr,cam);
+  const live=Object.values(meshes).filter(m=>m.visible).concat(wireMeshes.filter(m=>m.visible));
+  const hits=ray.intersectObjects(live,false).filter(h=>cutAxis==='off'||cut.distanceToPoint(h.point)>=0);
+  const skip=o=>{const k=o.userData.key;if(!k)return false;const t=PARTS[k].role;return (!solid&&(t==='shell'||t==='lid'))||(ghost&&(t==='box'||t==='top'||t==='spacer'));};
+  const hit=hits.find(h=>!skip(h.object))||hits[0];
+  if(!hit){pick(null);return;}
+  if(hit.object.userData.wire!==undefined)pick(null,hit.object.userData.wire);else pick(hit.object.userData.key);});
+
+// theme
+function bg(){renderer.setClearColor(new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--stage').trim()||'#dde3ea'));}
+bg();window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',bg);
+new MutationObserver(bg).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+
+setBody();setStep(stepNow);
+let fitted=false;
+function size(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+  if(!fitted||!moved){fitted=true;view(curView);}}   // refit to the pane until you've moved the camera yourself
+new ResizeObserver(size).observe(stage);size();
+const GAP_Z=13;
+(function loop(){requestAnimationFrame(loop);
+  apart+=reduce?(apartTo-apart):(apartTo-apart)*.14;turn+=reduce?(turnTo-turn):(turnTo-turn)*.1;pivot.rotation.x=turn;
+  for(const k in PARTS){meshes[k].position.z=apart*PARTS[k].layer*GAP_Z;}
+  ctl.update();renderer.render(scene,cam);})();
+})();
+</script>

@@ -577,6 +577,107 @@ all-rounders read on the full gauges (`finals.json`).
   plate 19 mm off its nose (without the plate it still reads 225 mm on its own seed, 200 on another). Its hill, push
   and turn champions were whole. The strict run replaces it.
 
+## Noisy copies (2026-11-08)
+
+`python gauges/noisy.py check | run | table | single` -> `out/noisy/`. NASA's ST5 antenna search scored each design on 3
+copies with noise added, so a design couldn't win by working only when built exactly. The gauges read a design as drawn.
+This reads the tow run's 15 finals, rebuilt under today's code, on the full gauges as three slightly wrong builds, with
+every copy of a design on one set of seeds. A design's noisy reading is the worst of the three. No gauge changed.
+
+| Copy | CoM, whole robot | Also |
+|---|---|---|
+| nose | 5 mm forward, 2\* mm sideways | 5 %\* heavier |
+| tail | 5 mm back, 2\* mm sideways | 5 %\* heavier |
+| weak | 3\* mm up | motors and servos 15 %\* weaker, tyres 1.5\* mm smaller |
+
+\* = a guess. The 5 mm rests on T3: 150 g\* of leads in the back moves its CoM 4.3 mm back, the sim counting 60 g\* of wiring,
+and the power bay's 105 g, unbought, 2.8 mm forward. Print 1's 1.5 mm of pack play moves it 0.2 mm, so it's left out. The
+one mass to compare is the tub: 232 g in the sim, 236 g in the slicer.
+
+Controls (`check`): a zero error gives the same model byte for byte, each copy a different one; G3 on T3 reads 13.3 mm of
+circle per mm of CoM, inside the 12-15 above (G3); `single` reproduces its copies (T3's step: x+5 alone 57, the nose copy
+55). **Noise floor**, each design as drawn on a second set of seeds, largest move: upright 0.095, step 6 mm, turn 0, hills
+0, crest 5, tow 2 kg, push 1 kg. So a single rung of crest or tow isn't established.
+
+Drawn -> the worst of three (one number: no change):
+
+| Design | Upright | Step, mm | Turn, mm | Hill up | Hill down | Crest | Tow, kg |
+|---|---|---|---|---|---|---|---|
+| T3 | 1.00 -> 0.77 | 150 -> 55 | 448 -> 520 | 40 -> 35 | 45 -> 40 | 25 -> 20 | 6 -> 5 |
+| Box | 0.64 -> 0.59 | 31 | 594 -> 648 | 45 -> 40 | 45 | 15 | 3 |
+| best all | 0.32 -> 0.30 | 46 -> 41 | 802 -> 881 | 55 | 55 | 30 -> 25 | 8 -> 6 |
+| front 1 | 0.29 | 62 -> 61 | 746 -> 998 | 55 -> 50 | 55 | 25 -> 20 | 8 |
+| front 2 | 0.34 | 45 -> 41 | 781 -> 817 | 55 -> 50 | 55 | 35 -> 30 | 8 -> 6 |
+| front 3 | 0.36 -> 0.35 | 141 -> 132 | 826 -> 1047 | 55 | 55 | 25 | 8 |
+| front 4 | 0.43 -> 0.41 | 62 -> 52 | 828 -> 844 | 55 -> 50 | 55 | 30 | 8 |
+| best low | 0.40 -> 0.35 | 61 -> 51 | 831 -> 972 | 55 | 60 -> 55 | 25 | 8 |
+| best up | 0.99 -> 0.48 | 45 -> 42 | 690 -> 737 | 55 | 55 | 30 | 8 -> 6 |
+| best climb | 0.74 -> 0.68 | 150 | 1002 -> 1197 | 50 | 55 | 15 -> 10 | 6 |
+| best turn | 0.46 -> 0.45 | 31 -> 25 | 377 -> 440 | 30 -> 25 | 30 | 20 | 4 |
+| best crest | 0.86 -> 0.36 | 121 -> 91 | 727 -> 849 | 55 | 60 | 45 -> 40 | 6 |
+| best h_up | 0.48 -> 0.40 | 47 -> 41 | 701 -> 773 | 60 -> 55 | 60 | 35 | 6 |
+| best h_down | 0.39 | 41 | 1502 -> 1504 | 55 | 65 -> 60 | 30 -> 25 | 6 |
+| best tow | 0.41 -> 0.38 | 51 | 1102 -> 1229 | 50 | 55 | 5 | 10 |
+
+- **Hills and tow hold;** upright, step and turn don't. Across the 15 the worst copy costs a median 8 % of upright, 9 % of step
+  and 11.5 % of turn, and nothing on hills, crest or tow. The all-rounder order's top group stays, with `best up` moving up to first. That rank is a
+  design's worst gauge, so it doesn't see `best up` lose half its upright: its step ranks lower still.
+- **Upright is the tail servo's strength** (`single`, one error at a time, upright):
+
+  | Servo strength | 100 % | 95 % | 90 % | 85 % | 75 % |
+  |---|---|---|---|---|---|
+  | T3 (3.31 N m) | 1.00 | 0.995 | 0.92 | 0.755 | 0.63 |
+  | best up (4.0 N m, the knob's top) | 0.995 | 0.975 | 0.505 | 0.495 | 0.48 |
+  | best crest (2.56 N m) | 0.865 | 0.845 | 0.635 | 0.455 | 0.39 |
+
+  CoM, mass, tyre and motor errors alone move these three by 0.065 at most, inside the floor. The knob is the servo's stall
+  torque and the sim gives all of it for as long as asked; a real servo won't. Its mass grows with torque (`robots.add_limb`),
+  so nothing rewards spare strength. Probably the search settles just above each design's cliff (not checked on more designs).
+- **T3's step is a cliff too:** x+5 reads 57, motors 15 % weaker 85, servos 15 % weaker 90; x-5, y+2, z+3, 5 % heavier and the
+  smaller tyre all keep 150. Why isn't traced.
+- **Turn goes both ways with the CoM:** T3 reads 432 at x-5 and 514 at x+5, `best up` 728 and 625. As G3 says, it reads where the CoM
+  sits against the wheels' centre. A real robot can trim that by moving a pack, unlike a servo's strength.
+
+**Not modelled:** the belly's height, parts shifting in a fall, hulls printed out of shape, G8 rough ground. Designs of the
+250 mm cap may behave otherwise: none has been read this way.
+
+## The 250 mm run (2026-11-07, wired, not run)
+
+`SCORPION_CAP=capability_250 SCORPION_UNTIL='2026-11-08 07:00' python gauges/capability.py run` -> `out/capability_250/`.
+Without SCORPION_UNTIL its deadline is the strict run's, long past, so it would stop after B. Two calls from Zach:
+- **A cap:** the body and wheels at most 250 mm; the claws and tail don't count ("Longer prints are easy on pla, if we
+  want better materials it gets more risky depending on how long it prints for").
+- **The head out of the body** ("Theres a good chance that is going to be blocked in some way for most bodies. We would
+  want the flexibility to be able to move that somewhere else").
+
+What changes, for a design with the new knob `head_f` only (the runs before rebuild as they ran):
+- **The head on top** (`search.HEAD_OUT`, `knobs._place_head`): the skin no longer wraps the head, so the parts inside
+  span 239 mm, not 270. The head's base sits flat on the body's top, on the highest point under its footprint, its pan
+  axis on the centre line at `head_f` of the way from the back (0) to the front (1), the base wholly over the body. Its
+  210 g moves with it. In the sims it's two hulls (base and drum, cradle and ball), part of the body: it lands in falls
+  and stops the tail.
+- **Refused:** the stowed tail through the head, the tail's turntable in its way, a flipper sweeping through it
+  (`knobs.head_problems`); a body print over 250 mm on any side (`knobs.cap_problems`: the hull and the motor pods; not
+  the head, tail or claws; the tyres may stand out past it).
+- **The space:** the rough run's protocol and gauges, every body a skin (the Trainer's own tub is 276 mm), the body's
+  size knobs narrowed to what 250 mm holds (`capability.CAP_RANGES`; with the old ranges not one of 480 samples passed),
+  and B of 4,096 (refusals cost about a second; screens are the cost).
+- **Pass rate, 480 Sobol samples:** 15 % build. Four wheels 28 %; six wheels 2 %: in 250 mm a six-wheeler fits only
+  with tyres under about 45 mm radius. The other refusals: flipper pairs more than 30 mm off a narrow body (they sit
+  outside the tyres), weak drives, the tail stowed onto the head. Built bodies run 216-245 long, 212-241 wide, 99-228
+  tall.
+- **Controls:** 51 tow-run designs rebuild identically under this code and HEAD's; with `head_f` added, 26 of them
+  change. T3 (323 mm skin) is refused for size; T3 with its head at the back is refused, its tail stowing onto it.
+- **Smoke** (`SCORPION_CAP=capability_250 python gauges/capability.py smoke`): the space's middle builds (body 216 x
+  222 x 150, the head on top to 302 mm) and reads all eight gauges in 51 s.
+- **Not modelled:** a dome or guard over the head; the cradle's 44 mm pan sweep against a body that rises past the
+  base's footprint; a fall that lands on the head (G1 reads upright only).
+- **Found later the same day** (`gauges/self_righting.py`): inside `CAP_RANGES` the skin's shape knobs barely move the
+  body. It's the hull of the parts and the motors, a box (400 shapes, head off, no tail: static upright 0.17 to 0.17).
+  A shell that rights the robot by itself would need about 385 x 347 mm round these wheels. Under 250 mm the tail rights
+  it (97 % upright in 120 falls) or an invertible layout drives either way up (96 %). Zach has since moved the camera
+  to a pinhole in the nose (`docs/decisions.md`), so this run needs its head knob changed before it runs.
+
 ## One body (2026-10-28)
 
 Zach, on the capability page: "a lot of floating parts. Make a check to ensure everythings connected when sampling

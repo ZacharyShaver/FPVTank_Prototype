@@ -1,0 +1,174 @@
+<meta charset="utf-8">
+<title>Scorpion Head Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a drawing sheet. A short verdict up top, then one card per option (side elevation to one scale, three readings), then the table. */
+:root{
+  --paper:#eef1f4; --card:#ffffff; --ink:#1b2330; --muted:#5a6575; --line:#d3dae3; --accent:#2c64a8;
+  --sand:#dcc6a1; --sand-edge:#9a8462; --bronze:#b98552; --ballc:#d7c3a3; --steel:#2c64a8; --glass:#2f9fc4;
+  --sight:#6b7a8f; --blindc:#b8402f; --good:#2e7d4f; --warn:#a86b12; --bad:#b8402f; --chip:#eef2f7;
+  --tyre:#2b2e33; --hub:#8b939e;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10151c; --card:#171e28; --ink:#e4e9f0; --muted:#94a1b2; --line:#283240; --accent:#6ea6e6;
+  --sand:#8f7a58; --sand-edge:#c9b38b; --bronze:#c7955f; --ballc:#a8957a; --steel:#6ea6e6; --glass:#5cc4e6;
+  --sight:#98a6b8; --blindc:#ef7a66; --good:#5fbf86; --warn:#e0a548; --bad:#ef7a66; --chip:#1f2835;
+  --tyre:#3b414b; --hub:#6c7684; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10151c; --card:#171e28; --ink:#e4e9f0; --muted:#94a1b2; --line:#283240; --accent:#6ea6e6;
+  --sand:#8f7a58; --sand-edge:#c9b38b; --bronze:#c7955f; --ballc:#a8957a; --steel:#6ea6e6; --glass:#5cc4e6;
+  --sight:#98a6b8; --blindc:#ef7a66; --good:#5fbf86; --warn:#e0a548; --bad:#ef7a66; --chip:#1f2835;
+  --tyre:#3b414b; --hub:#6c7684; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px;box-sizing:border-box;
+  padding-block:22px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font:600 34px/1.05 var(--f-display);margin:0;text-wrap:balance;letter-spacing:.005em}
+h2{font:600 22px/1.15 var(--f-display);margin:0;text-wrap:balance}
+h3{font:600 13px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+p{margin:0;max-width:72ch}
+.lede{color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.pick{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.pick ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:80ch}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:18px;height:10px;border-radius:2px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card .tag{font:500 12px var(--f-mono);color:var(--muted)}
+.reads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.read{background:var(--chip);border-radius:7px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;border-top:3px solid var(--line)}
+.read b{font:600 11px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.read span{font:500 14px/1.3 var(--f-body)}
+.read.good{border-top-color:var(--good)} .read.warn{border-top-color:var(--warn)} .read.bad{border-top-color:var(--bad)}
+.drawing{border:1px solid var(--line);border-radius:6px;background:var(--paper);overflow:hidden}
+.drawing svg{display:block;width:100%;height:auto}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.pc h3{margin-bottom:4px}
+.pc .g h3{color:var(--good)} .pc .b h3{color:var(--bad)}
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+tr:last-child td{border-bottom:0}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.notes{display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:14px}
+/* the drawings */
+svg .ground{stroke:var(--ink);stroke-width:2}
+svg .tick{stroke:var(--muted);stroke-width:1}
+svg .hull{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:5 5;opacity:.75}
+svg .body{fill:var(--sand);stroke:var(--sand-edge);stroke-width:1.5}
+svg .tyre{fill:var(--tyre)} svg .hub{fill:var(--hub)}
+svg polygon.head.ghost{fill:none;stroke:var(--bronze);stroke-width:2;stroke-dasharray:5 4;stroke-opacity:1;opacity:1}
+svg .tail{fill:none;stroke:var(--sand-edge);stroke-width:14;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+svg .tailfoot{fill:var(--sand-edge);opacity:.8}
+svg .head{stroke:var(--ink);stroke-width:1;stroke-opacity:.35}
+svg .head.base{fill:var(--bronze)} svg .head.drum{fill:var(--bronze);opacity:.85}
+svg .head.cradle{fill:var(--sand-edge);opacity:.75} svg .head.ball{fill:var(--ballc)}
+svg .guard{fill:var(--steel);opacity:.9}
+svg .cam{fill:var(--tyre);stroke:var(--accent);stroke-width:2}
+svg .dome{fill:var(--glass);fill-opacity:.12;stroke:var(--glass);stroke-width:3}
+svg .sight{stroke:var(--sight);stroke-width:2;stroke-dasharray:7 5}
+svg .fov{stroke:var(--sight);stroke-width:1.5;stroke-dasharray:3 4}
+svg .lens{fill:var(--accent);stroke:var(--card);stroke-width:2}
+svg .blind{stroke:var(--blindc);stroke-width:5}
+svg .dim{fill:var(--ink);font:600 20px var(--f-mono)}
+svg .hgt{stroke:var(--muted);stroke-width:1.5}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.reads{grid-template-columns:minmax(0,1fr)}.pc{grid-template-columns:minmax(0,1fr)}h1{font-size:28px}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>Scorpion Head Options</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section class="pick" aria-labelledby="h-call" style="border-left-color:var(--good)">
+    <h2 id="h-call">Your call, 2026-11-07</h2>
+    <p>"We might just have to keep it as a pin hole in the front. Later on a tail camera is going to be a must." So: a fixed pinhole camera in the nose (the last option below), the pan-tilt head off the body for now, and a camera on the tail later.</p>
+  </section>
+
+  <section class="pick" aria-labelledby="h-pick">
+    <h2 id="h-pick">Where it comes out</h2>
+    <ol>
+      <li><b>Only two options keep the head from landing first in a roll:</b> roll hoops, and a fixed camera with no head. Every other spot puts the head, or its dome, on the outside of the robot's roll outline.</li>
+      <li><b>If looking around with the head matters, use two roll hoops.</b> The hoops land first, end over end and sideways, and the camera still sees the ground <span class="num" id="hoop-blind"></span> mm ahead. It stands <span class="num" id="hoop-dh"></span> mm taller than the open head. Seal the ball itself (below) and no dome is needed.</li>
+      <li><b>If a fixed view is enough, a wide camera in the nose is the simplest.</b> It wins all three readings (the body lands first, it sees right to the front, and it's the lowest), with no moving parts and a flat window. But it drops the head.</li>
+      <li><b>The dome reads worst for the camera.</b> It still lands first, and its clamp ring hangs over the nose like a brim, so the ground close in front is hidden.</li>
+    </ol>
+    <p><b>Sealing the ball without a dome:</b> the M12 lens's front is glass, so an O-ring round the lens barrel makes the lens the window. The light sensor only needs brightness, so a skin 2–3 layers thick of natural filament, printed as part of the ball, covers it. A TPU wiper at the pan joint keeps out dust.</p>
+  </section>
+
+  <section aria-labelledby="h-key" style="display:flex;flex-direction:column;gap:8px">
+    <h3 id="h-key">Reading the drawings</h3>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--sand)"></i>body and tail</span>
+      <span><i class="sw" style="background:var(--bronze)"></i>head: base and drum</span>
+      <span><i class="sw" style="background:var(--ballc)"></i>ball and cradle</span>
+      <span><i class="sw" style="background:var(--steel)"></i>added guard or mount</span>
+      <span><i class="sw" style="background:var(--glass)"></i>clear dome</span>
+      <span><i class="sw" style="border-top:2px dashed var(--muted);height:0"></i>what it rolls on</span>
+      <span><i class="sw" style="border-top:2px dashed var(--sight);height:0"></i>nearest ground the camera sees</span>
+      <span><i class="sw" style="background:var(--blindc);height:4px"></i>blind ground ahead, mm</span>
+    </div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+
+  <section aria-labelledby="h-table" style="display:flex;flex-direction:column;gap:10px">
+    <h2 id="h-table">Side by side</h2>
+    <div class="tbl"><table id="table"><thead><tr><th>Option</th><th>Lands first, end over end</th><th>Lands first, sideways</th><th style="text-align:right">Blind ahead, mm</th><th style="text-align:right">Height, mm</th></tr></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="notes" aria-labelledby="h-notes">
+    <h3 id="h-notes">How these were read</h3>
+    <p><b>Lands first</b> is whatever sits on the convex outline the robot rolls on, over its top, in the side view (end over end) and the front view (sideways). The tail is left out because it moves. The <b>blind ground</b> is the nearest ground ahead of the robot's front-most point that a line from the lens reaches without passing through the body's centre-line cut or a guard. It assumes the head can tilt down as far as it needs. The tyres sit off to the sides, so they don't block it.</p>
+    <p id="guesses"></p>
+    <p>None of the guards, the dome, the shelf, the stinger mount or the fixed camera is in the sims yet. The 250 mm run models the open head on top.</p>
+  </section>
+</div>
+
+<script>/*DATA*/</script>
+<script>
+(function(){
+const D=window.HEAD, O=D.options, by=k=>O.find(o=>o.key===k);
+document.getElementById('lede').textContent='Seven ways to carry the pan-tilt head, drawn to one scale on a body the 250 mm run builds ('+D.body.join(' × ')+' mm, '+Math.round(D.R)+' mm wheels, a '+D.tail+' mm tail). Each one is read three ways: what lands first when it rolls, how much ground ahead the camera can\'t see, and how tall it stands.';
+const h=by('hoops'),op=by('open');
+document.getElementById('hoop-blind').textContent=h.blind;
+document.getElementById('hoop-dh').textContent=h.height-op.height;
+const g=D.guesses;
+document.getElementById('guesses').innerHTML='<b>Guessed numbers</b> (mine, for the sketches): hoops stand '+g.hoop_gap+' mm over the ball with a '+g.hoop_bar+' mm bar; the dome clears the head and its 44 mm pan sweep by '+g.dome_gap+' mm; the sunk ball\'s centre is '+g.well_up+' mm over the top; the chin head sits '+g.chin_out+' mm ahead of the nose, '+g.chin_z+' mm over the belly; the stinger raises the tail to '+g.stinger_pitch+'°; the fixed camera is '+g.cam_fov+'° wide, tilted '+g.cam_tilt+'° down.';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cls={roll:o=>/the head|the dome|the camera/.test(o.end+' '+o.side)?(/the dome/.test(o.end+o.side)?'warn':'bad'):'good',
+  blind:o=>o.blind==null?'bad':o.blind<=60?'good':o.blind<=150?'warn':'bad',
+  height:o=>o.height<=230?'good':o.height<=320?'warn':'bad'};
+const grid=document.getElementById('grid'),tb=document.querySelector('#table tbody');
+O.forEach(o=>{
+  const lands=o.end===o.side?o.end:o.end+' (end over end), '+o.side+' (sideways)';
+  const c=document.createElement('article');c.className='card';c.id=o.key;
+  c.innerHTML='<div class="top"><h2>'+esc(o.name)+'</h2></div>'
+   +'<div class="reads">'
+   +'<div class="read '+cls.roll(o)+'"><b>Lands first</b><span>'+esc(lands)+'</span></div>'
+   +'<div class="read '+cls.blind(o)+'"><b>Blind ahead</b><span class="num">'+(o.blind==null?'all':o.blind+' mm')+'</span></div>'
+   +'<div class="read '+cls.height(o)+'"><b>Height</b><span class="num">'+o.height+' mm</span></div></div>'
+   +'<div class="drawing">'+o.svg+'</div>'
+   +'<p>'+esc(o.what)+'</p>'
+   +'<div class="pc"><div class="g"><h3>Good</h3><ul>'+o.good.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></div>'
+   +'<div class="b"><h3>Against</h3><ul>'+o.bad.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></div></div>';
+  grid.appendChild(c);
+  const dot=k=>'<i class="dot" style="background:var(--'+cls[k](o)+')"></i>';
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td><a href="#'+o.key+'">'+esc(o.name)+'</a></td><td>'+dot('roll')+esc(o.end)+'</td><td>'+esc(o.side)+'</td><td class="n">'+dot('blind')+(o.blind==null?'all':o.blind)+'</td><td class="n">'+dot('height')+o.height+'</td>';
+  tb.appendChild(tr);});
+})();
+</script>

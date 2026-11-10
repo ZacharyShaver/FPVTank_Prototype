@@ -1,0 +1,261 @@
+<meta charset="utf-8">
+<title>Brain Box Parts Review</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a parts review. The calls to make first (one card each), then the full inventory table, then the sources. */
+:root{
+  --paper:#eef1f4; --card:#ffffff; --ink:#1b2330; --muted:#5a6575; --line:#d3dae3; --accent:#2c64a8; --chip:#eef2f7;
+  --have:#2e7d4f; --buy:#a86b12; --sim:#6b5aa8; --gone:#7a8494; --call:#b8402f; --w-pack:#8e24aa;--w-5v:#d32f2f;--w-3v:#d97706;--w-sda:#2e7d32;--w-scl:#1565c0;--w-sig:#00838f;--tint:#fbeeeb;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10151c; --card:#171e28; --ink:#e4e9f0; --muted:#94a1b2; --line:#283240; --accent:#6ea6e6; --chip:#1f2835;
+  --have:#5fbf86; --buy:#e0a548; --sim:#a596e6; --gone:#8b95a5; --call:#ef7a66; --w-pack:#ce93d8;--w-5v:#ff8a80;--w-3v:#ffb74d;--w-sda:#81c784;--w-scl:#64b5f6;--w-sig:#4dd0e1;--tint:#3a221e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10151c; --card:#171e28; --ink:#e4e9f0; --muted:#94a1b2; --line:#283240; --accent:#6ea6e6; --chip:#1f2835;
+  --have:#5fbf86; --buy:#e0a548; --sim:#a596e6; --gone:#8b95a5; --call:#ef7a66; --w-pack:#ce93d8;--w-5v:#ff8a80;--w-3v:#ffb74d;--w-sda:#81c784;--w-scl:#64b5f6;--w-sig:#4dd0e1;--tint:#3a221e; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:22px;box-sizing:border-box;
+  padding-block:22px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font:600 34px/1.05 var(--f-display);margin:0;text-wrap:balance}
+h2{font:600 22px/1.15 var(--f-display);margin:0;text-wrap:balance}
+h3{font:600 17px/1.2 var(--f-display);margin:0;text-wrap:balance}
+p{margin:0;max-width:74ch}
+.lede{color:var(--muted)}
+.calls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.call{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--call);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;min-width:0}
+.call .q{font-weight:600}
+.call ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:14px}
+.call .pick{font-size:14px;background:var(--chip);border-radius:6px;padding:6px 9px}
+.call .pick b{color:var(--accent)}
+.n{font:600 12px var(--f-mono);color:var(--call);letter-spacing:.04em}
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+td.m{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.grp td{font:600 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--chip)}
+.st{display:inline-block;font:600 11px var(--f-body);letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:1px 6px;border:1px solid currentColor;white-space:nowrap}
+.have{color:var(--have)} .buy{color:var(--buy)} .sim{color:var(--sim)} .gone{color:var(--gone)} .later{color:var(--accent)}
+.cref{font:600 12px var(--f-mono);color:var(--call)}
+.notes{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:14px}
+@media (max-width:760px){.calls{grid-template-columns:minmax(0,1fr)}h1{font-size:28px}}
+/*ina219*/
+.explain{grid-column:1/-1;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--call);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.explain figure{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.explain figcaption{font-size:13px;color:var(--muted);max-width:90ch}
+.explain ol,.explain ul{margin:4px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:3px;font-size:14px;max-width:74ch}
+.explain .tbl table{min-width:0}
+.explain table.wl{min-width:640px}
+.explain td.m{white-space:nowrap}
+.ex-top{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+.ex-words{display:flex;flex-direction:column;gap:10px;font-size:14px}
+.wd-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+svg.plan{display:block;width:100%;height:auto;color:var(--ink)}
+svg.wd{display:block;width:100%;min-width:940px;height:auto;color:var(--ink)}
+.wlist summary{cursor:pointer;font-weight:600}
+.wlist[open] summary{margin-bottom:8px}
+.t{font:400 12px var(--f-body);fill:currentColor}
+.tb{font:600 13px var(--f-body);fill:currentColor}
+.ts{font:400 11.5px var(--f-body);fill:currentColor}
+.tm{font:500 11px var(--f-mono);fill:currentColor}
+.tm.b{font-weight:600}
+.dim{fill:var(--muted)}
+.bx{fill:var(--card);stroke:currentColor;stroke-width:1.4}
+.bx.have{stroke:var(--have)} .bx.buy{stroke:var(--buy)}
+.bx.ina,.ina{fill:var(--tint);stroke:var(--call);stroke-width:2.4}
+.bx.slot{stroke:var(--muted);stroke-dasharray:4 3;fill:none}
+.tubo{fill:var(--chip);stroke:var(--muted);stroke-width:1.6}
+.inat{fill:var(--call)}
+.lead{stroke:var(--call);stroke-width:1.4}
+.cell{fill:none;stroke:var(--line)}
+.cell.on{fill:var(--chip);stroke:var(--muted)}
+.res{fill:var(--card);stroke:currentColor;stroke-width:1.2}
+.shunt{fill:var(--card);stroke:var(--w-pack);stroke-width:1.6}
+.pin{fill:currentColor}
+.sw{stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.w{fill:none;stroke-width:2.2;stroke-linejoin:round}
+.w.old{stroke-width:1.2}
+.w.opt{stroke-dasharray:6 4}
+.pk{stroke:var(--w-pack)} .v5{stroke:var(--w-5v)} .v3{stroke:var(--w-3v)} .gn{stroke:currentColor} .sda{stroke:var(--w-sda)} .scl{stroke:var(--w-scl)} .sg{stroke:var(--w-sig)}
+.pkf{fill:var(--w-pack)} .v5f{fill:var(--w-5v)} .sgf{fill:var(--w-sig)}
+.pkt{fill:var(--w-pack)} .v5t{fill:var(--w-5v)}
+@media (max-width:980px){.ex-top{grid-template-columns:minmax(0,1fr)}}
+/*/ina219*/
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>Brain Box Parts Review</h1>
+    <p class="lede">Everything that could go in the brain box, from three lists that disagree: what you own (the Control repo's <code>HARDWARE.md</code>), the power plan of 2026-10-11, and the parts the sims carry. Today's calls are in too: no pan-tilt head, a pinhole camera in the nose, and a tail later. The 11 calls first, then every part.</p>
+  </header>
+
+  <section aria-labelledby="h-agreed" style="background:var(--card);border:1px solid var(--line);border-left:4px solid var(--have);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+    <h2 id="h-agreed">Agreed, updated 2026-11-08</h2>
+    <p>You took the picks below ("good picks ... what I'd do for now"). Then, on power: "one for the motors one for the pi". So <b>C1: two packs. One runs both ESCs through the Y-harness, the other runs the Pi through the Pololu, and the robot comes off the wall.</b> <b>C2: a stop button on the OE gate,</b> which the Pi can trigger and read. <b>C3: the Pololu with a switch on its EN pin. C4: a slot kept for the tail's servo BEC, nothing bought. C5: the IMU on its own serial wire, off the motors' bus. C6: the INA219 goes in this order, moved to 0x41. C7: no dongle, and the Pi's WiFi is measured well over what 720p30 needs. C8: the IR camera and lights go on the tail; your IMX219 120° camera goes in the nose. C9: plain vents, no filter.</b> The selector waits. Your ESP32 reads the four motors' encoders (C11), so no Pico. The drive plan, two motors a side in parallel on the two ESCs, is in <code>gauges/SHOPPING.md</code>. Buying now comes to about $180-270.</p>
+  </section>
+
+  <section aria-labelledby="h-calls" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="h-calls">The calls, with the picks you took</h2>
+    <div class="calls">
+      <article class="call"><span class="n">C1 · sets the box's size</span><p class="q">How many packs ride in the box: two or three?</p>
+        <ul><li>Built today: two, one per ESC (each drive side on its own pack).</li><li>The power plan: two drive packs on a selector switch, plus pack C for the Pi. That's three in the robot, and untethered.</li><li>The sims carry two. A third 5200 is 141 × 46 × 26 mm and 300 g.</li></ul>
+        <p class="pick"><b>Resolved:</b> two. One runs both ESCs, the other runs the Pi through the Pololu, so the robot comes off the wall. A third 5200 wouldn't fit anyway: 141 mm against 126 across the back.</p></article>
+      <article class="call"><span class="n">C2 · the kill switch</span><p class="q">Which switch is the e-stop?</p>
+        <ul><li>The sims have a separate red e-stop button on the side.</li><li>The power plan's Carling selector has a centre-off, which kills the drive.</li><li>Each INJORA ESC also has its own power switch on a lead.</li></ul>
+        <p class="pick"><b>Resolved:</b> a latching button in the wire from GPIO 17 to the PCA's OE, recessed but within reach. The Pi can trigger the same line and reads the button on GPIO 27. The ESC switches stay on, tucked inside, as the hard power cut.</p></article>
+      <article class="call"><span class="n">C3 · Pi power</span><p class="q">Does the Pi get its own switch?</p>
+        <ul><li>The plan: the Pololu 5 V regulator, and no switch, so the Pi boots when pack C is plugged in.</li><li>The sims have a Pi power switch and a 45 mm UBEC, the plan's superseded alternative.</li></ul>
+        <p class="pick"><b>Resolved:</b> the Pololu, with a small switch from its EN pin to ground that puts the board to sleep. It carries almost no current, unlike an inline switch. Bench-test it first: Pololu doesn't say what a floating EN does.</p></article>
+      <article class="call"><span class="n">C4 · servo power, for the tail</span><p class="q">What powers the tail's servos?</p>
+        <ul><li>Today the servos run off the left ESC's 5 V / 2 A BEC (built for two MG90Ds).</li><li>The tail the sims search uses servos of 2–3.5 N·m stall, which draw several amps.</li><li>The sims have an 8 A UBEC for it, which isn't in the plan or on the shopping list.</li></ul>
+        <p class="pick"><b>Resolved:</b> nothing bought now. A 48 × 30 × 15 slot (the sims' size, a guess) stays open at the back of the box, and the BEC comes with the tail's servos.</p></article>
+      <article class="call"><span class="n">C5 · missing part</span><p class="q">Buy an IMU?</p>
+        <ul><li>The sims carry one near the centre of mass (a BNO085, guessed size). The tail's righting reflex reads it to know it's upside down.</li><li>It also lets a real run log pitch, roll and heading, to set beside the sim's. That's useful for the pitch before there's a tail.</li><li>Its address is 0x4A, clear of the PCA9685's 0x40. But Adafruit lists the chip as troublesome on I²C: it breaks the bus's timing and sometimes needs a reset.</li><li>The PCA9685 is on that bus. If the bus hangs, the PCA keeps sending its last throttle and the Pi can't change it. Only OE or the stop button still stops the motors.</li></ul>
+        <p class="pick"><b>Resolved:</b> buy it now, and run it in its serial mode (UART-RVC): one signal wire to Pi pin 10, off the motors' bus. You get yaw, pitch, roll and acceleration, but no raw gyro.</p></article>
+      <article class="call"><span class="n">C6 · the Pi's pack gauge</span><p class="q">The INA219 and the PCA9685 both want address 0x40. And when does the INA219 get bought?</p>
+        <ul><li>The clash is one solder bridge: A0 moves the INA219 to 0x41.</li><li>It's how the Pi sees its own pack and stops cleanly. The ESCs have a cutoff for the drive pack. The Pololu has none, and the alarm only beeps.</li><li>If nobody hears the alarm, the Pi keeps draining its pack to about 5.9 V, or 2.95 V a cell, below the 3.0 V floor.</li><li>It was parked as "later" when the Pi was tethered, and it stayed there when the Pi got its own pack.</li></ul>
+        <p class="pick"><b>Resolved:</b> buy it in this order ($9.95). Wire it and write the shutdown code once the robot drives. <a href="#ina219">The picture and wiring are just below</a>.</p></article>
+                        <!--ina219-->
+      <article class="explain" id="ina219" aria-labelledby="h-ina">
+        <h3 id="h-ina">What the INA219 is, for C6</h3>
+        <div class="ex-top">
+          <figure>
+            <svg class="plan" viewBox="0 0 596 276" role="img" aria-label="Top view of the tub, print 1. The INA219 sits at the back, in the Pi pack's lead, between that pack and the 5 volt regulator."><text class="ts dim" x="112.0" y="20">back</text><text class="ts dim" x="581.5" y="20" text-anchor="end">front</text><rect class="tubo" x="112.0" y="30.0" width="469.5" height="237.2" rx="3"/><rect class="bx have" x="283.7" y="42.1" width="239.7" height="44.2" rx="3"/><text class="ts" x="403.6" y="68.2" text-anchor="middle">Drive pack</text><rect class="bx have" x="283.7" y="210.9" width="239.7" height="44.2" rx="3"/><text class="ts" x="403.6" y="237.0" text-anchor="middle">Pi pack (proposed: the right one)</text><rect class="bx have" x="203.8" y="42.1" width="76.5" height="40.8" rx="3"/><text class="ts" x="242.0" y="66.5" text-anchor="middle">ESC</text><rect class="bx have" x="203.8" y="214.3" width="76.5" height="40.8" rx="3"/><text class="ts" x="242.0" y="238.7" text-anchor="middle">ESC</text><rect class="bx have" x="254.8" y="92.8" width="167.4" height="111.5" rx="3"/><text class="ts" x="338.5" y="152.6" text-anchor="middle">Pi in its box</text><rect class="bx have" x="146.0" y="126.7" width="105.7" height="43.7" rx="3"/><text class="ts" x="198.9" y="152.6" text-anchor="middle">PCA9685</text><rect class="bx slot" x="117.1" y="54.8" width="81.6" height="25.5" rx="3"/><text class="ts" x="157.9" y="71.6" text-anchor="middle">servo BEC slot</text><rect class="bx buy" x="117.1" y="199.2" width="43.2" height="43.2" rx="3"/><text class="ts" x="138.7" y="224.7" text-anchor="middle">Pololu</text><path class="w pk" d="M283.7 211.0 H176.6 V175.3 H163.0" marker-end="url(#arP)"/><path class="w pk" d="M139.5 191.0 V199.2"/><path class="w v5" d="M160.3 224.7 H197.0 V216.0 a5 5 0 0 0 0 -10 V188.9 H253.4" marker-end="url(#arR)"/><text class="ts v5t" x="224.2" y="183.9" text-anchor="middle">5 V</text><text class="ts pkt" x="225.9" y="206.0" text-anchor="middle">pack +</text><rect class="ina" x="118.8" y="155.3" width="44.2" height="35.7" rx="3"/><line class="lead" x1="118.8" y1="173.1" x2="80" y2="173.1"/><text class="tb inat" x="4" y="177.1">INA219</text><text class="ts" x="4" y="193.1">in the Pi</text><text class="ts" x="4" y="207.1">pack's lead</text><defs><marker id="arP" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path class="pkf" d="M0 0 L6 3 L0 6 z"/></marker><marker id="arR" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path class="v5f" d="M0 0 L6 3 L0 6 z"/></marker></defs></svg>
+            <figcaption>Print 1's tub from above, with parts where the sim has them. The Pi's box and the Pololu are at their real sizes, and the INA219 sits above the PCA's back end. Box v2 isn't laid out, so these can move. Not placed yet: the IMU, stop button, Pi off switch and alarm.</figcaption>
+          </figure>
+          <div class="ex-words">
+            <p><b>What it's for:</b> it lets the Pi's software read how full its own pack is. Today only the alarm knows, and the alarm can only beep. Think of it as a health endpoint for the battery: a number the program can act on.</p>
+            <div>
+              <p><b>What it's doing:</b></p>
+              <ol>
+                <li>The pack's + wire runs through a 0.1 Ω resistor on the board, so all the Pi's current passes through it.</li>
+                <li>The chip measures the voltage across that resistor, which gives the current, and the voltage at its far end, which gives the pack's level.</li>
+                <li>The Pi asks for both numbers over I²C, about once a second.</li>
+                <li>At 7.0 V, a program stops the motors and then shuts the Pi down. That program doesn't exist yet.</li>
+              </ol>
+            </div>
+            <p><b>What it doesn't do:</b> it never cuts power, so if the program isn't running, nothing happens. It only watches the Pi's pack. The ESCs' own cutoff covers the drive pack.</p>
+          </div>
+        </div>
+        <div class="tbl"><table class="cmp"><thead><tr><th>Pi's pack at</th><th>Alarm only</th><th>Alarm + INA219</th></tr></thead><tbody>
+          <tr><td class="m">7.0 V</td><td>It beeps. If you hear it, you stop and shut down by hand.</td><td>It beeps, and the program stops the motors and shuts the Pi down.</td></tr>
+          <tr><td class="m">about 5.9 V</td><td>If nobody heard: the Pololu can't hold 5 V, the Pi loses power mid-run, which risks the SD card, and the cells are below their 3.0 V floor.</td><td>Only reached if the program wasn't running.</td></tr>
+        </tbody></table></div>
+        <p><b>What it costs:</b> $9.95, four thin wires, and that program. The resistor also loses about 0.2 V at 2 A, so the Pololu holds 5 V down to about 6.1 V in, not 5.9. That's still well under the alarm.</p>
+        <figure class="ex-wide">
+          <div class="wd-scroll"><svg class="wd" viewBox="0 0 1060 716" role="img" aria-label="Wiring. The Pi pack's positive wire runs through the INA219 to the Pololu regulator, which feeds the Pi's 5 volt pins. The INA219 takes power and I2C from the PCA9685's far header. The IMU sends one data wire to Pi pin 10. The stop button sits in the wire from GPIO 17 to the PCA9685's OE pin."><rect class="bx buy" x="20" y="6" width="104" height="36" rx="6"/><text class="tb" x="72" y="21" text-anchor="middle">LiPo alarm</text><text class="ts" x="72" y="35" text-anchor="middle">beeps at 7.0 V</text><path class="w gn" d="M60 42 V66"/><text class="ts dim" x="52" y="58" text-anchor="end">balance</text><rect class="bx have" x="20" y="66" width="120" height="100" rx="6"/><text class="tb" x="30" y="88">Pi pack</text><text class="ts" x="30" y="104">Zeee 2S 5200</text><text class="ts dim" x="30" y="118">T-plug</text><text class="tm b" x="134" y="88" text-anchor="end">−</text><text class="tm b" x="134" y="114" text-anchor="end">+</text><path class="w gn" d="M140 84 H170 V46 H520 V62"/><text class="ts" x="300" y="40" text-anchor="middle">pack −</text><path class="w pk opt" d="M140 110 H200"/><text class="ts pkt" x="170" y="104" text-anchor="middle">pack +</text><path class="w pk opt" d="M350 110 H470"/><text class="ts pkt" x="410" y="104" text-anchor="middle">pack +</text><rect class="bx ina" x="200" y="62" width="150" height="96" rx="6"/><text class="tb inat" x="275" y="80" text-anchor="middle">INA219</text><text class="tm" x="206" y="114">Vin+</text><text class="tm" x="344" y="114" text-anchor="end">Vin−</text><line class="w pk" x1="238" y1="110" x2="312" y2="110"/><rect class="shunt" x="257" y="102" width="36" height="16" rx="2"/><text class="tm" x="275" y="114" text-anchor="middle">0.1 Ω</text><text class="ts" x="275" y="132" text-anchor="middle">A0 bridged: 0x41</text><text class="tm" x="216" y="152" text-anchor="middle">GND</text><text class="tm" x="246" y="152" text-anchor="middle">SCL</text><text class="tm" x="276" y="152" text-anchor="middle">SDA</text><text class="tm" x="306" y="152" text-anchor="middle">VCC</text><rect class="bx buy" x="470" y="62" width="170" height="112" rx="6"/><text class="tb" x="510" y="94">Pololu</text><text class="ts" x="510" y="108">D36V50F5</text><text class="ts" x="510" y="122">5 V regulator</text><text class="tm" x="520" y="76" text-anchor="middle">GND</text><text class="tm" x="476" y="114">VIN</text><text class="tm" x="634" y="76" text-anchor="end">VOUT</text><text class="tm" x="634" y="92" text-anchor="end">GND</text><text class="tm" x="634" y="108" text-anchor="end">GND</text><text class="tm" x="634" y="128" text-anchor="end">VOUT</text><text class="tm" x="634" y="144" text-anchor="end">VOUT</text><text class="tm" x="520" y="168" text-anchor="middle">EN</text><text class="tm" x="600" y="168" text-anchor="middle">GND</text><path class="w sg" d="M520 174 V206 H546"/><path class="w gn" d="M574 206 H600 V174"/><circle class="pin" cx="548" cy="206" r="2.6"/><circle class="pin" cx="572" cy="206" r="2.6"/><line class="sw" x1="550" y1="205" x2="571" y2="194"/><text class="tb" x="560" y="226" text-anchor="middle">Pi off switch</text><text class="ts" x="560" y="240" text-anchor="middle">closed = Pi asleep</text><path class="w v5" d="M640 72 H880"/><path class="w gn" d="M640 88 H866 V300"/><path class="w gn" d="M640 104 H722 V300"/><path class="w v5" d="M640 124 H686 V300"/><path class="w v5" d="M640 140 H650 V300"/><rect class="bx buy" x="880" y="56" width="150" height="120" rx="6"/><text class="tb" x="955" y="90" text-anchor="middle">BNO085</text><text class="ts" x="955" y="104" text-anchor="middle">IMU, serial mode</text><text class="tm" x="886" y="76">VIN</text><text class="tm" x="886" y="134">SDA (TX)</text><text class="tm" x="1024" y="124" text-anchor="end">3Vo</text><text class="tm" x="1024" y="152" text-anchor="end">P0</text><path class="w v3" d="M1030 120 H1046 V148 H1030"/><text class="tm" x="974" y="170" text-anchor="middle">GND</text><path class="w sg" d="M880 130 H872 a6 6 0 0 0 -12 0 H794 V298" marker-end="url(#arS)"/><text class="ts" x="788" y="226" text-anchor="end">one way:</text><text class="ts" x="788" y="240" text-anchor="end">IMU to Pi</text><path class="w gn" d="M974 176 V300"/><rect class="bx have" x="630" y="294" width="364" height="90" rx="8"/><rect class="cell on" x="633" y="300" width="34" height="34" rx="3"/><text class="tm b" x="650" y="313" text-anchor="middle">2</text><text class="tm" x="650" y="327" text-anchor="middle">5V</text><rect class="cell on" x="633" y="342" width="34" height="34" rx="3"/><text class="tm b" x="650" y="355" text-anchor="middle">1</text><text class="tm" x="650" y="369" text-anchor="middle">3V3</text><rect class="cell on" x="669" y="300" width="34" height="34" rx="3"/><text class="tm b" x="686" y="313" text-anchor="middle">4</text><text class="tm" x="686" y="327" text-anchor="middle">5V</text><rect class="cell on" x="669" y="342" width="34" height="34" rx="3"/><text class="tm b" x="686" y="355" text-anchor="middle">3</text><text class="tm" x="686" y="369" text-anchor="middle">SDA</text><rect class="cell on" x="705" y="300" width="34" height="34" rx="3"/><text class="tm b" x="722" y="313" text-anchor="middle">6</text><text class="tm" x="722" y="327" text-anchor="middle">GND</text><rect class="cell on" x="705" y="342" width="34" height="34" rx="3"/><text class="tm b" x="722" y="355" text-anchor="middle">5</text><text class="tm" x="722" y="369" text-anchor="middle">SCL</text><rect class="cell" x="741" y="300" width="34" height="34" rx="3"/><text class="tm dim" x="758" y="313" text-anchor="middle">8</text><rect class="cell" x="741" y="342" width="34" height="34" rx="3"/><text class="tm dim" x="758" y="355" text-anchor="middle">7</text><rect class="cell on" x="777" y="300" width="34" height="34" rx="3"/><text class="tm b" x="794" y="313" text-anchor="middle">10</text><text class="tm" x="794" y="327" text-anchor="middle">RX</text><rect class="cell on" x="777" y="342" width="34" height="34" rx="3"/><text class="tm b" x="794" y="355" text-anchor="middle">9</text><text class="tm" x="794" y="369" text-anchor="middle">GND</text><rect class="cell" x="813" y="300" width="34" height="34" rx="3"/><text class="tm dim" x="830" y="313" text-anchor="middle">12</text><rect class="cell on" x="813" y="342" width="34" height="34" rx="3"/><text class="tm b" x="830" y="355" text-anchor="middle">11</text><text class="tm" x="830" y="369" text-anchor="middle">G17</text><rect class="cell on" x="849" y="300" width="34" height="34" rx="3"/><text class="tm b" x="866" y="313" text-anchor="middle">14</text><text class="tm" x="866" y="327" text-anchor="middle">GND</text><rect class="cell on" x="849" y="342" width="34" height="34" rx="3"/><text class="tm b" x="866" y="355" text-anchor="middle">13</text><text class="tm" x="866" y="369" text-anchor="middle">G27</text><rect class="cell" x="885" y="300" width="34" height="34" rx="3"/><text class="tm dim" x="902" y="313" text-anchor="middle">16</text><rect class="cell" x="885" y="342" width="34" height="34" rx="3"/><text class="tm dim" x="902" y="355" text-anchor="middle">15</text><rect class="cell" x="921" y="300" width="34" height="34" rx="3"/><text class="tm dim" x="938" y="313" text-anchor="middle">18</text><rect class="cell on" x="921" y="342" width="34" height="34" rx="3"/><text class="tm b" x="938" y="355" text-anchor="middle">17</text><text class="tm" x="938" y="369" text-anchor="middle">3V3</text><rect class="cell on" x="957" y="300" width="34" height="34" rx="3"/><text class="tm b" x="974" y="313" text-anchor="middle">20</text><text class="tm" x="974" y="327" text-anchor="middle">GND</text><rect class="cell" x="957" y="342" width="34" height="34" rx="3"/><text class="tm dim" x="974" y="355" text-anchor="middle">19</text><text class="tb" x="622" y="324" text-anchor="end">Raspberry Pi 5</text><text class="ts" x="622" y="340" text-anchor="end">GPIO header, pins 1 to 20</text><text class="ts dim" x="622" y="354" text-anchor="end">pin 1 at the SD card end</text><text class="ts dim" x="622" y="368" text-anchor="end">pins 21 to 40 stay free</text><path class="w v3 opt" d="M306 158 V460 H350"/><path class="w sda opt" d="M276 158 V478 H350"/><path class="w scl opt" d="M246 158 V496 H350"/><path class="w gn opt" d="M216 158 V532 H324 a6 6 0 0 1 12 0 H350"/><text class="ts" x="316" y="296">4 thin wires, off the</text><text class="ts" x="316" y="310">PCA's far header</text><rect class="bx have" x="350" y="408" width="290" height="150" rx="6"/><text class="tb" x="495" y="468" text-anchor="middle">PCA9685</text><text class="ts" x="495" y="484" text-anchor="middle">address 0x40</text><text class="ts dim" x="356" y="426">far header</text><text class="ts dim" x="634" y="426" text-anchor="end">near header</text><text class="tm dim" x="356" y="446">V+</text><text class="tm dim" x="634" y="446" text-anchor="end">V+</text><text class="tm" x="356" y="464">VCC</text><text class="tm" x="634" y="464" text-anchor="end">VCC</text><text class="tm" x="356" y="482">SDA</text><text class="tm" x="634" y="482" text-anchor="end">SDA</text><text class="tm" x="356" y="500">SCL</text><text class="tm" x="634" y="500" text-anchor="end">SCL</text><text class="tm" x="356" y="518">OE</text><text class="tm" x="634" y="518" text-anchor="end">OE</text><text class="tm" x="356" y="536">GND</text><text class="tm" x="634" y="536" text-anchor="end">GND</text><text class="ts" x="404" y="550" text-anchor="middle">V+ terminal</text><text class="ts" x="476" y="550" text-anchor="middle">ch 0</text><text class="ts" x="576" y="550" text-anchor="middle">ch 1</text><path class="w v3 old" d="M650 376 V460 H640"/><path class="w sda old" d="M686 376 V478 H640"/><path class="w scl old" d="M722 376 V496 H640"/><path class="w gn old" d="M794 376 V532 H640"/><path class="w sg" d="M830 376 V392"/><rect class="bx buy" x="815" y="392" width="30" height="28" rx="4"/><text class="tm b" x="830" y="410" text-anchor="middle">STOP</text><path class="w sg" d="M830 420 V514 H800 a6 6 0 0 0 -12 0 H640"/><path class="w sg" d="M866 376 V392"/><rect class="res" x="853" y="392" width="26" height="28" rx="3"/><text class="tm" x="866" y="410" text-anchor="middle">1k*</text><path class="w sg" d="M866 420 V444 H830"/><circle class="sgf" cx="830" cy="444" r="3.2"/><text class="tb" x="840" y="472">Stop button:</text><text class="ts" x="840" y="486">latching,</text><text class="ts" x="840" y="500">normally closed</text><text class="ts" x="874" y="432">Pi reads</text><text class="ts" x="874" y="446">the button</text><path class="w v3 old" d="M938 376 V396"/><rect class="res" x="925" y="396" width="26" height="28" rx="3"/><text class="tm" x="938" y="414" text-anchor="middle">1k</text><path class="w v3 old" d="M938 424 V702 H330 V514 H350"/><text class="ts" x="958" y="408">pull-up, locks</text><text class="ts" x="958" y="422">OE by default</text><rect class="bx have" x="370" y="606" width="130" height="54" rx="6"/><text class="tb" x="435" y="628" text-anchor="middle">Left ESC</text><text class="ts" x="435" y="644" text-anchor="middle">2 left motors</text><rect class="bx have" x="520" y="606" width="130" height="54" rx="6"/><text class="tb" x="585" y="628" text-anchor="middle">Right ESC</text><text class="ts" x="585" y="644" text-anchor="middle">2 right motors</text><rect class="bx have" x="720" y="606" width="130" height="54" rx="6"/><text class="tb" x="785" y="628" text-anchor="middle">Drive pack</text><text class="ts" x="785" y="644" text-anchor="middle">Zeee 2S 5200</text><path class="w v5 old" d="M404 606 V558"/><text class="ts" x="398" y="588" text-anchor="end">5 V BEC</text><path class="w sg old" d="M470 606 V558"/><path class="w gn old" d="M482 606 V558"/><text class="ts" x="490" y="588">signal, GND</text><path class="w sg old" d="M570 606 V558"/><path class="w gn old" d="M582 606 V558"/><text class="ts" x="590" y="582">signal, GND</text><text class="ts dim" x="590" y="596">red lead left off</text><path class="w pk" d="M720 633 H650"/><path class="w pk" d="M685 633 V682 H435 V660"/><circle class="pkf" cx="685" cy="633" r="3.2"/><text class="ts" x="560" y="677" text-anchor="middle">T-plug Y-harness, + and −</text><text class="ts dim" x="720" y="678">ESC leads join the</text><text class="ts dim" x="720" y="692">two packs' grounds</text><text class="tb" x="20" y="200">Wires</text><line class="w pk" x1="20" y1="220" x2="46" y2="220"/><text class="ts" x="54" y="224">pack +, 6 to 8.4 V</text><line class="w v5" x1="20" y1="236" x2="46" y2="236"/><text class="ts" x="54" y="240">5 V</text><line class="w v3" x1="20" y1="252" x2="46" y2="252"/><text class="ts" x="54" y="256">3.3 V</text><line class="w gn" x1="20" y1="268" x2="46" y2="268"/><text class="ts" x="54" y="272">ground</text><line class="w sda" x1="20" y1="284" x2="46" y2="284"/><text class="ts" x="54" y="288">SDA (I²C data)</text><line class="w scl" x1="20" y1="300" x2="46" y2="300"/><text class="ts" x="54" y="304">SCL (I²C clock)</text><line class="w sg" x1="20" y1="316" x2="46" y2="316"/><text class="ts" x="54" y="320">signal</text><line class="w gn" x1="20" y1="340" x2="46" y2="340"/><text class="ts" x="54" y="344">new</text><line class="w gn old" x1="20" y1="356" x2="46" y2="356"/><text class="ts" x="54" y="360">already on the robot</text><line class="w gn opt" x1="20" y1="372" x2="46" y2="372"/><text class="ts" x="54" y="376">only with the INA219</text><text class="tb" x="20" y="402">Boxes</text><rect class="bx have" x="20" y="413" width="26" height="12" rx="3"/><text class="ts" x="54" y="424">you have it</text><rect class="bx buy" x="20" y="431" width="26" height="12" rx="3"/><text class="ts" x="54" y="442">on the buy list</text><rect class="bx ina" x="20" y="449" width="26" height="12" rx="3"/><text class="ts" x="54" y="460">your call</text><defs><marker id="arS" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path class="sgf" d="M0 0 L6 3 L0 6 z"/></marker></defs></svg></div>
+          <figcaption>The proposed wiring. Dashed wires exist only with the INA219: without it, pack + runs straight to the Pololu's VIN. Wires that hop don't touch; a dot marks a join. G17 and G27 are GPIO 17 and 27. SDA, SCL, 3.3 V and ground use the colours already on your robot, with ground drawn in the page's text colour. Not drawn: the ESP32 and encoders (waiting on the motor), the camera ribbon and the HAT.</figcaption>
+        </figure>
+        <div>
+          <p><b>Check before wiring:</b></p>
+          <ul>
+            <li><b>INA219's power pin:</b> Adafruit's newer boards may print it as VIN, not VCC. It's the header pin that takes 3 to 5 V. Vin+ on the terminal block is the pack wire. Mixing them up puts 8.4 V on the chip.</li>
+            <li><b>Pololu's holes:</b> VOUT and GND each carry several wires here. The board duplicates those pins, but I don't have the hole count. If they run out, splice.</li>
+            <li><b>Guesses:</b> the 1 kΩ on pin 13 (*), and P0 tied to the IMU's own 3Vo, where Adafruit uses the Pi's 3 V.</li>
+          </ul>
+        </div>
+        <details class="wlist"><summary>Every wire, as a list</summary><div class="tbl"><table class="wl"><thead><tr><th>From</th><th>To</th><th>What</th><th>Status</th></tr></thead><tbody><tr class="grp"><td colspan="4">Pi power</td></tr><tr><td>Pi pack + (T-plug)</td><td>INA219 Vin+</td><td>20 AWG</td><td>new, INA219 only</td></tr><tr><td>INA219 Vin−</td><td>Pololu VIN</td><td>20 AWG</td><td>new, INA219 only</td></tr><tr><td>Pi pack − (T-plug)</td><td>Pololu GND</td><td>20 AWG</td><td>new</td></tr><tr><td>Pololu VOUT</td><td>Pi pin 2 (5 V)</td><td>5 V, Dupont</td><td>new</td></tr><tr><td>Pololu VOUT</td><td>Pi pin 4 (5 V)</td><td>5 V, Dupont</td><td>new</td></tr><tr><td>Pololu GND</td><td>Pi pin 6 (GND)</td><td>ground, Dupont</td><td>new</td></tr><tr><td>Pololu GND</td><td>Pi pin 14 (GND)</td><td>ground, Dupont</td><td>new</td></tr><tr><td>Pololu EN</td><td>switch, then Pololu GND</td><td>closed = Pi asleep</td><td>new</td></tr><tr><td>Pi pack balance lead</td><td>LiPo alarm</td><td>plugs in</td><td>new</td></tr><tr class="grp"><td colspan="4">INA219</td></tr><tr><td>INA219 VCC (may read VIN)</td><td>PCA far header VCC</td><td>3.3 V</td><td>new, INA219 only</td></tr><tr><td>INA219 SDA</td><td>PCA far header SDA</td><td>I²C data</td><td>new, INA219 only</td></tr><tr><td>INA219 SCL</td><td>PCA far header SCL</td><td>I²C clock</td><td>new, INA219 only</td></tr><tr><td>INA219 GND</td><td>PCA far header GND</td><td>ground</td><td>new, INA219 only</td></tr><tr><td>INA219 A0 pads</td><td>bridged with solder</td><td>sets address 0x41</td><td>new, INA219 only</td></tr><tr class="grp"><td colspan="4">Pi to PCA</td></tr><tr><td>Pi pin 1 (3.3 V)</td><td>PCA near header VCC</td><td>orange</td><td>on the robot</td></tr><tr><td>Pi pin 3 (GPIO 2, SDA)</td><td>PCA near header SDA</td><td>green</td><td>on the robot</td></tr><tr><td>Pi pin 5 (GPIO 3, SCL)</td><td>PCA near header SCL</td><td>blue</td><td>on the robot</td></tr><tr><td>Pi pin 9 (GND)</td><td>PCA near header GND</td><td>black</td><td>on the robot</td></tr><tr><td>Pi pin 17 (3.3 V)</td><td>1 kΩ, then PCA far header OE</td><td>white, pull-up</td><td>on the robot</td></tr><tr class="grp"><td colspan="4">Stop button</td></tr><tr><td>Pi pin 11 (GPIO 17)</td><td>button, then PCA near header OE</td><td>replaces the plain jumper</td><td>changed</td></tr><tr><td>Pi pin 13 (GPIO 27)</td><td>1 kΩ*, then the OE wire past the button</td><td>the Pi reads a press</td><td>new</td></tr><tr class="grp"><td colspan="4">IMU</td></tr><tr><td>BNO085 SDA (TX in this mode)</td><td>Pi pin 10 (GPIO 15, RX)</td><td>data, IMU to Pi</td><td>new</td></tr><tr><td>BNO085 GND</td><td>Pi pin 20 (GND)</td><td>ground</td><td>new</td></tr><tr><td>BNO085 VIN</td><td>Pololu VOUT</td><td>5 V</td><td>new</td></tr><tr><td>BNO085 P0</td><td>BNO085 3Vo</td><td>selects serial mode</td><td>new</td></tr><tr class="grp"><td colspan="4">Drive</td></tr><tr><td>Drive pack (T-plug)</td><td>Y-harness, then both ESCs</td><td>one pack, both ESCs</td><td>new</td></tr><tr><td>Left ESC signal, GND</td><td>PCA ch 0</td><td>servo lead</td><td>on the robot</td></tr><tr><td>Left ESC 5 V BEC</td><td>PCA V+ terminal</td><td>red</td><td>on the robot</td></tr><tr><td>Right ESC signal, GND</td><td>PCA ch 1</td><td>red lead left off</td><td>on the robot</td></tr></tbody></table></div></details>
+      </article>
+<!--/ina219-->
+      <article class="call"><span class="n">C7 · radio</span><p class="q">WiFi dongle and antenna: in or out?</p>
+        <ul><li>The sims have a USB dongle with an antenna up a hoop.</li><li>The plan doesn't. The Pi 5 has its own WiFi, and a closed box with a lid round it cuts range.</li><li>Measured 2026-07-14, with the Pi inside the old chassis: only about 2.5-5 Mbps. A 720p30 stream reached the desktop at 1.5-7.6 fps. Small packets were fine, at 4-14 ms.</li><li>The cable that fixed this (31.9 fps at 4.4 Mbps) goes away once the robot is off the wall, so WiFi becomes the only link.</li><li>Measured again 2026-11-08, power save off, against a bar of 6 Mbps: 180-188 Mbps on 5 GHz and 41-45 on 2.4 GHz in the open, and 47-48 on 2.4 GHz inside PLA.</li></ul>
+        <p class="pick"><b>Resolved:</b> no dongle. Leave a USB port reachable and the lid radio-clear (PLA is) over the Pi. Not tested yet: packs on each side, and the far end of the driving area, so rerun it there on the first drive.</p></article>
+      <article class="call"><span class="n">C8 · the IR lights</span><p class="q">Where do the two IR LED pods go?</p>
+        <ul><li>You own them (the camera kit). They flanked the camera in the head.</li><li>The sims put lights on the claws.</li><li>With a pinhole in the nose, the head is gone.</li></ul>
+        <p class="pick"><b>Resolved:</b> on the tail, with the Arducam IR camera, when the tail comes. So the first robot has no IR. The nose gets the IMX219 120° camera you own, and the pinhole lens is off the list.</p></article>
+      <article class="call"><span class="n">C9 · heat</span><p class="q">A sealed box against cooling the Pi.</p>
+        <ul><li>The drop test wants a closed lid with pads, and dust wants it sealed.</li><li>The Pi 5 runs up to ~12 W at full load (YOLO on the Hailo too), and the Pololu and ESCs add heat.</li><li>Rough sum: 15 W in a sealed 250 × 140 × 50 box sits about 20-25 °C over the room. PLA starts to soften near 55-60 °C, so that leaves little margin, and the Pi's cooler would be breathing that warm air.</li></ul>
+        <p class="pick"><b>Resolved:</b> plain vent slots in and out, past the Pi box's own vents, with the lid's pads clear of them. No filter, to keep it simple; add one only if dust becomes a problem. Then run a load test in the printed box.</p></article>
+      <article class="call"><span class="n">C10 · getting at the packs</span><p class="q">A screwed lid against charging and swapping the packs.</p>
+        <ul><li>The fitted design holds the packs under a screwed lid.</li><li>With the selector gone, there's no flipping to a second pack: a swap means opening up. You own 4, so 2 can sit charged and ready.</li><li>The drop test modelled one lid over everything. Doors haven't been tested.</li></ul>
+        <p class="pick"><b>My pick:</b> one screwed lid over everything for v2. That replaces the separate battery door I first proposed: the door is two more parts and more screws. The stop button and Pi switch go on the shell, so only a pack swap needs the lid off. Charge the packs out of the robot. Add a door later if swaps get annoying. Your call is pending.</p></article>
+      <article class="call"><span class="n">C11 · encoders</span><p class="q">Who counts the new motors' encoders?</p>
+        <ul><li>Four JGB37-520s with Hall encoders: 8 signal wires plus power.</li><li>The Pi's GPIO in Python may not keep up.</li></ul>
+        <p class="pick"><b>Resolved:</b> your ESP32-WROOM-32 reads all four with its 8 pulse counters, so no Pico. It goes beside the PCA.</p></article>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-inv" style="display:flex;flex-direction:column;gap:10px">
+    <h2 id="h-inv">Everything that could go in</h2>
+    <p class="lede">Status: <span class="st have">have</span> owned · <span class="st buy">buy</span> planned, not bought · <span class="st sim">sims only</span> the sims carry it, no plan has it · <span class="st gone">gone</span> out after today · <span class="st later">later</span> comes with the tail. Sizes in mm.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Part</th><th>Status</th><th>Size, mass</th><th>Goes</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="5">Brain</td></tr>
+        <tr><td>Raspberry Pi 5 + active cooler</td><td><span class="st have">have</span></td><td class="m">85 × 56, stack 95 g</td><td>In its friction box, mid box</td><td>Needs air across its cooler <span class="cref">C9</span></td></tr>
+        <tr><td>M.2 HAT+ with Hailo-8L</td><td><span class="st have">have</span></td><td class="m">on the Pi</td><td>Stacked on the Pi</td><td>Its own standoffs come with the kit</td></tr>
+        <tr><td>PCA9685 (clone)</td><td><span class="st have">have</span></td><td class="m">~62 × 26, 12 g</td><td>Friction fit, behind the Pi</td><td>Caliper its outline: a clone isn't Adafruit's size</td></tr>
+        <tr><td>IMU (BNO085 in the sims)</td><td><span class="st sim">sims only</span></td><td class="m">~25 × 20</td><td>Near the centre of mass</td><td>Tail righting, and logging real runs <span class="cref">C5</span></td></tr>
+        <tr><td>ESP32-WROOM-32 for the encoders</td><td><span class="st have">have</span></td><td class="m">caliper it</td><td>Beside the PCA</td><td><span class="cref">C11</span></td></tr>
+        <tr><td>USB WiFi dongle + antenna</td><td><span class="st sim">sims only</span></td><td class="m">40 × 18</td><td>-</td><td><span class="cref">C7</span></td></tr>
+        <tr class="grp"><td colspan="5">Camera</td></tr>
+        <tr><td>IMX219 8MP camera, 120° (by eye from a listing)</td><td><span class="st have">have</span></td><td class="m">~25 × 24 listed</td><td>In the nose</td><td>Needs a small funnel, not a pinhole: about 13.5 mm with the lens 2 mm back. Caliper it</td></tr>
+        <tr><td>HC-SR04 distance sensor</td><td><span class="st have">have</span></td><td class="m">45 × 20 × 15 listed</td><td>Off the robot</td><td>One distance reading, not a depth image. Could read real speed from a stand at the end of a test lane</td></tr>
+        <tr><td>Arducam day-night board (OV5647, M12)</td><td><span class="st later">later</span></td><td class="m">~25 × 24</td><td>On the tail</td><td>You own it. The tail's IR camera <span class="cref">C8</span></td></tr>
+        <tr><td><s>M12 pinhole lens</s></td><td><span class="st gone">gone</span></td><td class="m">-</td><td>-</td><td>Off the list: the IMX219 takes the nose</td></tr>
+        <tr><td>IR LED pods with light sensor ×2</td><td><span class="st later">later</span></td><td class="m">-</td><td>On the tail, with the IR camera</td><td>You own them; not assembled yet <span class="cref">C8</span></td></tr>
+        <tr><td>30 cm CSI ribbon</td><td><span class="st have">have</span></td><td class="m">-</td><td>With the Arducam, tail to the Pi</td><td>The Pi 5 has two camera ports. Whether 30 cm reaches isn't checked</td></tr>
+        <tr class="grp"><td colspan="5">Power</td></tr>
+        <tr><td>Zeee 2S 5200 packs (own 4)</td><td><span class="st have">have</span></td><td class="m">141 × 46 × 26, 300 g</td><td>Bays along the walls, on edge</td><td>2 in the box <span class="cref">C1</span>, out to charge <span class="cref">C10</span></td></tr>
+        <tr><td>INJORA ESCs ×2</td><td><span class="st have">have</span></td><td class="m">45 × 24 × 34 (caliper), 55 g</td><td>Bays behind the packs</td><td>The bay must be cut to 24 mm, not print 1's 26.5. Each has a power switch on a lead <span class="cref">C2</span></td></tr>
+        <tr><td>Carling ON-OFF-ON selector, 20 A DC</td><td><span class="st later">later</span></td><td class="m">-</td><td>Outside, reachable</td><td>Only if two drive packs come back; no longer the e-stop <span class="cref">C2</span></td></tr>
+        <tr><td>Latching stop button, normally closed</td><td><span class="st buy">buy</span></td><td class="m">16 mm cutout</td><td>Outside, recessed, reachable</td><td>On the OE gate, signal only <span class="cref">C2</span></td></tr>
+        <tr><td>T-plug Y-harness</td><td><span class="st buy">buy</span></td><td class="m">-</td><td>Behind the selector</td><td>Leads need room: print 1 left none between pack and ESC</td></tr>
+        <tr><td>Pololu D36V50F5, 5 V</td><td><span class="st buy">buy</span></td><td class="m">small board</td><td>Back of the box</td><td>Replaces the sims' 45 mm UBEC <span class="cref">C3</span></td></tr>
+        <tr><td>Pi power switch</td><td><span class="st buy">buy</span></td><td class="m">small</td><td>On the Pololu's EN pin</td><td>Carries almost no current <span class="cref">C3</span></td></tr>
+        <tr><td>LiPo alarm on the Pi's pack</td><td><span class="st buy">buy</span></td><td class="m">~40 × 25</td><td>Where it's heard</td><td>The Pololu has no cutoff of its own <span class="cref">C1</span></td></tr>
+        <tr><td>INA219, address jumpers</td><td><span class="st buy">buy</span></td><td class="m">~26 × 21</td><td>On the Pi's power lead</td><td><span class="cref">C6</span></td></tr>
+        <tr><td>Servo BEC, 8 A class</td><td><span class="st later">later</span></td><td class="m">~48 × 30</td><td>A slot at the back</td><td>For the tail <span class="cref">C4</span></td></tr>
+        <tr class="grp"><td colspan="5">Leaving, coming later</td></tr>
+        <tr><td>Pan and tilt servos (MG90D ×2)</td><td><span class="st gone">gone</span></td><td class="m">-</td><td>-</td><td>With the head. Frees PCA ch 4 and 5 and the ESC BEC's load</td></tr>
+        <tr><td>Head (base, drum, cradle, ball)</td><td><span class="st gone">gone</span></td><td class="m">210 g</td><td>-</td><td>Shelved, not deleted</td></tr>
+        <tr><td>Drive motors: JGB37-520 ×4</td><td><span class="st buy">1 coming</span></td><td class="m">-</td><td>In the wheel pods</td><td>Two a side in parallel to each ESC; encoders <span class="cref">C11</span></td></tr>
+        <tr><td>Tail servos and tail camera</td><td><span class="st later">later</span></td><td class="m">-</td><td>The tail</td><td>Cable through the turntable; the second CSI port</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="h-cost" style="display:flex;flex-direction:column;gap:10px">
+    <h2 id="h-cost">What the missing parts cost</h2>
+    <p class="lede">Looked up 2026-11-07, USD before shipping and tax; listings move, so check before buying. Sources and notes are in <code>gauges/SHOPPING.md</code>.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Cheapest sensible source</th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="4">Power and wiring: about $95-115</td></tr>
+        <tr><td>Pololu D36V50F5 5 V regulator</td><td>1</td><td class="m">$39.95</td><td><a href="https://www.pololu.com/product/4091">Pololu</a></td></tr>
+        <tr><td>Carling L16D1S001 rocker, on-off-on, 20 A</td><td>1</td><td class="m">$10-23</td><td><a href="https://spemco.com/l16d1s001-carling-spdt-l-series-on-off-on-rocker-switch-no-lamps-20a-12v/">Spemco</a> $10.25 (the exact -AZZG9-1H2 suffix wasn't listed)</td></tr>
+        <tr><td><s>M12 pinhole lens, 3.7 mm</s> <span class="cref">C8</span></td><td>-</td><td class="m">$0</td><td>Your IMX219 camera takes the nose</td></tr>
+        <tr><td>INA219 with address jumpers (Adafruit 904) <span class="cref">C6: yes</span></td><td>1</td><td class="m">$9.95</td><td><a href="https://www.adafruit.com/product/904">Adafruit</a></td></tr>
+        <tr><td>18 AWG silicone wire, red/black 5 m</td><td>1</td><td class="m">$9.49</td><td>MMOBIEL, Walmart</td></tr>
+        <tr><td>T-plug Y-harness, 1 female to 2 male</td><td>2-pack</td><td class="m">$8.99</td><td><a href="https://gator-rc.com/t-plug-2-male-to-1-female-connector-adapter?amp=1">Gator-RC</a></td></tr>
+        <tr><td>2 mm bullet connectors</td><td>10 pairs</td><td class="m">$7.95</td><td><a href="https://vetco.net/products/vupn638_10_pair_gold_2mm_rc_bullet_connectors">VETCO</a></td></tr>
+        <tr><td>20 AWG silicone wire</td><td>~1 m</td><td class="m">$5-10</td><td>stock patchy</td></tr>
+        <tr><td>1-8S LiPo checker with buzzer</td><td>1</td><td class="m">$4-5.50</td><td><a href="https://racedayquads.com/products/1-8s-lipo-battery-voltage-tester-low-voltage-buzzer-alarm">Race Day Quads</a> $3.99</td></tr>
+        <tr class="grp"><td colspan="4">Drive and printing: about $42-88</td></tr>
+        <tr><td>JGB37-520, 12 V 333 rpm, encoder (4 more after the one coming)</td><td>4</td><td class="m">$10-22 each</td><td><a href="https://www.aliexpress.us/item/3256807403055518.html">AliExpress</a> $11.59 with bracket and wheel</td></tr>
+        <tr><td><s>TPU 95A, 1 kg</s></td><td>-</td><td class="m">$0</td><td>You have Inland TPU, 95A</td></tr>
+        <tr class="grp"><td colspan="4">Holding parts in: only what you don't have, up to about $38</td></tr>
+        <tr><td><s>M2.5 brass standoff kit</s></td><td>-</td><td class="m">$0</td><td>Not needed: friction box</td></tr>
+        <tr><td>Heat-set inserts, M3</td><td>1</td><td class="m">up to $25</td><td>An M2-M6 kit for $25; M3-only packs not priced</td></tr>
+        <tr><td>Rubberized straps, 20 × 200 mm</td><td>5-pack</td><td class="m">$12.55</td><td><a href="https://toytooth.com/products/apex-rc-products-5-pack-20mm-x-200mm-hd-rubberized-battery-straps-non-slip-3030">Apex RC</a></td></tr>
+        <tr class="grp"><td colspan="4">From the calls</td></tr>
+        <tr><td>BNO085 IMU (Adafruit 4754) <span class="cref">C5: yes</span></td><td>1</td><td class="m">$24.95</td><td>DigiKey or Mouser</td></tr>
+        <tr><td>Latching stop button, normally closed, 16 mm <span class="cref">C2</span></td><td>1</td><td class="m">about $25-40</td><td><a href="https://www.buerklin.com/en/p/eao/emergency-stop/51-256-026/12G0467/">EAO, Bürklin</a> €24.23; generic ones not priced</td></tr>
+        <tr><td>Small switch for the Pololu's EN pin <span class="cref">C3: yes</span></td><td>1</td><td class="m">not priced</td><td>-</td></tr>
+        <tr><td><s>Raspberry Pi Pico 2</s> <span class="cref">C11: resolved</span></td><td>-</td><td class="m">$0</td><td>Your ESP32 reads the encoders</td></tr>
+        <tr class="grp"><td colspan="4">All in: about $200-305 before shipping. Not priced: the WiFi dongle (C7) and the tail's servo BEC (C4, later).</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="notes" aria-labelledby="h-src">
+    <h3 id="h-src" style="color:var(--muted);font-family:var(--f-body);font-size:13px;letter-spacing:.08em;text-transform:uppercase">Where these come from</h3>
+    <p>Owned parts and the power plan: FPVTank_Control <code>HARDWARE.md</code>. The sims' parts: <code>chassis-v2/rugged.py</code> (its LAYOUT) and <code>gauges/search.py</code> components. Today's calls: <code>docs/decisions.md</code>. The drop test that picked the holds: <code>twin/retention.py</code>. Sizes marked ~ are the sims' guesses or listings; caliper anything that goes in a fitted pocket.</p>
+  </section>
+</div>

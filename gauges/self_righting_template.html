@@ -1,0 +1,152 @@
+<meta charset="utf-8">
+<title>Can the Body Be the Roll Hoop?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a drawing sheet, as on the head options page. The answer, then one card per way of getting back on its wheels. */
+:root{
+  --paper:#eef1f4; --card:#ffffff; --ink:#1b2330; --muted:#5a6575; --line:#d3dae3; --accent:#2c64a8;
+  --sand:#dcc6a1; --sand-edge:#9a8462; --tyre:#2b2e33; --hub:#8b939e; --need:#b8402f; --capc:#2c64a8;
+  --good:#2e7d4f; --warn:#a86b12; --bad:#b8402f; --chip:#eef2f7;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10151c; --card:#171e28; --ink:#e4e9f0; --muted:#94a1b2; --line:#283240; --accent:#6ea6e6;
+  --sand:#8f7a58; --sand-edge:#c9b38b; --tyre:#3b414b; --hub:#6c7684; --need:#ef7a66; --capc:#6ea6e6;
+  --good:#5fbf86; --warn:#e0a548; --bad:#ef7a66; --chip:#1f2835; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10151c; --card:#171e28; --ink:#e4e9f0; --muted:#94a1b2; --line:#283240; --accent:#6ea6e6;
+  --sand:#8f7a58; --sand-edge:#c9b38b; --tyre:#3b414b; --hub:#6c7684; --need:#ef7a66; --capc:#6ea6e6;
+  --good:#5fbf86; --warn:#e0a548; --bad:#ef7a66; --chip:#1f2835; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--f-body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:22px;box-sizing:border-box;
+  padding-block:22px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font:600 34px/1.05 var(--f-display);margin:0;text-wrap:balance}
+h2{font:600 22px/1.15 var(--f-display);margin:0;text-wrap:balance}
+h3{font:600 13px/1.2 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+p{margin:0;max-width:74ch}
+.lede{color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.pick{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.pick ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;max-width:80ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.reads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.read{background:var(--chip);border-radius:7px;padding:7px 9px;display:flex;flex-direction:column;gap:2px;border-top:3px solid var(--line)}
+.read b{font:600 11px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.read span{font:500 14px/1.3 var(--f-body)}
+.read.good{border-top-color:var(--good)} .read.warn{border-top-color:var(--warn)} .read.bad{border-top-color:var(--bad)}
+.views{display:grid;gap:10px;grid-template-columns:repeat(var(--n,2),minmax(0,1fr))}
+figure{margin:0;display:flex;flex-direction:column;gap:4px;min-width:0}
+figcaption{font:500 12px var(--f-body);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.drawing{border:1px solid var(--line);border-radius:6px;background:var(--paper);overflow:hidden}
+.drawing svg{display:block;width:100%;height:auto}
+.pc{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.pc .g h3{color:var(--good)} .pc .b h3{color:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:18px;height:10px;border-radius:2px}
+.notes{display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:14px}
+svg .ground{stroke:var(--ink);stroke-width:2}
+svg .body{fill:var(--sand);stroke:var(--sand-edge);stroke-width:1.5}
+svg .tyre{fill:var(--tyre)} svg .hub{fill:var(--hub)}
+svg .tail{fill:none;stroke:var(--sand-edge);stroke-width:14;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+svg .tailfoot{fill:var(--sand-edge)} svg .tailghost{fill:none;stroke:var(--sand-edge);stroke-width:3;stroke-dasharray:4 4}
+svg .arc{fill:none;stroke:var(--sand-edge);stroke-width:2.5;stroke-dasharray:8 6}
+svg .need{fill:var(--need);fill-opacity:.07;stroke:var(--need);stroke-width:2.5;stroke-dasharray:9 6}
+svg .cap{fill:none;stroke:var(--capc);stroke-width:2.5}
+svg .com{fill:var(--card);stroke:var(--ink);stroke-width:2} svg .comx{stroke:var(--ink);stroke-width:2}
+svg .lens{fill:var(--accent);stroke:var(--card);stroke-width:2}
+@media (max-width:760px){.views{grid-template-columns:minmax(0,1fr)}.reads{grid-template-columns:minmax(0,1fr)}.pc{grid-template-columns:minmax(0,1fr)}h1{font-size:28px}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <h1>Can the Body Be the Roll Hoop?</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <section class="pick" aria-labelledby="h-ans">
+    <h2 id="h-ans">Not by shape alone, under 250 mm</h2>
+    <ul id="answer"></ul>
+  </section>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--sand)"></i>body and tail</span>
+    <span><i class="sw" style="background:var(--tyre)"></i>tyres</span>
+    <span><i class="sw" style="border:2px solid var(--capc);height:6px"></i>the 250 mm box</span>
+    <span><i class="sw" style="border:2px dashed var(--need);height:6px"></i>the shell it would need</span>
+    <span>⊕ centre of mass</span>
+    <span><i class="sw" style="background:var(--accent);border-radius:50%;width:10px"></i>pinhole camera</span>
+  </div>
+
+  <article class="card" id="need">
+    <h2>A shell that rolls it back by itself</h2>
+    <div class="reads" id="r-need"></div>
+    <div class="views">
+      <figure><figcaption>From the front</figcaption><div class="drawing" data-d="need_front"></div></figure>
+      <figure><figcaption>From the side</figcaption><div class="drawing" data-d="need_side"></div></figure>
+    </div>
+    <p id="t-need"></p>
+  </article>
+
+  <article class="card" id="tail">
+    <h2>The tail rolls it back</h2>
+    <div class="reads" id="r-tail"></div>
+    <div class="views" style="--n:1"><figure><figcaption>From the side: the tail's tip swings over the top (dashed)</figcaption><div class="drawing" data-d="tail_side"></div></figure></div>
+    <div class="pc">
+      <div class="g"><h3>Good</h3><ul><li>The body stays as it is: no hoops, no big shell</li><li>You want a tail anyway (and a camera on it later)</li><li>It's how T3 reads upright in every fall</li></ul></div>
+      <div class="b"><h3>Against</h3><ul><li>Only works if the tail works: a jammed or broken tail leaves it on its back</li><li>A camera on the tail takes the push</li><li>Takes a second or two each time</li></ul></div>
+    </div>
+  </article>
+
+  <article class="card" id="inv">
+    <h2>Invertible: either side up</h2>
+    <div class="reads" id="r-inv"></div>
+    <div class="views" style="--n:3">
+      <figure><figcaption>From the front</figcaption><div class="drawing" data-d="inv_front"></div></figure>
+      <figure><figcaption>From the side</figcaption><div class="drawing" data-d="inv_side"></div></figure>
+      <figure><figcaption>Upside down: the same</figcaption><div class="drawing" data-d="inv_flip"></div></figure>
+    </div>
+    <p id="t-inv"></p>
+    <div class="pc">
+      <div class="g"><h3>Good</h3><ul><li>Nothing to right: it drives off whichever way it lands</li><li>No tail needed for it, and nothing sticks up to break</li><li>A pinhole in the nose works either way up: flip the image in software (drawn high in the nose here; centred, it would see the same both ways)</li></ul></div>
+      <div class="b"><h3>Against</h3><ul><li>Bigger wheels, a thin slab of a body: the parts inside just fit</li><li>A tail, and its camera, have to work both ways up</li><li>Lower clearance than the box, both ways up</li><li>The sims' falls gauge counts only one side as upright; it would need to count both</li></ul></div>
+    </div>
+  </article>
+
+  <section class="notes" aria-labelledby="h-notes">
+    <h3 id="h-notes">How these were read</h3>
+    <p id="n1"></p>
+    <p><b>The shell rule</b> is the rugged body's: if the body's outline gets farther from the centre of mass all the way from the tyres' bottom edges to its top, the only place it can settle is on its wheels. The dashed circle is the smallest such outline round these wheels. The search tried it too: 600 shapes of the skin's top, and a dome up to 241 mm tall, inside the cap. None got past 26 % of starting orientations rolling back by shape alone.</p>
+    <p id="n2"></p>
+  </section>
+</div>
+
+<script>/*DATA*/</script>
+<script>
+(function(){
+const D=window.SR, pc=v=>Math.round(100*v)+' %';
+document.querySelectorAll('[data-d]').forEach(e=>{e.innerHTML=D.d[e.dataset.d];});
+document.getElementById('lede').textContent='Your question: can the body itself do the roll hoops\' job, instead of hoops on top? Drawn to scale on the 250 mm body from the head options page, head off and a pinhole camera in the nose, and checked with '+D.n+' real falls each in the sims.';
+const A=document.getElementById('answer');
+[['<b>The shell would have to be about '+D.shell_w+' × '+D.shell_l+' mm.</b> To roll back onto its wheels by itself, a body\'s outline must reach farther from the centre of mass than the tyres\' edges do, and these tyres\' bottom edges are '+D.r_side+' mm out sideways and '+D.r_end+' mm out fore and aft.'],
+ ['<b>As a 250 mm box it mostly lands on its back:</b> upright in '+pc(D.box_up)+' of falls, on its back in '+pc(D.box_back)+'.'],
+ ['<b>Two things work under 250 mm.</b> The tail rolls it back: the same box with its tail is upright in '+pc(D.tail_up)+' of falls. Or make it invertible: wheels taller than the body, so it\'s on its wheels either way up in '+pc(D.inv_either)+' of falls, with no tail at all.'],
+ ['<b>So skip the hoops.</b> Since a tail is coming anyway, the tail is the cheapest righting. Invertible is the most robust: nothing has to work for it to drive off.']
+].forEach(([h])=>{const li=document.createElement('li');li.innerHTML=h;A.appendChild(li);});
+const R=(id,rows)=>{document.getElementById(id).innerHTML=rows.map(([c,b,s])=>'<div class="read '+c+'"><b>'+b+'</b><span class="num">'+s+'</span></div>').join('');};
+R('r-need',[['bad','Shell needed',D.shell_w+' × '+D.shell_l+' mm'],['bad','Upright as a box',pc(D.box_up)],['warn','On its back',pc(D.box_back)]]);
+document.getElementById('t-need').innerHTML='The body in the drawings is the 250 mm box ('+D.box.join(' × ')+' mm, its centre of mass '+D.com_z+' mm up). The dashed circle is the shell that would roll it back by itself. It runs well past the 250 mm box (solid) both ways, because the tyres stick out that far.';
+R('r-tail',[['good','Upright',pc(D.tail_up)],['good','Body','the same box'],['warn','Tail',D.tail_len+' mm, two links']]);
+R('r-inv',[['good','On its wheels',pc(D.inv_either)+' either way'],['good','Body',D.inv.join(' × ')+' mm'],['warn','Clearance',D.inv_clear[0]+' mm up, '+D.inv_clear[1]+' mm flipped']]);
+document.getElementById('t-inv').innerHTML='Wheels '+(2*D.inv_R)+' mm across round a body only as thick as the parts inside (the head off). It lands upright or flipped about equally often, and either is a driving position. The next wheel size up, 150 mm, fails the drive check: its motor can\'t hold it on a 30° slope.';
+const f=D.falls,t=k=>Object.entries(f[k]).map(([a,b])=>a+' '+b).join(', ');
+document.getElementById('n1').innerHTML='<b>Falls</b> are the sims\' falls gauge (G1) in MuJoCo: '+(D.n/2)+' drops from random orientations at each of two grip levels, wheels unpowered, the tail free to act when there is one. Box: '+t('box')+'. Box with its tail: '+t('tail')+'. Invertible: '+t('inv')+'.';
+document.getElementById('n2').innerHTML='<b>Guessed and picked numbers:</b> the pinhole camera\'s '+D.cam_g+' g; the invertible layout is mine (140 mm wheels, 40 mm tyres, track 130, 22 mm belly, the skin hugging the parts). It\'s a sketch, not a run: the 250 mm run still has the head on top, and none of this is in it yet.';
+})();
+</script>

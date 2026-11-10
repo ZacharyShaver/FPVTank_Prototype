@@ -82,14 +82,18 @@ FLIP_KNOBS = [('flipper', 'FL', 60.0, 300.0, "the flipper's length, pivot to tip
               ('flipper', 'f_press', -90.0, -10.0, 'the angle they press down to, degrees (below level)'),
               ('flipper', 'fz', 0.0, 1.0, "the centre-line flipper's pivot height, belly (0) to the top of the nose (1)")]
 BRACE = (-30.0, -15.0)
+# The head as its own module (2026-11-07, search.HEAD_OUT): on only for a design with head_f, kept apart from KNOBS so the
+# runs before rebuild as they ran. It sits on the body's top, its base wholly over the body fore and aft.
+HEAD_KNOBS = [('head', 'head_f', 0.0, 1.0, "the head's place along the body's top: 0 at the back, 1 at the front")]
 
 
-def make(q, strict=False, real=False, why=None):
+def make(q, strict=False, real=False, why=None, cap=None):
     """the spec of a design given as T3's knobs with changes; None when it can't be built. strict (2026-10-28): None
     too when a part isn't fixed to the body (problems()); searches from then on sample strict, the runs before don't,
     so they rebuild as they ran. real (2026-10-31, strict as well): the body weighs as its one-piece print, the
     motors' pods are in the sims, the motors clear the parts inside and the flippers mount on the body (_real,
-    real_problems). why: a list the refusals are added to"""
+    real_problems). why: a list the refusals are added to. cap (2026-11-07, mm): a real build is refused when its body's
+    print (the hull and the motor pods; not the head, tail or claws) is longer, wider or taller than cap (cap_problems)"""
     strict = strict or real
     sp = _make(q)
     if sp is None:
@@ -103,8 +107,13 @@ def make(q, strict=False, real=False, why=None):
         sp = RB.add_flippers(sp, f['FL'], f['ftq'], f['f_stow'], f['f_up'], f['f_press'], nose=f['f_nose'] > 0.5, fz=f['fz'], with_tail=f['f_tail'] > 0.5)
     if real and sp is not None:
         sp = _real(q, sp)
+    if sp is not None and _head_out(q):
+        sp = _place_head(q, sp)
+        if sp is None and why is not None:
+            why.append('head: no body under it')
     if strict and sp is not None:
-        p = problems(q, sp) + (real_problems(q, sp) if real else [])
+        p = problems(q, sp) + (real_problems(q, sp) if real else []) + (head_problems(sp) if sp.get('head') else []) \
+            + (cap_problems(q, sp, cap) if real and cap else [])
         if why is not None:
             why += p
         if p:
@@ -119,6 +128,7 @@ def _make(q):
     q['xf'], q['xr'] = q['xw'] + wb / 2, q['xw'] - wb / 2
     S.LIMB_BASE = (MOUNT[0], MOUNT[1], q['mount_z'] + q['clr'] - T3['clr'])   # the mount rides with the body
     S.TRACK_R = q.get('track_r')                                         # front and rear tracks apart (Zach, 2026-10-28: "two knobs for wheel width")
+    S.HEAD_OUT = _head_out(q)                                            # the head out of the body (2026-11-07)
     sp = S.build(np.array([q[k] for k in S.KEYS]))
     if sp is None:
         return None
@@ -380,7 +390,8 @@ def real_problems(q, sp):
     the body"""
     U = _uni(); out = []; body = np.asarray(sp['hulls'][0], float)
     C, _, _, clr0 = U.B.parts(); dz = q['clr'] - clr0; a = np.linspace(0, 2 * np.pi, 16, endpoint=False); worst = {}
-    parts = {k: RB.hull(np.asarray(P, float) + ([q['dxp'], 0.0, dz + q['dzp']] if k.startswith('pack') else [0.0, 0.0, dz])) for k, P in C.items()}
+    parts = {k: RB.hull(np.asarray(P, float) + ([q['dxp'], 0.0, dz + q['dzp']] if k.startswith('pack') else [0.0, 0.0, dz]))
+             for k, P in C.items() if not (_head_out(q) and k in S.HEAD)}   # the head on top: head_problems
     for x, s, b in _bosses(sp):
         ys = s * np.linspace(b['face'] - U.MOT_L, b['face'], 6); R = sp['R']
         Mp = np.vstack([np.c_[x + U.MOTOR_R * np.cos(a), np.full(16, yy), R + U.MOTOR_R * np.sin(a)] for yy in ys])
@@ -396,6 +407,96 @@ def real_problems(q, sp):
         if d > MOUNT_OUT:
             out.append(f'flipper: {d:.0f} mm off the body')
     return out
+
+
+# ---------- the head as its own module (2026-11-07) ----------
+# Zach: "I dont think we should include the pan tilt in this box. Theres a good chance that is going to be blocked in
+# some way for most bodies. We would want the flexibility to be able to move that somewhere else." The body (skin or
+# Trainer hull) leaves the head out (search.HEAD_OUT); the head's base sits flat on the body's top, on the highest point
+# under its footprint, the pan axis on the centre line at head_f of the way from the back to the front (the base wholly
+# over the body fore and aft). Its 210 g moves with it. In the sims it is two hulls, base and drum, cradle and ball, part
+# of the body (it lands in falls and stops the tail), last in the hull list (head_n of them). Not modelled: a dome or
+# guard over it, and the cradle's 44 mm pan sweep against a body that rises past the base's footprint.
+HEAD_SEAT_IN = 5.0                                          # mm: the base's footprint pulled in, so it sits on the body, not its edge
+
+
+def _head_out(q):
+    return 'head_f' in q
+
+
+def _top_z(body, xy):
+    """the convex hull's top surface over each (x, y): nan outside its outline"""
+    from scipy.spatial import ConvexHull
+    E = ConvexHull(body).equations; up, dn, side = E[:, 2] > 1e-9, E[:, 2] < -1e-9, np.abs(E[:, 2]) <= 1e-9
+    xy = np.asarray(xy, float); z = np.full(len(xy), np.nan)
+    top = (-(xy @ E[up, :2].T + E[up, 3]) / E[up, 2]).min(1)
+    low = (-(xy @ E[dn, :2].T + E[dn, 3]) / E[dn, 2]).max(1) if dn.any() else np.full(len(xy), -np.inf)
+    ok = top >= low
+    if side.any():
+        ok &= ((xy @ E[side, :2].T + E[side, 3]) <= 1e-6).all(1)
+    z[ok] = top[ok]
+    return z
+
+
+def _place_head(q, sp):
+    """the spec with the head seated on the body's top at head_f (see above); refused (None) when no body is under it"""
+    import chassis3 as C3
+    C = S.components(); b = C3.base(); dz = q['clr'] - b['clr0']
+    H = {k: np.asarray(C[k], float) + [0.0, 0.0, dz] for k in S.HEAD}
+    D = H['drum']; pan0 = 0.5 * (D.min(0) + D.max(0)); z_b0 = float(H['base'][:, 2].min())
+    foot = H['base'][:, :2] - pan0[:2]; f_lo, f_hi = float(foot[:, 0].min()), float(foot[:, 0].max())
+    body = np.asarray(sp['hulls'][0], float); x0, x1 = float(body[:, 0].min()), float(body[:, 0].max())
+    lo, hi = x0 - f_lo, x1 - f_hi
+    xp = lo + q['head_f'] * (hi - lo) if hi > lo else 0.5 * (x0 + x1 - f_lo - f_hi)
+    F = foot[np.unique(np.round(foot / 4.0), axis=0, return_index=True)[1]]        # a 4 mm sample of the footprint
+    c = F.mean(0); F = c + (F - c) * np.maximum(0.0, 1.0 - HEAD_SEAT_IN / np.maximum(np.linalg.norm(F - c, axis=1), 1e-9))[:, None]
+    zt = _top_z(body, F + [xp, 0.0])
+    if np.isnan(zt).all():
+        return None
+    d = np.array([xp - pan0[0], -pan0[1], float(np.nanmax(zt)) - z_b0])
+    heads = [RB.hull(np.vstack([H['base'], H['drum']]) + d), RB.hull(np.vstack([H['cradle'], H['ball']]) + d)]
+    m, p0 = next((m, np.asarray(p, float) + [0.0, 0.0, dz]) for n, m, p in b['items'] if n == 'head')
+    M, cm, I = _add_body(sp['M'], sp['com'], sp['I'], -m, p0, np.zeros((3, 3)))
+    M, cm, I = _add_body(M, cm, I, m, p0 + d, np.zeros((3, 3)))
+    note = f'head on top at x {xp:.0f} (f {q["head_f"]:.2f}), seat z {d[2] + z_b0:.0f}'
+    return RB.dims(dict(sp, hulls=list(sp['hulls']) + heads, head_n=2, head=dict(pan=[float(xp), 0.0, float(d[2] + z_b0)], f=float(q['head_f'])),
+                        M=M, com=cm, I=I, notes=list(sp['notes']) + [note]))
+
+
+def head_hulls(sp):
+    return sp['hulls'][len(sp['hulls']) - sp.get('head_n', 0):] if sp.get('head_n') else []
+
+
+def head_problems(sp):
+    """the head in the way of the tail or a flipper: the stowed tail through it, the tail's turntable (40 mm across) on
+    it, a flipper's sweep through it"""
+    out = []; Hs = head_hulls(sp); lm = sp.get('limb'); fl = sp.get('flip')
+    if lm:
+        P = RB.limb_points(lm, 0.0, lm['th_stow'], k=24); P = P[np.linalg.norm(P - np.asarray(lm['base']), axis=1) > 20.0]
+        if any((RB.hull_dist(Hh, P) < RB.LINK_R - 1.0).any() for Hh in Hs):
+            out.append('tail: stowed through the head')
+        if min(float(RB.hull_dist(Hh, [lm['base']])[0]) for Hh in Hs) < 20.0:
+            out.append("tail mount: in the head's way")
+    if fl and RB._sweep_hits(Hs, fl):
+        out.append('flipper: sweeps through the head')
+    return out
+
+
+def body_print_size(sp):
+    """the body's print, (length, width, height) mm: the hull and its motor pods (_real_shape); not the head, the tail
+    or the claws"""
+    sh = _real_shape(dict(sp, hulls=sp['hulls'][:len(sp['hulls']) - sp.get('head_n', 0)]))
+    P = np.vstack([sh['hulls'][0]] + sh['hulls'][1:1 + sh['pods']])
+    return tuple(float(v) for v in P.max(0) - P.min(0))
+
+
+def cap_problems(q, sp, cap):
+    """the body's print over the cap on any side (Zach, 2026-11-07: 250 mm for the body and wheels, not the claws and
+    tail: long prints in tougher materials are the risk). The Trainer's own body is its 276 mm tub and claws: over"""
+    if q['shell'] <= 0.5:
+        return [f"size: the Trainer's own body (tub 276 mm), over the {cap:.0f} mm cap"]
+    L, W, H = body_print_size(sp)
+    return [f'size: body {L:.0f} x {W:.0f} x {H:.0f} mm, over the {cap:.0f} mm cap'] if max(L, W, H) > cap else []
 
 
 def _real_shape(sp):

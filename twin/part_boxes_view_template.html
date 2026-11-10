@@ -1,0 +1,341 @@
+<meta charset="utf-8">
+<title>Part Holders</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The same workbench as the Pi Box and Peg Test pages: the 3D stage takes the room, what you'd want to read sits beside it (below it on a phone). */
+:root{
+  --bg:#eceff3; --panel:#ffffff; --stage:#dde3ea; --fg:#1b2330; --muted:#5a6575; --line:#d3dae3;
+  --accent:#2c64a8; --accent-ink:#ffffff; --chip:#eef2f7;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10151c; --panel:#171e28; --stage:#0b1016; --fg:#e4e9f0; --muted:#94a1b2; --line:#283240;
+  --accent:#6ea6e6; --accent-ink:#0b1016; --chip:#1f2835; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10151c; --panel:#171e28; --stage:#0b1016; --fg:#e4e9f0; --muted:#94a1b2; --line:#283240;
+  --accent:#6ea6e6; --accent-ink:#0b1016; --chip:#1f2835; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--f-body);margin:0}
+.wrap{display:flex;flex-direction:column;gap:12px;min-height:100%;box-sizing:border-box;
+  padding-block:14px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+h1{font:600 26px/1.1 var(--f-display);letter-spacing:.01em;margin:0}
+header p{margin:0;color:var(--muted);max-width:80ch}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:14px;align-items:start}
+.stage{position:relative;background:var(--stage);border:1px solid var(--line);border-radius:10px;overflow:hidden;height:max(420px,calc(100vh - 120px))}
+aside{display:flex;flex-direction:column;gap:12px;min-width:0;max-height:max(420px,calc(100vh - 120px));overflow-y:auto}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.views{position:absolute;left:10px;top:10px;display:flex;flex-wrap:wrap;gap:6px;max-width:calc(100% - 20px)}
+.hint{position:absolute;left:10px;bottom:8px;font:12px var(--f-mono);color:var(--muted);pointer-events:none}
+button{font:500 13px var(--f-body);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:5px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.blk{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.blk h2{font:600 15px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase;margin:0;color:var(--muted)}
+.blk p{margin:0}
+.ask{border-left:3px solid var(--accent)}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.sel .name{font:600 17px/1.25 var(--f-display)}
+.sel .none{color:var(--muted)}
+.qa{display:flex;flex-direction:column;gap:8px;margin:0}
+.qa dt{font-weight:600}
+.qa dd{margin:0}
+.g{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.g b{font-weight:600}
+.g .num{font-family:var(--f-mono)}
+.g span.why{color:var(--muted);display:block}
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:grid;grid-template-columns:auto 12px 1fr;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer}
+.row:hover,.row.on{background:var(--chip)}
+.row input{margin:0}
+.sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--line)}
+.row .nm{all:unset;cursor:pointer;min-width:0}
+.row .nm:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.m{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.cutrow{display:flex;align-items:center;gap:8px}
+.cutrow input{flex:1;min-width:0}
+.steptext{min-height:3em}
+.stk{margin:0}
+.stk svg{display:block;width:100%;height:auto}
+.stk .tick{stroke:var(--line);stroke-width:1}
+.stk .ceil{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 3}
+.stk text{font:12px var(--f-body);fill:var(--fg)}
+.stk text.ink{fill:#1b2330;font-weight:600}
+.stk text.dim{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.stk rect{stroke:#1b2330;stroke-width:1}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:3px 6px 3px 0;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+td.m,th.m{text-align:right;padding-right:6px}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.stage{height:58vh;min-height:320px}aside{max-height:none;overflow:visible}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Part Holders</h1>
+    <p>Boxes that stack the way Gridfinity bins do, to inspect. Nothing here is printed. Amber is a box, green is its stacking top, purple is a spacer, and the rest is your part. Drag to turn, right-drag to move, scroll to zoom, click a piece to read about it.</p>
+  </header>
+  <div class="main">
+    <div class="stage" id="stage">
+      <div class="views" role="group" aria-label="Views">
+        <button data-view="iso">3/4</button><button data-view="top">Top</button><button data-view="side">Side</button><button data-view="end">End</button>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+    <aside>
+      <section class="blk" aria-labelledby="h-which">
+        <h2 id="h-which">Which part</h2>
+        <div class="toggles" id="which" role="group" aria-label="Which part"></div>
+      </section>
+      <section class="blk" aria-labelledby="h-stack">
+        <h2 id="h-stack">How they stack</h2>
+        <figure class="stk" id="stack-svg"></figure>
+      </section>
+      <section class="blk" aria-labelledby="h-build">
+        <h2 id="h-build">Build it</h2>
+        <div class="cutrow"><input type="range" id="step" min="1" max="4" step="1" value="4" aria-label="Build step"><span class="m" id="step-val"></span></div>
+        <p class="steptext" id="step-text"></p>
+        <div class="toggles"><button id="t-explode" aria-pressed="false">Pull apart</button></div>
+      </section>
+      <section class="blk ask" aria-labelledby="h-ans">
+        <h2 id="h-ans">How it works</h2>
+        <dl class="qa" id="answers"></dl>
+      </section>
+      <section class="blk" aria-labelledby="h-show">
+        <h2 id="h-show">Show</h2>
+        <div class="toggles">
+          <button id="t-part" aria-pressed="false">Hide the part</button>
+          <button id="t-ghost" aria-pressed="false">See-through boxes</button>
+          <button id="t-flip" aria-pressed="false">Upside down</button>
+          <button id="t-ceil" aria-pressed="false">The ceiling</button>
+          <button id="t-floor" aria-pressed="false">Hide the floor</button>
+        </div>
+        <div class="toggles" role="group" aria-label="Cut through">
+          <button id="x-off" aria-pressed="true">No cut</button>
+          <button id="x-along" aria-pressed="false">Cut along</button>
+          <button id="x-across" aria-pressed="false">Cut across</button>
+        </div>
+        <div class="cutrow"><label for="cut-pos" class="m">at</label><input type="range" id="cut-pos" min="-60" max="60" step="0.5" value="0" disabled><span class="m" id="cut-val">0.0</span></div>
+      </section>
+      <section class="blk sel" aria-live="polite" id="sel"><p class="none">Click a piece, in the view or in the list.</p></section>
+      <section class="blk" aria-labelledby="h-print">
+        <h2 id="h-print">To print</h2>
+        <div id="print-text"></div>
+      </section>
+      <section class="blk" aria-labelledby="h-pegs">
+        <h2 id="h-pegs">Pegs</h2>
+        <div id="peg-text"></div>
+      </section>
+      <section class="blk" aria-labelledby="h-guess">
+        <h2 id="h-guess">Guessed numbers: OK or measure</h2>
+        <ul class="g" id="guesses"></ul>
+      </section>
+      <section class="blk" aria-labelledby="h-parts">
+        <h2 id="h-parts">Pieces</h2>
+        <div class="list" id="list"></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>/*DATA*/</script>
+<script>
+(function(){
+const stage=document.getElementById('stage');
+if(!window.PARTS){stage.textContent='This is the page\'s template, with no model in it. Open twin/out/part_boxes_view.html (python twin/part_boxes.py writes it).';return;}
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.localClippingEnabled=true;stage.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(32,1,5,3000);cam.up.set(0,0,1);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.12;ctl.minDistance=30;ctl.maxDistance=1400;
+scene.add(new THREE.HemisphereLight(0xffffff,0x6b6355,.75));
+const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(120,-200,300);scene.add(sun);
+const fillLight=new THREE.DirectionalLight(0xffffff,.3);fillLight.position.set(-200,160,120);scene.add(fillLight);
+
+function dec(b64,T){const s=atob(b64),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return new T(u.buffer);}
+// Smooth the normals only across shallow edges: flat faces stay flat and curves stay round.
+function creased(g,deg){const src=g.index?g.toNonIndexed():g,p=src.attributes.position.array,tris=p.length/9,cos=Math.cos(deg*Math.PI/180);
+  const fn=new Float32Array(tris*3),n=new Float32Array(p.length),map=new Map();
+  const key=i=>Math.round(p[i]*100)+'_'+Math.round(p[i+1]*100)+'_'+Math.round(p[i+2]*100);
+  for(let t=0;t<tris;t++){const a=t*9,ux=p[a+3]-p[a],uy=p[a+4]-p[a+1],uz=p[a+5]-p[a+2],vx=p[a+6]-p[a],vy=p[a+7]-p[a+1],vz=p[a+8]-p[a+2];
+    const x=uy*vz-uz*vy,y=uz*vx-ux*vz,z=ux*vy-uy*vx,l=Math.hypot(x,y,z)||1;fn[t*3]=x/l;fn[t*3+1]=y/l;fn[t*3+2]=z/l;
+    for(let c=0;c<3;c++){const k=key(a+c*3);let s=map.get(k);if(!s)map.set(k,s=[]);s.push(t);}}
+  for(let t=0;t<tris;t++)for(let c=0;c<3;c++){const i=t*9+c*3;let x=0,y=0,z=0;
+    for(const o of map.get(key(i))){if(fn[t*3]*fn[o*3]+fn[t*3+1]*fn[o*3+1]+fn[t*3+2]*fn[o*3+2]>=cos){x+=fn[o*3];y+=fn[o*3+1];z+=fn[o*3+2];}}
+    const l=Math.hypot(x,y,z)||1;n[i]=x/l;n[i+1]=y/l;n[i+2]=z/l;}
+  src.setAttribute('normal',new THREE.BufferAttribute(n,3));return src;}
+
+// The flip turns everything about the chosen part's centre: pivot sits on that centre, world holds the model
+const pivot=new THREE.Group(),world=new THREE.Group();pivot.add(world);scene.add(pivot);
+const groups={floor:new THREE.Group()};world.add(groups.floor);
+META.order.forEach(k=>{groups[k]=new THREE.Group();world.add(groups[k]);});
+const meshes={},edgeMats=[],hidden={};
+for(const k in PARTS){const d=PARTS[k],raw=new THREE.BufferGeometry();
+  raw.setAttribute('position',new THREE.BufferAttribute(dec(d.v,Float32Array),3));raw.setIndex(new THREE.BufferAttribute(dec(d.f,Uint32Array),1));
+  const g=creased(raw,30);
+  const m=new THREE.MeshStandardMaterial({color:d.color,roughness:.7,metalness:0,side:THREE.DoubleSide});
+  const me=new THREE.Mesh(g,m);me.userData.key=k;meshes[k]=me;groups[d.group].add(me);
+  const em=new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:.3});edgeMats.push(em);me.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,30),em));}
+const fx=META.floor_x,fy=META.floor_y;
+const ceil=new THREE.Mesh(new THREE.BoxGeometry(fx[1]-fx[0],fy[1]-fy[0],2),new THREE.MeshStandardMaterial({color:0x6ea6e6,transparent:true,opacity:.2,depthWrite:false,side:THREE.DoubleSide}));
+ceil.position.set((fx[0]+fx[1])/2,(fy[0]+fy[1])/2,META.floor+META.ceiling+1);ceil.visible=false;world.add(ceil);
+
+let which=META.order[0],hidePart=false,ghost=false,cutAxis='off',stepNow=3,ceilOn=false,scheme='small';
+const info=k=>k==='all'?META.all:META.parts[k];
+const btn=id=>document.getElementById(id);
+function press(id,on){btn(id).setAttribute('aria-pressed',on);}
+function isPressed(id){return btn(id).getAttribute('aria-pressed')==='true';}
+const showing=k=>which==='all'?['esc','pack','pi','stack','stack2'].includes(k):which==='stack'?(k==='esc'||k==='stack'):which==='stack2'?(k==='pi'||k==='stack2'):k===which;
+
+// views: the distance comes from the chosen part's size
+const VIEWS={iso:[.5,-.72,.55],top:[0,-.001,1],side:[0,-1,.05],end:[1,0,.05]};
+let curView='iso',moved=false;ctl.addEventListener('start',()=>{moved=true;});
+function view(n){curView=n;moved=false;const d=VIEWS[n],I=info(which),t=new THREE.Vector3(...I.center),v=Math.PI*cam.fov/360,h=Math.atan(Math.tan(v)*cam.aspect);
+  cam.position.copy(t).add(new THREE.Vector3(...d).normalize().multiplyScalar(I.r/Math.tan(Math.min(v,h))*1.08));ctl.target.copy(t);ctl.update();}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>view(b.dataset.view)));
+
+// what's showing
+function applyVis(){
+  META.order.forEach(k=>{groups[k].visible=showing(k);});
+  groups.floor.visible=!isPressed('t-floor');
+  const n=info(which).steps.length;
+  for(const k in PARTS){const d=PARTS[k];let on=!hidden[k]&&d.layer<=stepNow;
+    if(d.role==='part')on=on&&!hidePart;
+    if(d.role==='ceil')on=!hidden[k]&&ceilOn&&stepNow>=n&&which!=='stack'&&which!=='stack2'&&!(which==='all'&&d.group==='esc');
+    if(d.scheme&&d.scheme!==scheme)on=false;
+    meshes[k].visible=on;}
+  ceil.visible=ceilOn;syncList();}
+function setGhost(on){ghost=on;for(const k in PARTS){const r=PARTS[k].role;if(r==='box'||r==='lid'||r==='ceil'){const m=meshes[k].material;m.transparent=on;m.opacity=on?.28:1;m.depthWrite=!on;m.needsUpdate=true;}}}
+
+// the build slider
+const stepEl=btn('step');
+function setStep(n){stepNow=n;stepEl.value=n;const S=info(which).steps;btn('step-val').textContent=n+' of '+S.length;btn('step-text').textContent=S[n-1]||'';applyVis();}
+stepEl.addEventListener('input',()=>setStep(parseInt(stepEl.value,10)));
+
+// the cut
+const cut=new THREE.Plane(new THREE.Vector3(0,1,0),0),cutPos=btn('cut-pos');
+function setCutPlane(){const c=info(which).center,p=parseFloat(cutPos.value);btn('cut-val').textContent=p.toFixed(1);
+  if(cutAxis==='along'){cut.normal.set(0,1,0);cut.constant=-(c[1]+p);}
+  if(cutAxis==='across'){cut.normal.set(-1,0,0);cut.constant=c[0]+p;}}
+function setCut(a){cutAxis=a;['off','along','across'].forEach(n=>press('x-'+n,n===a));cutPos.disabled=a==='off';
+  const on=a!=='off',r=info(which).r;cutPos.min=-r;cutPos.max=r;
+  Object.values(meshes).forEach(me=>{me.material.clippingPlanes=on?[cut]:[];me.material.needsUpdate=true;});edgeMats.forEach(m=>{m.clippingPlanes=on?[cut]:[];m.needsUpdate=true;});
+  ceil.material.clippingPlanes=on?[cut]:[];setCutPlane();if(on)view(a==='along'?'side':'end');}
+cutPos.addEventListener('input',setCutPlane);
+btn('x-off').addEventListener('click',()=>{setCut('off');view('iso');});
+btn('x-along').addEventListener('click',()=>setCut('along'));
+btn('x-across').addEventListener('click',()=>setCut('across'));
+
+// toggles
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let apart=0,apartTo=0,turn=0,turnTo=0;
+function tog(id,fn){btn(id).addEventListener('click',()=>{const on=!isPressed(id);press(id,on);fn(on);});}
+tog('t-explode',on=>{apartTo=on?1:0;});
+tog('t-part',on=>{hidePart=on;applyVis();});
+tog('t-ghost',on=>setGhost(on));
+tog('t-flip',on=>{turnTo=on?Math.PI:0;});
+tog('t-ceil',on=>{ceilOn=on;applyVis();});
+tog('t-floor',()=>applyVis());
+
+// the pegs
+function pegText(){
+  btn('peg-text').innerHTML='<table><thead><tr><th>Stress at a peg\'s root</th><th class="m">Bricks</th><th class="m">Now</th></tr></thead><tbody>'+
+    META.pegs.map(r=>'<tr><td>'+r.name+', '+r.load.toFixed(0)+' N</td><td class="m">'+r.old_n+' pegs: '+r.old.toFixed(1)+'</td><td class="m"><b>'+r.n_s+' pegs: '+r.s.toFixed(1)+'</b></td></tr>').join('')+
+    '</tbody></table><p>All 5 mm, in MPa, against my guess of about '+META.pla.toFixed(0)+' MPa for PLA across its layers. The loads are the drop test\'s: 1 m onto hard ground with no tyres, so harsher than the robot will see.</p>';}
+
+// the stacks: every column to one scale, in height units
+function drawStacks(){const S=META.stacks,u=META.unit,n=META.ceiling_units,k=20,cw=74,left=34,top=20,H=n*k,w=left+S.length*cw+4;
+  let o='<svg viewBox="0 0 '+w+' '+(top+H+24)+'" role="img" aria-label="Four stacks to one scale, in 7 mm units. Each comes to '+n+' units: ESC 6 plus PCA 5, Pi 6 plus ESP32 5, pack 8 plus a 3 unit spacer, and ESC 6 plus a 5 unit spacer.">';
+  for(let i=0;i<=n;i++){const y=top+H-i*k;o+='<line class="'+(i===n?'ceil':'tick')+'" x1="'+(left-4)+'" x2="'+(w-2)+'" y1="'+y+'" y2="'+y+'"/>';
+    if(i%2===n%2||i===0)o+='<text class="dim" x="'+(left-8)+'" y="'+(y+4)+'" text-anchor="end">'+i+'</text>';}
+  o+='<text class="dim" x="'+(w-2)+'" y="'+(top-6)+'" text-anchor="end">'+n+' units, '+(n*u).toFixed(0)+' mm</text>';
+  S.forEach((c,i)=>{let z=0;const x=left+i*cw+6,bw=cw-12;
+    c.parts.forEach(p=>{const y=top+H-(z+p.u)*k,h=p.u*k;o+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" rx="2" fill="'+p.c+'"/>'+
+      '<text class="ink" x="'+(x+bw/2)+'" y="'+(y+h/2+4)+'" text-anchor="middle">'+p.n+' '+p.u+'</text>';z+=p.u;});});
+  o+='</svg><figcaption class="m" style="color:var(--muted);font-size:12px">Numbers are height units of '+u.toFixed(0)+' mm. A tall box is as tall as two short ones.</figcaption>';
+  btn('stack-svg').innerHTML=o;}
+drawStacks();
+
+// which part
+const whichBox=btn('which');
+META.order.concat(['all']).forEach(k=>{const b=document.createElement('button');b.id='w-'+k;b.textContent=info(k).name;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>setWhich(k));whichBox.appendChild(b);});
+function mins(t){if(!t)return 0;const h=/(\d+)h/.exec(t),m=/(\d+)m/.exec(t),s=/(\d+)s/.exec(t);return (h?+h[1]*60:0)+(m?+m[1]:0)+(s?+s[1]/60:0);}
+function hm(x){x=Math.round(x);return x>=60?Math.floor(x/60)+' h '+String(x%60).padStart(2,'0'):x+' min';}
+function printTable(rows,note){let g=0,t=0;const body=rows.map(r=>{g+=r.qty*r.g;t+=r.qty*mins(r.time);return '<tr><td>'+r.name+'</td><td class="m">'+r.qty+'</td><td class="m">'+(r.time||'-')+'</td><td class="m">'+r.g.toFixed(1)+'</td></tr>';}).join('');
+  return '<table><thead><tr><th>Piece</th><th class="m">How many</th><th class="m">Each</th><th class="m">g each</th></tr></thead><tbody>'+body+'<tr><td><b>Total</b></td><td></td><td class="m"><b>'+hm(t)+'</b></td><td class="m"><b>'+g.toFixed(0)+'</b></td></tr></tbody></table><p>'+note+'</p>';}
+function fillPanels(){
+  const A=btn('answers'),G=btn('guesses'),P=btn('print-text');
+  btn('hint').textContent='mm · holes every 15 · one height unit '+META.unit.toFixed(0)+' · a line-up, not a layout';
+  pegText();
+  if(which==='all'){
+    A.innerHTML='<dt>What\'s the idea?</dt><dd>What Gridfinity does. Every height is a whole number of '+META.unit.toFixed(0)+' mm units, so a tall box is as tall as two short ones. Every box has a piece on top with the floor\'s holes, so the next box pegs on, like a LEGO brick.</dd>'+
+      '<dt>Does everything stack now?</dt><dd>Yes, the Pi and PCA included. The Pi\'s top has a bite out of it for your plugs, so a box as wide as the ESP32\'s sits beside them. The PCA\'s top sits over its plugs.</dd>'+
+      '<dt>What fits on what?</dt><dd>Every box has its pegs in two rows, 15 apart, and the small boxes\' pegs are 30 apart along those rows, so any small box fits any top. The pack\'s top takes two side by side.</dd>'+
+      '<dt>What about the ceiling?</dt><dd>Turn it on. It\'s drawn at '+META.ceiling_units+' units ('+META.ceiling.toFixed(0)+'), where these stacks all meet, with room for your Pi\'s plugs and a wire bend. Not a decision: a spacer changes it, and the boxes don\'t.</dd>';
+    P.innerHTML=printTable(META.set[scheme],'From the slicer, on draft settings, printed one at a time. Plates would save some time. Only the sleeve needs supports. Not sent to the printer. Your PCA case is counted in case you need to print it.');
+    G.innerHTML=META.common.map(g=>'<li><b>'+g.name+'</b> <span class="num">'+g.value+'</span><span class="why">'+g.why+'</span></li>').join('');
+  }else{const I=META.parts[which];
+    A.innerHTML=I.answers.map(x=>'<dt>'+x.q+'</dt><dd>'+x.a+'</dd>').join('');
+    P.innerHTML=I.print[scheme].length?printTable(I.print[scheme],'Draft settings, upside down on the bed, so the pegs point up. Not sent to the printer.'):'<p>No new pieces: these are the same boxes as on their own pages.</p>';
+    G.innerHTML=I.guesses.concat(META.common).map(g=>'<li><b>'+g.name+'</b> <span class="num">'+g.value+'</span><span class="why">'+g.why+'</span></li>').join('');}
+  buildList();}
+function setWhich(k){which=k;META.order.concat(['all']).forEach(n=>press('w-'+n,n===k));
+  const c=info(k).center;pivot.position.set(c[0],c[1],c[2]);world.position.set(-c[0],-c[1],-c[2]);
+  const n=info(k).steps.length;stepEl.max=n;fillPanels();setStep(n);pick(null);if(cutAxis!=='off'){cutPos.value=0;setCut(cutAxis);}else view('iso');}
+
+// list: the checkbox shows and hides, the name selects
+const list=btn('list');let rowsEl={};
+function hex(c){return '#'+c.toString(16).padStart(6,'0');}
+function buildList(){list.innerHTML='';rowsEl={};
+  const keys=Object.keys(PARTS).filter(k=>PARTS[k].group==='floor'||showing(PARTS[k].group));
+  keys.forEach(k=>{const r=document.createElement('div');r.className='row';
+    r.innerHTML='<input type="checkbox" id="p-'+k+'" aria-label="Show '+PARTS[k].label+'" checked><span class="sw" style="background:'+hex(PARTS[k].color)+'"></span><button type="button" class="nm">'+PARTS[k].label+'</button>';
+    const cb=r.querySelector('input');cb.checked=!hidden[k];cb.addEventListener('change',()=>{hidden[k]=!cb.checked;applyVis();});
+    r.addEventListener('click',e=>{if(e.target!==cb)pick(k);});list.appendChild(r);rowsEl[k]=r;});}
+function syncList(){Object.keys(rowsEl).forEach(k=>{const c=rowsEl[k].querySelector('input');if(c)c.checked=!hidden[k];
+  rowsEl[k].style.display=PARTS[k].role==='ceil'&&!ceilOn?'none':'';});}
+
+// selection
+const sel=btn('sel');let lit=null;
+function pick(k){Object.values(rowsEl).forEach(r=>r.classList.remove('on'));
+  if(lit)meshes[lit].material.emissive.setHex(0);lit=null;
+  if(!k){sel.innerHTML='<p class="none">Click a piece, in the view or in the list.</p>';return;}
+  lit=k;meshes[k].material.emissive.setHex(0x5a3a00);if(rowsEl[k])rowsEl[k].classList.add('on');
+  sel.innerHTML='<p class="name">'+PARTS[k].label+'</p><p>'+PARTS[k].note+'</p>';}
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+renderer.domElement.addEventListener('pointerdown',e=>{down=[e.clientX,e.clientY];});
+renderer.domElement.addEventListener('pointerup',e=>{if(e.button!==0||!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>4)return;
+  const r=renderer.domElement.getBoundingClientRect();ptr.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+  ray.setFromCamera(ptr,cam);
+  const live=Object.values(meshes).filter(m=>m.visible&&m.parent.visible);
+  const hits=ray.intersectObjects(live,false).filter(h=>cutAxis==='off'||cut.distanceToPoint(h.point)>=0);
+  const isBrick=o=>{const t=PARTS[o.userData.key].role;return t==='box'||t==='lid'||t==='ceil';};
+  const hit=hits.find(h=>!(ghost&&isBrick(h.object)))||hits[0];
+  pick(hit?hit.object.userData.key:null);});
+
+// theme
+function bg(){renderer.setClearColor(new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--stage').trim()||'#dde3ea'));}
+bg();window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',bg);
+new MutationObserver(bg).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+
+setWhich(which);
+let fitted=false;
+function size(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
+  if(!fitted||!moved){fitted=true;view(curView);}}   // refit to the pane until you've moved the camera yourself
+new ResizeObserver(size).observe(stage);size();
+const GAP_Z=13;
+(function loop(){requestAnimationFrame(loop);
+  apart+=reduce?(apartTo-apart):(apartTo-apart)*.14;turn+=reduce?(turnTo-turn):(turnTo-turn)*.1;pivot.rotation.x=turn;
+  for(const k in PARTS){meshes[k].position.z=apart*PARTS[k].layer*GAP_Z;}
+  ctl.update();renderer.render(scene,cam);})();
+})();
+</script>
