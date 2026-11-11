@@ -118,6 +118,7 @@ Mark superseded files; don't silently replace them.
   phase B, 2026-09-27). No CAD goes back into Control.
 - Run with `python` (3.10; it has cadquery). `python head-v2/fixes/build_all.py` regenerates the
   hand-off; `python head-v2/checks/regression.py` must reproduce its table.
+- Designing or changing a part: the `design-part` skill (the order of work, and the lesson behind each step).
 - Reviewing a new Fusion revision: the `review-revision` skill.
 - Slicing and printing on his K2 Pro: the `print-on-k2` skill (`tools/orca.py`, `tools/k2.py`).
 - The head's MuJoCo model is in `sim/mujoco/` (`build_head.py`; rebuild it after a CAD change).

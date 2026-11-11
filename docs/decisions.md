@@ -3,6 +3,45 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-11-11: The spring stack's clips, in TPU
+
+Zach: "alright lets try the tpu". The PLA plate finished overnight.
+- **The PLA stack goes together** (Zach, once he'd seen how the hoop goes on: "the whole thing fits"). His bench, on both ESC
+  boxes, the PCA box and the hoop:
+  - the boxes drop onto the patch with **"no force, slightly loose"**;
+  - seated, they move sideways **"about 1-3/10 mm"** (drawn: 0.25 of room a side on the two 4.6 locating pegs in 5.1 holes,
+    so up to 0.5 end to end; the checks slid 0.26 before a peg touched);
+  - **both ESCs go into both boxes** ("both work"). The first box plates had an ESC top "a tax too tight"; the pad it hit is
+    gone.
+  - the PCA box's two peg sizes surprised him ("has both sizes on it. kinda works though. they definitely dont stick but
+    thats by design i assume"). It is by design: two 4.6 pegs locate, two 4.0 stand clear, and nothing grips with the lid
+    off (his call, 2026-11-09). The pictures hadn't said why the pegs differ.
+  So the two-peg joint is tested on these three boxes: 4.6 locating and 4.0 backup pegs in 5.1 holes, PLA, draft settings.
+  The noise screen had said 94 % and 88 % would go together at 0.10 mm of error; all of them did. The other boxes (pack, Pi,
+  ESP32) still carry friction pegs. The hold (the TPU clips) is still printing.
+- **The hoop wasn't explained** (Zach: "theres no stubs or a place to take them on it", so he couldn't say what the plate
+  showed). It has none by design: it's a belt that slides along the stack, round the floor patch too, and only the top clip's
+  squeeze holds it; with no clip it hangs 3 mm loose. The plate's picture said "slide the hoop on" and no more. Now drawn:
+  `twin/out/hoop_how.png`. How the real lid fastens is still not designed.
+- **Two skills carry the lessons now** (Zach: show "a model visual of the print before we go to the printer"; "update the
+  print skill with things that we have found from the log and decisions"; "formalize a design skill with lessons learned").
+  `print-on-k2` requires a 3D model view before any upload or bed question, and gained section 5: the fits that have been on
+  the bench with what each was tested on, how to shape a part for the printer, and what to do before a plate. The new
+  `design-part` skill is the order of work for a part, with the failure behind each step. Both were collected from this log,
+  `docs/lessons/` and CLAUDE.md, and each line was checked back against its entry; CLAUDE.md points at the new skill.
+- **The strip is twelve clips now**, four of each blade (0.8, 1.2, 1.6), up from six: a stack with two ESCs takes three clips of
+  the blade he picks, and the filament swap is the costly part. `spring_stack.py`'s checks rerun: all pass, with controls.
+- **First TPU slice from here.** `tools/orca.py --material TPU` loads Creality's Generic TPU preset for the K2 Pro (230 then
+  220 C, bed 40 C, 2 mm3/s, retraction 1.2) and runs the start's purge line at that flow; the PLA start pushed it at about
+  10 mm3/s. The PLA path renders as before. Sliced with four walls (solid), no supports, no brim: 38 min, 3.9 g. Read back
+  from the G-code: peak flow 2.00 mm3/s. Uploaded as `spring_clips_orca_TPU_38m.gcode` and started on his word ("Bed clear,
+  start"); picture `twin/out/spring_clips.png`.
+- **The scale test changed.** A clip alone on a scale stands on its prongs and its thin floor bends, not the blades. So: the
+  stack on the scale, zeroed, and the upper clip pressed flat with a ruler.
+- **Predictions, before the print** (TPU stiffness guessed at 40 MPa, so half to double): pressed flat, about 420 g (0.8),
+  870 g (1.2), 1370 g (1.6). The prongs (3.0 x 4.6 in a 5.1 hole) go in by hand and stay in when the top is turned over.
+  The 1.2 blade stops the rattle under the hoop.
+
 ## 2026-11-10: After the review: a mule first; the spring stack's PLA parts queued
 
 Zach asked for a whole-project review (`docs/audit/2026-11-10-fable-review.md`), then, on its proposals:

@@ -207,16 +207,21 @@ def check(A):
 
 
 # ---------------------------------------------------------------- the print files
+CLIPS_EACH = 4                    # of each blade on the strip: a stack with two ESCs takes three clips of the blade he picks, and a filament swap is the costly part
+
+
 def lay_clips():
-    """the test strip: two of each blade, lying on their sides, thin to thick along x"""
-    out, x = None, 0.0
-    for t in BLADES:
-        for _ in range(2):
-            c = clip(t).rotate((0, 0, 0), (0, 1, 0), 90)
-            b = c.val().BoundingBox()
-            c = c.translate((x - b.xmin, 0, -b.zmin))
-            out = c if out is None else out.add(c)
-            x += b.xlen + 3.0
+    """the test strip: CLIPS_EACH of each blade, lying on their sides, thin to thick along x, in rows of two a blade"""
+    out = None
+    for row in range(CLIPS_EACH // 2):
+        x = 0.0
+        for t in BLADES:
+            for _ in range(2):
+                c = clip(t).rotate((0, 0, 0), (0, 1, 0), 90)
+                b = c.val().BoundingBox()
+                c = c.translate((x - b.xmin, row * (b.ylen + 4.0) - b.ymin, -b.zmin))
+                out = c if out is None else out.add(c)
+                x += b.xlen + 4.0
     return out
 
 
@@ -237,7 +242,7 @@ def export():
     write_stl(cq.Compound.makeCompound(S.vals()).wrapped, p, lin=0.01, ang=0.2)
     h_ok, msg = health(p)
     b = cq.Compound.makeCompound(S.vals()).BoundingBox()
-    print('  %-10s %5.1f x %5.1f x %5.1f  %s (six bodies, as meant)' % ('clip strip', b.xlen, b.ylen, b.zlen, msg))
+    print('  %-10s %5.1f x %5.1f x %5.1f  %s (%d bodies, as meant)' % ('clip strip', b.xlen, b.ylen, b.zlen, msg, CLIPS_EACH * len(BLADES)))
     return good, paths
 
 
@@ -268,11 +273,11 @@ def page(A, N, info):
     P['case_lid'] = BX.enc_t(Lo, AT, 'Your PCA case, lid', 'all', 'part', 5, 0xc9b48c, 'Your own lid, not changed.', z=H_ESC)
     P['pca_top'] = BX.enc_w(A['pca_top'], (0, 0), 'PCA top', 'all', 'top', 6, TOP, 'The top you already printed, as it is.')
     P['clip_top'] = BX.enc_w(A['clip_top'], (0, 0), 'Clip under the lid', 'all', 'clip', 6, CLIP, 'The same clip, plugged into the top of the stack, blades up. The lid squeezes it %.2f. It prints lying on its side, so the blades are drawn by the nozzle and need no supports.' % SQUEEZE, tol=0.02)
-    P['hoop'] = BX.enc_w(A['hoop'], (0, 0), 'Test hoop', 'all', 'lid', 7, HOOP, 'A ring for the bench test. Your patch sits on its bottom bar, and its top bar is where the robot\'s lid would be: %.1f over the stack. It slides on from the end. To print.' % ROOM, tol=0.1)
+    P['hoop'] = BX.enc_w(A['hoop'], (0, 0), 'Test hoop', 'all', 'lid', 7, HOOP, 'A ring for the bench test, with no pegs or holes: a belt. It slides on along the stack from one end, round your patch too. Your patch rests on its bottom bar, and its top bar is where the robot\'s lid would be: %.1f over the stack. Only the top clip\'s squeeze holds it, so with no clip in it hangs loose.' % ROOM, tol=0.1)
     steps = ['The ESC box drops onto your patch. Its pegs are loose, so nothing presses.', 'The ESC clicks in past the ridges, as it does now.',
              'The ESC\'s top goes on, with a soft clip plugged in under it. The clip presses the ESC down.', 'The PCA box drops onto that top. Loose pegs again.',
              'Your case snaps in.', 'The PCA\'s top goes on, and a second clip plugs into it, blades up.',
-             'The hoop slides on from the end. Its top bar stands in for the lid and squeezes the clip %.2f mm.' % SQUEEZE]
+             'The hoop slides on from one end, round the patch and the stack like a belt. It has no pegs. Its top bar stands in for the lid and squeezes the clip %.2f mm, and that squeeze is all that holds it.' % SQUEEZE]
     f = {t: (clip_force(t, SQUEEZE), clip_force(t, CLIP_RISE)) for t in BLADES}
     answers = [('How does it get in?', 'Everything drops in. The only things that press are the ESC past its ridges, as now, and the clips\' soft prongs.'),
                ('What holds it?', 'The lid, through the clip on top of the stack: about %.0f N by my estimate, which could be half or double. With the lid off nothing holds it, as you said it needn\'t.' % f[BLADE][0]),
@@ -294,9 +299,9 @@ def page(A, N, info):
                ('One clip a stack', '1', 'Drawn with one. A heavier stack, like a pack, may want two or three.')]
     prints = [dict(name='ESC box, loose pegs', mat='PLA', **(info.get('esc_box') or dict(time='', g=0.0))), dict(name='ESC top, no pad', mat='PLA', **(info.get('esc_top') or dict(time='', g=0.0))),
               dict(name='PCA box, loose pegs', mat='PLA', **(info.get('pca_box') or dict(time='', g=0.0))), dict(name='Test hoop', mat='PLA', **(info.get('hoop') or dict(time='', g=0.0))),
-              dict(name='Clip strip: six, three blades', mat='TPU', time='', g=0.0)]
+              dict(name='Clip strip: %d, three blades' % (CLIPS_EACH * len(BLADES)), mat='TPU', time='', g=0.0)]
     tests = ['Drop the boxes on the patch a few times. Do they go in with no force, every time?',
-             'Press each clip flat on a kitchen scale with something flat. Read the grams as the blades go flat. Thin, middle and thick: which feels right?',
+             'Build the stack on a kitchen scale without the hoop and zero it. Press the clip on top flat with a ruler and read the grams. Thin, middle and thick: which feels right? (A clip alone on the scale stands on its prongs, and its thin floor bends instead of the blades.)',
              'Build the stack, slide the hoop on, flip it and shake it. Does anything move or rattle?',
              'Leave it in the hoop overnight. Does the clip still push back in the morning?']
     meta = dict(steps=steps, answers=[dict(q=q, a=a) for q, a in answers], guesses=[dict(name=n, value=v, why=w) for n, v, w in guesses], prints=prints, tests=tests, noise=N,

@@ -13,6 +13,13 @@ Never kill Orca by image name: he often has it open.
 
 ## 1. Before anything
 
+- **Show the model before the printer** (Zach, 2026-11-11: "you should have to show me a model visual of the print before
+  we go to the printer, i could be able to catch some of these things"). Before any upload or bed question, put a 3D view
+  of what's printing in front of him: every piece on the plate, in its place in the assembly with its neighbours, and one
+  line a piece on how it goes on and what holds it. Publish the fit view as an Artifact so it opens on his phone, and give
+  the link. A plate picture or a 2D section alone doesn't count. This holds for a reprint and for a part he saw days ago.
+  Why: the spring stack's hoop went to the printer on a plate picture. It has no pegs, by design, and he couldn't tell how
+  it attached.
 - `python tools/k2.py status`. If it isn't `standby`, `complete` or `cancelled`, a print is running.
   Don't touch it, and ask him before changing the part it is printing (CLAUDE.md).
 - If the part still has open guesses, say so before he prints it.
@@ -43,6 +50,12 @@ python tools/orca.py part.stl --set layer_height=0.24 --set wall_loops=3 --name 
 - **Times run long:** Orca's tree supports use about 25 % more line than Creality Print's. On the pan base
   that was 2h52m and 52 g, against 2h23m and 45 g. The part's own paths match.
 
+- **TPU: add `--material TPU`** (2026-11-11). It loads Creality's Generic TPU preset for the K2 Pro (230 then 220 °C, bed
+  40 °C, 2 mm³/s) in place of his PLA numbers, slows the start's purge line to match, and names the file `_orca_TPU_`.
+  `--draft` is PLA only. For small soft parts: `--set wall_loops=4` (solid), no supports, `--set brim_type=no_brim`, no raft
+  (a TPU raft welds on). TPU feeds from the side spool holder only, never the CFS. Ask that TPU is loaded, as well as the
+  bed check. First sliced for the spring stack's clips; update this line with how that print went.
+
 ## 3. Send and start
 
 ```
@@ -50,6 +63,7 @@ python tools/k2.py upload head-v2/out/gcode/<file>.gcode
 python tools/k2.py start <file>.gcode --bed-clear
 ```
 
+- **Model first:** don't upload, and don't ask the bed question, until he has had the model view (section 1).
 - **Bed check:** nothing can see the bed (the camera isn't on Moonraker). Before every start, ask Zach
   whether the plate is empty and the right filament is loaded. Pass `--bed-clear` only after he says yes.
   `start` also refuses if the printer is busy, the file isn't on it, or the sensor sees no filament.
@@ -63,6 +77,69 @@ python tools/k2.py start <file>.gcode --bed-clear
 
 `python tools/k2.py pause | resume | cancel`. These run Creality's own PAUSE, RESUME and CANCEL_PRINT
 macros. Cancelling can't be undone: confirm it with him first unless he said "cancel" himself.
+
+## 5. What the prints have taught
+
+Collected 2026-11-11 from `docs/decisions.md` (the date on each line is its entry), `head-v2/NOTES.md` and the session notes. Read it before
+drawing or slicing a part, not after. Every number is PLA on the K2 and carries what it was tested on: past that range
+it's a guess, so print a small test piece first. ASA shrinks more, and none of these has been tried in it (2026-10-02).
+
+### Fits that have been on the bench
+
+| Fit | Number | Tested on | His verdict |
+|---|---|---|---|
+| Peg that holds with a little snap | 5.0 peg, 5.1 hole | peg test, draft, upright peg, 2.6 floor (11-08) | "fits best in 5.1"; 5.2 looser; 5.3 and 5.4 "will fall out when tipped" |
+| Pegs that locate and can't jam | two 4.6 + the rest 4.0, in 5.1 holes | ESC and PCA boxes, draft (11-11) | "no force, slightly loose", 0.1-0.3 mm of wiggle |
+| Several tight pegs on one part | don't | 4- and 6-peg boxes (11-09) | "impossible to assemble": each peg is another chance to jam |
+| Slide | 0.15 a side | the 21 mm slide (09-19) | his rule; it doesn't carry down to small pegs (a 5.3 hole fell off a 5.0 peg) |
+| Horn pocket, shallow | zero offset | his real horn model, 1-2 mm of roof (09-19) | tight, as wanted |
+| Horn's whole outline, carried through | 0.10 a side | 3.4 mm deep in the input gear (10-10, 10-11) | zero threw the horn into his eye; 0.15 "too loose"; 0.10 "a bit tight, which is good" |
+| Small square seat | 0.10 a side | 6.0 square, small gear (10-10) | 0.05 was so tight that pulling the gear off tore the seat off |
+| Sleeve pressed into a bearing | 20.0 and 20.1 in a 6704's 20 bore | the +Y sleeve, both printed to try (10-03) | "the press held"; which of the two isn't recorded |
+| Bearing in a printed seat | the 688's seat in `pan_coil_b.py` | pan base, set 9 (10-11) | "fits beautifully, feeling very smooth" |
+| Screw head in a bore | 0.25 a side | Pi box rings, 4.75 for a 4.25 head (11-08) | "perfect fit" |
+| Printed-in-place turning joint | 0.5 mm gap, 45° V-groove | keepsake coin, his default settings, no supports or brim (10-04) | broke free, "spins quite well" |
+| Metal spline pressed into PLA | don't rely on it | input gear, set 6 (10-04, 10-10) | "nice and tight" at first; within a week it wore smooth and slipped. Grip the horn's arms |
+
+Print the fit as a row of sizes on one plate and let him pick: the 5.1-5.4 hole row, the 0.05 and 0.10 gears, the 0.10 and
+0.15 pockets, the three clip blades. Glasses on for press fits.
+
+### Shape the part for the printer
+
+- **A gap under a bridge isn't the gap you drew** (11-09). The boxes print upside down, so the bottom's inside face is a
+  bridge and sags. A pad drawn 0.3 over his caliper number came out too tight on one ESC. Put a tight gap on a wall the
+  nozzle draws, or make the hold a spring with more travel than the print's error.
+- **Rigid on rigid with a 0.1 mm window is inside the print's noise** (11-09): "the pla inside of the connection holes and
+  stubs can warp or have defects". 5.1 snaps and 5.3 falls out. Run a new joint through `twin/print_noise.py`.
+- **Supports he can't get out** sent two sets back. Nothing may need support inside a closed lane, a bore or a pocket.
+  - A flat ceiling in a bore became a cone 30° off vertical, his limit: supports off, 188 contacts to none (set 6, 10-03).
+  - An overhang over a 3.5 mm lane became its own drop-in part, printed face down (set 7, 10-04).
+  - Holes and slits through a wall get a pointed roof (set 7).
+  - Pick the way up so no support can land in a bore (the gears print bottom face down).
+  - Snug supports save time and pack holes: don't (the `--draft` note above).
+- **A screw must squeeze the part, not pull it apart across its layers** (set 8, 10-09). The drum's seat "keeps snapping":
+  the M3 threaded below a step, at a sharp corner, on a part printed upside down. Thread into the bulk above the step.
+- **A part that has to bend to go together snaps** (10-03). The cradle's arm spread 5 mm each time the ball went in. Make
+  the piece that blocks the way a separate part that goes in afterwards.
+- **Springy features lie on their side**, so the nozzle draws their outline: the snap pins (09-25), the TPU clips (11-11).
+- **Thin walls round holes read as flimsy** (set 10, 10-11: "extremely flimsy"; the first boxes, 11-08: "very thin"). The redraws
+  that then printed: about 1.4 mm round a screw hole, and 2.0 mm box walls with a flat bottom.
+- **The STL has to sit on z = 0.** The seam pins shipped 0.5 mm above the bed: a loose bounding box on a curved nose (09-26).
+  Size with `AddOptimal_s`, and read the mesh report's z range.
+- **Long prints are for PLA.** Zach (11-07): "TPU and PETG can be a bitch to print large things". Keep soft parts small.
+
+### Before it goes on the plate
+
+- **Slide it together in order first.** Set 1 printed and couldn't be assembled: the small gear couldn't reach its hole,
+  while every pair check read zero (09-27). `docs/lessons/2026-09-27-seated-is-not-assembled.md`.
+- **Draw it round his part, not a typical one.** The ESP32 box, drawn round a typical board, "can fly around in there and
+  eventually out" (11-09). The servo's datasheet box and the camera's photo offset each cost a reprint (CLAUDE.md).
+- **Test a big part's seat with a thin slice of it.** The Pi box's bottom 9 mm (33 min, 17 g) settled the seat before the
+  whole box printed (11-08).
+- **Don't queue plates that carry a joint the bench hasn't seen.** Five box plates were uploaded ahead of the first one's
+  test; two went on hold when its joints failed (11-09).
+- **Settings that have worked for PLA test boxes:** `--draft`, supports off, `--set brim_type=outer_only --set
+  brim_width=5` (Pi ring test, 11-08; spring stack plate, 11-10). Tiny parts get a raft instead (below).
 
 ## Things learned (2026-10-03)
 

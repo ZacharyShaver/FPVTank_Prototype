@@ -3,6 +3,7 @@
     python tools/orca.py head-v2/out/print-pan/base.stl                 # his settings, G-code in head-v2/out/gcode/
     python tools/orca.py part.stl --set layer_height=0.24 --set wall_loops=3 --name part_draft
     python tools/orca.py a.stl b.stl --draft          # PLA test parts: ~20% faster (DRAFT below)
+    python tools/orca.py clip.stl --material TPU      # Creality's own TPU numbers for the K2 Pro (MATERIALS below)
 
 The defaults are his own Creality Print slice of the base (2026-10-03): 0.20 Standard, 2 walls, 15 % grid,
 tree supports at 30 deg, PLA 220/50 on the textured PEI plate. Change one with --set key=value (Orca's
@@ -25,6 +26,13 @@ PROFILES = r'C:\Program Files\OrcaSlicer\resources\profiles\Creality'
 MACHINE = 'Creality K2 Pro 0.4 nozzle'
 PROCESS = '0.20mm Standard @Creality K2 Pro 0.4 nozzle'
 FILAMENT = 'Creality Generic PLA @K2-all'
+# Other materials. TPU (2026-11-11, first sliced for the spring stack's clips): Creality's Generic TPU preset for the K2 Pro, the
+# same numbers as Creality Print 7.2's (2 mm3/s, 230 then 220, bed 40, retraction 1.2 at 30 mm/s). None of Zach's PLA numbers
+# apply. `purge` is the start line's three feed rates: Creality Print's template, outer_wall_volumetric_speed/(24/20)*60 and
+# /(0.3*0.5)[/4]*60, worked at the preset's 2 mm3/s. The PLA start runs that line at about 10 mm3/s, which TPU can't take.
+# TPU feeds from the side spool holder only: it can't go through the CFS.
+MATERIALS = {'PLA': dict(filament=FILAMENT, purge=(720, 1200, 4800)),
+             'TPU': dict(filament='Generic TPU @K2 Pro-all', purge=(100, 200, 800))}
 GCODE = os.path.join(config.OUT, 'gcode')
 
 # Zach's Creality Print process for the base, 2026-10-03 ("0.20mm Standard ... - Copy(2)").
@@ -70,12 +78,12 @@ M83
 G1 X125 Y-1 F30000
 G1 E1 F300
 G1 Z0.3 F1200
-G1 X150 E9 F720
-G1 X155 E.3742 F1200
-G1 X160 E.3742 F4800
-G1 X165 E.3742 F1200
-G1 X170 E.3742 F4800
-G1 X175 E.3742 F1200
+G1 X150 E9 F%(a)d
+G1 X155 E.3742 F%(b)d
+G1 X160 E.3742 F%(c)d
+G1 X165 E.3742 F%(b)d
+G1 X170 E.3742 F%(c)d
+G1 X175 E.3742 F%(b)d
 G91
 G1 X1 Z-0.3
 G1 X4
@@ -100,12 +108,13 @@ def flat(kind, name):
     return out
 
 
-def presets(sets):
+def presets(sets, material='PLA'):
     """the three flat presets, with Zach's settings and then the --set overrides applied"""
-    m, p, f = flat('machine', MACHINE), flat('process', PROCESS), flat('filament', FILAMENT)
-    m.update(ZACH['machine'], machine_start_gcode=START, **{'from': 'system'})
+    M = MATERIALS[material]
+    m, p, f = flat('machine', MACHINE), flat('process', PROCESS), flat('filament', M['filament'])
+    m.update(ZACH['machine'], machine_start_gcode=START % dict(zip('abc', M['purge'])), **{'from': 'system'})
     p.update(ZACH['process'], compatible_printers=[MACHINE], **{'from': 'User'})
-    f.update(ZACH['filament'], compatible_printers=[MACHINE], **{'from': 'User'})
+    f.update(ZACH['filament'] if material == 'PLA' else {}, compatible_printers=[MACHINE], **{'from': 'User'})
     for kv in sets:
         k, v = kv.split('=', 1)
         hit = [d for d in (p, f, m) if k in d]
@@ -169,7 +178,7 @@ def creality_header(src, dest):
         shutil.copyfileobj(fi, fo)
 
 
-def slice_parts(stls, name=None, sets=(), outdir=GCODE):
+def slice_parts(stls, name=None, sets=(), outdir=GCODE, material='PLA'):
     """slice the STLs onto one plate; returns the G-code's path. One part keeps its drawn orientation,
     centred on the bed; several are left to Orca's arrange."""
     name = name or os.path.splitext(os.path.basename(stls[0]))[0]
@@ -177,7 +186,7 @@ def slice_parts(stls, name=None, sets=(), outdir=GCODE):
     if len(stls) == 1:
         stls = [centred(stls[0], os.path.join(work, os.path.basename(stls[0])))]
     files = []
-    for kind, d in zip(('machine', 'process', 'filament'), presets(sets)):
+    for kind, d in zip(('machine', 'process', 'filament'), presets(sets, material)):
         files.append(os.path.join(work, kind + '.json'))
         with open(files[-1], 'w', encoding='utf-8') as fh:
             json.dump(d, fh, indent=1)
@@ -203,7 +212,7 @@ def slice_parts(stls, name=None, sets=(), outdir=GCODE):
     s = summary(plate)
     hm = re.findall(r'(\d+)([hms])', s['time'] or '')
     tag = ''.join(n + u for n, u in hm if u in 'hm') or 'x'
-    dest = os.path.join(outdir, '%s_orca_PLA_%s.gcode' % (name, tag))
+    dest = os.path.join(outdir, '%s_orca_%s_%s.gcode' % (name, material, tag))
     creality_header(plate, dest)
     os.remove(plate)
     shutil.rmtree(work, ignore_errors=True)
@@ -217,8 +226,11 @@ if __name__ == '__main__':
     ap.add_argument('--name')
     ap.add_argument('--out', default=GCODE)
     ap.add_argument('--draft', action='store_true', help='PLA test parts: speed over finish (DRAFT)')
+    ap.add_argument('--material', default='PLA', choices=sorted(MATERIALS))
     a = ap.parse_args()
-    path, s = slice_parts(a.stl, a.name, (DRAFT if a.draft else []) + a.set, a.out)
+    if a.draft and a.material != 'PLA':
+        sys.exit('--draft is measured on PLA only')
+    path, s = slice_parts(a.stl, a.name, (DRAFT if a.draft else []) + a.set, a.out, a.material)
     print(path)
     print('  %(time)s, %(grams)s g, %(layers)s layers, %(height)s mm tall, supports: %(support)s, '
           'start G-code ok: %(start_ok)s' % s)
