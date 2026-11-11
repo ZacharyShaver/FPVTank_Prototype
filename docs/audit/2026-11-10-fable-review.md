@@ -27,8 +27,8 @@ Nothing in this review is a decision. Every recommendation is for Zach to accept
 1. **No number has ever been measured on a robot that drives.** About 23,000 designs were screened in the simulator.
    Six of the eight gauge cards still say "Trust: none yet". The 2026-11-08 working rules name this, but the work since
    then (the brain box) does not close it.
-2. **The parts on the critical path are not ordered, and the robot's code has stood still.** The shopping list still
-   shows the drive motor as not on hand, eleven days after it was picked. FPVTank_Control's last commit is 2026-10-13,
+2. **Most of the critical-path parts are not ordered, and the robot's code has stood still.** One drive motor is on its
+   way (Zach, 2026-11-07); the other four, and everything else on the list, are not ordered. FPVTank_Control's last commit is 2026-10-13,
    with a bench session (Task 18) still owed.
 3. **The simulator is validated for one thing and used for eight.** It is checked for how a passive printed shell comes
    to rest after a short drop. It is used to rank steps, turns, hills, crests, tows, rough ground and tail righting,
@@ -41,7 +41,7 @@ Nothing in this review is a decision. Every recommendation is for Zach to accept
 
 **Five pieces of advice, in order of value**
 
-1. Order the motors today (section 9, step 1). Nothing else in the project is as cheap or as blocking.
+1. Order the other four motors today (section 9, step 1). Nothing else in the project is as cheap or as blocking.
 2. Name one goal for the next two weeks: a robot that drives off the wall, with gauges predicted before and measured
    after. Park everything that doesn't serve it, the brain box included.
 3. Measure four numbers before printing any body: the motor's stall torque and free speed on the 2S pack, the tyres'
@@ -231,7 +231,7 @@ friction box already works and stays.
 | 10-26 | A tail instead of a righting shell | Unproven | Section 3.3. |
 | 10-28 | The capability search: "max out every single goal" | Low value | 55 % impossible bodies; two families already known. No real test was named for it. |
 | 10-29 | One-piece bodies grown by a voxel FEM | Park | 1,273 lines that no test in reach can check. |
-| 10-30 | JGB37-520 motors; keep the RC ESCs | Motor fine; ESC a risk | "Buy one and caliper it" still isn't done. Closing a speed loop through a brushed RC ESC at a crawl is likely to be awkward (many have a drag brake and a reverse delay; check his). Two MDD3A drivers are $25: order them with the motors as a hedge. |
+| 10-30 | JGB37-520 motors; keep the RC ESCs | Motor fine; ESC a risk | One is on its way, not yet calipered. Closing a speed loop through a brushed RC ESC at a crawl is likely to be awkward (many have a drag brake and a reverse delay; check his). Two MDD3A drivers are $25: order them with the motors as a hedge. |
 | 10-30 | A 12 V motor on 2S packs | Open | Every ranking used the 12 V figures. Either re-read at 0.62, or run the drive on a 3S pack if the ESCs allow it. Measuring the real motor settles which. |
 | 11-07 | Bodies capped at 250 mm | Open | The reason is fair (long prints in tough materials fail). But 3 of 394 capped bodies hold the parts. The cap or the part list has to give, and the two 5200 packs are the longest parts. |
 | 11-07 | Head off, fixed nose camera | Sound | |
@@ -370,8 +370,9 @@ their tests", depends on commit times being routine.
    never mounted. The tumble shells, the tail search, the one-piece bodies and the brain box each stopped at the same
    point. The interesting sub-problem gets solved; the dull work of joining it to the rest is deferred. Joining is where
    the failures the prototype exists to find actually live.
-5. **Buying is treated as later.** The motor was chosen on 10-30 with the note "buy one first and caliper it". It is a
-   $12 part with a shipping delay, and everything since has been designed to its listing. His own rule, never design
+5. **Buying is treated as later.** The motor was chosen on 10-30 with the note "buy one first and caliper it". One is on
+   its way; the other four wait on it. They are $12 parts with a shipping delay, and everything since has been designed to
+   the listing. His own rule, never design
    round a datasheet when he could own the part, only works if the part is ordered the day it is chosen.
 6. **Measurements are owed.** The log carries open asks that became guessed numbers in prints: which feature sets the
    ESC's 24 mm (noted 10-11, never asked), the ESP32 board's size (the box was drawn round a typical board and failed),
@@ -462,7 +463,7 @@ Each step has a done-test. Nothing here needs a new search, gauge, knob or page.
 
 | # | Step | Done when | Needs |
 |---|---|---|---|
-| 1 | Order four motors with brackets and wheels, plus one spare. Consider two MDD3A drivers with them. | The order is placed | 20 minutes, about $60 to $85 |
+| 1 | Order the other four motors with brackets and wheels (one is already coming). Consider two MDD3A drivers with them. | The order is placed | 20 minutes, about $60 to $85 |
 | 2 | Commit the working tree | `git status` is clean | Zach's go-ahead |
 | 3 | Write `STATE.md`, one page: what is built, what is measured, what is guessed, what is owed to the bench, what is parked | A new session can start from it alone | An hour |
 | 4 | Run the owed Control bench session (Task 18) on the robot as it stands | Phase 4c closes or its faults are listed | One evening |
@@ -527,7 +528,8 @@ general engineering knowledge, not cited findings.
 - `sim/mujoco/` holds `bird.py`, `butterfly.py`, `flight.py` and `train_bird.py`, which were not opened.
 - Control's code, `HARDWARE.md` and the roadmap past its decision log were not read. "Task 18 still owed" is from the
   roadmap's own text and the date of its last commit.
-- Whether the motors have been ordered since the shopping list was last edited isn't known. The list says "no".
+- **Corrected 2026-11-10:** the first draft said no motor was ordered. It read the shopping list's "On hand" column and
+  missed the note beside it: one is on its way (Zach, 2026-11-07, "next weekend").
 - The submitted paper may differ from draft v6 in the repo.
 - Prices and the RC-ESC behaviour described in section 4 are general knowledge to confirm against Zach's own parts.
 - The diamond pin, the foam pad and the mule are proposals. None has been drawn, screened or tested.

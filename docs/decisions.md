@@ -3,6 +3,33 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-11-10: After the review: a mule first; the spring stack's PLA parts queued
+
+Zach asked for a whole-project review (`docs/audit/2026-11-10-fable-review.md`), then, on its proposals:
+- **A mule first** (his words: "i was planning on building a simple shape first like a mule. we also have the square control box
+  thats been used in ever test ... so id use that or t3"). The mule's shape is the gauges' plain box or T3: **not chosen yet**. Not
+  drawn. The review's case for the box: the sim has read it every run, so every gauge already has a prediction to check.
+- **"youre right bench hours are limited."**
+- **The spring stack's PLA parts, queued** ("queue up a longer print for the redesigns pla parts only. show me a graphic first"). One
+  draft plate: two ESC boxes and two ESC tops (he has two ESCs, and swapping them shows whether a tight fit follows the ESC or the
+  box), the PCA box and the hoop. 1 h 41 min, 61 g, no supports, 5 mm brim. `spring_stack.py`'s checks were rerun first: all pass,
+  with controls. Uploaded as `spring_plate_orca_PLA_1h41m.gcode` and started the same evening on his word ("Bed clear, start"); its
+  picture is `twin/out/spring_plate.png`.
+- **The TPU clips wait** ("switching to tpu is a pita"). Foam where the clips go stands in, or the stack is shaken without them.
+  The hoop's height still assumes the clip.
+- **Shopping list:** the "Scorpion Parts List" page, from `gauges/SHOPPING.md`, grouped by what each part unlocks. The two MDD3A
+  drivers are on it as an optional hedge, from the review; not decided.
+- **The review corrected:** it said no motor was ordered. One is on its way (2026-11-07). It is the **330 rpm** ratio (Zach,
+  2026-11-10, after asking whether the motors were 76 rpm), the one `wheels3.MOTOR` already models (w0 330 rpm), so no gauge
+  needs re-reading for it.
+- **Everything on the parts list is ordered** (Zach, 2026-11-10: "everything is ordered now we wait"), after an AliExpress pass
+  that put a link and an option on every row (about $90-150). **The MDD3A drivers were skipped** ("skipped on the esc thing for
+  now"): the drive stays two RC ESCs, two motors in parallel on each. The pass also found the list's Y-harness link was a
+  series adapter, which can't split one pack; it now names a parallel one. **The 5 V regulator is the Mini560 Pro** (Zach:
+  "got the mini for now"); the Pololu is the fallback. Before the Pi rides on it: meter it with no load (5.0-5.25 V; the same
+  board is sold in 9 and 12 V), then run the Pi on it from a low pack and read the Pi's own undervoltage flag
+  (`vcgencmd get_throttled`) under load.
+
 ## 2026-11-09: The box prints on the bench; rigid fits sit inside the printer's noise
 
 Printed so far: `stack_test`, `rest1_esc_esp`, `rest5_small`, `rest4_pi_sleeve`. `rest3_floor` and `rest2_packs` are uploaded and **on hold**: they carry the joints that failed. Zach's bench findings:

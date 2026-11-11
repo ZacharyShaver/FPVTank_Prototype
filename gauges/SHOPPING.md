@@ -83,12 +83,12 @@ spread between sellers found; the source is the cheapest sensible one.
 
 | Item | Qty | For | Price each | Line | Notes |
 |---|---|---|---|---|---|
-| JGB37-520 gearmotor, 12 V 333 rpm, Hall encoder | 1, then 4 more | Drive | $10-22 ([AliExpress](https://www.aliexpress.us/item/3256807403055518.html) $11.59 with bracket and wheel; [OzRobotics](https://ozrobotics.com/shop/encoder-reduction-motor-jgb37-520b-12v-dc-deceleration-motor-12v-333rpm/) $22) | $42-88 for the 4 | One is coming (Zach, 2026-11-07: next weekend); caliper it before the pods are sized. Listings disagree on the encoder's pulses a turn (11 or 20). |
+| JGB37-520 gearmotor, 12 V 333 rpm, Hall encoder | 1, then 4 more | Drive | $10-22 ([AliExpress](https://www.aliexpress.us/item/3256807403055518.html) $11.59 with bracket and wheel; [OzRobotics](https://ozrobotics.com/shop/encoder-reduction-motor-jgb37-520b-12v-dc-deceleration-motor-12v-333rpm/) $22) | $42-88 for the 4 | One is coming (Zach, 2026-11-07: next weekend), the 330 rpm one (Zach, 2026-11-10), as the sim models it; caliper it before the pods are sized. Listings disagree on the encoder's pulses a turn (11 or 20). |
 | ~~TPU 95A filament, 1 kg~~ | - | ~~Tyres, bumpers~~ | - | $0 | **Not needed** (Zach, 2026-11-08): he already has Inland TPU, which is 95A. |
 | [Pololu D36V50F5](https://www.pololu.com/product/4091) fixed 5 V regulator | 1 | The Pi off its own pack | $39.95 (Pololu) | $39.95 | 25.4 x 25.4 x 9.5 mm. Fixed 5 V, so it can't be set to 6 V by mistake. Holds 5 V down to about 5.9 V in at 2.5 A (its dropout graph, read by eye). Meter it under load before the Pi goes on. |
 | 1-8S LiPo checker with buzzer | 1 | The Pi pack's low-voltage alarm | $4-5.50 ([Race Day Quads](https://racedayquads.com/products/1-8s-lipo-battery-voltage-tester-low-voltage-buzzer-alarm) $3.99; [GetFPV](https://www.getfpv.com/batteries/battery-accessories/1-8s-lipo-battery-voltage-tester-low-voltage-buzzer-alarm.html) $5.49) | $4-5.50 | The regulator has no cutoff; set ~3.5 V a cell. |
 | [Carling L16D1S001-AZZG9-1H2](https://www.datasheets.com/carling-technologies/l16d1s001-azzg9-1h2) rocker, ON-OFF-ON, 20 A at 12 V DC | 1 | The drive pack selector (A / off / B) | $10-23 for the L16D1S001 family ([Spemco](https://spemco.com/l16d1s001-carling-spdt-l-series-on-off-on-rocker-switch-no-lamps-20a-12v/) $10.25; [Del City](https://www.delcity.net/store/switches/rocker-switches/carling-rocker-switches/l-series-non-illuminated-spdt/) $22.56) | $10-23 | No listing found for the exact suffix (-AZZG9-1H2, the options); Spemco's is the same switch, 20 A 12 V, on-off-on. Its centre-off is the drive kill switch. |
-| T-plug (Deans) Y-harness, 1 female to 2 male, 12 AWG | 1 (sold in 2s) | Both ESCs off one drive pack | $8.99 for 2 ([Gator-RC](https://gator-rc.com/t-plug-2-male-to-1-female-connector-adapter?amp=1)) | $8.99 | Plugged, not soldered. Check the gender: the pack's plug to two ESC plugs. |
+| T-plug (Deans) Y-harness, **parallel**, 12 AWG | 1 | Both ESCs off one drive pack | $3.15 ([AliExpress](https://www.aliexpress.us/item/3256807605726245.html), option "T Parallel 1M 2F") | $3.15 | Plugged, not soldered. **Corrected 2026-11-10:** the Gator-RC link first listed here ($8.99 for 2) is a *series* adapter, which can't split one pack to two ESCs. 1M 2F fits a pack with a female T-plug (the usual); check the pack. |
 | INA219 current/voltage board with address jumpers ([Adafruit 904](https://www.adafruit.com/product/904)) | 1 | The Pi watches its own pack and shuts down cleanly | $9.95 (Adafruit) | $9.95 | Buy now (review C6). Its default I2C address, 0x40, is the PCA9685's: solder A0 to move it to 0x41. Its power pin may read VIN on newer boards, which isn't the Vin+ pack terminal. |
 | M12 pinhole lens, M12 x 0.5, 3.7 mm, **no IR-cut filter of its own** | 1 (2 to compare) | The pinhole camera in the nose, on his Arducam day-night board | $11.32 ([M12Lenses PT-3722](https://www.m12lenses.com/3-7mm-F2-2-Pinhole-Board-Lens-p/pt-3722.htm)) | $0 | **Not needed** (Zach, 2026-11-08): the Arducam goes on the tail, and the nose gets the IMX219 120-degree module he owns. Kept for the record: the board switches its own IR-cut filter, so skip listings with "IR cut" (the cheap $8 eBay ones have it); confirm the PT-3722 has none before ordering. On the OV5647 a 3.7 mm lens sees about 53° across; shorter is wider. |
 | 18 AWG silicone wire, red and black, 5 m | 1 | Each side's motors in parallel | $9.49 (MMOBIEL, Walmart) | $9.49 | |
@@ -104,6 +104,20 @@ spread between sellers found; the source is the cheapest sensible one.
 | USB WiFi dongle (optional) | 1 | Range | not priced in the US ([£13.90 at The Pi Hut](https://thepihut.com/products/dual-band-usb-wifi-adapter-for-raspberry-pi-5ghz-2-4ghz-mt7612u)) | - | Not needed so far (review C7): the Pi's own WiFi measured 41-188 Mbps in the open and 47-48 inside PLA (2026-11-08), against 6 needed. Retest with the packs on, at the far end of the driving area. If one is needed, pick an MT7612U: its driver has been in Linux since 4.19. |
 | Servo BEC, 8 A class (later) | 1 | The tail's servos (review C4) | not priced | - | Buy with the tail's servos. The box keeps a 48 x 30 x 15\* slot for it at the back (the sims' size, a guess). |
 
+**Ordered 2026-11-10** (Zach: "everything is ordered now we wait"). The MDD3A drivers were skipped ("skipped on the esc
+thing for now"). The regulator is the Mini560 Pro ("got the mini for now"), the Pololu
+the fallback. Its test, before the Pi rides on it: 5.0-5.25 V with no load, then no undervoltage flag on the Pi under load
+from a low pack.
+
+**AliExpress pass (2026-11-10).** The "Scorpion Parts List" page carries an AliExpress link and the option to pick for
+each row; buying there brings "now" to about **$90-150**. The calls in it:
+- **Motors:** the other four from the same listing as the one coming (3256807403055518, option 330rpm 12V, $11.15 with
+  bracket, coupling and wheel), so all five match. That listing also offers 76 rpm, which is where "76" came from.
+- **Regulator:** a Mini560 Pro 5 V ($2-4) is on the page beside the Pololu. Its dropout isn't published, so it gets a bench
+  test at 7.0 V in and 3 A before the Pi rides on it; the Pololu stays the fallback.
+- **IMU:** stays Adafruit. The cheap AliExpress "BNO085" listings were a GY-85 board or a BNO080.
+- **MDD3A:** not sold on AliExpress.
+
 **Totals, roughly (2026-11-08):**
 - **Buying now, $180-270:** the four more motors, the 18 AWG wire and bullets, the IMU, M3 inserts if needed,
   the regulator, the alarm, the INA219, the Y-harness, the 20 AWG wire and the stop button. The EN switch isn't priced.
@@ -112,5 +126,6 @@ spread between sellers found; the source is the cheapest sensible one.
 - **About $200-305 in all,** before shipping. The review's calls (C1-C11) are in `docs/decisions.md`, 2026-11-07 (evening).
 
 Already owned and staying: the four Zeee 2S 5200 packs (one drive, one for the Pi, two to swap in and charge), the two INJORA ESCs, the
-PCA9685, the Pi 5 with M.2 HAT+ and Hailo-8L, the ESP32-WROOM-32, the IMX219 120-degree camera (the nose), the Arducam day-night board and its 30 cm ribbon (the tail), an HC-SR04, a T-plug,
+PCA9685, the Pi 5 with M.2 HAT+ and Hailo-8L, the ESP32-WROOM-32, the IMX219 120-degree camera (the nose), the Arducam day-night board and its 30 cm ribbon (the tail), an HC-SR04, a T-plug, T-plug extension leads (female to
+male, 18 AWG) with a 2-pin JST power tap (2026-11-10: the tap carries the pack's own 7-8.4 V, not 5 V; it isn't a Y-harness),
 Dupont leads and header extensions, Inland TPU 95A filament.
