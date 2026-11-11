@@ -10,6 +10,16 @@ The order of work for a part that will be printed, with the failure behind each 
 learned"). CLAUDE.md is still the rule book; this is the checklist that applies it. Dates are 2026, and each points at
 its entry in `docs/decisions.md` or its file in `docs/lessons/`.
 
+**This is the one design workflow** (2026-11-11). The check library in `checks/` (`checks/README.md`) is its data, not a
+second process. Each step touches it:
+- before drawing: read the registry rows and ledger findings (`research/data/iterations_live.csv`) for the part's scope;
+- checking: every check is a registry row (runner, control, born_from); a new check gets its row the day it's written;
+  run the rows whose scope the change touches, each with its control. The `gatekeeper` and `adversary` agents are for a
+  joint or mechanism new to the robot, or when Zach asks; a resize of a tested part doesn't need them;
+- before the print: write `checks/predictions/<date>-<part>.md` (observable, expected, the guesses it rests on);
+- after the bench: score that file, add a ledger row per finding, an escape gets a `check_failures.csv` row or a proposed
+  registry row; tested fits go into `print-on-k2` section 5. The `bench-intake` agent can do this.
+
 Related: fits, print shapes and slicing are in the `print-on-k2` skill, section 5. His Fusion exports go through the
 `review-revision` skill.
 

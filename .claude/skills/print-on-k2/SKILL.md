@@ -54,7 +54,8 @@ python tools/orca.py part.stl --set layer_height=0.24 --set wall_loops=3 --name 
   40 °C, 2 mm³/s) in place of his PLA numbers, slows the start's purge line to match, and names the file `_orca_TPU_`.
   `--draft` is PLA only. For small soft parts: `--set wall_loops=4` (solid), no supports, `--set brim_type=no_brim`, no raft
   (a TPU raft welds on). TPU feeds from the side spool holder only, never the CFS. Ask that TPU is loaded, as well as the
-  bed check. First sliced for the spring stack's clips; update this line with how that print went.
+  bed check. First printed 2026-11-11, the spring stack's twelve clips (38 min, 4 g, four walls): "tpu print went well",
+  and the prongs lock into a 5.1 hole.
 
 ## 3. Send and start
 
@@ -98,6 +99,7 @@ it's a guess, so print a small test piece first. ASA shrinks more, and none of t
 | Sleeve pressed into a bearing | 20.0 and 20.1 in a 6704's 20 bore | the +Y sleeve, both printed to try (10-03) | "the press held"; which of the two isn't recorded |
 | Bearing in a printed seat | the 688's seat in `pan_coil_b.py` | pan base, set 9 (10-11) | "fits beautifully, feeling very smooth" |
 | Screw head in a bore | 0.25 a side | Pi box rings, 4.75 for a 4.25 head (11-08) | "perfect fit" |
+| TPU prong in a PLA hole | 3.0 x 4.6 prong, 5.1 hole | spring stack clips, TPU 95A, four walls (11-11) | "lock into the top very well" |
 | Printed-in-place turning joint | 0.5 mm gap, 45° V-groove | keepsake coin, his default settings, no supports or brim (10-04) | broke free, "spins quite well" |
 | Metal spline pressed into PLA | don't rely on it | input gear, set 6 (10-04, 10-10) | "nice and tight" at first; within a week it wore smooth and slipped. Grip the horn's arms |
 

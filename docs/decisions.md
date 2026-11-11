@@ -3,6 +3,29 @@
 Why each design went the way it did. Newest first. A reversed decision stays here, marked
 **superseded**.
 
+## 2026-11-11 (later): The TPU clips on the bench; one design workflow
+
+**The clips** (Zach): "tpu print went well. I noticed that the little square parts lock into the top very well. The part is
+quite solid when assembled. It survived about 5 drops, then i kicked it kinda hard across the floor. Under enough force it
+will slide to the left or right across the belt thing and this could maybe lead to it falling out."
+- **Held:** the first TPU print from `tools/orca.py --material TPU` printed well; the prongs (3.0 x 4.6 in a 5.1 hole) lock
+  in; the stack survives about 5 drops.
+- **Not reported:** the grams per blade (the scale test), and which blade was in.
+- **New:** a hard kick slides the stack sideways along the hoop. The hoop has no end stops, so along it only the clip's
+  friction holds; in the robot the floor is fixed and neighbours and walls stand there. His reading: "the boxes well end
+  up benefiting from sitting on a wall. That or we design wider boxes, but these fit well. Some of this error is in part to
+  the belt moving a lot more then a box would." So: what stops a stack sideways is now an open requirement.
+- **TPU is done for now:** 12 clips printed, 2 in use. PLA goes back on.
+
+**One workflow** (Zach: "theres two methods for a workflow for designing prints. One has been added in skills and one is
+chasis-v2 checks ... the two dont really talk about eachother ... Lets consolidate this into one thing"). The second one is
+the check library in `checks/` (draft 1, 2026-10-24: registry, agents, predictions, ledger). Found: nothing since 10-24 had
+used it. No twin part had a registry row, `checks/predictions/` didn't exist, and the findings ledger stopped at L17
+(10-17). Consolidated: the `design-part` skill is the one workflow, and each of its steps reads or writes the library.
+`checks/README.md` is the library's reference. The twin checks got registry rows (K38-K42, legacy), the sideways stop a
+proposed row (K43), today's spring stack results are ledger rows L18-L20, and its predictions are the first file in
+`checks/predictions/`, scored. The ledger's gap from 10-17 to 11-09 isn't backfilled.
+
 ## 2026-11-11: The spring stack's clips, in TPU
 
 Zach: "alright lets try the tpu". The PLA plate finished overnight.

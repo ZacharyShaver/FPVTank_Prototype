@@ -1,5 +1,8 @@
 # The check library: checks that can fail, run as everyday work
 
+**2026-11-11: the workflow that uses this library is the `design-part` skill** (`.claude/skills/design-part/SKILL.md`);
+this file is the library's reference. From 10-24 to 11-11 nothing used it; the twin checks are now K38-K43.
+
 Draft 1, 2026-10-24. The paper's method (*Checks That Can Fail*, `research/paper/`) turned into the way parts get
 designed, gated, printed and learned from here. Status: design and baseline only. Nothing gates a print yet.
 
